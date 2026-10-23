@@ -1,78 +1,82 @@
-# KoboldCpp: AVX2 и RX 580 Polaris — патчи производительности
+# KoboldCpp performance patches: AVX2 and RX 580 Polaris
 
-Это форк **[оригинального KoboldCpp от LostRuins](https://github.com/LostRuins/koboldcpp)** на основе ветки **concedo_experimental**. Здесь собраны проверенные оптимизации CPU Haswell/AVX2, Vulkan для **AMD RX 580 Polaris (gfx803)** и поддержка Windows NUMA.
+**[Русская версия](README.ru.md)**
 
-**[Скачать Windows-сборку](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest)** · **[Медиапайплайн: фото, музыка и апскейл](https://github.com/aktalascloud/koboldcpp-media-pipeline)** · [Патчи](performance/PATCHES.md) · [Сборка](performance/BUILD.md) · [Исходный README](README.upstream.md)
+This is a fork of **[the original KoboldCpp by LostRuins](https://github.com/LostRuins/koboldcpp)**, based strictly on **concedo_experimental**. It contains measured speed improvements for Haswell/AVX2 CPUs and **AMD RX 580 Polaris (gfx803)**, plus optional Windows NUMA and HybridMoE support.
 
-Ключевые темы: KoboldCpp, llama.cpp, AVX2, Haswell, RX580, Polaris, gfx803, Vulkan, NUMA, speed, performance, patches, PGO и LTO.
+**[Download the Windows build](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest)** · **[Photo/music media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline)** · [Patch details](performance/PATCHES.md) · [Build instructions](performance/BUILD.md) · [Original README](README.upstream.md)
 
-## Скорость до и после
+Topics: KoboldCpp, llama.cpp, AVX2, Haswell, RX580, Polaris, gfx803, Vulkan, NUMA, speed, performance, patches, PGO and LTO.
 
-Железо: **Xeon E5-2696 v3, RX 580 2048SP 8 ГБ, Windows**. Один и тот же Qwen3 4B IQ4_XS; контекст 512, batch 256, 64 выходных токена. В таблице — скорость **выдачи ответа**.
+## CPU and GPU: before versus after
 
-| Режим | Стоковый KoboldCpp | Наш билд | Прирост |
+Measured on **Xeon E5-2696 v3, RX 580 2048SP 8 GB, Windows**, using the same Qwen3 4B IQ4_XS weights. The short benchmark uses context 512, batch 256 and 64 output tokens. The following table shows **output generation speed**.
+
+| Configuration | Stock KoboldCpp | This build | Speed increase |
 |---|---:|---:|---:|
-| CPU: одинаковые 16/20 потоков | 17,34 токена/с | **17,50 токена/с** | **+0,92%** |
-| Vulkan: одинаковые graphics queue и 6/4 потока | 17,09 токена/с | **21,33 токена/с** | **+24,81%** |
-| Vulkan: исходные настройки стока против полного тюнинга | 12,125 токена/с | **21,33 токена/с** | **+75,92%** |
+| CPU, identical 16/20 thread settings | 17.34 tokens/s | **17.50 tokens/s** | **+0.92%** |
+| Vulkan, identical graphics queue and 6/4 thread settings | 17.09 tokens/s | **21.33 tokens/s** | **+24.81%** |
+| Vulkan, stock defaults versus the complete tuned configuration | 12.125 tokens/s | **21.33 tokens/s** | **+75.92%** |
 
-Последняя строка показывает общий эффект сборки и настроек. Graphics queue уже есть в оригинальном KoboldCpp; весь её эффект нельзя приписывать нашим патчам.
+The last row includes both build changes and configuration tuning. The graphics queue option already exists upstream; its entire benefit must not be attributed to these patches.
 
-Обработка входного промпта:
+Input prompt processing also improved:
 
-| Режим | До | После |
+| Configuration | Before | After |
 |---|---:|---:|
-| CPU, одинаковые потоки | 40,90 токена/с | **42,10 токена/с** |
-| Vulkan, одинаковые graphics queue и потоки | 410,45 токена/с | **429,74 токена/с** |
+| CPU, identical thread settings | 40.90 tokens/s | **42.10 tokens/s** |
+| Vulkan, identical graphics queue and thread settings | 410.45 tokens/s | **429.74 tokens/s** |
 
-Реальный API-запрос с **675 входными и 191 выходным токеном** сократился с **10,77 до 8,62 с** — на **19,96% меньше времени**, с полностью совпавшим ответом.
+A real API request with **675 input tokens and 191 output tokens** improved from **10.77 to 8.62 seconds**, taking **19.96% less time** with an identical complete answer.
 
-Для CPU учтены все четыре контрольных прогона: диапазон стока 17,12–17,49, нового билда — 17,08–17,70 токена/с. Диапазоны пересекаются: небольшой средний прирост сохранён, но статистическая уверенность не заявляется. Для каждой GPU-конфигурации выполнено по два прогона. [Числовые результаты](performance/benchmarks/results.json).
+All four matched CPU controls are included: stock range 17.12–17.49, new range 17.08–17.70 tokens/s. The ranges overlap; the small measured mean gain is retained without claiming statistical certainty. Each GPU configuration has two repetitions. [Recorded results](performance/benchmarks/results.json).
 
-## Фотогенерация в секундах
+## Photo generation, in seconds
 
-Одинаковая сцена, seed и разрешение **576×864**, три LoRA, обработка лиц и Gater Restore, без апскейла:
+Same scene, seed and **576×864** resolution, with three LoRAs, face refinement and Gater Restore, without upscaling:
 
-| Сборка / состояние | Полный цикл |
+| Build / state | Complete image pipeline |
 |---|---:|
-| Стоковый KoboldCpp | **163,15 с** |
-| Новый билд, первый запрос | **138,35 с** |
-| Новый билд, повторный запрос | **131,83 с** |
+| Stock KoboldCpp | **163.15 s** |
+| This build, first request | **138.35 s** |
+| This build, repeated request | **131.83 s** |
 
-Прогретый цикл занимает на **19,20% меньше времени**, чем стоковый. Предыдущая оптимизированная сборка показывала 136,02 с: первый запрос нового билда был немного медленнее неё. Это сохранено в результатах.
+The warm pipeline takes **19.20% less time** than stock. The previous optimized build recorded 136.02 s, so the new build's first request was slightly slower than that previous optimized result. This regression is preserved in the evidence.
 
-Текущий медиапрофиль использует **592×896**: **145,34 с первым запросом и 140,09 с повторным**, без апскейла. Это другое разрешение, поэтому его время показано отдельно.
+The current media profile uses a larger **592×896** image: **145.34 s on the first request and 140.09 s on the repeat**, without upscaling. These timings are listed separately because the resolution differs.
 
-**[Примеры фотографий, крупные глаза и лицо, настройки LoRA и Helaman 4× — в медиапайплайне](https://github.com/aktalascloud/koboldcpp-media-pipeline).** Для публикации использованы сохранённые сравнения; новые изображения не генерировались.
+**[Photo examples, close-ups of eyes and faces, LoRA settings and Helaman 4× upscaling are in the media pipeline repository](https://github.com/aktalascloud/koboldcpp-media-pipeline).** Publication reused existing comparisons; no new images were generated.
 
-## Прямой запуск EXE
+## Run the EXE directly
 
-Распакуйте Windows-релиз и запустите **koboldcpp-nocuda.exe двойным щелчком**. Откроется штатный интерфейс KoboldCpp. Выберите свою GGUF-модель и задайте параметры. PowerShell-скрипт для запуска не требуется.
+Extract the Windows release and **double-click koboldcpp-nocuda.exe** to open the standard KoboldCpp GUI. Select your own GGUF model and configure the settings. No PowerShell launcher is required.
 
-| Параметр | RX 580 / Vulkan | Только CPU |
+Recommended settings for the measured machine:
+
+| Setting | RX 580 / Vulkan | CPU only |
 |---|---:|---:|
 | Threads | 6 | 16 |
 | BLAS threads | 4 | 20 |
-| Batch / ubatch | 1024 / 1024 | Подбирать под задачу |
-| GPU layers | 99, если модель помещается | 0 |
+| Batch / ubatch | 1024 / 1024 | Tune for the workload |
+| GPU layers | 99, when the model fits | 0 |
 | NUMA | auto | auto |
-| Приоритет | Обычный | Обычный |
+| Process priority | Normal | Normal |
 
-Прямой запуск из командной строки Windows:
+Direct Windows command line:
 
 ```text
 koboldcpp-nocuda.exe --model model.gguf --usevulkan 0 --gpulayers 99 --threads 6 --blasthreads 4 --batchsize 1024 --ubatchsize 1024 --numa auto
 ```
 
-Для CPU:
+CPU only:
 
 ```text
 koboldcpp-nocuda.exe --model model.gguf --usecpu --threads 16 --blasthreads 20 --numa auto
 ```
 
-Для полного измеренного тюнинга Polaris задайте переменные среды Windows до запуска EXE. Их можно добавить через редактор переменных среды Windows, без файла скрипта.
+For the full measured Polaris configuration, set these Windows environment variables before launching the EXE. The Windows environment editor is sufficient; no script file is needed.
 
-| Переменная | Значение |
+| Variable | Value |
 |---|---|
 | GGML_VK_ALLOW_GRAPHICS_QUEUE | 1 |
 | GGML_VK_BATCHED_SUBMITS | 1 |
@@ -82,23 +86,23 @@ koboldcpp-nocuda.exe --model model.gguf --usecpu --threads 16 --blasthreads 20 -
 | GGML_VK_IQ4_XS_ROWS | 4 |
 | GGML_VK_IQ4_XS_WG | 64 |
 
-Это настройки измеренной машины. Для другого железа потоки, offload и batch следует подобрать отдельно. Основные модели в репозиторий и Windows-релиз не включены.
+These values were measured on this RX 580. Tune threads, offload and batch for other hardware. No main model weights are included in Git or the Windows release.
 
-## Рабочие оптимизации
+## Optimizations retained
 
-* **O3 / Haswell / AVX2 / FMA / F16C, PGO для 20 горячих единиц и LTO**; register renaming, выравнивание функций и циклов 32, `-fno-ipa-cp-clone` для горячего кода. Отдельный процент для каждого флага не измерялся.
-* **IQ4_XS rows4 / WG64** для одноколоночной Vulkan-операции: в одной сборке 17,355 против 21,345 токена/с при прежних rows8. Веса и точность сохранены.
-* **Пакетные Vulkan submit и FP32 GCN64/K16**, с сохранением защитного лимита вычислений. Идеи vkblas адаптированы к GGML. Прогретая чистая фотогенерация K32/K16: 129,9435 / 129,7727 с; RGB-пиксели совпали во всех шести проверках.
-* **HybridMoE / SLRU — по запросу**, для MoE-моделей. На проверенной OLMoE один upload сократил API-цикл с 14,5312 до 13,3383 с. Для dense Qwen и медиамоделей expert cache выключен. Если модель помещается целиком, полный GPU-offload быстрее.
-* **Windows NUMA, CPU Sets и processor groups**, с восстановлением affinity. На этой одноузловой машине выбран auto. Физическая двухсокетная машина не измерялась; распределение страниц памяти не меняется.
-* Исправления Python/C ABI, выравнивания стека, AVX exp/silu и зависимостей шейдеров. Это исправления корректности, без отдельного заявления о приросте скорости.
+* **O3 / Haswell / AVX2 / FMA / F16C, fresh PGO for 20 hot units and LTO**, register renaming, function/loop alignment 32 and hot `-fno-ipa-cp-clone`. Individual compiler flags do not have independently measured percentages.
+* **IQ4_XS rows4 / WG64** for single-column Vulkan operations. Within the same candidate: 17.355 versus 21.345 tokens/s with the previous rows8 setting. Weights and precision are unchanged.
+* **Batched Vulkan submissions and FP32 GCN64/K16**, retaining the computation watchdog limit. vkblas ideas were adapted to GGML. Warm raw photo generation with K32/K16 took 129.9435 / 129.7727 s; RGB pixels matched across all six checks.
+* **Opt-in HybridMoE / SLRU** for MoE models. On the tested OLMoE, one upload reduced the API cycle from 14.5312 to 13.3383 s. Dense Qwen/media keep expert caching disabled. Full GPU offload is faster when the whole model fits.
+* **Windows NUMA, CPU Sets and processor groups**, restoring caller affinity. Auto was selected on this single-node host. Physical dual-socket performance was not measured; memory page allocation is unchanged.
+* Python/C ABI, stack alignment, AVX exp/silu and shader dependency fixes. These are correctness/build fixes without a separate throughput claim.
 
-**Отклонены:** GPU sampling (на 1–2,4% медленнее), активная MoE/SwiGLU-фузия, отдельная draft-модель и проигравшие варианты CPU. Native HIP/ROCm прошёл ограниченный текстовый тест, но фото завершилось ошибкой в системной AMD HIP-библиотеке. HIP в рабочий релиз не включён. [Подробности](performance/PATCHES.md).
+**Rejected:** GPU sampling, which was 1–2.4% slower; active MoE/SwiGLU fusion; a separate draft model; and losing CPU variants. Native HIP/ROCm passed restricted text tests, but photo generation crashed in the system AMD HIP library. HIP is excluded from the production release. [Detailed patch results](performance/PATCHES.md).
 
-## Обновления и лицензии
+## Maintenance and licenses
 
-Новые коммиты официальной **concedo_experimental** сливаются в форк. Ежедневная локальная задача на **08:00 Asia/Bishkek** собирает кандидат и публикует Windows-релиз после проверки исходников, ответов, скорости, SHA и автозапуска. Для локального расписания компьютер и Codex должны быть запущены.
+Official **concedo_experimental** commits are merged into this fork. Local maintenance runs daily at **08:00 Asia/Bishkek**, builds a candidate and publishes Windows assets after source, correctness, performance, hash and startup checks. The computer and Codex must be running for the local schedule.
 
-Кэши, логи, PID-файлы, PGO-счётчики, ключи и личные настройки не публикуются. Все 23 исследованных источника перечислены в [sources.json](performance/sources.json). Анализ истории был ограниченным; построчная проверка всех репозиториев не заявляется.
+Runtime caches, logs, PID files, PGO counters, credentials and personal settings are excluded. [sources.json](performance/sources.json) lists all 23 investigated repositories. History review was bounded; a line-by-line audit of every repository is not claimed.
 
-Лицензия KoboldCpp — [AGPL-3.0](LICENSE.md). GGML/llama.cpp/stable-diffusion.cpp сохраняют [исходные MIT-уведомления](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md). Соответствующие исходники доступны в теге каждого релиза. [Сторонние компоненты](performance/NOTICE.md).
+KoboldCpp is licensed under [AGPL-3.0](LICENSE.md). GGML/llama.cpp/stable-diffusion.cpp retain their [upstream MIT notices](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md). Corresponding source is available at each release tag. [Third-party notices](performance/NOTICE.md).
