@@ -1844,16 +1844,18 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
         return;
     }
 
+    // the copy callback is called before the wait below and synchronizes the backend itself if it needs to: an MoE cache
+    // that copies from pinned memory in the backend's queue does not, and that wait would idle the device at every layer
+    if (sched->callback_copy != NULL && ggml_backend_sched_is_host_weight(input) &&
+        sched->callback_copy(split_backend, input, input_cpy, &split->graph, sched->callback_copy_user_data)) {
+        return;
+    }
+
     // wait for the split backend to finish using the input before overwriting it
     if (sched->events[split_backend_id][sched->cur_copy] != NULL) {
         ggml_backend_event_wait(split_backend, sched->events[split_backend_id][sched->cur_copy]);
     } else {
         ggml_backend_synchronize(split_backend);
-    }
-
-    if (sched->callback_copy != NULL && ggml_backend_sched_is_host_weight(input) &&
-        sched->callback_copy(split_backend, input, input_cpy, &split->graph, sched->callback_copy_user_data)) {
-        return;
     }
 
     // try async copy, but if not possible, we can still use a sync copy without synchronizing the dst backend, since we handle the synchronization here with multiple copies and events
@@ -1869,7 +1871,47 @@ static void ggml_backend_sched_copy_input(ggml_backend_sched_t sched, struct ggm
     }
 }
 
+// GGML_SCHED_TIMING=1: report where the host spends the time of each graph evaluation, every 64 evaluations
+// (input copies including the copy callbacks, and submitting each backend's splits); a diagnostic, off by default
+struct ggml_sched_timing {
+    int     enabled = -1;
+    int64_t n_evals = 0;
+    int64_t n_splits = 0;
+    int64_t t_total = 0;
+    int64_t t_copy = 0;
+    int64_t t_compute[GGML_SCHED_MAX_BACKENDS] = {};
+};
+static ggml_sched_timing g_sched_timing;
+
+static enum ggml_status ggml_backend_sched_compute_splits_impl(ggml_backend_sched_t sched);
+
 static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t sched) {
+    ggml_sched_timing & tm = g_sched_timing;
+    if (tm.enabled < 0) {
+        const char * env = getenv("GGML_SCHED_TIMING");
+        tm.enabled = env != nullptr && atoi(env) != 0;
+    }
+    if (!tm.enabled) {
+        return ggml_backend_sched_compute_splits_impl(sched);
+    }
+    const int64_t t0 = ggml_time_us();
+    enum ggml_status res = ggml_backend_sched_compute_splits_impl(sched);
+    tm.t_total += ggml_time_us() - t0;
+    tm.n_splits += sched->n_splits;
+    if (++tm.n_evals % 64 == 0) {
+        const double n = (double) tm.n_evals;
+        GGML_LOG_INFO("sched timing: %.1f splits/eval, host %.2f ms/eval: copies %.2f", tm.n_splits/n, tm.t_total/1000.0/n, tm.t_copy/1000.0/n);
+        for (int b = 0; b < sched->n_backends; b++) {
+            GGML_LOG_INFO(", %s %.2f", ggml_backend_name(sched->backends[b]), tm.t_compute[b]/1000.0/n);
+        }
+        GGML_LOG_INFO("\n");
+        tm = ggml_sched_timing();
+        tm.enabled = 1;
+    }
+    return res;
+}
+
+static enum ggml_status ggml_backend_sched_compute_splits_impl(ggml_backend_sched_t sched) {
     GGML_ASSERT(sched);
     struct ggml_backend_sched_split * splits = sched->splits;
 
@@ -1892,6 +1934,7 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
 
         // copy the input tensors to the split backend
         // the weights in host memory are copied last, so that the copy callback can read the other inputs of the split
+        const int64_t t_copy0 = g_sched_timing.enabled > 0 ? ggml_time_us() : 0;
         for (int input_id = 0; input_id < split->n_inputs; input_id++) {
             if (!ggml_backend_sched_is_host_weight(split->inputs[input_id])) {
                 ggml_backend_sched_copy_input(sched, split, split->inputs[input_id]);
@@ -1903,8 +1946,16 @@ static enum ggml_status ggml_backend_sched_compute_splits(ggml_backend_sched_t s
             }
         }
 
+        if (g_sched_timing.enabled > 0) {
+            g_sched_timing.t_copy += ggml_time_us() - t_copy0;
+        }
+
         if (!sched->callback_eval) {
+            const int64_t t_comp0 = g_sched_timing.enabled > 0 ? ggml_time_us() : 0;
             enum ggml_status ec = ggml_backend_graph_compute_async(split_backend, &split->graph);
+            if (g_sched_timing.enabled > 0) {
+                g_sched_timing.t_compute[split_backend_id] += ggml_time_us() - t_comp0;
+            }
             if (ec != GGML_STATUS_SUCCESS) {
                 return ec;
             }

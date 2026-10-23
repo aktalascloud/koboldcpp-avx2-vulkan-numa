@@ -2789,6 +2789,27 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
         }
     ).set_env("LLAMA_ARG_MOE_CACHE_MIB"));
     add_opt(common_arg(
+        {"--moe-hybrid"}, "N",
+        "with --moe-cache-mib: the CPU computes the experts missing from the cache with N threads, at the same time as the GPU\n"
+        "computes the cached ones, instead of uploading them first (default: 0, disabled)",
+        [](common_params & params, int value) {
+            if (value < 0) {
+                throw std::invalid_argument("invalid value");
+            }
+            params.moe_hybrid_threads = value;
+        }
+    ).set_env("LLAMA_ARG_MOE_HYBRID"));
+    add_opt(common_arg(
+        {"--moe-hybrid-uploads"}, "N",
+        string_format("in hybrid mode, the most experts a layer admits into the cache per decode step (default: %d)", params.moe_hybrid_uploads),
+        [](common_params & params, int value) {
+            if (value < 0) {
+                throw std::invalid_argument("invalid value");
+            }
+            params.moe_hybrid_uploads = value;
+        }
+    ).set_env("LLAMA_ARG_MOE_HYBRID_UPLOADS"));
+    add_opt(common_arg(
         {"-ncffn", "--n-cpu-ffn"}, "N",
         "keep the dense FFN weights of the first N layers in the CPU\n"
         "(dense models; for MoE expert weights use --n-cpu-moe)",

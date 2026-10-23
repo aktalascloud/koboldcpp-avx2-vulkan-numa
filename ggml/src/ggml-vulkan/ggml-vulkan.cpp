@@ -1885,6 +1885,28 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
             }
         }
 
+        // KCPP_GCN_TILE64_PORT: opt-in 64x64 tile, four wave64 groups, 16 accumulators/thread.
+        const bool polaris_id = device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df;
+        if (device->architecture == AMD_GCN && polaris_id && device->subgroup_size == 64 &&
+            !device->coopmat_support && getenv("GGML_VK_GCN_TILE64") != nullptr) {
+            l_warptile = m_warptile = { 256, 64, 64, 32, 16, 64, 1, 4, 4, 1, 64 };
+            l_wg_denoms = m_wg_denoms = { 64, 64, 1 };
+            // KCPP_VKBLAS_GEOMETRY: compare occupancy/K depth without importing an incompatible LDS layout.
+            const char * geometry = getenv("GGML_VK_GCN_TILE_VARIANT");
+            if (geometry && strcmp(geometry,"k16") == 0) {
+                l_warptile[3] = m_warptile[3] = 16;
+            } else if (geometry && strcmp(geometry,"m32") == 0) {
+                l_warptile = m_warptile = { 128, 32, 64, 32, 16, 64, 1, 4, 4, 1, 64 };
+                l_wg_denoms = m_wg_denoms = { 32, 64, 1 };
+            } else if (geometry && strcmp(geometry,"n32") == 0) {
+                l_warptile = m_warptile = { 128, 64, 32, 32, 32, 32, 1, 4, 4, 1, 64 };
+                l_wg_denoms = m_wg_denoms = { 64, 32, 1 };
+            }
+            GGML_LOG_INFO("ggml_vulkan: Polaris FP32 tile M%u N%u K%u threads%u\n",
+                          l_warptile[1],l_warptile[2],l_warptile[3],l_warptile[0]);
+            GGML_LOG_INFO("ggml_vulkan: local Polaris 64x64 FP32 tile tuning enabled\n");
+        }
+
         const bool use_cm1_int = device->coopmat_int_support &&
                                  (device->architecture == AMD_RDNA3 || device->architecture == AMD_RDNA4);
 
@@ -2902,6 +2924,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         return is_rdna3_or_4 ? 4u : rows;
     };
     uint32_t rm_iq = 2 * rm_kq;
+    // KCPP_IQ4_MMV_TUNING: vary only the protected format's one-column kernels.
+    uint32_t rm_iq4_xs_single = rm_iq;
+    if (device->architecture == AMD_GCN && device->subgroup_size == 64) {
+        if (const char * option = getenv("GGML_VK_IQ4_XS_ROWS")) {
+            const int rows = atoi(option);
+            if (rows >= 1 && rows <= 16 && (rows & (rows-1)) == 0) rm_iq4_xs_single = uint32_t(rows);
+            GGML_LOG_INFO("KCPP_IQ4_MMV: single-column rows %u\n",rm_iq4_xs_single);
+        }
+    }
+    auto const &rm_iq4_xs = [&](uint32_t i) { return i == 0 ? rm_iq4_xs_single : rm_iq; };
+
 
     const bool use_subgroups = device->subgroup_arithmetic;
     // The Imagination proprietary compiler rejects the subgroup-only dequant mul_mat_vec
@@ -2964,7 +2997,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ2_S][i],   "mul_mat_vec_iq2_s_f32_f32",   arr_dmmv_iq2_s_f32_f32_len[reduc16],   arr_dmmv_iq2_s_f32_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ3_XXS][i], "mul_mat_vec_iq3_xxs_f32_f32", arr_dmmv_iq3_xxs_f32_f32_len[reduc16], arr_dmmv_iq3_xxs_f32_f32_data[reduc16], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ3_S][i],   "mul_mat_vec_iq3_s_f32_f32",   arr_dmmv_iq3_s_f32_f32_len[reduc16],   arr_dmmv_iq3_s_f32_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
-            ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ4_XS][i],  "mul_mat_vec_iq4_xs_f32_f32",  arr_dmmv_iq4_xs_f32_f32_len[reduc16],  arr_dmmv_iq4_xs_f32_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
+            ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ4_XS][i],  "mul_mat_vec_iq4_xs_f32_f32",  arr_dmmv_iq4_xs_f32_f32_len[reduc16],  arr_dmmv_iq4_xs_f32_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq4_xs(i), 1, 1}, {wg_size_subgroup16, rm_iq4_xs(i), i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ4_NL][i],  "mul_mat_vec_iq4_nl_f32_f32",  arr_dmmv_iq4_nl_f32_f32_len[reduc16],  arr_dmmv_iq4_nl_f32_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_MXFP4][i],   "mul_mat_vec_mxfp4_f32_f32",   OCP_DMMV_LEN(arr_dmmv_mxfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_mxfp4_f32_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_NVFP4][i],   "mul_mat_vec_nvfp4_f32_f32",   OCP_DMMV_LEN(arr_dmmv_nvfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_nvfp4_f32_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -2993,7 +3026,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ2_S][i],   "mul_mat_vec_iq2_s_f16_f32",   arr_dmmv_iq2_s_f16_f32_len[reduc16],   arr_dmmv_iq2_s_f16_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ3_XXS][i], "mul_mat_vec_iq3_xxs_f16_f32", arr_dmmv_iq3_xxs_f16_f32_len[reduc16], arr_dmmv_iq3_xxs_f16_f32_data[reduc16], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ3_S][i],   "mul_mat_vec_iq3_s_f16_f32",   arr_dmmv_iq3_s_f16_f32_len[reduc16],   arr_dmmv_iq3_s_f16_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
-            ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ4_XS][i],  "mul_mat_vec_iq4_xs_f16_f32",  arr_dmmv_iq4_xs_f16_f32_len[reduc16],  arr_dmmv_iq4_xs_f16_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
+            ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ4_XS][i],  "mul_mat_vec_iq4_xs_f16_f32",  arr_dmmv_iq4_xs_f16_f32_len[reduc16],  arr_dmmv_iq4_xs_f16_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq4_xs(i), 1, 1}, {wg_size_subgroup16, rm_iq4_xs(i), i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ4_NL][i],  "mul_mat_vec_iq4_nl_f16_f32",  arr_dmmv_iq4_nl_f16_f32_len[reduc16],  arr_dmmv_iq4_nl_f16_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_MXFP4][i],   "mul_mat_vec_mxfp4_f16_f32",   OCP_DMMV_LEN(arr_dmmv_mxfp4_f16_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_mxfp4_f16_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
             ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_NVFP4][i],   "mul_mat_vec_nvfp4_f16_f32",   OCP_DMMV_LEN(arr_dmmv_nvfp4_f16_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_nvfp4_f16_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -3050,7 +3083,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ2_S],   "mul_mat_vec_id_iq2_s_f32",   arr_dmmv_id_iq2_s_f32_f32_len[reduc16],   arr_dmmv_id_iq2_s_f32_f32_data[reduc16],   "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
         ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ3_XXS], "mul_mat_vec_id_iq3_xxs_f32", arr_dmmv_id_iq3_xxs_f32_f32_len[reduc16], arr_dmmv_id_iq3_xxs_f32_f32_data[reduc16], "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
         ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ3_S],   "mul_mat_vec_id_iq3_s_f32",   arr_dmmv_id_iq3_s_f32_f32_len[reduc16],   arr_dmmv_id_iq3_s_f32_f32_data[reduc16],   "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
-        ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ4_XS],  "mul_mat_vec_id_iq4_xs_f32",  arr_dmmv_id_iq4_xs_f32_f32_len[reduc16],  arr_dmmv_id_iq4_xs_f32_f32_data[reduc16],  "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
+        ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ4_XS],  "mul_mat_vec_id_iq4_xs_f32",  arr_dmmv_id_iq4_xs_f32_f32_len[reduc16],  arr_dmmv_id_iq4_xs_f32_f32_data[reduc16],  "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq4_xs_single, 1, 1}, {wg_size_subgroup16, rm_iq4_xs_single}, 1, true, use_subgroups16, force_subgroup_size16);
         ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ4_NL],  "mul_mat_vec_id_iq4_nl_f32",  arr_dmmv_id_iq4_nl_f32_f32_len[reduc16],  arr_dmmv_id_iq4_nl_f32_f32_data[reduc16],  "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
         ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_MXFP4],   "mul_mat_vec_id_mxfp4_f32",   OCP_DMMV_LEN(arr_dmmv_id_mxfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_id_mxfp4_f32_f32, reduc16), "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
         ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_NVFP4],   "mul_mat_vec_id_nvfp4_f32",   OCP_DMMV_LEN(arr_dmmv_id_nvfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_id_nvfp4_f32_f32, reduc16), "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -4326,11 +4359,23 @@ vk_device ggml_vk_get_device(size_t idx) {
         // Allow overriding avoiding the graphics queue because it can increase performance on RADV
         const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
         const vk::QueueFlagBits graphics_flag = allow_graphics_queue ? (vk::QueueFlagBits)0 : vk::QueueFlagBits::eGraphics;
-        const uint32_t compute_queue_family_index = ggml_vk_find_queue_family_index(queue_family_props, vk::QueueFlagBits::eCompute, graphics_flag, -1, 1);
-        const uint32_t transfer_queue_family_index = ggml_vk_find_queue_family_index(queue_family_props, vk::QueueFlagBits::eTransfer, vk::QueueFlagBits::eCompute | graphics_flag, compute_queue_family_index, 1);
+        uint32_t compute_queue_family_index = ggml_vk_find_queue_family_index(queue_family_props, vk::QueueFlagBits::eCompute, graphics_flag, -1, 1);
+        uint32_t transfer_queue_family_index = ggml_vk_find_queue_family_index(queue_family_props, vk::QueueFlagBits::eTransfer, vk::QueueFlagBits::eCompute | graphics_flag, compute_queue_family_index, 1);
+
+        // KCPP_POLARIS_QUEUE_PORT: opt-in compatibility path, not a universal speed fix.
+        const bool polaris_queue = device->vendor_id == VK_VENDOR_ID_AMD &&
+                                   getenv("GGML_VK_POLARIS_SAFE") != nullptr;
+        if (polaris_queue) {
+            if (queue_family_props.empty() || !(queue_family_props[0].queueFlags & vk::QueueFlagBits::eCompute)) {
+                throw std::runtime_error("Polaris queue 0 has no compute support");
+            }
+            compute_queue_family_index = 0;
+            transfer_queue_family_index = 0;
+            GGML_LOG_INFO("ggml_vulkan: local Polaris single queue 0 compatibility mode\n");
+        }
 
         const float priorities[] = { 1.0f, 1.0f };
-        device->single_queue = compute_queue_family_index == transfer_queue_family_index && queue_family_props[compute_queue_family_index].queueCount == 1;
+        device->single_queue = polaris_queue || (compute_queue_family_index == transfer_queue_family_index && queue_family_props[compute_queue_family_index].queueCount == 1);
 
         std::vector<vk::DeviceQueueCreateInfo> device_queue_create_infos;
         vk::DeviceCreateInfo device_create_info{};
@@ -4342,12 +4387,12 @@ vk_device ggml_vk_get_device(size_t idx) {
         device_features2.pNext = nullptr;
         device_features2.features = (VkPhysicalDeviceFeatures)device_features;
 
-        VkPhysicalDeviceVulkan11Features vk11_features;
+        VkPhysicalDeviceVulkan11Features vk11_features{};
         vk11_features.pNext = nullptr;
         vk11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
         device_features2.pNext = &vk11_features;
 
-        VkPhysicalDeviceVulkan12Features vk12_features;
+        VkPhysicalDeviceVulkan12Features vk12_features{};
         vk12_features.pNext = nullptr;
         vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
         vk11_features.pNext = &vk12_features;
@@ -4803,7 +4848,19 @@ vk_device ggml_vk_get_device(size_t idx) {
             .setQueueCreateInfos(device_queue_create_infos)
             .setPEnabledExtensionNames(device_extensions);
         device_create_info.setPNext(&device_features2);
-        device->device = device->physical_device.createDevice(device_create_info);
+        if (polaris_queue) {
+            // Keep the queried feature chain; stripping it can break modern shaders.
+            const VkDeviceCreateInfo raw_info = static_cast<VkDeviceCreateInfo>(device_create_info);
+            VkDevice raw_device = VK_NULL_HANDLE;
+            const VkResult result = vkCreateDevice(static_cast<VkPhysicalDevice>(device->physical_device),
+                                                   &raw_info, nullptr, &raw_device);
+            if (result != VK_SUCCESS) {
+                throw std::runtime_error("Polaris vkCreateDevice failed: " + std::to_string(result));
+            }
+            device->device = vk::Device(raw_device);
+        } else {
+            device->device = device->physical_device.createDevice(device_create_info);
+        }
 
         if (device->device_fault) {
             device->pfn_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT)
@@ -5069,12 +5126,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
     device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
     device_features2.pNext = nullptr;
 
-    VkPhysicalDeviceVulkan11Features vk11_features;
+    VkPhysicalDeviceVulkan11Features vk11_features{};
     vk11_features.pNext = nullptr;
     vk11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
     device_features2.pNext = &vk11_features;
 
-    VkPhysicalDeviceVulkan12Features vk12_features;
+    VkPhysicalDeviceVulkan12Features vk12_features{};
     vk12_features.pNext = nullptr;
     vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
     vk11_features.pNext = &vk12_features;
@@ -5657,6 +5714,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context * 
             if (m <= 8192 && k >= 1024) {
                 dmmv_wg = DMMV_WG_SIZE_LARGE;
             }
+        }
+    }
+
+    if (a_type == GGML_TYPE_IQ4_XS && num_cols == 1 && ctx->device->architecture == AMD_GCN) {
+        static const int requested = getenv("GGML_VK_IQ4_XS_WG") ? atoi(getenv("GGML_VK_IQ4_XS_WG")) : 0;
+        if (requested == 64) dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
+        if (requested == 256) dmmv_wg = DMMV_WG_SIZE_LARGE;
+        static bool reported = false;
+        if (requested && !reported) {
+            reported = true;
+            GGML_LOG_INFO("KCPP_IQ4_MMV: workgroup %d selected\n",requested);
         }
     }
 
@@ -14409,6 +14477,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
     }
     uint64_t flops_per_submit = std::min(flops_cap, ctx->last_total_flops / 40u);
 
+    // KCPP_BATCHED_SUBMITS_PORT: reduce host submit overhead, retain watchdog cap.
+    static const bool batched_submits = getenv("GGML_VK_BATCHED_SUBMITS") != nullptr;
+    if (batched_submits) {
+        flops_per_submit = flops_cap;
+    }
+
     auto const submit_after = [&](int start, int end) {
         if (ctx->device->serialize_submissions) {
             try {
@@ -14433,7 +14507,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
         first_node_in_batch = true;
         submitted_nodes = 0;
         batch_flops = 0;
-        if (submit_count < 3) {
+        if (!batched_submits && submit_count < 3) {
             flops_per_submit *= 2;
         }
         submit_count++;
@@ -14720,7 +14794,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
         }
 
         // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
-        bool almost_ready = (cgraph->n_nodes - i) < cgraph->n_nodes / 5;
+        bool almost_ready = !batched_submits && (cgraph->n_nodes - i) < cgraph->n_nodes / 5;
         bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                       (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                       (i + ctx->num_additional_fused_ops >= last_node) ||
@@ -16380,7 +16454,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
     VkPhysicalDeviceFeatures2 device_features2;
     device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
 
-    VkPhysicalDeviceVulkan11Features vk11_features;
+    VkPhysicalDeviceVulkan11Features vk11_features{};
     vk11_features.pNext = nullptr;
     vk11_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
     device_features2.pNext = &vk11_features;

@@ -401,6 +401,11 @@ extern "C" {
 
         size_t moe_cache_size; // device cache in bytes for the experts kept in host memory, split among the devices like the layers, 0 = disabled [EXPERIMENTAL]
 
+        // hybrid MoE cache: experts missing from the device cache are computed by the CPU from host memory,
+        // concurrently with the device, instead of being uploaded before use [EXPERIMENTAL]
+        int32_t moe_hybrid_threads; // CPU threads for the missing experts, 0 = hybrid mode off
+        int32_t moe_hybrid_uploads; // most experts a layer admits into the device cache per decode step
+
         // Abort callback
         // if it returns true, execution of llama_decode() will be aborted
         // currently works only with CPU execution

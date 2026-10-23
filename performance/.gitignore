@@ -1,0 +1,14 @@
+toolchain/
+pgo/
+variants/
+results/
+candidate/
+package-work/
+*.spec
+*.def
+*.log
+*.lock
+object-flags.json
+optimized.mk
+cpu-variant.mk
+__pycache__/

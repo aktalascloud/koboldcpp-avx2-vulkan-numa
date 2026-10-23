@@ -1,0 +1,6 @@
+{
+  "variant": "pgo-lto-tuned",
+  "compiler": "winlibs",
+  "hot_tuning_flags": "-fno-ipa-cp-clone",
+  "exclude_pgo_objects": []
+}

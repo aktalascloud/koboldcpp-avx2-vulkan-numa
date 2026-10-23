@@ -1,0 +1,108 @@
+[
+  {
+    "repository": "LostRuins/koboldcpp",
+    "path": "koboldcpp",
+    "commit": "99bfa84a7d2023d94580721ab241a61ae8f2b3bc"
+  },
+  {
+    "path": "vulkan-polaris",
+    "repository": "andrewdhannah/vulkan-polaris-llama",
+    "commit": "e29790e07978c5826d23752d4416a173e5b731db"
+  },
+  {
+    "path": "ponyol",
+    "repository": "ponyol/llama.cpp.patch.speed",
+    "commit": "4bcc0364b3ab8484b3693aa0b31739e63f635b9c"
+  },
+  {
+    "path": "cubetitled",
+    "repository": "cubetitled-ui/llama.cpp",
+    "commit": "124ac98237f6701ffc30cb5708a7220207f14031"
+  },
+  {
+    "path": "polaris-local-ai",
+    "repository": "AvilaCarlosDev/polaris-local-ai",
+    "commit": "9e11cc9ad76b429560d3ff0a786a40df10dfd7b2"
+  },
+  {
+    "path": "rx580-guide",
+    "repository": "castlen3/rx580-llamacpp-vulkan-guide",
+    "commit": "f89a119d79fe9c9ba8608613f2e296e1e974806d"
+  },
+  {
+    "path": "rx580-agents",
+    "repository": "doteyeso-ops/rx580-vulkan-agents",
+    "commit": "14489d204c62bfe1de15628865753573ebde065c"
+  },
+  {
+    "path": "HybridMoE",
+    "repository": "MohammadR3za/HybridMoE",
+    "commit": "8d9951a787373a8396824abb0f321bdf926e9fee"
+  },
+  {
+    "repository": "lakitu12/vkblas",
+    "commit": "b0bf6b40905e1ca2b1ae78f69f7e80d65d446777"
+  },
+  {
+    "repository": "robertrosenbusch/gfx803_rocm",
+    "commit": "3cd3cb880e20dd234fd25415019a71abbff47479"
+  },
+  {
+    "repository": "Schaka/rocm-gfx803",
+    "commit": "8fdcf7b1305d0cfc6fc8c1fc7b1bfb5f73494e78"
+  },
+  {
+    "repository": "chboishabba/gfx803_compat_graph",
+    "commit": "b7a2e0b055083619c627870c5207f63e4bd81741"
+  },
+  {
+    "repository": "lakitu12/rocm-gfx803-torch",
+    "commit": "ba9ad01a423777841ac9990c38d119745b51df8a"
+  },
+  {
+    "repository": "lakitu12/rocm-gfx803",
+    "commit": "0b94b30e5a2090e2feb964925bd07f5b6e1cbe66"
+  },
+  {
+    "repository": "dhaern/VelociQ8",
+    "commit": "fadbc689932795ecac52ed94d8cfb1cddf3fa4b6"
+  },
+  {
+    "repository": "cjml555/llama-native",
+    "commit": "98703b3536e00b4bf47b5c2d271832f701b6bda3"
+  },
+  {
+    "repository": "layfhaker/llama.cpp-x86-neon",
+    "commit": "d79c52fcf72aec5e712502000f61cddab8bb2e4b"
+  },
+  {
+    "repository": "superexp1/llama2c-avx2-tuning",
+    "commit": "d04f9740b0aafbdee3f33edeb68c7ad3f846fc0e",
+    "path": "llama2c-avx2"
+  },
+  {
+    "repository": "ikawrakow/ik_llama.cpp",
+    "path": "ik_llama",
+    "commit": "55d5dd9f215df6f3c93a863aa0bcaf68599fd7eb"
+  },
+  {
+    "repository": "pauldmartinphd/llm-performance-engineering-notebook",
+    "path": "performance-notebook",
+    "commit": "76eb7c0936ab04fedd487c2db17a3176a49f44f7"
+  },
+  {
+    "repository": "HarshaVardhan3002/ROCmFPX",
+    "path": "ROCmFPX",
+    "commit": "3dbf1fa7d0e7d6a32e3d980c566941d5d01d3702"
+  },
+  {
+    "repository": "nandyalu/rocm-llamacpp-cpu-fix",
+    "path": "rocm-cpu-fix",
+    "commit": "0c1bb64b415e8e494bd661d3f6b7582b3fdcdcf5"
+  },
+  {
+    "repository": "sirfyyn/FastLocalExperts",
+    "path": "FastLocalExperts",
+    "commit": "d05482eb0bed6c52af9b3ce89a3675bae2f35f59"
+  }
+]

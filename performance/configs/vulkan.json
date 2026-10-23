@@ -1,0 +1,11 @@
+{
+  "threads": 6,
+  "blasthreads": 4,
+  "batchsize": 1024,
+  "ubatchsize": 1024,
+  "gpulayers": 99,
+  "numa": "auto",
+  "usevulkan": [
+    0
+  ]
+}

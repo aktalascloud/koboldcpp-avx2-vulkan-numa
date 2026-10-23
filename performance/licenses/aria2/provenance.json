@@ -1,0 +1,20 @@
+{
+  "binary_sha256": "be2099c214f63a3cb4954b09a0becd6e2e34660b886d4c898d260febfe9d70c2",
+  "official_windows_binary_verified_identical": true,
+  "sources": [
+    {
+      "name": "aria2-1.37.0.tar.xz",
+      "source": "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0.tar.xz",
+      "bytes": 1705256,
+      "sha256": "60a420ad7085eb616cb6e2bdf0a7206d68ff3d37fb5a956dc44242eb2f79b66b"
+    },
+    {
+      "name": "gmp-6.3.0.tar.xz",
+      "source": "https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.xz",
+      "bytes": 2094196,
+      "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
+    }
+  ],
+  "linked_versions": "zlib1.3 expat2.5.0 sqlite3.43.1 GMP6.3.0 c-ares1.19.1 libssh2 1.11.0; Windows Schannel",
+  "source_asset": "third-party-corresponding-sources.zip"
+}

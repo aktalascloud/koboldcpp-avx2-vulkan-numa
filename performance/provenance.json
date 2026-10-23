@@ -1,0 +1,50 @@
+{
+  "source": "https://github.com/LostRuins/koboldcpp",
+  "branch": "concedo_experimental",
+  "commit": "99bfa84a7d2023d94580721ab241a61ae8f2b3bc",
+  "flags": [
+    "-O3",
+    "-march=haswell",
+    "-mtune=haswell"
+  ],
+  "jobs": 4,
+  "host_cxx_flags": [
+    "-O3",
+    "-mtune=haswell",
+    "-mstackrealign"
+  ],
+  "ffi_no_avx": true,
+  "native_version": "1.123.1",
+  "compiler": "gcc.exe (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders, r8) 13.2.0",
+  "cpu_optimization": "pgo-lto-tuned",
+  "compiler_policy": "winlibs",
+  "profile_flags": "-fprofile-use=<BUILD>/pgo/data -fprofile-correction -fprofile-partial-training -Werror=missing-profile",
+  "lto_flags": "-flto=4 -fuse-linker-plugin",
+  "executable_sha256": "651e4a41d3581bf619ae9fe2112a09af1a39110489ae8bd2b32f1f3ff142aee4",
+  "patch_sha256": "e2164b83350bd9dd99836f3fed00905254c441bccabc5b9ddda821728772209b",
+  "seconds": 582.9867508411407,
+  "deployed": true,
+  "native_dll_sha256": {
+    "koboldcpp_default.dll": "f4cd99cee9ca6e418a6d0ec851668e2b5f7583318dd509e08d5bb7e1bb98c13b",
+    "koboldcpp_vulkan.dll": "1125ad82ce3b196404c476016a688159398a9508803ce2cb07da43d5577edd65"
+  },
+  "hot_tuning_flags": "-fno-ipa-cp-clone",
+  "profile_units_used": 20,
+  "profile_excluded": [],
+  "profile_provenance": "pgo/profile-metadata.json",
+  "cpu_threads": {
+    "threads": 16,
+    "blasthreads": 20,
+    "sdthreads": 20
+  },
+  "runtime_settings": {
+    "threads": 6,
+    "blasthreads": 4,
+    "sdthreads": 20,
+    "batchsize": 1024,
+    "ubatchsize": 1024,
+    "gpulayers": 99
+  },
+  "source_distribution": "Full source at this tag; runtime.patch against the recorded upstream commit.",
+  "binary_unchanged": true
+}

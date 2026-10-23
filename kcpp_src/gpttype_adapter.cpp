@@ -989,6 +989,7 @@ static void mtp_decoding_setup(llama_model * main_model, llama_context * main_ct
     llama_context_params mtp_ctx_params = base_ctx_params;
     // Match upstream: only the target context owns an expert cache.
     mtp_ctx_params.moe_cache_size = 0;
+    mtp_ctx_params.moe_hybrid_threads = 0;
     mtp_ctx_params.ctx_type = LLAMA_CONTEXT_TYPE_MTP;
     mtp_ctx_params.ctx_other = main_ctx;
     mtp_ctx_params.n_rs_seq = 0;
@@ -3441,6 +3442,8 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
         llama_context_params llama_ctx_params = llama_context_default_params();
         model_params.lazy_mode = static_cast<llama_lazy_mode>(inputs.lazy_mode);
         llama_ctx_params.moe_cache_size = static_cast<size_t>(inputs.moe_cache_mib) * 1024 * 1024;
+        llama_ctx_params.moe_hybrid_threads = inputs.moe_hybrid_threads;
+        llama_ctx_params.moe_hybrid_uploads = inputs.moe_hybrid_uploads;
         const bool configure_batch_cache = continuous_batching_slots > 1 &&
             !inputs.use_mtp && draftmodel_filename.empty() && !load_guidance &&
             !kcpp_data->use_smartcontext && !kcpp_data->use_contextshift;
@@ -3890,6 +3893,7 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
             // accounts for the target context.
             llama_context_params guidance_ctx_params = llama_ctx_params;
             guidance_ctx_params.moe_cache_size = 0;
+    guidance_ctx_params.moe_hybrid_threads = 0;
             guidance_ctx = llama_init_from_model(llamamodel, guidance_ctx_params);
         }
 

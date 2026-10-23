@@ -1,0 +1,116 @@
+[
+  {
+    "name": "altgraph",
+    "version": "0.17.5",
+    "license_expression": "MIT",
+    "notices": [
+      "licenses/python-packages/altgraph/LICENSE"
+    ]
+  },
+  {
+    "name": "customtkinter",
+    "version": "5.2.0",
+    "license_expression": "Creative Commons Zero v1.0 Universal",
+    "notices": [
+      "licenses/python-packages/customtkinter/LICENSE"
+    ]
+  },
+  {
+    "name": "darkdetect",
+    "version": "0.8.0",
+    "license_expression": "BSD-3-Clause",
+    "notices": [
+      "licenses/python-packages/darkdetect/LICENSE"
+    ]
+  },
+  {
+    "name": "Jinja2",
+    "version": "3.1.6",
+    "license_expression": null,
+    "notices": [
+      "licenses/python-packages/Jinja2/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "MarkupSafe",
+    "version": "3.0.4",
+    "license_expression": "BSD-3-Clause",
+    "notices": [
+      "licenses/python-packages/MarkupSafe/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "license_expression": "Apache-2.0 OR BSD-2-Clause",
+    "notices": [
+      "licenses/python-packages/packaging/licenses/LICENSE",
+      "licenses/python-packages/packaging/licenses/LICENSE.APACHE",
+      "licenses/python-packages/packaging/licenses/LICENSE.BSD"
+    ]
+  },
+  {
+    "name": "pefile",
+    "version": "2024.8.26",
+    "license_expression": "MIT",
+    "notices": [
+      "licenses/python-packages/pefile/LICENSE"
+    ]
+  },
+  {
+    "name": "psutil",
+    "version": "7.2.2",
+    "license_expression": "BSD-3-Clause",
+    "notices": [
+      "licenses/python-packages/psutil/LICENSE"
+    ]
+  },
+  {
+    "name": "pyinstaller",
+    "version": "6.22.3",
+    "license_expression": "GPLv2-or-later with a special exception which allows to use PyInstaller to build and distribute non-free programs (including commercial ones)",
+    "notices": [
+      "licenses/python-packages/pyinstaller/licenses/COPYING.txt"
+    ]
+  },
+  {
+    "name": "pyinstaller-hooks-contrib",
+    "version": "2026.9",
+    "license_expression": null,
+    "notices": [
+      "licenses/python-packages/pyinstaller-hooks-contrib/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pywin32-ctypes",
+    "version": "0.2.3",
+    "license_expression": "BSD-3-Clause",
+    "notices": [
+      "licenses/python-packages/pywin32-ctypes/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "setuptools",
+    "version": "84.2.1",
+    "license_expression": "MIT",
+    "notices": [
+      "licenses/python-packages/setuptools/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/packaging-26.3.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/packaging-26.3.dist-info/licenses/LICENSE.APACHE",
+      "licenses/python-packages/setuptools/_vendor/packaging-26.3.dist-info/licenses/LICENSE.BSD",
+      "licenses/python-packages/setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt",
+      "licenses/python-packages/setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE",
+      "licenses/python-packages/setuptools/config/NOTICE",
+      "licenses/python-packages/setuptools/config/_validate_pyproject/NOTICE"
+    ]
+  }
+]

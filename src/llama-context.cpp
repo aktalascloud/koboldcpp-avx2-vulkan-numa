@@ -1,3 +1,4 @@
+#include <atomic> // KCPP_MOE_PREFILL_COPY_ALL diagnostic guard
 #include "llama-context.h"
 
 #include "ggml.h"
@@ -363,6 +364,8 @@ llama_context::llama_context(
     cparams.op_offload     = params.op_offload;
     cparams.kv_unified     = params.kv_unified;
     cparams.moe_cache_size = params.moe_cache_size;
+    cparams.moe_hybrid_threads = params.moe_hybrid_threads;
+    cparams.moe_hybrid_uploads = params.moe_hybrid_uploads;
 
     // initialized later
     cparams.pipeline_parallel = false;
@@ -558,7 +561,8 @@ llama_context::llama_context(
         }
 
         if (cparams.moe_cache_size > 0) {
-            moe_cache = std::make_unique<llama_moe_cache>(model, backend_ptrs, backend_buft, cparams.moe_cache_size);
+            moe_cache = std::make_unique<llama_moe_cache>(model, backend_ptrs, backend_buft, cparams.moe_cache_size,
+                cparams.moe_hybrid_threads, cparams.moe_hybrid_uploads);
         }
 
         sched_reserve();
@@ -2790,6 +2794,25 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
     }
 
     const ggml_tensor * ids = node->src[2];
+    // KCPP_MOE_PREFILL_COPY_ALL: copy immutable host experts without a routing readback.
+    // Unlike the old scheduler patch, modern expert copies live in this context callback.
+    // Copying extra experts changes traffic only; selected experts and arithmetic are unchanged.
+    static const bool copy_all_prefill = []() {
+        const char * option = getenv("KCPP_MOE_PREFILL_COPY_ALL");
+        return option != nullptr && atoi(option) != 0;
+    }();
+    if (copy_all_prefill && !lctx->moe_cache && src->ne[2] > 0 &&
+        ggml_nelements(ids) >= 8 * src->ne[2]) {
+        static std::atomic<bool> announced{false};
+        if (!announced.exchange(true)) {
+            LLAMA_LOG_INFO("KCPP_MOE_PREFILL_COPY_ALL: routing readback bypass active\n");
+        }
+        ggml_backend_tensor_set_async(backend, dst, src->data, 0, ggml_nbytes(src));
+        return true;
+    }
+
+    // Other callbacks still require the original synchronization before overwriting dst.
+    ggml_backend_synchronize(backend);
     if (ggml_nelements(ids) == 0) {
         return true;
     }
@@ -4013,6 +4036,8 @@ llama_context_params llama_context_default_params() {
         /*.type_k                      =*/ GGML_TYPE_F16,
         /*.type_v                      =*/ GGML_TYPE_F16,
         /*.moe_cache_size              =*/ 0,
+        /*.moe_hybrid_threads          =*/ 0,
+        /*.moe_hybrid_uploads          =*/ 1,
         /*.abort_callback              =*/ nullptr,
         /*.abort_callback_data         =*/ nullptr,
         /*.embeddings                  =*/ false,

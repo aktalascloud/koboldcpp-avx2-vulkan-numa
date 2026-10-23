@@ -1533,6 +1533,20 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
                     ? (i11      + i12*ne11)*row_size
                     : (i11*nb11 + i12*nb12));
 
+                // KCPP_MOE_PREFETCH_PORT: sparse next-token read hint; no arithmetic changes.
+#if defined(__GNUC__) || defined(__clang__)
+                if (ir1 + 1 < iir1 + blck_1 && ir1 + 1 < ir1_end) {
+                    const struct mmid_row_mapping next_map = MMID_MATRIX_ROW(cur_a, ir1 + 1);
+                    const int64_t ni11 = next_map.i1 % ne11;
+                    const int64_t ni12 = next_map.i2;
+                    const char * next_col = (const char *) wdata +
+                        (src1_cont || src1->type != vec_dot_type
+                        ? (ni11 + ni12*ne11)*row_size
+                        : (ni11*nb11 + ni12*nb12));
+                    __builtin_prefetch(next_col, 0, 1);
+                }
+#endif
+
                 float * dst_col = (float *) ((char *) dst->data + (i1*nb1 + i2*nb2));
 
                 for (int64_t ir0 = iir0; ir0 < iir0 + blck_0 && ir0 < ir0_end; ++ir0) {
@@ -3053,10 +3067,146 @@ static void clear_numa_thread_affinity(void) {
     CPU_FREE(cpus);
 }
 #else
+#if defined(_WIN32)
+/* KCPP_WINDOWS_NUMA: topology-aware worker placement, including processor groups.
+ * Included into ggml-cpu.c by the checked port script. No memory-placement claims:
+ * Windows page allocation remains unchanged. Modes:0 disabled,1 auto,2 distribute,3 isolate.
+ */
+typedef struct {
+    USHORT group, node;
+    BYTE cpu, core, sibling;
+    DWORD set_id;
+} kcpp_win_cpu;
+static struct {
+    INIT_ONCE once;
+    int mode, count, n_nodes;
+    USHORT nodes[GGML_MAX_N_THREADS], current_node;
+    kcpp_win_cpu cpus[GGML_MAX_N_THREADS];
+    LONG warned;
+} kcpp_win_numa = { .once = INIT_ONCE_STATIC_INIT };
+static _Thread_local GROUP_AFFINITY kcpp_win_previous_affinity;
+static _Thread_local bool kcpp_win_numa_pinned;
+
+static BOOL CALLBACK kcpp_win_numa_init(PINIT_ONCE once, PVOID parameter, PVOID * context) {
+    UNUSED(once); UNUSED(parameter); UNUSED(context);
+    const char * option = getenv("KCPP_WIN_NUMA_POLICY");
+    kcpp_win_numa.mode = option ? atoi(option) : 1;
+    typedef BOOL (WINAPI * get_sets_t)(PSYSTEM_CPU_SET_INFORMATION, ULONG, PULONG, HANDLE, ULONG);
+    get_sets_t get_sets = (get_sets_t) GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetSystemCpuSetInformation");
+    ULONG bytes = 0;
+    if (!get_sets) return TRUE;
+    get_sets(NULL, 0, &bytes, GetCurrentProcess(), 0);
+    if (!bytes || bytes > 16*1024*1024) return TRUE;
+    BYTE * buffer = (BYTE *) malloc(bytes);
+    if (!buffer) return TRUE;
+    if (!get_sets((PSYSTEM_CPU_SET_INFORMATION)buffer, bytes, &bytes, GetCurrentProcess(), 0)) {
+        free(buffer); return TRUE;
+    }
+    PROCESSOR_NUMBER current;
+    GetCurrentProcessorNumberEx(&current);
+    GetNumaProcessorNodeEx(&current, &kcpp_win_numa.current_node);
+    for (ULONG offset = 0; offset + sizeof(DWORD)*2 <= bytes;) {
+        const SYSTEM_CPU_SET_INFORMATION * info = (const SYSTEM_CPU_SET_INFORMATION *)(buffer+offset);
+        if (info->Size < sizeof(DWORD)*2 || info->Size > bytes-offset) break;
+        if (info->Type == CpuSetInformation && info->Size >= sizeof(SYSTEM_CPU_SET_INFORMATION) &&
+            (!info->CpuSet.Allocated || info->CpuSet.AllocatedToTargetProcess) &&
+            kcpp_win_numa.count < GGML_MAX_N_THREADS) {
+            PROCESSOR_NUMBER processor = { info->CpuSet.Group, info->CpuSet.LogicalProcessorIndex, 0 };
+            USHORT node;
+            if (!GetNumaProcessorNodeEx(&processor, &node) || node == 0xffff) {
+                offset += info->Size; continue;
+            }
+            int node_index = 0;
+            while (node_index < kcpp_win_numa.n_nodes && kcpp_win_numa.nodes[node_index] != node) ++node_index;
+            if (node_index == kcpp_win_numa.n_nodes) kcpp_win_numa.nodes[kcpp_win_numa.n_nodes++] = node;
+            kcpp_win_cpu cpu = { info->CpuSet.Group, node, info->CpuSet.LogicalProcessorIndex,
+                info->CpuSet.CoreIndex, 0, info->CpuSet.Id };
+            for (int i = 0; i < kcpp_win_numa.count; ++i) {
+                if (kcpp_win_numa.cpus[i].group == cpu.group && kcpp_win_numa.cpus[i].core == cpu.core) cpu.sibling++;
+            }
+            kcpp_win_numa.cpus[kcpp_win_numa.count++] = cpu;
+        }
+        offset += info->Size;
+    }
+    free(buffer);
+    if (kcpp_win_numa.mode && kcpp_win_numa.n_nodes > 1) {
+        GGML_LOG_INFO("ggml: Windows NUMA topology: %d nodes, %d logical CPUs, policy%d; group-aware affinity\n",
+                      kcpp_win_numa.n_nodes,kcpp_win_numa.count,kcpp_win_numa.mode);
+    }
+    return TRUE;
+}
+
+static void kcpp_win_ensure_numa(void) {
+    InitOnceExecuteOnce(&kcpp_win_numa.once,kcpp_win_numa_init,NULL,NULL);
+}
+
+static void kcpp_win_set_numa_affinity(int thread_n) {
+    kcpp_win_ensure_numa();
+    if (kcpp_win_numa_pinned || !kcpp_win_numa.mode || !kcpp_win_numa.count ||
+        (kcpp_win_numa.mode == 1 && kcpp_win_numa.n_nodes < 2)) return;
+    const bool isolate = kcpp_win_numa.mode == 3;
+    const USHORT node = isolate ? kcpp_win_numa.current_node : kcpp_win_numa.nodes[thread_n % kcpp_win_numa.n_nodes];
+    const int rank = isolate ? thread_n : thread_n / kcpp_win_numa.n_nodes;
+    int count = 0;
+    for (int i=0;i<kcpp_win_numa.count;i++) if (kcpp_win_numa.cpus[i].node==node) count++;
+    if (!count) return;
+    const int target = rank % count;
+    int index = 0;
+    for (int sibling=0;sibling<64;sibling++) {
+        for (int i=0;i<kcpp_win_numa.count;i++) {
+            const kcpp_win_cpu * cpu=&kcpp_win_numa.cpus[i];
+            if (cpu->node!=node || cpu->sibling!=sibling || index++!=target) continue;
+            GROUP_AFFINITY affinity={0};affinity.Group=cpu->group;affinity.Mask=(KAFFINITY)1<<cpu->cpu;
+            if (SetThreadGroupAffinity(GetCurrentThread(),&affinity,&kcpp_win_previous_affinity)) {
+                kcpp_win_numa_pinned=true;
+            } else if (InterlockedCompareExchange(&kcpp_win_numa.warned,1,0)==0) {
+                GGML_LOG_WARN("ggml: Windows NUMA affinity unavailable (%lu); preserving OS placement\n",GetLastError());
+            }
+            return;
+        }
+    }
+}
+
+static void kcpp_win_clear_numa_affinity(void) {
+    if (kcpp_win_numa_pinned) {
+        SetThreadGroupAffinity(GetCurrentThread(),&kcpp_win_previous_affinity,NULL);
+        kcpp_win_numa_pinned=false;
+    }
+}
+
+static bool kcpp_win_apply_cpu_mask(const bool * mask) {
+    GROUP_AFFINITY selected={0};int groups=0;
+    for (int group=0;group<(GGML_MAX_N_THREADS+63)/64;group++) {
+        KAFFINITY bits=0;
+        for (int bit=0;bit<64 && group*64+bit<GGML_MAX_N_THREADS;bit++) {
+            if (mask[group*64+bit]) bits|=(KAFFINITY)1<<bit;
+        }
+        if (bits) { selected.Group=(WORD)group;selected.Mask=bits;groups++; }
+    }
+    if (groups==1) return SetThreadGroupAffinity(GetCurrentThread(),&selected,NULL)!=0;
+    if (!groups) return false;
+    kcpp_win_ensure_numa();
+    DWORD ids[GGML_MAX_N_THREADS];ULONG count=0;
+    for (int i=0;i<kcpp_win_numa.count;i++) {
+        const kcpp_win_cpu * cpu=&kcpp_win_numa.cpus[i];
+        const int index=cpu->group*64+cpu->cpu;
+        if (index<GGML_MAX_N_THREADS && mask[index]) ids[count++]=cpu->set_id;
+    }
+    typedef BOOL (WINAPI * set_sets_t)(HANDLE,const ULONG *,ULONG);
+    set_sets_t set_sets=(set_sets_t)GetProcAddress(GetModuleHandleW(L"kernel32.dll"),"SetThreadSelectedCpuSets");
+    return set_sets && count && set_sets(GetCurrentThread(),ids,count);
+}
+
+/* KCPP_WINDOWS_NUMA_END */
+
+static void set_numa_thread_affinity(int thread_n) { kcpp_win_set_numa_affinity(thread_n); }
+static void clear_numa_thread_affinity(void) { kcpp_win_clear_numa_affinity(); }
+#else
 // TODO: Windows etc.
 // (the linux implementation may also work on BSD, someone should test)
 static void set_numa_thread_affinity(int thread_n) { UNUSED(thread_n);  }
 static void clear_numa_thread_affinity(void) {}
+#endif
 #endif
 
 static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
@@ -3349,40 +3499,8 @@ static thread_ret_t ggml_graph_compute_secondary_thread(void* data);
 #if defined(_WIN32)
 #include "windows.h"
 
-// TODO: support > 64 CPUs
-static bool ggml_thread_apply_affinity(bool * mask) {
-    HANDLE    h = GetCurrentThread();
-    uint64_t  bitmask = 0ULL;
-
-    assert(GGML_MAX_N_THREADS >= 64);
-
-    for (int32_t i = 0; i < 8; i++) {
-        int32_t idx = i * 8;
-        uint8_t val = 0;
-        val |= mask[idx + 0] << 0;
-        val |= mask[idx + 1] << 1;
-        val |= mask[idx + 2] << 2;
-        val |= mask[idx + 3] << 3;
-        val |= mask[idx + 4] << 4;
-        val |= mask[idx + 5] << 5;
-        val |= mask[idx + 6] << 6;
-        val |= mask[idx + 7] << 7;
-        bitmask |= (uint64_t)val << idx;
-    }
-
-    for (int32_t i = 64; i < GGML_MAX_N_THREADS; i++) {
-        if (mask[i]) {
-            fprintf(stderr, "warn: setting thread-affinity for > 64 CPUs isn't supported on windows!\n");
-            break;
-        }
-    }
-
-    DWORD_PTR m = (DWORD_PTR)bitmask;
-
-    m = SetThreadAffinityMask(h, m);
-
-    return m != 0;
-}
+// KCPP_WINDOWS_GROUP_AFFINITY: CPU IDs are group*64+processor number.
+static bool ggml_thread_apply_affinity(bool * mask) { return kcpp_win_apply_cpu_mask(mask); }
 
 static bool powethrottlemsgshown = false;
 static bool ggml_thread_apply_priority(int32_t prio) {
@@ -3957,6 +4075,9 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
 #ifdef GGML_USE_CPU_RISCV64_SPACEMIT
     ggml_backend_cpu_riscv64_spacemit_set_numa_thread_affinity(state->ith);
 #else
+#if defined(_WIN32)
+    if (!ggml_thread_cpumask_is_valid(state->cpumask))
+#endif
     set_numa_thread_affinity(state->ith);
 #endif
 

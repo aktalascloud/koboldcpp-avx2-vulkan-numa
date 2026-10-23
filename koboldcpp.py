@@ -381,7 +381,9 @@ class load_model_inputs(ctypes.Structure):
                 ("rpc_targets", ctypes.c_char_p),
                 ("lazy_mode", ctypes.c_int),
                 ("moe_cache_mib", ctypes.c_int),
-                ("parallel_total_context", ctypes.c_int)]
+                ("parallel_total_context", ctypes.c_int),
+                ("moe_hybrid_threads", ctypes.c_int),
+                ("moe_hybrid_uploads", ctypes.c_int)]
 
 class generation_inputs(ctypes.Structure):
     _fields_ = [("seed", ctypes.c_int),
@@ -909,6 +911,18 @@ def restore_stdout():
         saved_stdout = saved_stderr = saved_stdout_py = saved_stderr_py = stdout_nullfile = stdout_nullfile_py = None
 
 def get_default_threads():
+    # KCPP_NUMA_DEFAULT_THREADS: do not apply the desktop8-thread cap to dual-socket servers.
+    if os.name == 'nt':
+        try:
+            kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+            highest=ctypes.c_ulong()
+            if kernel.GetNumaHighestNodeNumber(ctypes.byref(highest)) and highest.value>0:
+                import psutil
+                logical=kernel.GetActiveProcessorCount(0xffff)
+                physical=psutil.cpu_count(logical=False) or max(1,logical//2)
+                return max(1,min(512,physical))
+        except (OSError,AttributeError):
+            pass
     physical_core_limit = 1
     if os.cpu_count() is not None and os.cpu_count()>1:
         physical_core_limit = os.cpu_count() // 2
@@ -961,10 +975,32 @@ lib_option_pairs = [
 default_option, cublas_option, hipblas_option, vulkan_option, noavx2_option, vulkan_noavx2_option, vulkan_failsafe_option, failsafe_option = (opt if file_exists(lib) or (os.name == 'nt' and file_exists(opt + ".dll")) else None for lib, opt in lib_option_pairs)
 runopts = [opt for lib, opt in lib_option_pairs if file_exists(lib)]
 
+def _kcpp_set_native_environment(name, value):
+    # KCPP_CRT_ENV_BRIDGE: Python uses UCRT; the MinGW native DLL uses MSVCRT.
+    os.environ[name]=value
+    if os.name == 'nt':
+        runtime=ctypes.CDLL('msvcrt.dll',winmode=0x800)
+        runtime._putenv_s.argtypes=[ctypes.c_char_p,ctypes.c_char_p]
+        runtime._putenv_s.restype=ctypes.c_int
+        if runtime._putenv_s(name.encode('ascii'),value.encode('ascii')):
+            raise RuntimeError('Cannot configure native CRT environment: '+name)
+        runtime.getenv.argtypes=[ctypes.c_char_p]
+        runtime.getenv.restype=ctypes.c_char_p
+        if runtime.getenv(name.encode('ascii')) != value.encode('ascii'):
+            raise RuntimeError('Native CRT environment verification failed: '+name)
+
 def init_library():
     global handle, args, libname
     global lib_default,lib_failsafe,lib_noavx2,lib_vulkan_failsafe,lib_cublas,lib_hipblas,lib_vulkan,lib_vulkan_noavx2
 
+    # KCPP_WINDOWS_NUMA_POLICY: configured before native library initialization.
+    if os.name == 'nt' and args:
+        mode=getattr(args,'numa','auto')
+        if mode not in ('auto','disabled','distribute','isolate'):
+            raise ValueError('--numa must be auto, disabled, distribute or isolate')
+        _kcpp_set_native_environment('KCPP_WIN_NUMA_POLICY',str({'disabled':0,'auto':1,'distribute':2,'isolate':3}[mode]))
+    if args:
+        _kcpp_set_native_environment('KCPP_MOE_PREFILL_COPY_ALL','1' if getattr(args,'moe_prefill_copy_all',False) else '0')
     libname = lib_default
 
     if not args: # debug helper: koboldcpp.py loaded by external script
@@ -2122,6 +2158,14 @@ def load_model(model_filename):
     inputs = load_model_inputs()
     inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
     inputs.moe_cache_mib = args.moe_cache_mib
+    if type(args.moe_hybrid_threads) is not int or not 0 <= args.moe_hybrid_threads <= 512:
+        raise ValueError("--moe-hybrid must be an integer between0 and512")
+    if type(args.moe_hybrid_uploads) is not int or not 0 <= args.moe_hybrid_uploads <= 1024:
+        raise ValueError("--moe-hybrid-uploads must be an integer between0 and1024")
+    if args.moe_hybrid_threads and not args.moe_cache_mib:
+        raise ValueError("--moe-hybrid requires --moe-cache-mib")
+    inputs.moe_hybrid_threads = args.moe_hybrid_threads
+    inputs.moe_hybrid_uploads = args.moe_hybrid_uploads
     inputs.model_filename = model_filename.encode("UTF-8")
     inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
     inputs.threads = args.threads
@@ -13900,6 +13944,7 @@ if __name__ == '__main__':
     advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
     advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
     advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
+    advparser.add_argument("--numa", choices=["auto","disabled","distribute","isolate"], default="auto", help="Windows NUMA worker placement. Auto preserves single-node behavior; distribute spans nodes; isolate uses the starting node. Memory policy is unchanged.")
     advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
     advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
     advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
@@ -13934,6 +13979,9 @@ if __name__ == '__main__':
     advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
     advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
     advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
+    advparser.add_argument("--moe-prefill-copy-all", action="store_true", help="Experimental: upload full CPU expert tensors for large prefill batches, avoiding routing readback. Requires local speed validation.")
+    advparser.add_argument("--moe-hybrid", dest="moe_hybrid_threads", type=check_range(int,0,512), default=0, help="Experimental CPU threads for expert cache misses; requires --moe-cache-mib.0 disables hybrid.")
+    advparser.add_argument("--moe-hybrid-uploads", type=check_range(int,0,1024), default=0, help="Expert replacements per layer step in hybrid mode; default0 avoids decode uploads.")
     advparser.add_argument("--moe-cache-mib", "--moecache", dest="moe_cache_mib", type=check_range(int, 0, 2147483647), default=0, metavar="MiB", help="Experimental GPU cache size in MiB for CPU-resident MoE experts. Split among GPUs like layers. Uses additional VRAM; combine with --moecpu or --autofit (default=0, disabled).")
     advparser.add_argument("--moecpu","--n-cpu-moe", "-ncmoe", metavar=('[layers affected]'), help="Keep the Mixture of Experts (MoE) weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
     advparser.add_argument("--ffncpu","--n-cpu-ffn", "-ncffn", metavar=('[layers affected]'), help="Keep the dense FFN weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)

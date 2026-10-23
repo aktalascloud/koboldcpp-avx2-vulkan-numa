@@ -1,0 +1,6 @@
+{
+  "threads": 16,
+  "blasthreads": 20,
+  "numa": "auto",
+  "usecpu": true
+}

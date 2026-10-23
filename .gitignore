@@ -162,3 +162,13 @@ conda/
 
 # Jetbrains idea folder
 .idea/
+
+# Local performance build state
+/performance/toolchain/
+/performance/pgo/
+/performance/results/
+/performance/candidate/
+/performance/variants/
+/performance/package-work/
+*.gcda
+*.gcno

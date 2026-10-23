@@ -96,6 +96,8 @@ struct load_model_inputs
     const int lazy_mode = 1; // llama_lazy_mode: off=0, auto=1, on=2
     const int moe_cache_mib = 0;
     const int parallel_total_context = 0;
+    const int moe_hybrid_threads = 0;
+    const int moe_hybrid_uploads = 0;
 };
 struct generation_inputs
 {

@@ -1224,14 +1224,14 @@ inline static __m512 ggml_v_silu(__m512 x) {
     const __m512 one_plus_exp_neg_x = _mm512_add_ps(one, exp_neg_x);
     return _mm512_div_ps(x, one_plus_exp_neg_x);
 }
-
 #elif defined(__AVX2__) && defined(__FMA__)
-
-// adapted from arm limited optimized routine
-// the maximum error is 1.45358 plus 0.5 ulps
-// numbers above 88.38 will flush to infinity
-// numbers beneath -103.97 will flush to zero
-inline static __m256 ggml_v_expf(__m256 x) {
+// KCPP_AVX_MATH_INLINE: avoid an out-of-line Win64 by-reference __m256 argument.
+#if defined(__GNUC__) || defined(__clang__)
+#define KCPP_AVX_MATH_INLINE inline static __attribute__((always_inline))
+#else
+#define KCPP_AVX_MATH_INLINE static __forceinline
+#endif
+KCPP_AVX_MATH_INLINE __m256 ggml_v_expf(__m256 x) {
   const __m256 r = _mm256_set1_ps(0x1.8p23f);
   const __m256 z = _mm256_fmadd_ps(x, _mm256_set1_ps(0x1.715476p+0f), r);
   const __m256 n = _mm256_sub_ps(z, r);
@@ -1271,7 +1271,7 @@ inline static __m256 ggml_v_expf(__m256 x) {
 }
 
 // computes silu x/(1+exp(-x)) in single precision vector
-inline static __m256 ggml_v_silu(__m256 x) {
+KCPP_AVX_MATH_INLINE __m256 ggml_v_silu(__m256 x) {
     const __m256 one = _mm256_set1_ps(1);
     const __m256 zero = _mm256_setzero_ps();
     const __m256 neg_x = _mm256_sub_ps(zero, x);
