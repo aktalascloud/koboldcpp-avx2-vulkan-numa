@@ -1,0 +1,30 @@
+KoboldCpp performance fork: Haswell AVX2 / RX 580 Polaris (gfx803)
+
+Run koboldcpp-nocuda.exe directly. Double-click opens the standard KoboldCpp GUI.
+Select your own GGUF model. No PowerShell launcher is required.
+
+Measured RX 580 settings:
+Vulkan device 0, GPU layers 99 when the model fits, threads 6, BLAS threads 4,
+batch 1024, ubatch 1024, NUMA auto, normal process priority.
+
+CPU-only settings on the measured Xeon: threads 16, BLAS threads 20, NUMA auto.
+
+Command line:
+koboldcpp-nocuda.exe --model model.gguf --usevulkan 0 --gpulayers 99 --threads 6 --blasthreads 4 --batchsize 1024 --ubatchsize 1024 --numa auto
+
+For the full measured Polaris configuration, set these Windows environment
+variables before starting the EXE (Windows environment editor is sufficient):
+GGML_VK_ALLOW_GRAPHICS_QUEUE=1
+GGML_VK_BATCHED_SUBMITS=1
+GGML_VK_MAX_NODES_PER_SUBMIT=100
+GGML_VK_GCN_TILE64=1
+GGML_VK_GCN_TILE_VARIANT=k16
+GGML_VK_IQ4_XS_ROWS=4
+GGML_VK_IQ4_XS_WG=64
+
+These values were measured on RX 580, not every GPU/model.
+No main model, user credential, runtime cache, log or PID state is included.
+
+Original: https://github.com/LostRuins/koboldcpp
+Performance fork: https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa
+Media pipeline: https://github.com/aktalascloud/koboldcpp-media-pipeline
