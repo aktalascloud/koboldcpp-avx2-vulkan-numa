@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-24",
+  "accepted": false,
+  "deployed": false,
+  "release_published": false,
+  "candidate_executable_sha256": "c37bedaa4ea779e6f93533814de60c8f1ad20897f0cf382ad76bcbe792b28141",
+  "candidate_official_experimental": "6475b2f6b733020da42a353e90476359bb918531",
+  "production_executable_sha256": "651e4a41d3581bf619ae9fe2112a09af1a39110489ae8bd2b32f1f3ff142aee4",
+  "production_official_experimental": "99bfa84a7d2023d94580721ab241a61ae8f2b3bc",
+  "summary": {
+    "cpu": {
+      "stock": {
+        "mean": 17.59,
+        "range": [
+          17.55,
+          17.67
+        ]
+      },
+      "previous": {
+        "mean": 17.555,
+        "range": [
+          17.37,
+          17.81
+        ]
+      },
+      "candidate": {
+        "mean": 17.395,
+        "range": [
+          16.88,
+          17.69
+        ]
+      }
+    },
+    "vulkan": {
+      "stock": {
+        "mean": 17.08,
+        "range": [
+          17.08,
+          17.08
+        ]
+      },
+      "previous": {
+        "mean": 21.345,
+        "range": [
+          21.34,
+          21.35
+        ]
+      },
+      "candidate": {
+        "mean": 21.345,
+        "range": [
+          21.34,
+          21.35
+        ]
+      }
+    }
+  },
+  "cpu_change_percent_against_previous": -0.9114212475078376,
+  "cpu_runs_per_arm": 4,
+  "vulkan_runs_per_arm": 2,
+  "all_control_runs_included": true,
+  "first_candidate_cpu_run_included": 16.88,
+  "scope": "Unchanged Qwen3 4B IQ4_XS; context512,batch/ubatch256,64 output tokens. CPU16/20; Vulkan6/4 with graphics queue, selected environment on previous/candidate.",
+  "api": {
+    "cpu_correct": true,
+    "vulkan_correct": true,
+    "vulkan_answer_identical_to_previous": true,
+    "json_grammar": true,
+    "boundaries": [
+      1023,
+      1024,
+      1030,
+      2049
+    ],
+    "director": {
+      "previous": {
+        "seconds": 8.603017899993574,
+        "usage": {
+          "prompt_tokens": 675,
+          "completion_tokens": 191,
+          "total_tokens": 866
+        },
+        "ok": true
+      },
+      "candidate": {
+        "seconds": 8.612744899990503,
+        "usage": {
+          "prompt_tokens": 675,
+          "completion_tokens": 191,
+          "total_tokens": 866
+        },
+        "ok": true
+      }
+    }
+  },
+  "candidate_training": {
+    "fresh": true,
+    "profile_units": 20,
+    "profile_bytes": 247048,
+    "languages": [
+      "English",
+      "Russian",
+      "Python"
+    ],
+    "threads": 1,
+    "output_tokens_per_prompt": 32,
+    "temporary_moe_training_included": false
+  },
+  "media_tested": false,
+  "media_test_reason": "CPU performance gate failed first; no new photo/SR claim.",
+  "interpretation": "Pooled CPU mean is lower; ranges overlap. This does not prove a universal regression. The conservative no-CPU-loss release gate was not passed; Vulkan did not improve. Prior accepted release retained.",
+  "sources_reviewed": 23,
+  "changed_commit_count": 19,
+  "changed_issue_pr_count": 24
+}

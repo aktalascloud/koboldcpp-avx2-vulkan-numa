@@ -8,6 +8,21 @@ This is a fork of **[the original KoboldCpp by LostRuins](https://github.com/Los
 
 Topics: KoboldCpp, llama.cpp, AVX2, Haswell, RX580, Polaris, gfx803, Vulkan, NUMA, speed, performance, patches, PGO and LTO.
 
+<!-- daily-check:start -->
+## Daily validation: 24 October 2026
+
+Official experimental **6475b2f** was merged. Its new TAEQI2.1-Tinier preview decoder does not change the selected Z-Image setup. A fresh O3/Haswell/PGO20/LTO candidate was built and tested, but **was not deployed or released** because it did not pass the CPU performance gate. The accepted Windows release remains **651e4a41**.
+
+| Same-model output speed | Stock 1.123.1 | Previous accepted build | Daily candidate |
+|---|---:|---:|---:|
+| CPU 16/20, four runs each | 17.590 tokens/s | 17.555 tokens/s | 17.395 tokens/s |
+| Vulkan 6/4, graphics queue, two runs each | 17.080 tokens/s | 21.345 tokens/s | 21.345 tokens/s |
+
+Candidate CPU range: 16.88–17.69; previous: 17.37–17.81 tokens/s. All four runs, including the first slower candidate run, remain included. The pooled CPU mean changed by **-0.91%**; overlapping ranges do not establish a universal slowdown. Vulkan means were identical. The real API request with 675 input tokens and 191 output tokens took **8.603 s before / 8.613 s after**, with identical answers. Russian, English, arithmetic, JSON grammar and the 1023/1024/1030/2049-token boundaries passed. No photo benchmark was run after this rejection. [Dated results](performance/benchmarks/daily-2026-10-24.json).
+
+The optimization comparisons below are the preserved **23 October / 651e4a41** measurements, not measurements of the rejected daily candidate.
+<!-- daily-check:end -->
+
 ## CPU and GPU: before versus after
 
 Measured on **Xeon E5-2696 v3, RX 580 2048SP 8 GB, Windows**, using the same Qwen3 4B IQ4_XS weights. The short benchmark uses context 512, batch 256 and 64 output tokens. The following table shows **output generation speed**.
