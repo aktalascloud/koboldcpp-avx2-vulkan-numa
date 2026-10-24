@@ -1270,7 +1270,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device, 
     // On AMD RDNA, for small head sizes and big batch size the shader uses few registers, so too many subgroups get scheduled
     // at once and end up thrashing the cache. Fix this by setting a large (unused) shmem buffer that reduces occupancy.
     // This targets an occupancy of 4 subgroups per SIMD.
-    if (device->vendor_id == VK_VENDOR_ID_AMD && device->properties.limits.maxComputeSharedMemorySize == 65536) {
+    if (device->vendor_id == VK_VENDOR_ID_AMD && (device->properties.limits.maxComputeSharedMemorySize == 65536 || (device->architecture == AMD_GCN && device->properties.limits.maxComputeSharedMemorySize >= 32768))) {
         if (device->architecture != AMD_GCN && n_rows >= 64 && hsk <= 128) {
             // 30kb target for hsk > 64, 26kb for <= 64 due to smaller workgroup size
             // Values are guessed, tested on RDNA2
@@ -1851,7 +1851,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         s_warptile_mmqid_int_k = { mul_mat_subgroup_size_32, 32,  32, 32, s_warptile_wm,          32, 1, 2, 1, 1, mul_mat_subgroup_size_16 };
 
         // chip specific tuning
-        if ((device->architecture == AMD_GCN) && (device->driver_id != vk::DriverId::eAmdProprietary)) {
+        // KCPP_GCN_LDS32: tested on Polaris/Windows proprietary driver; keep actual capability checks.
+        if (device->architecture == AMD_GCN) {
             m_warptile_mmq = m_warptile_mmq_int = { 256, 64, 64, 32, 16, 16, 2, 2, 2, 1, 16 };
             m_warptile_mmqid = m_warptile_mmqid_int = { 256, 64, 64, 32, 16, 16, 2, 2, 2, 1, 16 };
         } else if (device->vendor_id == VK_VENDOR_ID_AMD && device->coopmat_support && device->driver_id != vk::DriverId::eAmdProprietary) {

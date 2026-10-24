@@ -90,6 +90,8 @@
 #include "models/whisper-enc.cpp"
 #include "models/yasa2.cpp"
 #include "models/youtuvl.cpp"
+// KCPP_SOPRANO_INCLUDE: upstream PR2557, implementation belongs to mtmd.
+#include "models/soprano.cpp"
 
 struct clip_logger_state g_logger_state = {clip_log_callback_default, NULL};
 

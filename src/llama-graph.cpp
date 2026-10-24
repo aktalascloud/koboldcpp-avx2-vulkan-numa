@@ -2359,15 +2359,14 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
     //call early so that topk-moe can be used
     ggml_build_forward_expand(gf, weights);
 
-    // hybrid MoE cache: the CPU computes the experts that are not cached, and their result is added to the device's
-    // share below. The CPU reproduces only plain gated SiLU experts; other layers do not use the cache in hybrid mode,
-    // because the missing experts would read the zero slot and nothing would add them back.
+    // KCPP_HYBRID_GRAPH: plain experts only; unsupported new norm/rescale paths use ordinary full weights.
     ggml_tensor * cpu_out = nullptr;
     const bool moe_hybrid = moe_cache != nullptr && moe_cache->hybrid();
     if (moe_hybrid) {
         ggml_tensor * const exps[] = { gate_up_exps, gate_exps, up_exps, down_exps };
         const bool plain =
             type_op == LLM_FFN_SILU && (gate_exps != nullptr || gate_up_exps != nullptr) && !weight_before_ffn &&
+            post_exp_norm == nullptr && arch != LLM_ARCH_MISTRAL4 && arch != LLM_ARCH_MELLUM && arch != LLM_ARCH_FLINT &&
             up_exps_b == nullptr && gate_exps_b == nullptr && down_exps_b == nullptr && gate_up_exps_b == nullptr &&
             up_exps_s == nullptr && gate_exps_s == nullptr && down_exps_s == nullptr &&
             (loras == nullptr || loras->empty()) &&
@@ -2376,8 +2375,6 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
                 [&](const ggml_tensor * w) { return w != nullptr && hdmd != nullptr && hdmd->rot.count(w) > 0; });
         cpu_out = plain ? moe_cache->get_cpu_out(il, n_tokens) : nullptr;
     }
-
-    // the experts of host-resident layers may be read from the MoE cache
     ggml_tensor * slots = moe_hybrid && cpu_out == nullptr ? nullptr :
         build_moe_cache_slots(selected_experts, up_exps, gate_exps, down_exps, gate_up_exps, il);
 
@@ -2549,8 +2546,6 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
     }
 
     if (slots != nullptr && cpu_out != nullptr) {
-        // the CPU's share is a host weight, so the scheduler starts a new split at this add, after the device has been
-        // given its share; the copy callback of that split waits for the CPU, which ran meanwhile
         experts = ggml_add(ctx0, experts, cpu_out);
         ggml_backend_sched_set_tensor_backend(sched, experts, moe_cache->backend(il));
         cb(experts, "ffn_moe_down_hybrid", il);

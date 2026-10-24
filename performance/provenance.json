@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "6475b2f6b733020da42a353e90476359bb918531",
+  "commit": "329f6a5b31e9a1036ff862f8a0c694bd2fc6c98c",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,28 +20,23 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "75b0ed03483d8791e01f77af23f04f312a95a08ac22999a47ad422a064ab77c9",
-  "patch_sha256": "9c694a90e7243e9f534f582da591ef7b6fa72afd55727e7167a2b8a43e75a51f",
-  "seconds": 200.64744663238525,
+  "executable_sha256": "d1aa7e7e1a8882e7dfda02c31bf1d54a63dfcc94fa7118e2bd43ec0b05de94b3",
+  "patch_sha256": "8a5701e6b1e1a8f995c8432d9434f2ce95f28ba9ac64eef3007c26a32b1af36f",
   "deployed": true,
-  "profile_units_used": 0,
-  "profile_excluded": [],
-  "profile_provenance": null,
-  "pgo_disabled_verified": true,
-  "hot_tuning_flags": "-fno-ipa-cp-clone",
-  "native_dll_sha256": {
-    "koboldcpp_default.dll": "4bca37343fe6e200689737091f2dee53c51b223c08960206f77e83d115692029",
-    "koboldcpp_vulkan.dll": "ed1921c0141ff8a1b2661cd7190dfd6262674562062980816eda20580d138867"
-  },
-  "build_verified": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
+  "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
   "build_date": "2026-10-24",
-  "build_scope": "CPU hot20 recompiled and LTO-linked; exact accepted Vulkan DLL reused because native sources/base/compiler flags are unchanged. Python build-date title added.",
-  "reused_vulkan_from_executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
-  "cpu_compile_log": "results/cpu-flags-2026-10-24-tiled-haswell-build.log",
-  "cpu_compile_log_sha256": "363e109c6078d014322cf1061f7e8d0504e9ef3c0faa17bb00bbdb9ef890e917",
+  "build_verified": true,
+  "pgo_disabled_verified": true,
+  "profile_units_used": 0,
+  "profile_provenance": null,
+  "native_dll_sha256": {
+    "koboldcpp_default.dll": "c45aa76cc746582dc4cf40ee3ce7525fc26350ca0dae9f2487181a7eb41d1b05",
+    "koboldcpp_vulkan.dll": "4f02b4569de932bcb120ae53213ee9f99637c0df80aba278af03a1fde3e05423"
+  },
+  "build_scope": "Same fresh source/patch; selected CPU recipe rebuilt and LTO-linked; exact tested Vulkan DLL reused.",
   "cpu_threads": {
     "threads": 16,
     "blasthreads": 20,
@@ -55,5 +50,7 @@
     "ubatchsize": 1024,
     "gpulayers": 99
   },
+  "backend_build_seconds": 376.8015067577362,
+  "cpu_recipe_rebuild_seconds": 153.6646324999747,
   "binary_unchanged": false
 }

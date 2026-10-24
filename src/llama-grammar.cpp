@@ -32,7 +32,8 @@ struct std::hash<bytes>
     }
 };
 
-using candidates_memos = std::unordered_map<size_t, llama_grammar_candidates>;
+// KCPP_GRAMMAR_INDEX_CACHE: PR2434; cached pointers outlive the caller buffers.
+using candidates_memos = std::unordered_map<size_t, std::vector<size_t>>;
 using stack_memos = std::unordered_map<size_t, candidates_memos>;
 static stack_memos memo_cache;
 
@@ -1104,7 +1105,12 @@ llama_grammar_candidates llama_grammar_reject_candidates_for_stack(
     auto stack_hash_size  = sizeof(stack[0]) * stack.size();
     auto stack_hash       = std::hash<bytes>{}({ stack_hash_start, stack_hash_size });
 
-    llama_grammar_candidates * cache_target = nullptr;
+    std::vector<size_t> * cache_target = nullptr;
+    auto store_rejects = [&]() {
+        cache_target->clear();
+        cache_target->reserve(rejects.size());
+        for (const auto & r : rejects) { cache_target->push_back(r.index); }
+    };
 
     // Tests show that >75% of candidate lists are under 1280 and 50% are under 640b.
     // Most 'problem' loops are under 24b. However, candidate lists can be over 72k,
@@ -1138,7 +1144,23 @@ llama_grammar_candidates llama_grammar_reject_candidates_for_stack(
                 }
             }
             if (auto cache_hit2 = candidates_memos.find(candidates_hash); cache_hit2 != candidates_memos.end()) {
-                return cache_hit2->second;
+                // KCPP_GRAMMAR_FAST_RESTORE: direct dense lookup, linear sparse fallback; never O(rejects*candidates).
+                std::unordered_map<size_t, size_t> positions;
+                bool indexed = false;
+                for (size_t idx : cache_hit2->second) {
+                    if (idx < candidates.size() && candidates[idx].index == idx) {
+                        rejects.push_back(candidates[idx]);
+                    } else {
+                        if (!indexed) {
+                            positions.reserve(candidates.size());
+                            for (size_t j = 0; j < candidates.size(); ++j) { positions.emplace(candidates[j].index, j); }
+                            indexed = true;
+                        }
+                        const auto found = positions.find(idx);
+                        if (found != positions.end()) { rejects.push_back(candidates[found->second]); }
+                    }
+                }
+                return rejects;
             } else {
                 cache_target = &(candidates_memos[candidates_hash]);
             }
@@ -1165,7 +1187,7 @@ llama_grammar_candidates llama_grammar_reject_candidates_for_stack(
         // cache_target was set by operator[] which pre-inserted an empty vector; write the
         // result here so subsequent lookups don't return an empty reject set.
         if (cache_target) {
-            *cache_target = rejects;
+            store_rejects();
         }
         return rejects;
     }
@@ -1204,7 +1226,7 @@ llama_grammar_candidates llama_grammar_reject_candidates_for_stack(
     }
 
     if (cache_target) {
-        *cache_target = rejects;
+        store_rejects();
     }
     return rejects;
 }
