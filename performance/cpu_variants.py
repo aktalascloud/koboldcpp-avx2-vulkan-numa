@@ -39,10 +39,10 @@ def stage(name):
 
 
 def flags(name,jobs,compiler='stable'):
-    DATA.mkdir(parents=True,exist_ok=True)
     profile=''
     lto='-flto='+str(jobs)+' -fuse-linker-plugin' if 'lto' in name else ''
     if name=='instrument':
+        DATA.mkdir(parents=True,exist_ok=True)
         profile='-fprofile-generate='+str(DATA).replace('\\','/')+' -fprofile-update=atomic'
     elif 'pgo' in name:
         if not list(DATA.rglob('*.gcda')):
@@ -50,7 +50,7 @@ def flags(name,jobs,compiler='stable'):
         profile='-fprofile-use='+str(DATA).replace('\\','/')+' -fprofile-correction -fprofile-partial-training -Werror=missing-profile'
     # Whole-program LTO, profile guidance on the actual GGML numerical/scheduler core.
     text='CFLAGS += -fno-math-errno '+lto+'\nCXXFLAGS += -fno-math-errno '+lto+'\n'
-    if name=='pgo-lto-tuned':
+    if name in ('pgo-lto-tuned','lto-tuned'):
         tuning='-frename-registers -falign-functions=32 -falign-loops=32'
         text+='CFLAGS += '+tuning+'\nCXXFLAGS += '+tuning+'\nLDFLAGS += '+tuning+'\n'
     if profile:
@@ -67,7 +67,7 @@ def flags(name,jobs,compiler='stable'):
                 metadata.get('vec_profile_sources_sha256',{}).get(path)==hashlib.sha256((SRC/path).read_bytes()).hexdigest()
                 for path in vec_paths)
             if not vec_valid:text+='ggml-vec.o: CXXFLAGS += -fno-profile-use\n'
-    if name=='pgo-lto-tuned':
+    if name in ('pgo-lto-tuned','lto-tuned'):
         policy_path=BASE/'cpu-policy.json'
         policy=json.loads(policy_path.read_text(encoding='utf-8')) if policy_path.exists() else {}
         hot_flags=policy.get('hot_tuning_flags','')
@@ -77,7 +77,7 @@ def flags(name,jobs,compiler='stable'):
             text+=' '.join(HOT)+': CFLAGS += '+hot_flags+'\n'
             text+=' '.join(HOT)+': CXXFLAGS += '+hot_flags+'\n'
             text+='LDFLAGS += '+hot_flags+'\n'
-        excluded=policy.get('exclude_pgo_objects',[])
+        excluded=policy.get('exclude_pgo_objects',[]) if 'pgo' in name else []
         if any(unit not in HOT for unit in excluded):raise RuntimeError('Unknown PGO exclusion.')
         for unit in excluded:
             text+=unit+': CFLAGS += -fno-profile-use\n'+unit+': CXXFLAGS += -fno-profile-use\n'
@@ -176,7 +176,7 @@ def train(target,reset=True,start=0):
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('mode',choices=['base-final','instrument','pgo','lto','pgo-lto','pgo-lto-tuned','stage-base'])
+    parser.add_argument('mode',choices=['base-final','instrument','pgo','lto','lto-tuned','pgo-lto','pgo-lto-tuned','stage-base'])
     parser.add_argument('--jobs',type=int,default=4)
     parser.add_argument('--compiler',choices=['stable','winlibs'],default='stable')
     parser.add_argument('--link-only',action='store_true')

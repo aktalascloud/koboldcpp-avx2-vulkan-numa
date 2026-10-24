@@ -1,10 +1,10 @@
 # Working changes and attribution
 
-The exact native diff against experimental99bfa84 is [patches/runtime.patch](patches/runtime.patch), SHA256 e2164b83350bd9dd99836f3fed00905254c441bccabc5b9ddda821728772209b. The full fork source already includes it: **do not apply twice**. [provenance.json](provenance.json) identifies the unchanged released EXE.
+The exact native diff against experimental6475b2f is [patches/runtime.patch](patches/runtime.patch), SHA256 e2164b83350bd9dd99836f3fed00905254c441bccabc5b9ddda821728772209b. The full fork source already includes it: **do not apply twice**. [provenance.json](provenance.json) identifies the current released EXE.
 
 | Change | Scope / measured contribution |
 |---|---|
-| O3/Haswell, PGO20 + LTO, register renaming, align32, hot no-clone |Combined matched CPU17.34 to 17.50 tok/s; no independent additive percentage for each compiler flag.|
+| Historical23October: O3/Haswell, PGO20 + LTO, register renaming, align32, hot no-clone |Combined matched CPU17.34 to 17.50 tok/s; no independent additive percentage for each compiler flag.|
 | Win64 ABI/stack/AVX-helper repairs |Correctness fixes; no separate speed claim.|
 | IQ4_XS rows4/WG64 |Same candidate17.355 to 21.345 tok/s; single-column only.|
 | Graphics queue |Existing upstream option; runtime recommendation, not original patch.|
@@ -17,3 +17,5 @@ The exact native diff against experimental99bfa84 is [patches/runtime.patch](pat
 | Shader dependencies /4-worker cap /object-flag fingerprints |Build reliability and stale-SPIR-V prevention; not runtime token throughput.|
 
 All23 reviewed source repositories and their pins are in [sources.json](sources.json). Review covered bounded history (up to 40 commits/100 issue or PR entries per source) and17 selected ik_llama PR diffs, not every line of every project. Linux ROCm, CUDA/Metal and incompatible quantizations were not blindly imported into Windows Vulkan. GPU sampling and MoE fusion are deliberately absent after negative local measurements.
+
+Current24October recipe: O3/Haswell/AVX2+LTO without PGO. Fresh manually requested comparisons are in benchmarks/current.json. Historical per-patch figures above are not new measurements of the current EXE. Daily builds perform build/startup checks; speed and generation tests require a manual request.

@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "99bfa84a7d2023d94580721ab241a61ae8f2b3bc",
+  "commit": "6475b2f6b733020da42a353e90476359bb918531",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -16,22 +16,23 @@
   "ffi_no_avx": true,
   "native_version": "1.123.1",
   "compiler": "gcc.exe (MinGW-W64 x86_64-msvcrt-posix-seh, built by Brecht Sanders, r8) 13.2.0",
-  "cpu_optimization": "pgo-lto-tuned",
+  "cpu_optimization": "lto-tuned",
   "compiler_policy": "winlibs",
-  "profile_flags": "-fprofile-use=<BUILD>/pgo/data -fprofile-correction -fprofile-partial-training -Werror=missing-profile",
+  "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "651e4a41d3581bf619ae9fe2112a09af1a39110489ae8bd2b32f1f3ff142aee4",
+  "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
   "patch_sha256": "e2164b83350bd9dd99836f3fed00905254c441bccabc5b9ddda821728772209b",
-  "seconds": 582.9867508411407,
+  "seconds": 579.2936787605286,
   "deployed": true,
-  "native_dll_sha256": {
-    "koboldcpp_default.dll": "f4cd99cee9ca6e418a6d0ec851668e2b5f7583318dd509e08d5bb7e1bb98c13b",
-    "koboldcpp_vulkan.dll": "1125ad82ce3b196404c476016a688159398a9508803ce2cb07da43d5577edd65"
-  },
-  "hot_tuning_flags": "-fno-ipa-cp-clone",
-  "profile_units_used": 20,
+  "profile_units_used": 0,
   "profile_excluded": [],
-  "profile_provenance": "pgo/profile-metadata.json",
+  "profile_provenance": null,
+  "pgo_disabled_verified": true,
+  "hot_tuning_flags": "-fno-ipa-cp-clone",
+  "native_dll_sha256": {
+    "koboldcpp_default.dll": "b13a82f21bc747c0223a87df90b5d8fa2ee5337aed9c9604dd07de1401847dfb",
+    "koboldcpp_vulkan.dll": "ed1921c0141ff8a1b2661cd7190dfd6262674562062980816eda20580d138867"
+  },
   "cpu_threads": {
     "threads": 16,
     "blasthreads": 20,
@@ -45,6 +46,5 @@
     "ubatchsize": 1024,
     "gpulayers": 99
   },
-  "source_distribution": "Full source at this tag; runtime.patch against the recorded upstream commit.",
-  "binary_unchanged": true
+  "binary_unchanged": false
 }

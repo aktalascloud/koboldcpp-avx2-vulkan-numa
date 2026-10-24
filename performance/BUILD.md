@@ -1,13 +1,25 @@
 # Reproduce and maintain
 
-Use the full tagged source. Windows x64 with Haswell-compatible AVX2/FMA/F16C is required for this target. Install WinLibs GCC13.2 MSVCRT POSIX SEH **with LTO** under `performance/toolchain/winlibs/mingw64`; GNU Make/shell from w64devkit under `performance/toolchain/stable/w64devkit`. Its own GCC disables LTO and is not the selected compiler. Vulkan glslc/headers are the upstream pinned ones. Python with `performance/requirements-build.txt` is a build tool, not a model runtime download.
+The current recipe is **O3 / Haswell / AVX2 + LTO, without PGO**. It retains register renaming, 32-byte function/loop alignment, hot `-fno-ipa-cp-clone`, static runtimes and the Windows ABI fixes. A training model is not required.
 
-Set `KCPP_TRAIN_MODEL` to an existing GGUF, then run `python performance/build.py --jobs 4`. No GGUF or trained PGO counter files are in Git. A new checkout/root, compiler, source commit or patch requires fresh training. English/Russian/code prompts,32 outputs, one training thread. Optional temporary MoE training must retain provenance and delete only its temporary GGUF after validation. Always regenerate profiles; do not hide missing-profile or coverage-mismatch diagnostics.
+Use the full tagged source on Windows x64 with a Haswell-compatible AVX2/FMA/F16C CPU. Install WinLibs GCC 13.2 MSVCRT POSIX SEH **with LTO** under `performance/toolchain/winlibs/mingw64`, and GNU Make/shell from w64devkit under `performance/toolchain/stable/w64devkit`. The latter's own GCC disables LTO and is not the selected compiler. Vulkan glslc and headers are the upstream pinned ones. Install the Python build dependencies from `performance/requirements-build.txt`.
 
-Keep all20 trained hot units. vec.cpp/vec.h fingerprints must match the training metadata. Never reuse profile-generate objects in profile-use links; never link GCOV into production to hide stale objects. Separate shader compilation (maximum4 workers), then native links sequentially with LTO4. Keep explicit C ABI exports, static runtimes, stack realignment, no-AVX expose.o and inline AVX math helpers. No blanket fast-math, lowered precision or driver/BIOS/TDR/voltage changes.
+Run:
 
-`python performance/merge_upstream.py` fetches **only** LostRuins/koboldcpp `concedo_experimental`, then merges its actual commit into the current patched branch. Conflicts stop publication; resolve by meaning, retain upstream fixes and local invariants, then record the exact resolved revision. No force push or substitution of the stable branch.
+```text
+python performance/build.py --jobs 4
+```
 
-Daily maintainer sequence: merge upstream; adapt reviewed patches; build with fresh PGO when required; wait for compilers to finish; compare CPU/Vulkan against an unchanged control using identical model/threads; test real Russian/English/arithmetic, JSON grammar and batch boundaries; test the same photo parameters and seed; deploy through the idle ownership-checked supervisor; publish only the corresponding accepted source, EXE and checksums. Keep cold/warm and raw/full-chain timings distinct. Preserve all controls, including negative ones. No claims of physical dual-socket measurements until actually measured.
+The build reads `performance/cpu-policy.json`, regenerates shaders with at most four workers, and links Vulkan and CPU backends sequentially with LTO. It rebuilds native objects so old instrumented/profile-guided objects cannot enter the new link. Current compile/link commands must contain no `-fprofile-*` or GCOV runtime. Historical PGO experiments and their dated results are retained for comparison; they are not the release recipe.
 
-The current public release reuses existing validated EXE651e4a41 and previous measurements; publication itself does not regenerate photos. It was built at upstream99bfa84 with the exact runtime.patch. Package source at the tag plus the patch is the corresponding source; installation-only media files are in the separate media repository.
+Preserve explicit C ABI exports, static runtimes, stack realignment, no-AVX `expose.o`, always-inline AVX exp/silu helpers and shader dependency invalidation. Do not enable blanket fast-math, lower precision or change drivers, BIOS, TDR, voltage or clocks. Do not benchmark inference while compiling.
+
+`python performance/merge_upstream.py` fetches only LostRuins/koboldcpp **concedo_experimental**, then merges the exact official commit into the patched branch. Resolve conflicts by meaning, preserve upstream fixes and local invariants, and never force-push or substitute the stable branch.
+
+Only when the user explicitly requests manual benchmarks, compare stock, the previous working EXE and the new EXE with the same model and thread settings. Retain every run and range, including negative results. For a manual validation session, check real Russian/English/arithmetic answers, JSON grammar, batch boundaries and the same fixed-seed photo pipeline. Keep cold/warm and raw/full-pipeline timings separate. Verify startup, the visible Native window, APIs and model switching after deployment.
+
+The maintainer's current policy prioritizes a fresh functional experimental build even when measured throughput is lower. Report that difference; never relabel a negative performance verdict as a pass. Correctness, source/SHA, secret and license checks remain mandatory. A new EXE must have its own matching evidence.
+
+Publish the matching source, exact patch, EXE and checksums together. End users run `koboldcpp-nocuda.exe` directly through its GUI or CLI. The separate media repository supplies photo/music routing, face processing and upscaling.
+
+Daily automation builds, installs, verifies startup/API availability and publishes. It does not generate photos/music or run performance benchmarks. New SHA-bound startup evidence is required; previous manual measurements retain their original date and executable SHA.

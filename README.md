@@ -9,18 +9,22 @@ This is a fork of **[the original KoboldCpp by LostRuins](https://github.com/Los
 Topics: KoboldCpp, llama.cpp, AVX2, Haswell, RX580, Polaris, gfx803, Vulkan, NUMA, speed, performance, patches, PGO and LTO.
 
 <!-- daily-check:start -->
-## Daily validation: 24 October 2026
+## Current build: LTO without PGO, 24 October 2026
 
-Official experimental **6475b2f** was merged. Its new TAEQI2.1-Tinier preview decoder does not change the selected Z-Image setup. A fresh O3/Haswell/PGO20/LTO candidate was built and tested, but **was not deployed or released** because it did not pass the CPU performance gate. The accepted Windows release remains **651e4a41**.
+Official experimental **6475b2f** is installed and uses **O3 / Haswell / AVX2 + LTO**, with PGO disabled. The EXE fingerprint starts with **6546333c**. Register renaming, alignment 32, hot no-clone, Vulkan tuning and Windows ABI fixes remain enabled.
 
-| Same-model output speed | Stock 1.123.1 | Previous accepted build | Daily candidate |
+The following measurements were explicitly requested manually. Daily automation now builds, installs, verifies startup and publishes; it does not run token/image/music benchmarks.
+
+| Output speed, identical model/settings | Stock 1.123.1 | Previous 651e4a41 | Current LTO-only |
 |---|---:|---:|---:|
-| CPU 16/20, four runs each | 17.590 tokens/s | 17.555 tokens/s | 17.395 tokens/s |
-| Vulkan 6/4, graphics queue, two runs each | 17.080 tokens/s | 21.345 tokens/s | 21.345 tokens/s |
+| CPU 16/20, four runs each | 17.4325 tokens/s | 17.3775 tokens/s | 17.2175 tokens/s |
+| Vulkan 6/4, graphics queue, two runs each | 17.040 tokens/s | 21.285 tokens/s | 21.290 tokens/s |
 
-Candidate CPU range: 16.88–17.69; previous: 17.37–17.81 tokens/s. All four runs, including the first slower candidate run, remain included. The pooled CPU mean changed by **-0.91%**; overlapping ranges do not establish a universal slowdown. Vulkan means were identical. The real API request with 675 input tokens and 191 output tokens took **8.603 s before / 8.613 s after**, with identical answers. Russian, English, arithmetic, JSON grammar and the 1023/1024/1030/2049-token boundaries passed. No photo benchmark was run after this rejection. [Dated results](performance/benchmarks/daily-2026-10-24.json).
+CPU generation is lower in this matched series; removing PGO did not establish a speed improvement. All runs and ranges are retained. The Vulkan mean is slightly higher, with overlapping ranges. A separate 14/18/20-thread screen and ABBA confirmation retained **CPU 16/20**; the 18-thread peak was not reproduced consistently. GPU 6/4 and SD 20 remain separate.
 
-The optimization comparisons below are the preserved **23 October / 651e4a41** measurements, not measurements of the rejected daily candidate.
+Manual Normal 592×896, three LoRAs plus YuNet/GPEN/SFace/Gater: **147.83 s first / 139.48 s repeat** before deployment. This used the actual Pipeline.generate and Native API through a verified isolated lease, excluding initial model loading and frontend HTTP transfer. Both outputs are RGB-identical to the previous working result. After installation, startup, the visible window and API availability were checked without another generation or music-switch test.
+
+[Current measurements and scope](performance/benchmarks/current.json). The older optimization comparisons below belong to **23 October / 651e4a41** and remain historical evidence.
 <!-- daily-check:end -->
 
 ## CPU and GPU: before versus after
@@ -105,7 +109,7 @@ These values were measured on this RX 580. Tune threads, offload and batch for o
 
 ## Optimizations retained
 
-* **O3 / Haswell / AVX2 / FMA / F16C, fresh PGO for 20 hot units and LTO**, register renaming, function/loop alignment 32 and hot `-fno-ipa-cp-clone`. Individual compiler flags do not have independently measured percentages.
+* **O3 / Haswell / AVX2 / FMA / F16C, LTO without PGO (current recipe)**, register renaming, function/loop alignment 32 and hot `-fno-ipa-cp-clone`. Individual compiler flags do not have independently measured percentages.
 * **IQ4_XS rows4 / WG64** for single-column Vulkan operations. Within the same candidate: 17.355 versus 21.345 tokens/s with the previous rows8 setting. Weights and precision are unchanged.
 * **Batched Vulkan submissions and FP32 GCN64/K16**, retaining the computation watchdog limit. vkblas ideas were adapted to GGML. Warm raw photo generation with K32/K16 took 129.9435 / 129.7727 s; RGB pixels matched across all six checks.
 * **Opt-in HybridMoE / SLRU** for MoE models. On the tested OLMoE, one upload reduced the API cycle from 14.5312 to 13.3383 s. Dense Qwen/media keep expert caching disabled. Full GPU offload is faster when the whole model fits.
@@ -116,7 +120,7 @@ These values were measured on this RX 580. Tune threads, offload and batch for o
 
 ## Maintenance and licenses
 
-Official **concedo_experimental** commits are merged into this fork. Local maintenance runs daily at **08:00 Asia/Bishkek**, builds a candidate and publishes Windows assets after source, correctness, performance, hash and startup checks. The computer and Codex must be running for the local schedule.
+Official **concedo_experimental** commits are merged into this fork. Local maintenance runs daily at **08:00 Asia/Bishkek**, builds a candidate and publishes Windows assets after source, build, hash and startup checks; speed/generation tests are manual only. The computer and Codex must be running for the local schedule.
 
 Runtime caches, logs, PID files, PGO counters, credentials and personal settings are excluded. [sources.json](performance/sources.json) lists all 23 investigated repositories. History review was bounded; a line-by-line audit of every repository is not claimed.
 

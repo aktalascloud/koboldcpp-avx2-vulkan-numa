@@ -1,0 +1,234 @@
+{
+  "source_commit": "6475b2f6b733020da42a353e90476359bb918531",
+  "production_executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+  "cpu": {
+    "threads": 16,
+    "blasthreads": 20,
+    "numa": "auto",
+    "matched_runs": 4,
+    "stock_prompt_tps": 41.0275,
+    "new_prompt_tps": 41.0025,
+    "stock_generation_tps": 17.4325,
+    "new_generation_tps": 17.2175,
+    "stock_range": [
+      17.3,
+      17.54
+    ],
+    "new_range": [
+      16.93,
+      17.36
+    ],
+    "previous": {
+      "prompt_tps": 42.3175,
+      "generation_tps": 17.3775,
+      "range": [
+        17.26,
+        17.53
+      ],
+      "runs": 4
+    },
+    "scope": "2026-10-24;stock1.123.1 control,previous accepted EXE,candidate;context512/batch256/64 output.",
+    "tuned_settings": {
+      "selected_threads": 16,
+      "blasthreads": 20,
+      "sdthreads": 20,
+      "selected_generation_tps": 17.395000000000003,
+      "confirmed_means": {
+        "16": 17.395000000000003,
+        "18": 16.880000000000003
+      },
+      "scope": "CPU-only matched ABBA confirmation; GPU6/4 and SD20 unchanged. Screen runs retained separately."
+    }
+  },
+  "vulkan": {
+    "threads": 6,
+    "blasthreads": 4,
+    "batchsize": 1024,
+    "ubatchsize": 1024,
+    "stock_graphics_generation_tps": 17.04,
+    "before_generation_tps": 21.285,
+    "new_generation_tps": 21.29,
+    "director_before_seconds": 8.627112399990438,
+    "director_seconds": 8.632220899977256,
+    "director_answers_identical": true,
+    "environment": {
+      "GGML_VK_ALLOW_GRAPHICS_QUEUE": "1",
+      "GGML_VK_BATCHED_SUBMITS": "1",
+      "GGML_VK_MAX_NODES_PER_SUBMIT": "100",
+      "GGML_VK_GCN_TILE64": "1",
+      "GGML_VK_GCN_TILE_VARIANT": "k16",
+      "GGML_VK_IQ4_XS_ROWS": "4",
+      "GGML_VK_IQ4_XS_WG": "64"
+    },
+    "measured_date": "2026-10-24",
+    "matched_runs": 2,
+    "current_ranges": {
+      "stock": [
+        17.03,
+        17.05
+      ],
+      "previous": [
+        21.27,
+        21.3
+      ],
+      "candidate": [
+        21.28,
+        21.3
+      ]
+    }
+  },
+  "photo": {
+    "stock_seconds": 163.15458520001266,
+    "before_seconds": 136.01556070000152,
+    "cold_seconds": 138.34833489999437,
+    "warm_seconds": 131.82604799999535,
+    "png_identical": true,
+    "scope": "Historical576x864 stock/optimized651e4a41 photo comparison; NOT a fresh measurement of the daily EXE.",
+    "optimized_executable_sha256": "651e4a41d3581bf619ae9fe2112a09af1a39110489ae8bd2b32f1f3ff142aee4",
+    "measured_date": "2026-10-23"
+  },
+  "moe": {
+    "director_seconds": {
+      "before-u0": 14.546966300003987,
+      "new-u0": 14.531162799998128,
+      "new-u1": 13.338286500002141,
+      "new-u2": 13.444974999998522,
+      "new-u4": 13.415054400000372,
+      "new-small16": null
+    },
+    "selected_uploads": 1,
+    "scope": "Temporary OLMoE,RAM experts/cache1024/hybrid6;not dense-media",
+    "correctness_passed": true,
+    "upstream_policy": "SLRU"
+  },
+  "pgo": {
+    "enabled": false,
+    "used_units": 0,
+    "lto": true,
+    "compiler_policy": "lto-tuned",
+    "reason": "User24October disabled PGO and requires LTO; retained counters are historical only."
+  },
+  "numa": {
+    "current_nodes": 1,
+    "selected": "auto",
+    "physical_dual_socket_measured": false,
+    "destination_test": "tune_dual_numa.py"
+  },
+  "hip": "Historical restricted text/API passed;photo failed in system amdhip64;not selected or retested as a current backend.",
+  "rejected": [
+    "GPU sampling slower on matching API",
+    "Active MoE SwiGLU epilogue fusion slower",
+    "Compact loops",
+    "PGO vec/dot exclusions",
+    "single LTO partition failed"
+  ],
+  "measured_on": "Xeon E5-2696v3 / RX580 2048SP 8GB / Windows; see each measurement scope",
+  "daily_acceptance": {
+    "date": "2026-10-24",
+    "evidence": "daily-2026-10-24-lto-acceptance.json",
+    "cpu": {
+      "stock": {
+        "prompt_tps": 41.0275,
+        "generation_tps": 17.4325,
+        "range": [
+          17.3,
+          17.54
+        ],
+        "runs": 4
+      },
+      "previous": {
+        "prompt_tps": 42.3175,
+        "generation_tps": 17.3775,
+        "range": [
+          17.26,
+          17.53
+        ],
+        "runs": 4
+      },
+      "candidate": {
+        "prompt_tps": 41.0025,
+        "generation_tps": 17.2175,
+        "range": [
+          16.93,
+          17.36
+        ],
+        "runs": 4
+      }
+    },
+    "vulkan": {
+      "stock": {
+        "prompt_tps": 410.445,
+        "generation_tps": 17.04,
+        "range": [
+          17.03,
+          17.05
+        ],
+        "runs": 2
+      },
+      "previous": {
+        "prompt_tps": 428.71500000000003,
+        "generation_tps": 21.285,
+        "range": [
+          21.27,
+          21.3
+        ],
+        "runs": 2
+      },
+      "candidate": {
+        "prompt_tps": 428.505,
+        "generation_tps": 21.29,
+        "range": [
+          21.28,
+          21.3
+        ],
+        "runs": 2
+      }
+    },
+    "director": {
+      "previous": {
+        "seconds": 8.627112399990438,
+        "usage": {
+          "prompt_tokens": 675,
+          "completion_tokens": 191,
+          "total_tokens": 866
+        },
+        "ok": true
+      },
+      "candidate": {
+        "seconds": 8.632220899977256,
+        "usage": {
+          "prompt_tokens": 675,
+          "completion_tokens": 191,
+          "total_tokens": 866
+        },
+        "ok": true
+      }
+    },
+    "photo": {
+      "width": 592,
+      "height": 896,
+      "pixels": 530432,
+      "pixel_increase_percent": 6.584362139917688,
+      "author_aspect_relative_error": 0.008928571428571428,
+      "cold_seconds": 147.82959179999307,
+      "warm_seconds": 139.48006450000685,
+      "native_warm_seconds": 134.973,
+      "faces_warm_seconds": 1.0242,
+      "gater_warm_seconds": 3.1785405999980867,
+      "scope": "Actual unchanged Pipeline.generate and candidate Native API through verified isolated lease; startup/prewarm excluded; no SR",
+      "editing_same_budget": true,
+      "editing_native_inference_retested": false,
+      "measured_date": "2026-10-24",
+      "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+      "evidence": "daily-2026-10-24-lto-photo.json"
+    },
+    "answers_identical": true,
+    "photo_rgb_identical": true,
+    "pgo_enabled": false,
+    "performance_regression_authorized": true,
+    "previous_executable_sha256": "651e4a41d3581bf619ae9fe2112a09af1a39110489ae8bd2b32f1f3ff142aee4",
+    "current_executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+    "previous_source_commit": "99bfa84a7d2023d94580721ab241a61ae8f2b3bc",
+    "current_source_commit": "6475b2f6b733020da42a353e90476359bb918531"
+  }
+}

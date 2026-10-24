@@ -38,15 +38,12 @@ def main():
             fingerprint.update(name.encode());fingerprint.update(bytes.fromhex(sha(path)))
     compiler_version=subprocess.check_output([str(compiler/'gcc.exe'),'--version'],text=True).splitlines()[0]
     identity={'source_commit':revision,'source_root':str(SRC),'source_patch_sha256':fingerprint.hexdigest(),'compiler':compiler_version}
-    metadata_path=BASE/'pgo/profile-metadata.json'
-    metadata=json.loads(metadata_path.read_text()) if metadata_path.exists() else {}
     started=time.perf_counter()
-    if any(metadata.get(key)!=value for key,value in identity.items()):
-        target=cpu_variants.make('instrument',options.jobs,'winlibs')
-        training=cpu_variants.train(target)
-        metadata_path.write_text(json.dumps({**identity,'vec_profile_valid':training['vec_profile_valid'],
-            'vec_profile_sources_sha256':training['vec_profile_sources_sha256']},indent=2),encoding='utf-8')
-    recipe,profile,lto=cpu_variants.flags('pgo-lto-tuned',options.jobs,'winlibs')
+    policy=json.loads((BASE/"cpu-policy.json").read_text(encoding="utf-8"))
+    if policy.get("pgo_enabled") is not False or policy.get("variant") not in ("lto","lto-tuned"):
+        raise RuntimeError("This release requires LTO without PGO")
+    recipe,profile,lto=cpu_variants.flags(policy["variant"],options.jobs,"winlibs")
+    if profile or not lto:raise RuntimeError("No-PGO/LTO policy not satisfied")
     recipe_path=BASE/'optimized.mk';recipe_path.write_text(recipe,encoding='utf-8')
     environment=os.environ.copy()
     environment['PATH']=str(compiler)+os.pathsep+str(make.parent)+os.pathsep+environment['PATH']
