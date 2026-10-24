@@ -12,6 +12,10 @@ python performance/build.py --jobs 4
 
 The build reads `performance/cpu-policy.json`, regenerates shaders with at most four workers, and links Vulkan and CPU backends sequentially with LTO. It rebuilds native objects so old instrumented/profile-guided objects cannot enter the new link. Current compile/link commands must contain no `-fprofile-*` or GCOV runtime. Historical PGO experiments and their dated results are retained for comparison; they are not the release recipe.
 
+CPU-only hot-unit flags are selected by `cpu_hot_variant` in that policy and defined in `cpu_flag_options.py`. The Vulkan backend retains its own baseline recipe. Shared object files are rebuilt between backend links to prevent one backend's flags leaking into the other.
+
+Packaging embeds the actual build day in `embd_res/kcpp_build.json`. The GUI and terminal titles display it as `[YYYY-MM-DD]`; the API version remains unchanged. Launching an older build on a later day does not change its displayed build date.
+
 Preserve explicit C ABI exports, static runtimes, stack realignment, no-AVX `expose.o`, always-inline AVX exp/silu helpers and shader dependency invalidation. Do not enable blanket fast-math, lower precision or change drivers, BIOS, TDR, voltage or clocks. Do not benchmark inference while compiling.
 
 `python performance/merge_upstream.py` fetches only LostRuins/koboldcpp **concedo_experimental**, then merges the exact official commit into the patched branch. Resolve conflicts by meaning, preserve upstream fixes and local invariants, and never force-push or substitute the stable branch.

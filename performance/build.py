@@ -6,6 +6,7 @@ BASE=Path(__file__).resolve().parent
 SRC=BASE.parent
 sys.path.insert(0,str(BASE))
 import cpu_variants
+from cpu_flag_options import extra_flags,recipe as backend_recipe
 
 def sha(path):
     result=hashlib.sha256()
@@ -45,6 +46,10 @@ def main():
     recipe,profile,lto=cpu_variants.flags(policy["variant"],options.jobs,"winlibs")
     if profile or not lto:raise RuntimeError("No-PGO/LTO policy not satisfied")
     recipe_path=BASE/'optimized.mk';recipe_path.write_text(recipe,encoding='utf-8')
+    cpu_variant=policy.get('cpu_hot_variant','baseline')
+    cpu_extra=extra_flags(cpu_variant)
+    cpu_recipe_path=BASE/'cpu-optimized.mk'
+    cpu_recipe_path.write_text(backend_recipe(recipe,cpu_variants.HOT,cpu_variant),encoding='utf-8')
     environment=os.environ.copy()
     environment['PATH']=str(compiler)+os.pathsep+str(make.parent)+os.pathsep+environment['PATH']
     common=[str(make),'-f','Makefile','CC='+str(compiler/'gcc.exe').replace('\\','/'),
@@ -55,10 +60,13 @@ def main():
           '-j'+str(options.jobs),'-o','ggml/src/ggml-vulkan-shaders.cpp','-o','vulkan-shaders-gen']
     run([*args,'koboldcpp_vulkan'],environment,'vulkan.log')
     # Full rebuild also prevents instrumentation objects reaching the CPU link.
-    run([*args,'koboldcpp_default'],environment,'cpu.log')
+    cpu_args=[str(cpu_recipe_path).replace('\\','/') if value==str(recipe_path).replace('\\','/') else value for value in args]
+    run([*cpu_args,'koboldcpp_default'],environment,'cpu.log')
     subprocess.run([sys.executable,str(BASE/'package.py')],cwd=SRC,env=environment,check=True)
     exe=BASE/'candidate/koboldcpp-nocuda.exe'
     result={**identity,'exe_sha256':sha(exe),'dll_sha256':{path.name:sha(path) for path in (SRC/'koboldcpp_default.dll',SRC/'koboldcpp_vulkan.dll')},
+            'cpu_hot_variant':cpu_variant,'cpu_extra_flags':cpu_extra,'vulkan_hot_variant':'baseline',
+            'build_date':json.loads((SRC/'embd_res/kcpp_build.json').read_text(encoding='utf-8'))['build_date'],
             'jobs':options.jobs,'profile':profile,'lto':lto,'seconds':time.perf_counter()-started,
             'accepted':False,'note':'Build success is not correctness/performance acceptance.'}
     (BASE/'results/build.json').write_text(json.dumps(result,indent=2),encoding='utf-8')

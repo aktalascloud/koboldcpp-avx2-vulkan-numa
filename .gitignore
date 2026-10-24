@@ -172,3 +172,6 @@ conda/
 /performance/package-work/
 *.gcda
 *.gcno
+/embd_res/kcpp_build.json
+/performance/optimized.mk
+/performance/cpu-optimized.mk

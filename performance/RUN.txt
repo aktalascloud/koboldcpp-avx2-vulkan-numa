@@ -2,6 +2,7 @@ KoboldCpp performance fork: Haswell AVX2 / RX 580 Polaris (gfx803)
 
 Run koboldcpp-nocuda.exe directly. Double-click opens the standard KoboldCpp GUI.
 Select your own GGUF model. No PowerShell launcher is required.
+The terminal/GUI title includes the packaged build day [YYYY-MM-DD].
 
 Measured RX 580 settings:
 Vulkan device 0, GPU layers 99 when the model fits, threads 6, BLAS threads 4,

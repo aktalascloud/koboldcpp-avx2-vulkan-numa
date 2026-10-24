@@ -9,22 +9,24 @@ This is a fork of **[the original KoboldCpp by LostRuins](https://github.com/Los
 Topics: KoboldCpp, llama.cpp, AVX2, Haswell, RX580, Polaris, gfx803, Vulkan, NUMA, speed, performance, patches, PGO and LTO.
 
 <!-- daily-check:start -->
-## Current build: LTO without PGO, 24 October 2026
+## Current build: CPU compiler tuning, 2026-10-24
 
-Official experimental **6475b2f** is installed and uses **O3 / Haswell / AVX2 + LTO**, with PGO disabled. The EXE fingerprint starts with **6546333c**. Register renaming, alignment 32, hot no-clone, Vulkan tuning and Windows ABI fixes remain enabled.
+Official experimental **6475b2f**, EXE **75b0ed03**. **O3 / Haswell / AVX2 + LTO, without PGO**. Eight compiler flag recipes were compared manually. The selected recipe enables Haswell AVX2 in **only `ggml-tiled.o` and `ggml-tiled-kernel.o`**, which previously used generic C++ flags. It preserves baseline flags for other units and the LTO link, register renaming, alignment 32, hot no-clone and the no-AVX FFI exception. No fast-math or precision change was introduced.
 
-The following measurements were explicitly requested manually. Daily automation now builds, installs, verifies startup and publishes; it does not run token/image/music benchmarks.
+Same Qwen3 4B IQ4_XS, CPU 16/20, context 512, batch/ubatch 256, 64 output tokens. Four runs per arm, alternating forward/reverse order. Values are tokens/s:
 
-| Output speed, identical model/settings | Stock 1.123.1 | Previous 651e4a41 | Current LTO-only |
+| CPU stage | Stock 1.123.1 | Previous 6546333c | New 75b0ed03 |
 |---|---:|---:|---:|
-| CPU 16/20, four runs each | 17.4325 tokens/s | 17.3775 tokens/s | 17.2175 tokens/s |
-| Vulkan 6/4, graphics queue, two runs each | 17.040 tokens/s | 21.285 tokens/s | 21.290 tokens/s |
+| Prompt processing | 39.060 | 41.042 | 89.145 |
+| Output generation | 17.460 | 17.470 | 17.405 |
 
-CPU generation is lower in this matched series; removing PGO did not establish a speed improvement. All runs and ranges are retained. The Vulkan mean is slightly higher, with overlapping ranges. A separate 14/18/20-thread screen and ABBA confirmation retained **CPU 16/20**; the 18-thread peak was not reproduced consistently. GPU 6/4 and SD 20 remain separate.
+Measured change versus stock: **+128.23% prompt / -0.32% output**. Output ranges: stock [17.36, 17.54]; working [17.34, 17.61]; candidate [17.3, 17.52]. Overlapping ranges do not establish statistical significance. The main gain is prompt processing; do not describe it as a doubling of output-token speed.
 
-Manual Normal 592×896, three LoRAs plus YuNet/GPEN/SFace/Gater: **147.83 s first / 139.48 s repeat** before deployment. This used the actual Pipeline.generate and Native API through a verified isolated lease, excluding initial model loading and frontend HTTP transfer. Both outputs are RGB-identical to the previous working result. After installation, startup, the visible window and API availability were checked without another generation or music-switch test.
+Full-20-unit Haswell, function cloning, vector preference, loop unrolling, compact alignment and hot O2 alternatives, including every losing run, are retained in [the complete manual comparison](performance/benchmarks/cpu-compiler-flags.json). Real CPU arithmetic, English, Russian and prompt-director API answers passed for this EXE.
 
-[Current measurements and scope](performance/benchmarks/current.json). The older optimization comparisons below belong to **23 October / 651e4a41** and remain historical evidence.
+The **Vulkan DLL is byte-identical** to the previous accepted backend; it was reused explicitly rather than claimed as freshly benchmarked. Its last matched manual control remains **17.040 stock / 21.290 optimized output tokens/s**, measured on 6546333c, not a new GPU run. Image/music generation was not repeated. Existing photo timings below retain their original SHA and scope.
+
+The terminal and GUI now show the **embedded build day**, for example `KoboldCpp 1.123.1 [2026-10-24] Terminal`. It is the build date, not the launch date. Daily automation builds, installs, checks startup and publishes; **all performance and generation tests remain manual only**.
 <!-- daily-check:end -->
 
 ## CPU and GPU: before versus after
@@ -109,7 +111,7 @@ These values were measured on this RX 580. Tune threads, offload and batch for o
 
 ## Optimizations retained
 
-* **O3 / Haswell / AVX2 / FMA / F16C, LTO without PGO (current recipe)**, register renaming, function/loop alignment 32 and hot `-fno-ipa-cp-clone`. Individual compiler flags do not have independently measured percentages.
+* **O3 / Haswell / AVX2 / FMA / F16C, LTO without PGO (current recipe)**, register renaming, function/loop alignment 32 and hot `-fno-ipa-cp-clone`; CPU-only tiled AVX2/Haswell. Individual compiler flags do not have independently measured percentages.
 * **IQ4_XS rows4 / WG64** for single-column Vulkan operations. Within the same candidate: 17.355 versus 21.345 tokens/s with the previous rows8 setting. Weights and precision are unchanged.
 * **Batched Vulkan submissions and FP32 GCN64/K16**, retaining the computation watchdog limit. vkblas ideas were adapted to GGML. Warm raw photo generation with K32/K16 took 129.9435 / 129.7727 s; RGB pixels matched across all six checks.
 * **Opt-in HybridMoE / SLRU** for MoE models. On the tested OLMoE, one upload reduced the API cycle from 14.5312 to 13.3383 s. Dense Qwen/media keep expert caching disabled. Full GPU offload is faster when the whole model fits.

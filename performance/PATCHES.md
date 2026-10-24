@@ -1,6 +1,6 @@
 # Working changes and attribution
 
-The exact native diff against experimental6475b2f is [patches/runtime.patch](patches/runtime.patch), SHA256 e2164b83350bd9dd99836f3fed00905254c441bccabc5b9ddda821728772209b. The full fork source already includes it: **do not apply twice**. [provenance.json](provenance.json) identifies the current released EXE.
+The exact native diff against experimental6475b2f is [patches/runtime.patch](patches/runtime.patch), SHA256 9c694a90e7243e9f534f582da591ef7b6fa72afd55727e7167a2b8a43e75a51f. The full fork source already includes it: **do not apply twice**. [provenance.json](provenance.json) identifies the current released EXE.
 
 | Change | Scope / measured contribution |
 |---|---|
@@ -19,3 +19,5 @@ The exact native diff against experimental6475b2f is [patches/runtime.patch](pat
 All23 reviewed source repositories and their pins are in [sources.json](sources.json). Review covered bounded history (up to 40 commits/100 issue or PR entries per source) and17 selected ik_llama PR diffs, not every line of every project. Linux ROCm, CUDA/Metal and incompatible quantizations were not blindly imported into Windows Vulkan. GPU sampling and MoE fusion are deliberately absent after negative local measurements.
 
 Current24October recipe: O3/Haswell/AVX2+LTO without PGO. Fresh manually requested comparisons are in benchmarks/current.json. Historical per-patch figures above are not new measurements of the current EXE. Daily builds perform build/startup checks; speed and generation tests require a manual request.
+
+CPU compiler update 2026-10-24: selected tiled-only Haswell/vector256 with unchanged strict math, no PGO and mandatory LTO. See [all eight recipes and complete manual runs](benchmarks/cpu-compiler-flags.json); prompt/output changes versus stock are +128.23% / -0.32%. Other CPU units retain baseline flags; Vulkan DLL reused byte-for-byte. Window titles display the embedded build day.

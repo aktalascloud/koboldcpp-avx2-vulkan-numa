@@ -1,0 +1,744 @@
+{
+  "date": "2026-10-24",
+  "executable_sha256": "75b0ed03483d8791e01f77af23f04f312a95a08ac22999a47ad422a064ab77c9",
+  "previous_executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+  "source_commit": "6475b2f6b733020da42a353e90476359bb918531",
+  "selected_variant": "tiled-haswell",
+  "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
+  "pgo": false,
+  "lto": true,
+  "threads": 16,
+  "blasthreads": 20,
+  "context": 512,
+  "batch": 256,
+  "ubatch": 256,
+  "output_tokens": 64,
+  "summary": {
+    "stock": {
+      "prompt_tps": {
+        "mean": 39.06,
+        "range": [
+          33.3,
+          41.04
+        ],
+        "runs": [
+          40.92,
+          41.04,
+          33.3,
+          40.98
+        ]
+      },
+      "generation_tps": {
+        "mean": 17.46,
+        "range": [
+          17.36,
+          17.54
+        ],
+        "runs": [
+          17.54,
+          17.36,
+          17.51,
+          17.43
+        ]
+      }
+    },
+    "working": {
+      "prompt_tps": {
+        "mean": 41.0425,
+        "range": [
+          40.98,
+          41.1
+        ],
+        "runs": [
+          41.04,
+          41.1,
+          41.05,
+          40.98
+        ]
+      },
+      "generation_tps": {
+        "mean": 17.47,
+        "range": [
+          17.34,
+          17.61
+        ],
+        "runs": [
+          17.34,
+          17.48,
+          17.45,
+          17.61
+        ]
+      }
+    },
+    "candidate": {
+      "prompt_tps": {
+        "mean": 89.14500000000001,
+        "range": [
+          88.92,
+          89.26
+        ],
+        "runs": [
+          89.26,
+          88.92,
+          89.26,
+          89.14
+        ]
+      },
+      "generation_tps": {
+        "mean": 17.405,
+        "range": [
+          17.3,
+          17.52
+        ],
+        "runs": [
+          17.3,
+          17.38,
+          17.52,
+          17.42
+        ]
+      }
+    }
+  },
+  "cpu_api_ok": true,
+  "real_cpu_tests": [
+    "arithmetic",
+    "english",
+    "russian",
+    "director"
+  ],
+  "final_evidence": "cpu-flags-package-2026-10-24-runs.json",
+  "cpu_api_evidence": "cpu-flags-package-2026-10-24-api.json",
+  "vulkan_dll_unchanged": true,
+  "vulkan_benchmark_repeated": false,
+  "image_music_tests_repeated": false,
+  "cpu_decode_no_regression_stock": false,
+  "cpu_decode_no_regression_previous": false,
+  "scope": "Explicitly requested manual compiler comparison. All screening and confirmation runs, including negative values, are retained. No assertion of statistical significance.",
+  "percent_vs_stock": {
+    "prompt_tps": 128.2258064516129,
+    "generation_tps": -0.3150057273768603
+  },
+  "percent_vs_previous": {
+    "prompt_tps": 117.20168118413845,
+    "generation_tps": -0.3720663995420592
+  },
+  "variants": [
+    {
+      "name": "baseline",
+      "flags": "",
+      "dll_sha256": "b13a82f21bc747c0223a87df90b5d8fa2ee5337aed9c9604dd07de1401847dfb"
+    },
+    {
+      "name": "hot-default",
+      "flags": "-fno-rename-registers -falign-functions=16 -falign-loops=16 -fipa-cp-clone",
+      "dll_sha256": "f2050082f3b0f4bce5ec99d3cd1d0fad382fea3703a753f48b191681627e1df7",
+      "seconds": 152.35741010002675,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "hot-unroll",
+      "flags": "-funroll-loops -fpeel-loops -fipa-cp-clone",
+      "dll_sha256": "d80efcf2941df25002cda0d0ec7fa2e33f30f3053357247bea3103cab20114e5",
+      "seconds": 154.86342960002366,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "hot-compact",
+      "flags": "-fno-unroll-loops -falign-functions=16 -falign-loops=16 -fipa-cp-clone",
+      "dll_sha256": "d89bec2165df72647e3037cf82e41a3fd6929b9cebbf333765e224ac50515433",
+      "seconds": 153.1825342999946,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "hot-vector256",
+      "flags": "-mprefer-vector-width=256 -fipa-cp-clone",
+      "dll_sha256": "0be83a3e3d8f8873c9b4e04f88d0aba91fdfcc50bc64976f8920196b4a5bf390",
+      "seconds": 151.7407310999988,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "hot-haswell",
+      "flags": "-march=haswell -mprefer-vector-width=256 -fipa-cp-clone",
+      "dll_sha256": "6544768d264a1bcb1ebcaa9681594016925a4e6d5d27e365e2ea74a030af5990",
+      "seconds": 156.35569119997672,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "hot-haswell-noclone",
+      "flags": "-march=haswell -mprefer-vector-width=256",
+      "dll_sha256": "768211307331205a98c28862e8deef1ba6455c829b48343e0fe624fd1c7315aa",
+      "seconds": 153.5596178000269,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "hot-haswell-o2",
+      "flags": "-march=haswell -mprefer-vector-width=256 -O2",
+      "dll_sha256": "d21c5c30df1386dbb8c44527bdbfd0fb32cb2c00c8951416d3e0cfea78f07f15",
+      "seconds": 149.65295860002516,
+      "scope": "20 GGML hot translation units and LTO link; other units retain baseline flags."
+    },
+    {
+      "name": "tiled-haswell",
+      "flags": "-march=haswell -mprefer-vector-width=256",
+      "dll_sha256": "4bca37343fe6e200689737091f2dee53c51b223c08960206f77e83d115692029",
+      "seconds": 153.25439609997557,
+      "scope": "Only tiled.o/tiled-kernel.o use Haswell/vector256; all20 HOT units rebuilt, remaining units/link use baseline flags."
+    }
+  ],
+  "series": {
+    "cpu-flags-2026-10-24": [
+      {
+        "name": "cpu-flags-2026-10-24-stock-r0",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 40.66,
+        "generation_tps": 17.34,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-working-r0",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 40.92,
+        "generation_tps": 17.61,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-baseline-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "b13a82f21bc747c0223a87df90b5d8fa2ee5337aed9c9604dd07de1401847dfb",
+        "prompt_tps": 40.58,
+        "generation_tps": 17.33,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-default-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "f2050082f3b0f4bce5ec99d3cd1d0fad382fea3703a753f48b191681627e1df7",
+        "prompt_tps": 40.56,
+        "generation_tps": 17.29,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-unroll-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "d80efcf2941df25002cda0d0ec7fa2e33f30f3053357247bea3103cab20114e5",
+        "prompt_tps": 40.66,
+        "generation_tps": 17.25,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-compact-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "d89bec2165df72647e3037cf82e41a3fd6929b9cebbf333765e224ac50515433",
+        "prompt_tps": 40.77,
+        "generation_tps": 17.31,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-vector256-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "0be83a3e3d8f8873c9b4e04f88d0aba91fdfcc50bc64976f8920196b4a5bf390",
+        "prompt_tps": 40.33,
+        "generation_tps": 17.36,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-vector256-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "0be83a3e3d8f8873c9b4e04f88d0aba91fdfcc50bc64976f8920196b4a5bf390",
+        "prompt_tps": 40.54,
+        "generation_tps": 17.84,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-compact-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "d89bec2165df72647e3037cf82e41a3fd6929b9cebbf333765e224ac50515433",
+        "prompt_tps": 40.71,
+        "generation_tps": 17.1,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-unroll-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "d80efcf2941df25002cda0d0ec7fa2e33f30f3053357247bea3103cab20114e5",
+        "prompt_tps": 40.4,
+        "generation_tps": 17.54,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-hot-default-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "f2050082f3b0f4bce5ec99d3cd1d0fad382fea3703a753f48b191681627e1df7",
+        "prompt_tps": 40.46,
+        "generation_tps": 17.03,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-baseline-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "b13a82f21bc747c0223a87df90b5d8fa2ee5337aed9c9604dd07de1401847dfb",
+        "prompt_tps": 39.89,
+        "generation_tps": 17.54,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-working-r1",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.07,
+        "generation_tps": 17.32,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-2026-10-24-stock-r1",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 41.17,
+        "generation_tps": 17.87,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      }
+    ],
+    "cpu-flags-confirm-2026-10-24": [
+      {
+        "name": "cpu-flags-confirm-2026-10-24-stock-r0",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 40.64,
+        "generation_tps": 17.04,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-working-r0",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 40.24,
+        "generation_tps": 17.46,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-hot-vector256-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "0be83a3e3d8f8873c9b4e04f88d0aba91fdfcc50bc64976f8920196b4a5bf390",
+        "prompt_tps": 40.9,
+        "generation_tps": 16.3,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-hot-haswell-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "6544768d264a1bcb1ebcaa9681594016925a4e6d5d27e365e2ea74a030af5990",
+        "prompt_tps": 84.62,
+        "generation_tps": 17.11,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-hot-haswell-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "6544768d264a1bcb1ebcaa9681594016925a4e6d5d27e365e2ea74a030af5990",
+        "prompt_tps": 86.89,
+        "generation_tps": 17.04,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-hot-vector256-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "0be83a3e3d8f8873c9b4e04f88d0aba91fdfcc50bc64976f8920196b4a5bf390",
+        "prompt_tps": 40.87,
+        "generation_tps": 17.32,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-working-r1",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.17,
+        "generation_tps": 17.57,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-confirm-2026-10-24-stock-r1",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 40.85,
+        "generation_tps": 17.61,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      }
+    ],
+    "cpu-flags-last-2026-10-24": [
+      {
+        "name": "cpu-flags-last-2026-10-24-stock-r0",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 41.08,
+        "generation_tps": 17.42,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-working-r0",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.0,
+        "generation_tps": 17.74,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-hot-haswell-noclone-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "768211307331205a98c28862e8deef1ba6455c829b48343e0fe624fd1c7315aa",
+        "prompt_tps": 88.77,
+        "generation_tps": 17.18,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-hot-haswell-o2-r0",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "d21c5c30df1386dbb8c44527bdbfd0fb32cb2c00c8951416d3e0cfea78f07f15",
+        "prompt_tps": 83.16,
+        "generation_tps": 15.86,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-hot-haswell-o2-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "d21c5c30df1386dbb8c44527bdbfd0fb32cb2c00c8951416d3e0cfea78f07f15",
+        "prompt_tps": 82.86,
+        "generation_tps": 16.0,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-hot-haswell-noclone-r1",
+        "executable_sha256": "ae352b304d5de11aef0574cbcb52d4674b4898b72586a71dda7834bf47600d0f",
+        "dll_sha256": "768211307331205a98c28862e8deef1ba6455c829b48343e0fe624fd1c7315aa",
+        "prompt_tps": 89.21,
+        "generation_tps": 17.4,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-working-r1",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.07,
+        "generation_tps": 17.56,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-last-2026-10-24-stock-r1",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 40.5,
+        "generation_tps": 17.57,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      }
+    ],
+    "cpu-flags-package-2026-10-24": [
+      {
+        "name": "cpu-flags-package-2026-10-24-stock-r0",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 40.92,
+        "generation_tps": 17.54,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-working-r0",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.04,
+        "generation_tps": 17.34,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-candidate-r0",
+        "executable_sha256": "75b0ed03483d8791e01f77af23f04f312a95a08ac22999a47ad422a064ab77c9",
+        "dll_sha256": null,
+        "prompt_tps": 89.26,
+        "generation_tps": 17.3,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-candidate-r1",
+        "executable_sha256": "75b0ed03483d8791e01f77af23f04f312a95a08ac22999a47ad422a064ab77c9",
+        "dll_sha256": null,
+        "prompt_tps": 88.92,
+        "generation_tps": 17.38,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-working-r1",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.1,
+        "generation_tps": 17.48,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-stock-r1",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 41.04,
+        "generation_tps": 17.36,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-stock-r2",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 33.3,
+        "generation_tps": 17.51,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-working-r2",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 41.05,
+        "generation_tps": 17.45,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-candidate-r2",
+        "executable_sha256": "75b0ed03483d8791e01f77af23f04f312a95a08ac22999a47ad422a064ab77c9",
+        "dll_sha256": null,
+        "prompt_tps": 89.26,
+        "generation_tps": 17.52,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-candidate-r3",
+        "executable_sha256": "75b0ed03483d8791e01f77af23f04f312a95a08ac22999a47ad422a064ab77c9",
+        "dll_sha256": null,
+        "prompt_tps": 89.14,
+        "generation_tps": 17.42,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-working-r3",
+        "executable_sha256": "6546333cd2eaa9cb00046a2f7efaa4b89dc64127dc373bc00fd225f5b23e5e8c",
+        "dll_sha256": null,
+        "prompt_tps": 40.98,
+        "generation_tps": 17.61,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      },
+      {
+        "name": "cpu-flags-package-2026-10-24-stock-r3",
+        "executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+        "dll_sha256": null,
+        "prompt_tps": 40.98,
+        "generation_tps": 17.43,
+        "ok": true,
+        "threads": 16,
+        "blasthreads": 20,
+        "contextsize": 512,
+        "batchsize": 256,
+        "ubatchsize": 256
+      }
+    ]
+  }
+}
