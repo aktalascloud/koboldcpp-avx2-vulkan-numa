@@ -44,6 +44,9 @@ def main():
     if policy.get("pgo_enabled") is not False or policy.get("variant") not in ("lto","lto-tuned"):
         raise RuntimeError("This release requires LTO without PGO")
     recipe,profile,lto=cpu_variants.flags(policy["variant"],options.jobs,"winlibs")
+    vk_host=policy.get('vulkan_host_flags','')
+    if vk_host not in ('','-fno-semantic-interposition -fno-ipa-cp-clone'):raise RuntimeError('Unknown Vulkan host policy')
+    if vk_host:recipe+='\nggml-vulkan.o: CXXFLAGS += '+vk_host+'\n'
     if profile or not lto:raise RuntimeError("No-PGO/LTO policy not satisfied")
     recipe_path=BASE/'optimized.mk';recipe_path.write_text(recipe,encoding='utf-8')
     cpu_variant=policy.get('cpu_hot_variant','baseline')
@@ -66,6 +69,7 @@ def main():
     exe=BASE/'candidate/koboldcpp-nocuda.exe'
     result={**identity,'exe_sha256':sha(exe),'dll_sha256':{path.name:sha(path) for path in (SRC/'koboldcpp_default.dll',SRC/'koboldcpp_vulkan.dll')},
             'cpu_hot_variant':cpu_variant,'cpu_extra_flags':cpu_extra,'vulkan_hot_variant':'baseline',
+            'vulkan_host_flags':vk_host,
             'build_date':json.loads((SRC/'embd_res/kcpp_build.json').read_text(encoding='utf-8'))['build_date'],
             'jobs':options.jobs,'profile':profile,'lto':lto,'seconds':time.perf_counter()-started,
             'accepted':False,'note':'Build success is not correctness/performance acceptance.'}

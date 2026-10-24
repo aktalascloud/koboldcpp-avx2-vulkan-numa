@@ -5,5 +5,6 @@
   "lto_required": true,
   "hot_tuning_flags": "-fno-ipa-cp-clone",
   "exclude_pgo_objects": [],
-  "cpu_hot_variant": "tiled-haswell"
+  "cpu_hot_variant": "tiled-haswell",
+  "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone"
 }

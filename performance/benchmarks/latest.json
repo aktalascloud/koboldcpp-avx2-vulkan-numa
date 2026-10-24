@@ -1,0 +1,302 @@
+{
+  "date": "2026-10-24",
+  "source_commit": "329f6a5b31e9a1036ff862f8a0c694bd2fc6c98c",
+  "executable_sha256": "d1aa7e7e1a8882e7dfda02c31bf1d54a63dfcc94fa7118e2bd43ec0b05de94b3",
+  "model": "Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf",
+  "model_sha256": "78614724ef8ccb9d50831fb24b3be3b6a90a4b7c5d73230531fdb80e4386a98d",
+  "stock_version": "1.123.1",
+  "stock_executable_sha256": "ab53b529c6c9925ed5f67b2884a5b35cc6d13c645f310a71c7a9e5c996950376",
+  "context": 512,
+  "batch": 256,
+  "ubatch": 256,
+  "output_tokens": 64,
+  "runs_per_arm": {
+    "cpu": 4,
+    "vulkan": 2
+  },
+  "cpu_threads": [
+    16,
+    20
+  ],
+  "vulkan_threads": [
+    6,
+    4
+  ],
+  "stock_gpu_environment": {
+    "GGML_VK_ALLOW_GRAPHICS_QUEUE": "1"
+  },
+  "latest_gpu_environment": {
+    "GGML_VK_ALLOW_GRAPHICS_QUEUE": "1",
+    "GGML_VK_BATCHED_SUBMITS": "1",
+    "GGML_VK_MAX_NODES_PER_SUBMIT": "100",
+    "GGML_VK_GCN_TILE64": "1",
+    "GGML_VK_GCN_TILE_VARIANT": "k16",
+    "GGML_VK_IQ4_XS_ROWS": "4",
+    "GGML_VK_IQ4_XS_WG": "64"
+  },
+  "compiler": {
+    "pgo": false,
+    "lto": true,
+    "cpu_hot_variant": "tiled-haswell",
+    "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone"
+  },
+  "correctness": {
+    "cpu": true,
+    "vulkan": true,
+    "grammar": true,
+    "batch_boundaries": true
+  },
+  "scope": "Manual same-session stock/latest controls. Prompt and output throughput separate; no intermediate builds. No new photo/music generation.",
+  "cpu": {
+    "stock": {
+      "prompt_tps": {
+        "mean": 40.042500000000004,
+        "range": [
+          37.63,
+          40.86
+        ],
+        "runs": [
+          40.83,
+          40.86,
+          40.85,
+          37.63
+        ]
+      },
+      "generation_tps": {
+        "mean": 17.245,
+        "range": [
+          17.09,
+          17.5
+        ],
+        "runs": [
+          17.09,
+          17.16,
+          17.5,
+          17.23
+        ]
+      },
+      "prompt_seconds": {
+        "mean": 11.202,
+        "range": [
+          10.963,
+          11.904
+        ],
+        "runs": [
+          10.973,
+          10.963,
+          10.968,
+          11.904
+        ]
+      },
+      "generation_seconds": {
+        "mean": 3.7115,
+        "range": [
+          3.657,
+          3.745
+        ],
+        "runs": [
+          3.745,
+          3.729,
+          3.657,
+          3.715
+        ]
+      },
+      "native_seconds": {
+        "mean": 14.913499999999999,
+        "range": [
+          14.625,
+          15.619
+        ],
+        "runs": [
+          14.718,
+          14.692,
+          14.625,
+          15.619
+        ]
+      }
+    },
+    "latest": {
+      "prompt_tps": {
+        "mean": 88.1625,
+        "range": [
+          87.98,
+          88.5
+        ],
+        "runs": [
+          88.0,
+          88.17,
+          88.5,
+          87.98
+        ]
+      },
+      "generation_tps": {
+        "mean": 17.295,
+        "range": [
+          17.15,
+          17.45
+        ],
+        "runs": [
+          17.45,
+          17.15,
+          17.26,
+          17.32
+        ]
+      },
+      "prompt_seconds": {
+        "mean": 5.0815,
+        "range": [
+          5.062,
+          5.092
+        ],
+        "runs": [
+          5.091,
+          5.081,
+          5.062,
+          5.092
+        ]
+      },
+      "generation_seconds": {
+        "mean": 3.7005,
+        "range": [
+          3.668,
+          3.731
+        ],
+        "runs": [
+          3.668,
+          3.731,
+          3.708,
+          3.695
+        ]
+      },
+      "native_seconds": {
+        "mean": 8.782,
+        "range": [
+          8.759,
+          8.812
+        ],
+        "runs": [
+          8.759,
+          8.812,
+          8.77,
+          8.787
+        ]
+      }
+    }
+  },
+  "vulkan": {
+    "stock": {
+      "prompt_tps": {
+        "mean": 411.01,
+        "range": [
+          410.26,
+          411.76
+        ],
+        "runs": [
+          410.26,
+          411.76
+        ]
+      },
+      "generation_tps": {
+        "mean": 17.055,
+        "range": [
+          17.05,
+          17.06
+        ],
+        "runs": [
+          17.06,
+          17.05
+        ]
+      },
+      "prompt_seconds": {
+        "mean": 1.09,
+        "range": [
+          1.088,
+          1.092
+        ],
+        "runs": [
+          1.092,
+          1.088
+        ]
+      },
+      "generation_seconds": {
+        "mean": 3.753,
+        "range": [
+          3.752,
+          3.754
+        ],
+        "runs": [
+          3.752,
+          3.754
+        ]
+      },
+      "native_seconds": {
+        "mean": 4.843,
+        "range": [
+          4.842,
+          4.844
+        ],
+        "runs": [
+          4.844,
+          4.842
+        ]
+      }
+    },
+    "latest": {
+      "prompt_tps": {
+        "mean": 714.51,
+        "range": [
+          714.51,
+          714.51
+        ],
+        "runs": [
+          714.51,
+          714.51
+        ]
+      },
+      "generation_tps": {
+        "mean": 23.634999999999998,
+        "range": [
+          23.63,
+          23.64
+        ],
+        "runs": [
+          23.64,
+          23.63
+        ]
+      },
+      "prompt_seconds": {
+        "mean": 0.627,
+        "range": [
+          0.627,
+          0.627
+        ],
+        "runs": [
+          0.627,
+          0.627
+        ]
+      },
+      "generation_seconds": {
+        "mean": 2.7075,
+        "range": [
+          2.707,
+          2.708
+        ],
+        "runs": [
+          2.707,
+          2.708
+        ]
+      },
+      "native_seconds": {
+        "mean": 3.3345000000000002,
+        "range": [
+          3.334,
+          3.335
+        ],
+        "runs": [
+          3.334,
+          3.335
+        ]
+      }
+    }
+  }
+}
