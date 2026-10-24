@@ -1,9 +1,9 @@
 # Research decisions
-Reviewed24October2026:100 updated KoboldCpp PRs, all6 open PRs,20 selected active/starred forks (up to30 PRs and20 default-branch commits each), and13 global GitHub searches. This is bounded discovery, not every fork/file. Existing source pins are in sources.json.
+Reviewed 24 October 2026:100 updated KoboldCpp PRs, all 6 open PRs,20 selected active/starred forks (up to 30 PRs and 20 default-branch commits each), and 13 global GitHub searches. This is bounded discovery, not every fork/file. Existing source pins are in sources.json.
 
 | Source | Decision for Haswell / Windows / RX580 |
 |---|---|
-| [GCN FA/LDS gates](https://github.com/doteyeso-ops/rx580-vulkan-fa-lds) | Adapted and measured. Enable the GCN proprietary-driver path; accept32KiB LDS on GCN while retaining capability checks. No FP16 spoofing or driver replacement. |
+| [GCN FA/LDS gates](https://github.com/doteyeso-ops/rx580-vulkan-fa-lds) | Adapted and measured. Enable the GCN proprietary-driver path; accept 32 KiB LDS on GCN while retaining capability checks. No FP16 spoofing or driver replacement. |
 | [Grammar cache PR2434](https://github.com/LostRuins/koboldcpp/pull/2434) | Cache reject indices instead of pointers to caller-owned buffers. Reconstruct candidates from the current call. |
 | [Soprano PR2557](https://github.com/LostRuins/koboldcpp/pull/2557) | Fresh-upstream build repair: include implementation from mtmd, not llama-model. No Soprano model bundled or benchmark claimed. |
 | [AVX2 reduction PR30296](https://github.com/ggml-org/llama.cpp/pull/30296) | Already present in the base. Retained; not claimed as our new patch. |
