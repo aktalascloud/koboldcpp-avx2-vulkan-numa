@@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
 
 # global vars
 KcppVersion = "1.123.1"
+# KCPP_BUILD_DATE_PORT: package.py embeds the build day; launch time is not used.
+def _kcpp_packaged_build_day():
+    try:
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "embd_res", "kcpp_build.json")
+        with open(path, "r", encoding="utf-8") as stream:
+            day = json.load(stream).get("build_date", "")
+        return day if isinstance(day, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", day) else ""
+    except (OSError, ValueError, TypeError):
+        return ""
+KcppBuildDate = _kcpp_packaged_build_day()
+KcppWindowVersion = KcppVersion + (f" [{KcppBuildDate}]" if KcppBuildDate else "")
+
 showdebug = True
 kcpp_instance = None #global running instance
 global_memory = {"tunnel_url": "", "restart_target":"", "input_to_exit":False, "load_complete":False, "restart_override_base_config":"", "last_active_timestamp":datetime.now(), "triggered_sleeping":False, "current_model":"initial_model", "base_config":"", "swapReqType": None, "loadedReqTypes": [], "autoswapmode": False}
@@ -9086,7 +9098,7 @@ def show_gui():
         print("Adjusting tk scaling to try and fix scaling issues...")
         root.tk.call('tk','scaling', 2.25)
     root.geometry(str(windowwidth) + "x" + str(windowheight))
-    root.title(f"KoboldCpp v{KcppVersion}")
+    root.title(f"KoboldCpp v{KcppWindowVersion}")
 
     gtooltip_box = None
     gtooltip_label = None
@@ -12430,7 +12442,7 @@ def main(launch_args, default_args):
     # assign title to terminal on windows
     try:
         if os.name == 'nt':
-            windowtitle = f"KoboldCpp {KcppVersion} Terminal"
+            windowtitle = f"KoboldCpp {KcppWindowVersion} Terminal"
             os.system(f'title {windowtitle}')
     except Exception:
         pass
