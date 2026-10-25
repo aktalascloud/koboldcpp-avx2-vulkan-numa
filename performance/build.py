@@ -59,6 +59,8 @@ def main():
             'CXX='+str(compiler/'g++.exe').replace('\\','/'),'LLAMA_VULKAN=1']
     # Force shader regeneration separately. The generator is capped to4 workers.
     run([*common,'-B','-j1','ggml/src/ggml-vulkan-shaders.cpp'],environment,'shaders.log')
+    shader_object=SRC/'ggml-vulkan-shaders.o'
+    if shader_object.exists():shader_object.unlink()  # -o must not preserve stale embedded SPIR-V.
     args=[*common,'-B','-f',str(BASE/'haswell.mk').replace('\\','/'),'-f',str(recipe_path).replace('\\','/'),
           '-j'+str(options.jobs),'-o','ggml/src/ggml-vulkan-shaders.cpp','-o','vulkan-shaders-gen']
     run([*args,'koboldcpp_vulkan'],environment,'vulkan.log')

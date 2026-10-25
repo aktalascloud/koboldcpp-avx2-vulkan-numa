@@ -14,6 +14,8 @@ Exact diff: patches/runtime.patch. Current source/binary identities and flags: p
 | Windows NUMA / CPU Sets / groups | Worker placement and restored affinity; no claim of physical dual-socket gain or changed page allocation. |
 | Opt-in HybridMoE / SLRU | CPU misses/GPU hot experts; small-batch fix, new norm/rescale guards, off for dense media. |
 | Soprano include placement | Build repair for fresh upstream; no Soprano quality/speed claim. |
+| Reusable token-sampling CDF | Avoid per-token allocations; retain GCC 13 RNG draws and probability normalization. |
+| Large transposed concat | Bit-preserving32-bit shared-tile path; small/general views retain upstream fallback. |
 | Build day in window title | Embedded day, not launch day; API version unchanged. |
 
 [Original stock versus latest measured result](benchmarks/latest.json): all repeats, ranges, settings and SHA. Individual compiler/source percentages are not additive and are not invented.

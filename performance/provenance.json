@@ -20,9 +20,9 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "4ae77e5a4c75ec26200228841af5f9e595f30220387c778739598828cb865a71",
-  "patch_sha256": "ddd3e69183920f36f935a8ef709fdb87c09d9e123cdbaa9ce147b6bb08a3e928",
-  "seconds": 604.0178604125977,
+  "executable_sha256": "fb4a6ad11bd3951c80348e2c8a83df4fde6a08a42d71a86011ac5433708c2da8",
+  "patch_sha256": "18be9bd4f25ab6adab97ac46daafba3f387b539dae0264c3b91f038e0c4b51d0",
+  "seconds": 383.8670370578766,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
@@ -34,8 +34,8 @@
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "5047e8eacd54b1e297eeaeb850d3dd940edaba02106bf1ab5b636bd6e3a356eb",
-    "koboldcpp_vulkan.dll": "15f7f2b5ffaef99e12cc23688cb0744258980f0372f290de46c940d21a225d48"
+    "koboldcpp_default.dll": "a258cca596518a43787fed6a906b67ad1ad51a95e148a5deba10f1cb5ccd053f",
+    "koboldcpp_vulkan.dll": "3137ce8d79946bd4de6cc2030033e20fbac6fa759c1d6c39b742c17acf05e6fd"
   },
   "cpu_threads": {
     "threads": 16,

@@ -1,3 +1,4 @@
+#include <limits>
 #include "llama-sampler.h"
 
 #include "llama-impl.h"
@@ -215,37 +216,25 @@ static void llama_token_data_array_partial_sort_inplace(llama_token_data_array *
 }
 
 static int llama_sample_dist(llama_token_data_array * cur_p, std::mt19937 & rng) {
-    // iterator for the probabilities
-#ifdef __GNUC__
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#endif
-
-    struct probs_iterator {
-        typedef std::input_iterator_tag iterator_category;
-        typedef float value_type;
-        typedef float * pointer;
-        typedef float & reference;
-        typedef ptrdiff_t difference_type;
-
-        const llama_token_data * data;
-
-        bool operator==(const probs_iterator & other) const { return data == other.data; }
-        bool operator!=(const probs_iterator & other) const { return data != other.data; }
-        const float & operator*() const { return data->p; }
-        probs_iterator & operator++() { ++data; return *this; }
-        probs_iterator operator++(int) { probs_iterator tmp = *this; ++data; return tmp; }
-    };
-
-#ifdef __GNUC__
-    #pragma GCC diagnostic pop
-#endif
-
-    std::discrete_distribution<int> dist(probs_iterator{cur_p->data}, probs_iterator{cur_p->data + cur_p->size});
-
-    return dist(rng);
+    // KCPP_DIST_CDF_REUSE: ik PR1187 idea, retaining libstdc++ RNG/rounding.
+    GGML_ASSERT(cur_p->size > 0);
+    if (cur_p->size == 1) { return 0; }
+    double total = 0.0;
+    for (size_t i = 0; i < cur_p->size; ++i) { total += double(cur_p->data[i].p); }
+    GGML_ASSERT(total > 0.0);
+    double small_cdf[64];
+    thread_local std::vector<double> large_cdf;
+    double * cdf = small_cdf;
+    const size_t count = cur_p->size - 1;
+    if (count > 64) { large_cdf.resize(count); cdf = large_cdf.data(); }
+    double cumulative = 0.0;
+    for (size_t i = 0; i < count; ++i) {
+        cumulative += double(cur_p->data[i].p) / total;
+        cdf[i] = cumulative;
+    }
+    const double draw = std::generate_canonical<double, std::numeric_limits<double>::digits>(rng);
+    return int(std::lower_bound(cdf, cdf + count, draw) - cdf);
 }
-
 /*
 static void llama_log_softmax(float * array, size_t size) {
     float max_l = *std::max_element(array, array + size);
