@@ -789,7 +789,7 @@ index 6a817c0..211456c 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index eacf404..33a1a5f 100644
+index 3c0274a..41ba56e 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -889,7 +889,7 @@ index eacf404..33a1a5f 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -9176,7 +9232,7 @@ def show_gui():
+@@ -9175,7 +9231,7 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -898,7 +898,7 @@ index eacf404..33a1a5f 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -12520,7 +12576,7 @@ def main(launch_args, default_args):
+@@ -12692,7 +12748,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -907,7 +907,7 @@ index eacf404..33a1a5f 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14034,6 +14090,7 @@ if __name__ == '__main__':
+@@ -14206,6 +14262,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -915,7 +915,7 @@ index eacf404..33a1a5f 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14068,6 +14125,9 @@ if __name__ == '__main__':
+@@ -14240,6 +14297,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -1124,18 +1124,6 @@ index af38887..7caf264 100644
      if (down_exps_s) {
          cb(experts, "ffn_moe_down_scaled", il);
      }
-diff --git a/src/llama-model.cpp b/src/llama-model.cpp
-index 3287454..52a6943 100644
---- a/src/llama-model.cpp
-+++ b/src/llama-model.cpp
-@@ -195,7 +195,6 @@
- #include "models/sensenova-u1.cpp"
- #include "models/smallthinker.cpp"
- #include "models/smollm3.cpp"
--#include "models/soprano.cpp"
- #include "models/spark2-5.cpp"
- #include "models/stablelm.cpp"
- #include "models/starcoder.cpp"
 diff --git a/src/llama-moe-cache.cpp b/src/llama-moe-cache.cpp
 index 4d3596b..f12066b 100644
 --- a/src/llama-moe-cache.cpp
@@ -2067,17 +2055,4 @@ index 9baf063..874917b 100644
 +
      // ggml_backend_sched copy callback, returns false if src is not a slot map
      bool copy(ggml_backend_t backend, const ggml_tensor * src, ggml_tensor * dst, ggml_cgraph * graph);
- 
-diff --git a/tools/mtmd/clip.cpp b/tools/mtmd/clip.cpp
-index c80582b..ea6c8b0 100644
---- a/tools/mtmd/clip.cpp
-+++ b/tools/mtmd/clip.cpp
-@@ -90,6 +90,8 @@
- #include "models/whisper-enc.cpp"
- #include "models/yasa2.cpp"
- #include "models/youtuvl.cpp"
-+// KCPP_SOPRANO_INCLUDE: upstream PR2557, implementation belongs to mtmd.
-+#include "models/soprano.cpp"
- 
- struct clip_logger_state g_logger_state = {clip_log_callback_default, NULL};
  
