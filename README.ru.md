@@ -1,47 +1,43 @@
-# KoboldCpp: Haswell AVX2 / RX 580 Polaris
+# KoboldCpp: Haswell AVX2 / RX580 Polaris
 
-[English](README.md) · **[Windows release](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest)** · [Media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline) · [Patches](performance/PATCHES.md) · [Build](performance/BUILD.md)
+[English](README.md) · [Скачать для Windows](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Все патчи и источники](performance/PATCHES.md) · [Медиапайплайн](https://github.com/aktalascloud/koboldcpp-media-pipeline)
 
-Форк **[оригинального KoboldCpp](https://github.com/LostRuins/koboldcpp)**, только **concedo_experimental**. Windows x64, Haswell/AVX2, AMD RX 580 Polaris/gfx803, Vulkan и NUMA. EXE запускается напрямую; модели не включены.
+Форк [оригинального KoboldCpp](https://github.com/LostRuins/koboldcpp), ветка **concedo_experimental**. Windows x64, Haswell/AVX2, RX580 Polaris/gfx803, Vulkan и Windows NUMA. **O3 + LTO, без PGO.** Основные модели в пакет не включены.
 
-## Исходный сток и последний результат
+## Сток и последний измеренный билд
 
-Xeon E5-2696v3 / RX 580 2048SP 8 GB, одинаковый Qwen3-4B IQ4_XS. CPU 16/20, Vulkan 6/4; контекст 512, batch/ubatch 256, 64 выходных токена. Обе GPU-сборки используют один upstream-параметр graphics queue. Скорость в токенах/с; [все повторы, диапазоны, параметры и SHA](performance/benchmarks/latest.json).
+Xeon E5-2696v3 / RX580 2048SP 8GB, одинаковый Qwen3-4B IQ4_XS. Токенов/с, 2026-10-25, EXE `fb4a6ad1`.
 
-| Этап | Исходный сток | Последний результат | Изменение |
+| Stage | Original stock | This build | Change |
 |---|---:|---:|---:|
-| CPU: Ввод | 39.468 | 85.153 | +115.75% |
-| CPU: Выдача | 16.415 | 17.043 | +3.82% |
-| Vulkan: Ввод | 411.010 | 712.810 | +73.43% |
-| Vulkan: Выдача | 17.035 | 23.655 | +38.86% |
+| CPU prompt | 39.468 | 85.153 | +115.75% |
+| CPU output | 16.415 | 17.043 | +3.82% |
+| Vulkan prompt | 411.010 | 712.810 | +73.43% |
+| Vulkan output | 17.035 | 23.655 | +38.86% |
 
-Время Native «ввод + выдача», сток/итог, без загрузки модели: CPU: **15.287 с / 9.020 с**, 41.00% меньше времени; Vulkan: **4.847 с / 3.334 с**, 31.21% меньше времени.
+Prompt — ввод, Output — выдача. CPU 16/20, Vulkan 6/4; контекст 512, batch/ubatch 256, 64 выходных токена. По 4 CPU и 2 Vulkan повтора на вариант; первые холодные прогоны и все диапазоны сохранены. Диапазоны CPU пересекаются. [Полные замеры, настройки и SHA](performance/benchmarks/latest.json). Итог учитывает и прежние оптимизации.
 
-Замер 2026-10-25, EXE **fb4a6ad1**, исходники **e68c9b10**. Ввод и выдача считаются отдельно; проценты не складываются. Для небольших пересекающихся различий статистическая уверенность не заявляется. Все повторы, включая первый холодный контроль, сохранены; диапазоны CPU пересекаются. Плановые сборки не измеряются автоматически.
+## Что включено
 
-Сохранённый фотоконтроль576×864 с тремя LoRA, лицами и Gater, без SR: **сток163,15с, первый138,35с, прогретый131,83с**. Прогретый цикл короче на19,20%. Это отдельный датированный медиазамер. [Фото, глаза и полный пайплайн](https://github.com/aktalascloud/koboldcpp-media-pipeline).
+- Haswell/AVX2, исправления ABI/стека Windows, Polaris matvec, FP32-плитки и пакетные отправки.
+- Windows CPU Sets/groups, опциональные HybridMoE/SLRU, grammar-cache и проверка пересборки шейдеров.
+- [Идея CDF sampling](https://github.com/ikawrakow/ik_llama.cpp/pull/1187): выбор из 40 кандидатов быстрее в 3,17 раза; RNG и ответы при фиксированных seed проверены.
+- [Transposed concat](https://github.com/ggml-org/llama.cpp/pull/30591): проверенные крупные 32-битные операции быстрее в 3,04–4,30 раза, побитово одинаковы. Остальные формы используют прежний путь.
+
+Это ускорения отдельных операций. [Все повторы и отклонённые пробы](performance/benchmarks/operations.json) · [Полный список патчей со ссылками](performance/PATCHES.md).
 
 ## Запуск
 
-Распакуйте релиз и запустите **koboldcpp-nocuda.exe** двойным щелчком. Выберите GGUF в штатном GUI или используйте:
+Распакуйте релиз и запустите **koboldcpp-nocuda.exe** напрямую, выберите GGUF в GUI или используйте:
 
 ```text
 koboldcpp-nocuda.exe --model model.gguf --usevulkan 0 --gpulayers 99 --threads 6 --blasthreads 4 --batchsize 1024 --ubatchsize 1024 --numa auto
 ```
 
-CPU: --usecpu --threads 16 --blasthreads 20 --numa auto, с пробелами между опцией и значением. Кодировщик SD использует 20 потоков отдельно. Измеренные переменные Vulkan и CPU-команды приведены в RUN.txt релиза.
+CPU: `--usecpu --threads 16 --blasthreads 20 --numa auto`. [Настройки и переменные среды](performance/RUN.txt) · [Сборка](performance/BUILD.md). PowerShell-лаунчер не нужен.
 
-## Рабочие изменения
+Сохранённый фотоконтроль 23 октября: 163,15 с сток; 138,35 с первый / 131,83 с прогретый, 576×864, исторический пайплайн с тремя LoRA. Это не новый замер MOSS. [Текущий медиапайплайн и примеры](https://github.com/aktalascloud/koboldcpp-media-pipeline).
 
-- O3/Haswell/AVX2, обязательный LTO, **без PGO** и fast-math; подобранные флаги tiled.
-- Polaris IQ4_XS rows4/WG64, пакетные submits, FP32 GCN64/K16 и проверенная настройка GCN driver/LDS.
-- Повторное использование CDF при выборе токена: без лишних выделений памяти, с проверкой RNG и ответов при фиксированных seed.
-- Ускоренный крупный транспонированный concat для 32-битных данных; остальные формы сохраняют исходный путь.
-- Исправления Windows ABI/стека, пересборки встроенного объекта шейдеров и времени жизни grammar-cache.
-- Windows NUMA CPU Sets/groups и HybridMoE/SLRU — по запросу. Expert cache выключен для dense-медиа. Двухсокетное железо физически не измерено.
+Ежедневно 08:00 Asia/Bishkek: PR/issues независимо от изменения upstream, сборка и проверка запуска. Бенчмарки только вручную. Физическая двухсокетная машина не измерялась.
 
-[Решения по исследованным патчам](performance/RESEARCH.md). GPU sampling, MoE-фузия, draft и Native HIP в рабочую конфигурацию не включены.
-
-Ежедневно в 08:00 Asia/Bishkek: свежие исходники, сборка, установка, проверка SHA/запуска и релиз. **Бенчмарки — только вручную.** В окне указан день сборки. Для расписания компьютер и Codex должны работать.
-
-[AGPL-3.0](LICENSE.md), [MIT-уведомления](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md), [сторонние компоненты](performance/NOTICE.md). Модели, ключи, кэши, логи и PID не публикуются. Исходники соответствуют тегу релиза.
+[AGPL-3.0](LICENSE.md) · [MIT](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md) · [Лицензии зависимостей и соответствующие исходники](performance/NOTICE.md). Уведомления MIT встроенных малых декодеров сохранены. Без ключей, личных данных, логов и кэша.

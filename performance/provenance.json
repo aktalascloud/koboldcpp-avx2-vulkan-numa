@@ -50,5 +50,6 @@
     "ubatchsize": 1024,
     "gpulayers": 99
   },
-  "binary_unchanged": false
+  "binary_unchanged": true,
+  "packaging_revision": "r1: linked patch catalog and complete added-port MIT notices; native EXE unchanged"
 }
