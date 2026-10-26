@@ -8,7 +8,7 @@ Performance fork of [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp
 
 Xeon E5-2696v3 / RX580 2048SP 8GB; identical Qwen3-4B IQ4_XS. Tokens/s, measured 2026-10-25, EXE `fb4a6ad1`.
 
-| Stage | Original stock | This build | Change |
+| Stage | Original stock | Last measured | Change |
 |---|---:|---:|---:|
 | CPU prompt | 39.468 | 85.153 | +115.75% |
 | CPU output | 16.415 | 17.043 | +3.82% |

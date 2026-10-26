@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "e68c9b1005f967f8795fcee2e268d881e87d29a0",
+  "commit": "59ab92c3e7ff47b51f960d402dfea3aecc016532",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,22 +20,26 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "fb4a6ad11bd3951c80348e2c8a83df4fde6a08a42d71a86011ac5433708c2da8",
-  "patch_sha256": "18be9bd4f25ab6adab97ac46daafba3f387b539dae0264c3b91f038e0c4b51d0",
-  "seconds": 383.8670370578766,
+  "executable_sha256": "9cdacf216336f24d2585f4dab4f2602fe9f92728282094675b1b050febdd61ca",
+  "patch_sha256": "fe2e691ac0a467b4d968bb8990567ab160aba843ce302196357caa0f3bc230a2",
+  "seconds": 741.1483888626099,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "build_date": "2026-10-25",
+  "native_source_signature": "0c706c8fac32099790be846a02ac5f83c5384f4bcac807d9d9d569a7db0f1b12",
+  "native_input_count": 2756,
+  "native_dlls_reused": false,
+  "native_validation_parent_sha256": null,
+  "build_date": "2026-10-26",
   "build_verified": true,
   "pgo_disabled_verified": true,
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "a258cca596518a43787fed6a906b67ad1ad51a95e148a5deba10f1cb5ccd053f",
-    "koboldcpp_vulkan.dll": "3137ce8d79946bd4de6cc2030033e20fbac6fa759c1d6c39b742c17acf05e6fd"
+    "koboldcpp_default.dll": "8fa77174e369230b04b33947185b3c32e71c973264e6648d0cfa64f2fd8589e1",
+    "koboldcpp_vulkan.dll": "3f44c6a162eaf17c37e43f5108b639cdeb381e8d9bca766d7595b1e9c81cc71a"
   },
   "cpu_threads": {
     "threads": 16,
@@ -50,6 +54,5 @@
     "ubatchsize": 1024,
     "gpulayers": 99
   },
-  "binary_unchanged": true,
-  "packaging_revision": "r1: linked patch catalog and complete added-port MIT notices; native EXE unchanged"
+  "binary_unchanged": false
 }
