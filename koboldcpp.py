@@ -595,7 +595,9 @@ class tts_generation_inputs(ctypes.Structure):
                 ("reference_audio", ctypes.c_char_p),
                 ("speaker_instruction", ctypes.c_char_p),
                 ("language", ctypes.c_char_p),
-                ("use_mp3", ctypes.c_bool)]
+                ("use_mp3", ctypes.c_bool),
+                ("reference_text", ctypes.c_char_p),
+                ("audiocpp_extra_params_json", ctypes.c_char_p)]
 
 class tts_generation_outputs(ctypes.Structure):
     _fields_ = [("status", ctypes.c_int),
@@ -1154,6 +1156,8 @@ def init_library():
     handle.music_load_model.restype = ctypes.c_bool
     handle.music_generate.argtypes = [music_generation_inputs]
     handle.music_generate.restype = music_generation_outputs
+    handle.music_get_family.argtypes = []
+    handle.music_get_family.restype = ctypes.c_char_p
     handle.last_logprobs.restype = last_logprobs_outputs
     handle.detokenize.argtypes = [detokenize_inputs]
     handle.detokenize.restype = ctypes.c_char_p
@@ -1624,7 +1628,9 @@ def get_capabilities():
     has_mcp = True if (args.mcpfile and mcp_connections and len(mcp_connections) > 0) else False
     admin_type = (2 if args.admin and args.admindir and args.adminpassword else (1 if args.admin and args.admindir else 0))
     has_router = True if args.routermode else False
-    return {"result":"KoboldCpp", "version":KcppVersion, "protected":has_password, "llm":has_llm, "txt2img":has_txt2img,"vision":visionSupport,"audio":audioSupport,"transcribe":has_whisper,"multiplayer":has_multiplayer,"websearch":has_search,"tts":has_tts, "embeddings":has_embeddings, "music":has_music, "musicllm":bool(musicllmmodelpath), "savedata":(savedata_obj is not None), "admin": admin_type, "router":has_router, "guidance": has_guidance, "jinja": has_jinja, "mcp":has_mcp, "parallelrequests":args.parallelrequests, "defaults_modified":bool(args.gendefaults)}
+    musicfamily_raw = handle.music_get_family()
+    musicfamily = musicfamily_raw.decode("UTF-8", "ignore") if musicfamily_raw else "none"
+    return {"result":"KoboldCpp", "version":KcppVersion, "protected":has_password, "llm":has_llm, "txt2img":has_txt2img,"vision":visionSupport,"audio":audioSupport,"transcribe":has_whisper,"multiplayer":has_multiplayer,"websearch":has_search,"tts":has_tts, "embeddings":has_embeddings, "music":has_music, "musicllm":bool(musicllmmodelpath), "musicfamily":musicfamily, "savedata":(savedata_obj is not None), "admin": admin_type, "router":has_router, "guidance": has_guidance, "jinja": has_jinja, "mcp":has_mcp, "parallelrequests":args.parallelrequests, "defaults_modified":bool(args.gendefaults)}
 
 
 def scan_directory(dirpath, valid_exts, depth):
@@ -3512,6 +3518,20 @@ def tts_generate(genparams):
     if reference_audio and reference_audio.startswith("data:audio"):
         reference_audio = reference_audio.split(",", 1)[1]
     inputs.reference_audio = reference_audio.encode("UTF-8")
+    inputs.reference_text = genparams.get("reference_text", "").encode("UTF-8")
+    audiocpp_option_names = (
+        "exaggeration", "guidance_scale", "temperature", "repetition_penalty",
+        "min_p", "top_p", "top_k", "flow_guidance_scale", "max_tokens",
+        "max_new_tokens", "do_sample", "stop_on_eos", "num_inference_steps",
+        "text_chunk_size", "text_chunk_mode", "preset", "voice_id")
+    audiocpp_options = {
+        key: genparams[key] for key in audiocpp_option_names
+        if key in genparams and isinstance(genparams[key], (str, int, float, bool))
+    }
+    # Retain the original case for Audio.cpp families with named voices while
+    # leaving the longstanding normalized field unchanged for legacy models.
+    audiocpp_options["__kcpp_voice"] = voicestr.strip()
+    inputs.audiocpp_extra_params_json = json.dumps(audiocpp_options).encode("UTF-8")
     ret = handle.tts_generate(inputs)
     outstr = ""
     if ret.status==1:
@@ -10562,16 +10582,16 @@ def show_gui():
     tts_model_var.trace_add("write", gui_changed_modelfile)
     makelabelentry(audio_tab, "TTS Threads:" , tts_threads_var, 5, 50,padx=100,singleline=True,tooltip="How many threads to use during TTS generation.\nIf left blank, uses same value as threads.")
     makelabelentry(audio_tab, "TTS Max Tokens:" , ttsmaxlen_var, 5, 50,padx=300,singleline=True,tooltip="Max allowed audiotokens to generate per TTS request.", labelpadx=190)
-    makecheckbox(audio_tab, "TTS Use GPU", ttsgpu_var, 9, 0,tooltiptxt="Uses the GPU for TTS. Currently only works on certain models (OuteTTS/Q3TTS).")
+    makecheckbox(audio_tab, "TTS Use GPU", ttsgpu_var, 9, 0,tooltiptxt="Uses the GPU for TTS on supported model architectures.")
     ttsgpu_var.trace_add("write", gui_changed_modelfile)
     makefileentry(audio_tab, "WavTokenizer Model (Required for some models):", "Select WavTokenizer GGUF Model File", wavtokenizer_var, 11, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a WavTokenizer GGUF model file on disk to be loaded for Narration.")
     wavtokenizer_var.trace_add("write", gui_changed_modelfile)
     makefileentry(audio_tab, "TTS Voices Dir:", "Select directory containing voices for voice cloning", tts_dir_var, 20, width=280, singlerow=True, dialog_type=2, tooltiptxt="Select directory containing voices for voice cloning")
 
-    makefileentry(audio_tab, "MusicLLM:", "Select music LLM model (e.g acestep-5Hz-lm-0.6B)", musicllm_var, 30, width=280, singlerow=True, dialog_type=0, tooltiptxt="Select music LLM model (e.g acestep-5Hz-lm)")
+    makefileentry(audio_tab, "MusicLLM:", "Select music LLM model (ACE-Step LM or YuE2 main GGUF)", musicllm_var, 30, width=280, singlerow=True, dialog_type=0, tooltiptxt="Select an ACE-Step LM or YuE2 main GGUF model")
     makefileentry(audio_tab, "MusicEmbeds:", "Select music embedding model (e.g Qwen3-Embedding-0.6B)", musicembeddings_var, 32, width=280, singlerow=True, dialog_type=0, tooltiptxt="Select music embedding model (e.g Qwen3-Embedding-0.6B)")
     makefileentry(audio_tab, "MusicDiffuser:", "Select music diffusion (DiT) model (e.g acestep-v15-turbo)", musicdiffusion_var, 34, width=280, singlerow=True, dialog_type=0, tooltiptxt="Select music diffusion (DiT) model (e.g acestep-v15-turbo)")
-    makefileentry(audio_tab, "MusicVAE:", "Select music VAE model", musicvae_var, 36, width=280, singlerow=True, dialog_type=0, tooltiptxt="Select music VAE model")
+    makefileentry(audio_tab, "MusicVAE:", "Select music VAE model (including YuE2 VAE GGUF)", musicvae_var, 36, width=280, singlerow=True, dialog_type=0, tooltiptxt="Select the music VAE; YuE2 requires its VAE GGUF")
     makecheckbox(audio_tab, "Music Low VRAM", musiclowvram_var, 38, 0,tooltiptxt="Unload music models when not in use.")
 
     agent_tab = tabcontent["Agent"]
@@ -13841,6 +13861,24 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
                 if not loadok:
                     exitcounter = 999
                     exit_with_error(3, "Could not load Music LLM model!")
+        elif mu_has_llm and mu_has_vae and not mu_has_embed and not mu_has_diff:
+            paths_to_check = [args.musicllm, args.musicvae]
+            if not all(os.path.exists(p) for p in paths_to_check):
+                if args.ignoremissing:
+                    print("Ignoring missing YuE2 LLM/VAE model files!")
+                    args.musicllm = None
+                    args.musicvae = None
+                else:
+                    exitcounter = 999
+                    exit_with_error(2, "Cannot find required YuE2 LLM/VAE model files!")
+            else:
+                musicllmpath = os.path.abspath(args.musicllm)
+                musicvaepath = os.path.abspath(args.musicvae)
+                loadok = music_load_model(musicllmpath, "", "", musicvaepath)
+                print("Load YuE2 Music Models OK: " + str(loadok))
+                if not loadok:
+                    exitcounter = 999
+                    exit_with_error(3, "Could not load YuE2 music models!")
         elif mu_has_diff:
             if not (mu_has_embed and mu_has_vae):
                 exitcounter = 999
@@ -14398,10 +14436,10 @@ if __name__ == '__main__':
     ttsparsergroup.add_argument("--ttsdir", metavar=('[directory]'), help="Select directory containing voices for voice cloning.", default="")
 
     musicparsergroup = parser.add_argument_group('Music Gen Commands')
-    musicparsergroup.add_argument("--musicllm", metavar=('[filename]'), help="Select music LLM model (e.g acestep-5Hz-lm-0.6B)", default="")
+    musicparsergroup.add_argument("--musicllm", metavar=('[filename]'), help="Select music LLM model (e.g. ACE-Step LM or yue2-3b-q8_0.gguf)", default="")
     musicparsergroup.add_argument("--musicembeddings", metavar=('[filename]'), help="Select music embedding model (e.g Qwen3-Embedding-0.6B)", default="")
     musicparsergroup.add_argument("--musicdiffusion", metavar=('[filename]'), help="Select music diffusion (DiT) model (e.g acestep-v15-turbo)", default="")
-    musicparsergroup.add_argument("--musicvae", metavar=('[filename]'), help="Select music VAE model", default="")
+    musicparsergroup.add_argument("--musicvae", metavar=('[filename]'), help="Select music VAE model (e.g. yue2-vae-f16.gguf)", default="")
     musicparsergroup.add_argument("--musiclowvram", help="Unload music models when not in use", action='store_true')
 
     embeddingsparsergroup = parser.add_argument_group('Embeddings Model Commands')
