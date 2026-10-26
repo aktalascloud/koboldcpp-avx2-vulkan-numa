@@ -40,4 +40,4 @@ CPU: `--usecpu --threads 16 --blasthreads 20 --numa auto`. [Настройки �
 
 Ежедневно 08:00 Asia/Bishkek: PR/issues независимо от изменения upstream, сборка и проверка запуска. Бенчмарки только вручную. Физическая двухсокетная машина не измерялась.
 
-[AGPL-3.0](LICENSE.md) · [MIT](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md) · [Лицензии зависимостей и соответствующие исходники](performance/NOTICE.md). Уведомления MIT встроенных малых декодеров сохранены. Без ключей, личных данных, логов и кэша.
+[AGPL-3.0](LICENSE.md) · Audio.cpp Apache-2.0 · [MIT](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md) · [Лицензии зависимостей и соответствующие исходники](performance/NOTICE.md). Уведомления MIT встроенных малых декодеров сохранены. Без ключей, личных данных, логов и кэша.

@@ -40,4 +40,4 @@ Saved photo control: 163.15s stock; 138.35s cold / 131.83s warm, 576×864 with t
 
 Daily 08:00 Asia/Bishkek maintenance checks PRs/issues independently of upstream changes, builds and checks startup. Benchmarks are manual only; physical dual-socket gains remain unmeasured.
 
-[AGPL-3.0](LICENSE.md) · [MIT notices](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md) · [Dependencies, attribution and corresponding source](performance/NOTICE.md). Upstream tiny decoder assets retain their MIT notices. No keys, private state, logs or cache in releases.
+[AGPL-3.0](LICENSE.md) · Audio.cpp Apache-2.0 · [MIT notices](MIT_LICENSE_GGML_SDCPP_LLAMACPP_ONLY.md) · [Dependencies, attribution and corresponding source](performance/NOTICE.md). Upstream tiny decoder assets retain their MIT notices. No keys, private state, logs or cache in releases.
