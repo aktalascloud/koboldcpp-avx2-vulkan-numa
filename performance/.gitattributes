@@ -1,0 +1,3 @@
+licenses/** text eol=lf
+benchmarks/*.json text eol=lf
+patches/runtime.patch -text -diff

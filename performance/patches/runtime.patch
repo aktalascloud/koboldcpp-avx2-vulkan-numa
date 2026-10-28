@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 4fc283e..2a45142 100644
+index 67bf6d9..f3e2226 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -842,15 +842,17 @@ llamaserver: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml.o
+@@ -860,15 +860,17 @@ llamaserver: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml.o
  llamaservervk: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml_v4_vulkan.o ggml-cpu.o ggml-ops.o ggml-vec.o ggml-binops.o ggml-tiled.o ggml-tiled-kernel.o ggml-unops.o llama.o chat.o llama-model.o console.o clip_default.o mtmd.o mtmd-helper.o mtmd-helper-gen.o mtmd-image.o ggml-backend.o ggml-backend-meta.o ggml-backend-reg_vulkan.o ggml-vulkan.o ggml-vulkan-shaders.o ggml-repack.o $(OBJS_FULL) $(OBJS)
  	$(CXX) $(CXXFLAGS) $(LLAMASERVER_CXXFLAGS) -DGGML_USE_VULKAN $(filter-out %.h,$^) $(VULKAN_LIB) -o $@ $(LDFLAGS)
  
@@ -208,8 +208,28 @@ index ac55008..3622330 100644
              if (ec != GGML_STATUS_SUCCESS) {
                  return ec;
              }
+diff --git a/ggml/src/ggml-cpu/ggml-cpu-impl.h b/ggml/src/ggml-cpu/ggml-cpu-impl.h
+index 0d48c9a..9b57f9d 100644
+--- a/ggml/src/ggml-cpu/ggml-cpu-impl.h
++++ b/ggml/src/ggml-cpu/ggml-cpu-impl.h
+@@ -529,6 +529,15 @@ static __m256 __lasx_xvreplfr2vr_s(const float val) {
+ }
+ #endif
+ 
++// KCPP_REPEAT_ROWS_PARALLEL: shape-only gate shared by planner and kernel.
++static inline bool ggml_kcpp_parallel_repeat_rows(const struct ggml_tensor * node) {
++    const struct ggml_tensor * src = node->src[0];
++    return src != NULL && node->type == GGML_TYPE_F32 && src->type == GGML_TYPE_F32 &&
++           src->ne[1] > 0 && src->ne[2] > 0 && src->ne[3] > 0 &&
++           src->ne[0] == node->ne[0] && src->nb[0] == sizeof(float) &&
++           ggml_is_contiguous(node) && ggml_nelements(node) >= 65536 && ggml_nrows(node) >= 32;
++}
++
+ // TODO: move to ggml-threading
+ void ggml_barrier(struct ggml_threadpool * tp);
+ 
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index d1b39b7..e19ceb1 100644
+index d1b39b7..deacc12 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
 @@ -1533,6 +1533,20 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
@@ -381,7 +401,18 @@ index d1b39b7..e19ceb1 100644
  
  static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
      int n_tasks = 0;
-@@ -3354,40 +3504,8 @@ static thread_ret_t ggml_graph_compute_secondary_thread(void* data);
+@@ -3110,6 +3260,10 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
+                 n_tasks = n_threads;
+             } break;
+         case GGML_OP_REPEAT:
++            { // KCPP_REPEAT_ROWS_TASKS: small/F16/strided destinations keep one task.
++                n_tasks = ggml_kcpp_parallel_repeat_rows(node)
++                    ? (int) MIN((int64_t) n_threads, ggml_nrows(node)) : 1;
++            } break;
+         case GGML_OP_REPEAT_BACK:
+         case GGML_OP_LEAKY_RELU:
+             {
+@@ -3354,40 +3508,8 @@ static thread_ret_t ggml_graph_compute_secondary_thread(void* data);
  #if defined(_WIN32)
  #include "windows.h"
  
@@ -424,7 +455,7 @@ index d1b39b7..e19ceb1 100644
  
  static bool powethrottlemsgshown = false;
  static bool ggml_thread_apply_priority(int32_t prio) {
-@@ -3962,6 +4080,9 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
+@@ -3962,6 +4084,9 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
  #ifdef GGML_USE_CPU_RISCV64_SPACEMIT
      ggml_backend_cpu_riscv64_spacemit_set_numa_thread_affinity(state->ith);
  #else
@@ -434,6 +465,44 @@ index d1b39b7..e19ceb1 100644
      set_numa_thread_affinity(state->ith);
  #endif
  
+diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
+index 02d5eff..ea14c3c 100644
+--- a/ggml/src/ggml-cpu/ops.cpp
++++ b/ggml/src/ggml-cpu/ops.cpp
+@@ -1714,12 +1714,31 @@ static void ggml_compute_forward_repeat_f32(
+ 
+     const ggml_tensor * src0 = dst->src[0];
+ 
++    GGML_ASSERT(ggml_can_repeat(src0, dst));
++
++    // KCPP_REPEAT_ROWS_KERNEL: disjoint contiguous output rows, no float arithmetic.
++    if (ggml_kcpp_parallel_repeat_rows(dst) && src0->data != dst->data) {
++        const int64_t nr = ggml_nrows(dst);
++        const int64_t dr = (nr + params->nth - 1) / params->nth;
++        const int64_t first = dr * params->ith;
++        const int64_t last = MIN(first + dr, nr);
++        for (int64_t row = first; row < last; ++row) {
++            const int64_t i1 = row % dst->ne[1];
++            const int64_t i2 = (row / dst->ne[1]) % dst->ne[2];
++            const int64_t i3 = row / (dst->ne[1] * dst->ne[2]);
++            const char * src = (const char *) src0->data +
++                (i1 % src0->ne[1]) * src0->nb[1] +
++                (i2 % src0->ne[2]) * src0->nb[2] +
++                (i3 % src0->ne[3]) * src0->nb[3];
++            char * out = (char *) dst->data + row * dst->nb[1];
++            memcpy(out, src, (size_t) dst->ne[0] * sizeof(float));
++        }
++        return;
++    }
+     if (params->ith != 0) {
+         return;
+     }
+ 
+-    GGML_ASSERT(ggml_can_repeat(src0, dst));
+-
+     GGML_TENSOR_UNARY_OP_LOCALS
+ 
+     // guaranteed to be an integer due to the check in ggml_can_repeat
 diff --git a/ggml/src/ggml-cpu/vec.h b/ggml/src/ggml-cpu/vec.h
 index f24fa00..355f9c0 100644
 --- a/ggml/src/ggml-cpu/vec.h
@@ -830,6 +899,110 @@ index 19d3787..ea1d43e 100644
  #define BK_STEP 4
  #else
  layout (constant_id = 3) const uint BK = 16;  // Assumed to be 32 if working with a quant
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
+index 314c8e5..1a5d40f 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
+@@ -78,6 +78,9 @@ void rms_norm(uint num_iters) {
+ #else
+             uint32_t d_offset = ((samp*nchannels + channel)*nrows + row)*ncols + get_doffset();
+ #endif
++            // KCPP_RMS_CACHE4: retain <=2048-column rows; larger rows keep original loads.
++            FLOAT_TYPE kcpp_values[4] = FLOAT_TYPE[4](FLOAT_TYPE(0), FLOAT_TYPE(0), FLOAT_TYPE(0), FLOAT_TYPE(0));
++            const bool kcpp_keep_values = num_iters <= 4;
+             FLOAT_TYPE sum = FLOAT_TYPE(0.0f); // partial sum for thread in warp
+ 
+             [[unroll]] for (uint col = tid, idx = 0; idx < num_iters; col += BLOCK_SIZE, ++idx) {
+@@ -85,6 +88,7 @@ void rms_norm(uint num_iters) {
+                 if (col < ncols) {
+                     xi = FLOAT_TYPE(data_a[a_offset + col]);
+                 }
++                if (kcpp_keep_values) { kcpp_values[idx & 3u] = xi; }
+                 sum += xi * xi;
+             }
+ 
+@@ -109,7 +113,7 @@ void rms_norm(uint num_iters) {
+                         if (col >= ncols) {
+                             continue;
+                         }
+-                        FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
++                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
+ #if RMS_NORM_ADD_FUSION
+                         value += FLOAT_TYPE(data_c[d_offset + col]);
+                         if (do_post_multiply) {
+@@ -123,7 +127,7 @@ void rms_norm(uint num_iters) {
+                         if (col >= ncols) {
+                             continue;
+                         }
+-                        FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + col]);
++                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])) * FLOAT_TYPE(data_b[b_offset + col]);
+ #if RMS_NORM_ADD_FUSION
+                         value += FLOAT_TYPE(data_c[d_offset + col]);
+                         if (do_post_multiply) {
+@@ -138,7 +142,7 @@ void rms_norm(uint num_iters) {
+                     if (col >= ncols) {
+                         continue;
+                     }
+-                    data_d[d_offset + col] = D_TYPE(scale * FLOAT_TYPE(data_a[a_offset + col]));
++                    data_d[d_offset + col] = D_TYPE(scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])));
+                 }
+             }
+ #if RMS_NORM_ROPE_FUSION
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
+index cf7ab21..9a8094a 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
+@@ -45,6 +45,16 @@ void main() {
+     uint32_t b_offset = src1_idx(0, row, channel, samp) + get_boffset();
+     uint32_t d_offset = ((samp*nchannels + channel)*nrows + row)*ncols + get_doffset();
+ 
++    // KCPP_RMS_PARTIALS_PREFETCH: issue independent loads before partial reduction.
++    uint col = tid;
++    FLOAT_TYPE kcpp_x = FLOAT_TYPE(0);
++    FLOAT_TYPE kcpp_b = FLOAT_TYPE(0);
++    if (col < ncols) {
++        kcpp_x = FLOAT_TYPE(data_a[a_offset + col]);
++        if (do_multiply) {
++            kcpp_b = FLOAT_TYPE(data_b[b_offset + (ncols > p.ne10 ? fastmod(col, p.ne10) : col)]);
++        }
++    }
+     FLOAT_TYPE sum = FLOAT_TYPE(0.0f); // partial sum for thread in warp
+ 
+     uint32_t num_partials = p.param3;
+@@ -53,7 +63,6 @@ void main() {
+     }
+     sum = subgroupAdd(sum);
+ 
+-    uint col = tid;
+     if (col >= ncols) {
+         return;
+     }
+@@ -63,7 +72,7 @@ void main() {
+ 
+     if (do_multiply) {
+         if (ncols > p.ne10) {
+-            FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
++            FLOAT_TYPE value = scale * kcpp_x * kcpp_b;
+ #if RMS_NORM_ADD_FUSION
+             value += FLOAT_TYPE(data_c[d_offset + col]);
+             if (do_post_multiply) {
+@@ -72,7 +81,7 @@ void main() {
+ #endif
+             data_d[d_offset + col] = D_TYPE(value);
+         } else {
+-            FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + col]);
++            FLOAT_TYPE value = scale * kcpp_x * kcpp_b;
+ #if RMS_NORM_ADD_FUSION
+             value += FLOAT_TYPE(data_c[d_offset + col]);
+             if (do_post_multiply) {
+@@ -82,6 +91,6 @@ void main() {
+             data_d[d_offset + col] = D_TYPE(value);
+         }
+     } else {
+-        data_d[d_offset + col] = D_TYPE(scale * FLOAT_TYPE(data_a[a_offset + col]));
++        data_d[d_offset + col] = D_TYPE(scale * kcpp_x);
+     }
+ }
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 index e54a513..9ec4935 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
@@ -869,7 +1042,7 @@ index 93c9031..6480cef 100644
          // if it returns true, execution of llama_decode() will be aborted
          // currently works only with CPU execution
 diff --git a/kcpp_src/expose.h b/kcpp_src/expose.h
-index 1e92677..e581270 100644
+index 07d4a3d..ca10e81 100644
 --- a/kcpp_src/expose.h
 +++ b/kcpp_src/expose.h
 @@ -96,6 +96,8 @@ struct load_model_inputs
@@ -911,7 +1084,7 @@ index 6a817c0..211456c 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index e9b0311..f820766 100644
+index 786d9cb..dfe85f9 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -933,7 +1106,7 @@ index e9b0311..f820766 100644
  showdebug = True
  kcpp_instance = None #global running instance
  global_memory = {"tunnel_url": "", "restart_target":"", "input_to_exit":False, "load_complete":False, "restart_override_base_config":"", "last_active_timestamp":datetime.now(), "triggered_sleeping":False, "current_model":"initial_model", "base_config":"", "swapReqType": None, "loadedReqTypes": [], "autoswapmode": False}
-@@ -383,7 +395,9 @@ class load_model_inputs(ctypes.Structure):
+@@ -384,7 +396,9 @@ class load_model_inputs(ctypes.Structure):
                  ("rpc_targets", ctypes.c_char_p),
                  ("lazy_mode", ctypes.c_int),
                  ("moe_cache_mib", ctypes.c_int),
@@ -944,7 +1117,7 @@ index e9b0311..f820766 100644
  
  class generation_inputs(ctypes.Structure):
      _fields_ = [("seed", ctypes.c_int),
-@@ -913,6 +927,18 @@ def restore_stdout():
+@@ -914,6 +928,18 @@ def restore_stdout():
          saved_stdout = saved_stderr = saved_stdout_py = saved_stderr_py = stdout_nullfile = stdout_nullfile_py = None
  
  def get_default_threads():
@@ -963,7 +1136,7 @@ index e9b0311..f820766 100644
      physical_core_limit = 1
      if os.cpu_count() is not None and os.cpu_count()>1:
          physical_core_limit = os.cpu_count() // 2
-@@ -965,10 +991,32 @@ lib_option_pairs = [
+@@ -966,10 +992,32 @@ lib_option_pairs = [
  default_option, cublas_option, hipblas_option, vulkan_option, noavx2_option, vulkan_noavx2_option, vulkan_failsafe_option, failsafe_option = (opt if file_exists(lib) or (os.name == 'nt' and file_exists(opt + ".dll")) else None for lib, opt in lib_option_pairs)
  runopts = [opt for lib, opt in lib_option_pairs if file_exists(lib)]
  
@@ -996,7 +1169,7 @@ index e9b0311..f820766 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -2130,6 +2178,14 @@ def load_model(model_filename):
+@@ -2131,6 +2179,14 @@ def load_model(model_filename):
      inputs = load_model_inputs()
      inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
      inputs.moe_cache_mib = args.moe_cache_mib
@@ -1011,7 +1184,7 @@ index e9b0311..f820766 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -9196,7 +9252,7 @@ def show_gui():
+@@ -9197,7 +9253,7 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -1020,7 +1193,7 @@ index e9b0311..f820766 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -12713,7 +12769,7 @@ def main(launch_args, default_args):
+@@ -12731,7 +12787,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -1029,7 +1202,21 @@ index e9b0311..f820766 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14245,6 +14301,7 @@ if __name__ == '__main__':
+@@ -13568,7 +13624,12 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+     if args.password and args.password!="":
+         password = args.password.strip()
+ 
+-    print(args)
++    # KCPP_STARTUP_REDACTION: do not leak credentials; preserve the live Namespace.
++    safe_args = argparse.Namespace(**vars(args))
++    for secret_key in ("password", "adminpassword", "hordekey", "agent_api_key"):
++        if getattr(safe_args, secret_key, None):
++            setattr(safe_args, secret_key, "***")
++    print(safe_args)
+     print("==========")
+ 
+     #if RPC Host mode is specified
+@@ -14265,6 +14326,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -1037,7 +1224,7 @@ index e9b0311..f820766 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14279,6 +14336,9 @@ if __name__ == '__main__':
+@@ -14299,6 +14361,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")

@@ -11,3 +11,7 @@ Embedded upstream tiny autoencoders (TAESD/TAEQI): Ollin Boer Bohan / madebyolli
 New ports: the transposed-concat shader is adapted from [llama.cpp PR30591](https://github.com/ggml-org/llama.cpp/pull/30591), under MIT. The sampling CDF implementation independently adapts the idea in [ik_llama PR1187](https://github.com/ikawrakow/ik_llama.cpp/pull/1187), retaining GCC 13 RNG behavior. Full upstream copyright/permission notices are in licenses/llama.cpp-MIT.txt and licenses/ik_llama.cpp-MIT.txt; source and license fingerprints are in licenses/patch-sources.json.
 
 Official experimental59ab92c adds the selective [Audio.cpp](https://github.com/0xShug0/audio.cpp) integration (Copyright2026 ShugoAI LLC, Apache-2.0) and cJSON (MIT). Full notices and the relocated native-component licenses are included under licenses/; exact source paths/commit/hashes are in licenses/upstream-native.json. No audio model weights are distributed.
+
+Official experimental now bundles tinylibwebp (Google/WebM contributors): BSD3-clause notices, AUTHORS and PATENTS are retained under licenses/WebP/. Full corresponding source is in vendor/tinylibwebp in this tag.
+
+Compute ports28October2026: CPU row-copy parallelism is an independent GGML adaptation inspired by ik_llama PR2757 (MIT source already attributed). Vulkan RMS prefetch/cache adapts ideas/code from HarshaVardhan3002/ROCmFPX commit1fe09ec4e3 (MIT; licenses/ROCmFPX-MIT.txt). Startup credential masking follows LostRuins/koboldcpp PR2566 under the project AGPL. No new model weights or ROCm runtime are distributed.

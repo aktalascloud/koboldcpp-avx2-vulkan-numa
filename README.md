@@ -4,6 +4,9 @@
 
 Performance fork of [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp), based on **concedo_experimental**. Windows x64, Haswell/AVX2, RX580 Polaris/gfx803, Vulkan and optional Windows NUMA. **O3 + LTO, no PGO.** No main model weights included.
 
+Daily28October: CPU row-copy parallelism and bounded Vulkan RMS cache/prefetch are enabled by user request; speed impact is unmeasured. [Checks/scope](performance/benchmarks/compute-correctness.json).
+
+
 ## Stock versus latest measured result
 
 Xeon E5-2696v3 / RX580 2048SP 8GB; identical Qwen3-4B IQ4_XS. Tokens/s, measured 2026-10-25, EXE `fb4a6ad1`.

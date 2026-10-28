@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "cpu_byte_equivalence": "CPU repeat matched legacy bytes: 120 cases; guards and strided inputs passed.",
+  "gpu_scope": "Source/sum-order/bounds inspection plus mandatory shader compilation; no claim of a GPU numerical runtime test.",
+  "benchmarks_run": false,
+  "inference_started": false
+}

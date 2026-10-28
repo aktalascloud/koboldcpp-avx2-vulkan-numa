@@ -46,5 +46,29 @@
     "source_file": "otherarch/ttscpp/TTSCPP_LICENSE",
     "source_commit": "59ab92c3e7ff47b51f960d402dfea3aecc016532",
     "sha256": "fe42cecaf75713db306a3acfd046d10f7c15c2068e5ec4c3afa4a882c7ffab65"
+  },
+  {
+    "path": "licenses/WebP/LICENSE.txt",
+    "source_file": "vendor/tinylibwebp/LICENSE",
+    "source_commit": "50c9b01240642deeaf42dae62e72509b6071bc44",
+    "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf"
+  },
+  {
+    "path": "licenses/WebP/COPYING.txt",
+    "source_file": "vendor/tinylibwebp/COPYING",
+    "source_commit": "50c9b01240642deeaf42dae62e72509b6071bc44",
+    "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf"
+  },
+  {
+    "path": "licenses/WebP/AUTHORS.txt",
+    "source_file": "vendor/tinylibwebp/AUTHORS",
+    "source_commit": "50c9b01240642deeaf42dae62e72509b6071bc44",
+    "sha256": "f251be89fd442bd9d701360730aea163cc8e2076ff03528f59267dc2c4f8b60a"
+  },
+  {
+    "path": "licenses/WebP/PATENTS.txt",
+    "source_file": "vendor/tinylibwebp/PATENTS",
+    "source_commit": "50c9b01240642deeaf42dae62e72509b6071bc44",
+    "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c"
   }
 ]

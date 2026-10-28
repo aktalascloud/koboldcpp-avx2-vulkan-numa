@@ -529,6 +529,15 @@ static __m256 __lasx_xvreplfr2vr_s(const float val) {
 }
 #endif
 
+// KCPP_REPEAT_ROWS_PARALLEL: shape-only gate shared by planner and kernel.
+static inline bool ggml_kcpp_parallel_repeat_rows(const struct ggml_tensor * node) {
+    const struct ggml_tensor * src = node->src[0];
+    return src != NULL && node->type == GGML_TYPE_F32 && src->type == GGML_TYPE_F32 &&
+           src->ne[1] > 0 && src->ne[2] > 0 && src->ne[3] > 0 &&
+           src->ne[0] == node->ne[0] && src->nb[0] == sizeof(float) &&
+           ggml_is_contiguous(node) && ggml_nelements(node) >= 65536 && ggml_nrows(node) >= 32;
+}
+
 // TODO: move to ggml-threading
 void ggml_barrier(struct ggml_threadpool * tp);
 

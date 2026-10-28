@@ -3260,6 +3260,10 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
                 n_tasks = n_threads;
             } break;
         case GGML_OP_REPEAT:
+            { // KCPP_REPEAT_ROWS_TASKS: small/F16/strided destinations keep one task.
+                n_tasks = ggml_kcpp_parallel_repeat_rows(node)
+                    ? (int) MIN((int64_t) n_threads, ggml_nrows(node)) : 1;
+            } break;
         case GGML_OP_REPEAT_BACK:
         case GGML_OP_LEAKY_RELU:
             {

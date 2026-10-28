@@ -1,5 +1,5 @@
 {
-  "checked": "2026-10-25",
+  "checked": "2026-10-28",
   "sources": [
     {
       "repository": "ggml-org/llama.cpp",
@@ -26,6 +26,16 @@
       "local_notice": "HybridMoE-MIT.txt",
       "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
       "distribution_notes": "Wrapper patch collection has no detected root license; no wrapper scripts are redistributed. Adapted implementation license verified in its code fork at the actual patch commit."
+    },
+    {
+      "repository": "HarshaVardhan3002/ROCmFPX",
+      "code_commit": "1fe09ec4e3",
+      "spdx": "MIT",
+      "license_blob": "e7dca554bcb802f98408383a864404e3aa4eacca",
+      "source": "https://github.com/HarshaVardhan3002/ROCmFPX/blob/1fe09ec4e3/LICENSE",
+      "local_notice": "ROCmFPX-MIT.txt",
+      "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+      "scope": "RMS prefetch idea/adaptation; no ROCm runtime linked."
     }
   ],
   "native_license": "AGPL-3.0; bundled GGML/llama.cpp portions retain MIT notices",

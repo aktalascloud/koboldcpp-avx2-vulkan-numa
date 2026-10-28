@@ -78,6 +78,9 @@ void rms_norm(uint num_iters) {
 #else
             uint32_t d_offset = ((samp*nchannels + channel)*nrows + row)*ncols + get_doffset();
 #endif
+            // KCPP_RMS_CACHE4: retain <=2048-column rows; larger rows keep original loads.
+            FLOAT_TYPE kcpp_values[4] = FLOAT_TYPE[4](FLOAT_TYPE(0), FLOAT_TYPE(0), FLOAT_TYPE(0), FLOAT_TYPE(0));
+            const bool kcpp_keep_values = num_iters <= 4;
             FLOAT_TYPE sum = FLOAT_TYPE(0.0f); // partial sum for thread in warp
 
             [[unroll]] for (uint col = tid, idx = 0; idx < num_iters; col += BLOCK_SIZE, ++idx) {
@@ -85,6 +88,7 @@ void rms_norm(uint num_iters) {
                 if (col < ncols) {
                     xi = FLOAT_TYPE(data_a[a_offset + col]);
                 }
+                if (kcpp_keep_values) { kcpp_values[idx & 3u] = xi; }
                 sum += xi * xi;
             }
 
@@ -109,7 +113,7 @@ void rms_norm(uint num_iters) {
                         if (col >= ncols) {
                             continue;
                         }
-                        FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
+                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
 #if RMS_NORM_ADD_FUSION
                         value += FLOAT_TYPE(data_c[d_offset + col]);
                         if (do_post_multiply) {
@@ -123,7 +127,7 @@ void rms_norm(uint num_iters) {
                         if (col >= ncols) {
                             continue;
                         }
-                        FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + col]);
+                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])) * FLOAT_TYPE(data_b[b_offset + col]);
 #if RMS_NORM_ADD_FUSION
                         value += FLOAT_TYPE(data_c[d_offset + col]);
                         if (do_post_multiply) {
@@ -138,7 +142,7 @@ void rms_norm(uint num_iters) {
                     if (col >= ncols) {
                         continue;
                     }
-                    data_d[d_offset + col] = D_TYPE(scale * FLOAT_TYPE(data_a[a_offset + col]));
+                    data_d[d_offset + col] = D_TYPE(scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])));
                 }
             }
 #if RMS_NORM_ROPE_FUSION

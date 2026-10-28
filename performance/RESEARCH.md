@@ -35,3 +35,8 @@ All paginated PR/issue records were indexed for 23 configured sources, then rele
 - Build fix: regenerate the embedded shader object after its generated source changes; skipping the generator with Make -o must not retain old SPIR-V.
 
 [All operation repeats and negative probe](benchmarks/operations.json). These local operation gains must not be presented as end-to-end token or photo gains. No photo/music generation was repeated.
+
+## 28 October review
+23-source paginated PR/issues inventory and21 selected-fork bounded review refreshed without errors. Relevant commits, comments and diffs were inspected; not every file/comment in all forks.
+
+Included generic CPU REPEAT and Vulkan RMS adaptations after explicit user authorization; speed remains unmeasured. QSA CPU PR2751 targets another model/IQK path, Windows P/E affinity PR2756 targets hybrid CPUs absent on Haswell, and AVX512/Q8_R16/AMX/RDNA3-UMA-coopmat changes were not copied into Polaris. Polaris-local-ai PR7 is model-specific router/offload/ngram configuration. New source includes WebP, TTS timing and MCP startup changes. No routine inference benchmarks.

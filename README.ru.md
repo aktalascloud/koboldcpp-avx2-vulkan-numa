@@ -4,6 +4,9 @@
 
 Форк [оригинального KoboldCpp](https://github.com/LostRuins/koboldcpp), ветка **concedo_experimental**. Windows x64, Haswell/AVX2, RX580 Polaris/gfx803, Vulkan и Windows NUMA. **O3 + LTO, без PGO.** Основные модели в пакет не включены.
 
+Сборка28октября: включены параллельное копирование строкCPU и кэш/предзагрузка VulkanRMS по запросу пользователя. Прирост пока не измерен; прежняя таблица сохраняет исходные даты/SHA.
+
+
 ## Сток и последний измеренный билд
 
 Xeon E5-2696v3 / RX580 2048SP 8GB, одинаковый Qwen3-4B IQ4_XS. Токенов/с, 2026-10-25, EXE `fb4a6ad1`.

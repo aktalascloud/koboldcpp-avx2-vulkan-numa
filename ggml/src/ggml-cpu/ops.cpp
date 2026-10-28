@@ -1714,11 +1714,30 @@ static void ggml_compute_forward_repeat_f32(
 
     const ggml_tensor * src0 = dst->src[0];
 
+    GGML_ASSERT(ggml_can_repeat(src0, dst));
+
+    // KCPP_REPEAT_ROWS_KERNEL: disjoint contiguous output rows, no float arithmetic.
+    if (ggml_kcpp_parallel_repeat_rows(dst) && src0->data != dst->data) {
+        const int64_t nr = ggml_nrows(dst);
+        const int64_t dr = (nr + params->nth - 1) / params->nth;
+        const int64_t first = dr * params->ith;
+        const int64_t last = MIN(first + dr, nr);
+        for (int64_t row = first; row < last; ++row) {
+            const int64_t i1 = row % dst->ne[1];
+            const int64_t i2 = (row / dst->ne[1]) % dst->ne[2];
+            const int64_t i3 = row / (dst->ne[1] * dst->ne[2]);
+            const char * src = (const char *) src0->data +
+                (i1 % src0->ne[1]) * src0->nb[1] +
+                (i2 % src0->ne[2]) * src0->nb[2] +
+                (i3 % src0->ne[3]) * src0->nb[3];
+            char * out = (char *) dst->data + row * dst->nb[1];
+            memcpy(out, src, (size_t) dst->ne[0] * sizeof(float));
+        }
+        return;
+    }
     if (params->ith != 0) {
         return;
     }
-
-    GGML_ASSERT(ggml_can_repeat(src0, dst));
 
     GGML_TENSOR_UNARY_OP_LOCALS
 

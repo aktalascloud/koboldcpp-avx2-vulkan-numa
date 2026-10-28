@@ -24,3 +24,13 @@ The checkout already contains these changes. Do not reapply [runtime.patch](patc
 Already in upstream and retained: [Soprano include fix PR2557](https://github.com/LostRuins/koboldcpp/pull/2557), [AVX2 reduction PR30296](https://github.com/ggml-org/llama.cpp/pull/30296), [F16C lookup fix PR30343](https://github.com/ggml-org/llama.cpp/pull/30343), [tokenization/logprob stability](https://github.com/henk717/koboldcpp/commit/874f833a54). These are not presented as new local inventions.
 
 [Stock versus latest proof](benchmarks/latest.json) · [Operation A/B tests and rejected probe](benchmarks/operations.json) · [Research decisions](RESEARCH.md) · [Licenses](NOTICE.md). Individual patch multipliers are not added or attributed to full-model throughput.
+
+## 28 October2026 additions — speed impact unmeasured
+
+|Port|Source|Scope/checks|
+|---|---|---|
+|CPU F32 repeat row parallelism|[ik PR2757](https://github.com/ikawrakow/ik_llama.cpp/pull/2757), [local ops](../ggml/src/ggml-cpu/ops.cpp)|Large contiguous destinations only; shared planner/kernel gate, strided sources preserved;120 byte-equivalence cases. Different from the original single-thread IQK tree.|
+|Vulkan RMS4 cache + partial prefetch|[ROCmFPX commit](https://github.com/HarshaVardhan3002/ROCmFPX/commit/1fe09ec4e3), [shader](../ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp)|At most4 values per lane, unchanged workgroup/reduction order and large-row fallback. Compile/startup checked; no measured speed claim.|
+|Startup credential masking|[PR2566](https://github.com/LostRuins/koboldcpp/pull/2566), [source](../koboldcpp.py)|Masks4 fields in a copied Namespace; live credentials unchanged. Synthetic check passed.|
+
+User explicitly authorized these compute ports without a prior speed gate. [Correctness scope](benchmarks/compute-correctness.json). Historic stock/latest speed tables do not measure these additions.

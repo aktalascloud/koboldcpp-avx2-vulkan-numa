@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "835af0020742cee80e7052315264ee40e1c91f65",
+  "commit": "50c9b01240642deeaf42dae62e72509b6071bc44",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,26 +20,26 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "6b815fe4ace25231f789639b2595458f2b467d752c77370864520d3a15e2354d",
-  "patch_sha256": "587309e3b0b8b13d55a944b1753a3b9facce3e1aece64c2bfc88e1a49fb715de",
-  "seconds": 745.8968548774719,
+  "executable_sha256": "6c03b583f7a266facdfd045561013e164e88202b583a4bbe6d801938ae189c08",
+  "patch_sha256": "6e33e981793d2dc33441013e10bb65b3dd89888a4921ca26449e57995225226b",
+  "seconds": 764.362053155899,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "e876b5fa8d0cf8df5a153d3ae114a96b31f9128f4d8f4b1be89205fb489ffda1",
-  "native_input_count": 2791,
+  "native_source_signature": "cf852375a3c1f50f25f9e274ec0507307e85c320f7fbec81f7886669ecde9fed",
+  "native_input_count": 2908,
   "native_dlls_reused": false,
   "native_validation_parent_sha256": null,
-  "build_date": "2026-10-27",
+  "build_date": "2026-10-28",
   "build_verified": true,
   "pgo_disabled_verified": true,
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "5e197ab1016122547280e45f66cd65a86198c592b9bcac9d6c19c6b6f1277b60",
-    "koboldcpp_vulkan.dll": "292e4b6e03883b18e17060639351b0299127d3c899a6d13f3205db745148382b"
+    "koboldcpp_default.dll": "b5821ec06ed54e64679f9908ad5cb9472eaf294fbe0c10f791d094a46a5425af",
+    "koboldcpp_vulkan.dll": "df502c7bae9de021f9a6f2b45d1adeba70e1989d4ec20b450b13a7a5f0c4506f"
   },
   "cpu_threads": {
     "threads": 16,
@@ -54,5 +54,11 @@
     "ubatchsize": 1024,
     "gpulayers": 99
   },
-  "binary_unchanged": false
+  "binary_unchanged": false,
+  "user_authorized_unbenchmarked_compute": true,
+  "unmeasured_compute_ports": [
+    "CPU large contiguous F32 REPEAT row parallelism",
+    "Vulkan RMS register cache4 for short rows",
+    "Vulkan RMS partial-input prefetch"
+  ]
 }
