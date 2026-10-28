@@ -15,3 +15,7 @@ Official experimental59ab92c adds the selective [Audio.cpp](https://github.com/0
 Official experimental now bundles tinylibwebp (Google/WebM contributors): BSD3-clause notices, AUTHORS and PATENTS are retained under licenses/WebP/. Full corresponding source is in vendor/tinylibwebp in this tag.
 
 Compute ports28October2026: CPU row-copy parallelism is an independent GGML adaptation inspired by ik_llama PR2757 (MIT source already attributed). Vulkan RMS prefetch/cache adapts ideas/code from HarshaVardhan3002/ROCmFPX commit1fe09ec4e3 (MIT; licenses/ROCmFPX-MIT.txt). Startup credential masking follows LostRuins/koboldcpp PR2566 under the project AGPL. No new model weights or ROCm runtime are distributed.
+
+## Super-TinyVAE reference
+
+Native architecture adaptation follows madebyollin/taehv at commit 011dfc2112197741c540e0bdd5b7b67bcc930771 (MIT). Full copyright/license is retained in otherarch/sdcpp/SDCPP_LICENSE. Checkpoint downloads remain with the original distributor. The advanced-lvl-up VAE workflow supplies a configuration idea; no HIP/Tensile binary or code is redistributed.

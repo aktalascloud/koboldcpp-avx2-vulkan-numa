@@ -3802,6 +3802,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
     for (uint32_t s = 0; s < CONV_SHAPE_COUNT; ++s) {
         // smaller WG for the small-tile fallback gives more concurrent WGs per SM
         uint32_t conv2d_WG_SIZE  = (s == CONV_SHAPE_64x32) ? 128 : 256;
+        // KCPP_GCN_CONV_WG: preserve data reuse while reducing accumulators per lane.
+        static const bool wider_gcn_conv=[](){const char* v=std::getenv("GGML_VK_GCN_CONV_WG");return v && std::strcmp(v,"512")==0;}();
+        if (wider_gcn_conv && s==CONV_SHAPE_128x128 && device->vendor_id==VK_VENDOR_ID_AMD &&
+            device->architecture==vk_device_architecture::AMD_GCN && device->subgroup_size==64 &&
+            device->properties.limits.maxComputeWorkGroupInvocations>=512 &&
+            device->properties.limits.maxComputeSharedMemorySize>=32768 &&
+            (device->properties.deviceID==0x6fdf || device->properties.deviceID==0x67df)) {
+            conv2d_WG_SIZE=512;
+            GGML_LOG_INFO("KCPP: Polaris convolution512-lane candidate active\n");
+        }
+
         uint32_t use_collectives = 0;  // Enables subgroup ops for preventing the re-calculation of indices.
         uint32_t conv2d_TS_K     = (s == CONV_SHAPE_64x32) ? 4 : 8;
         uint32_t conv2d_SHMEM_PAD = 4;

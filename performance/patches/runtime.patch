@@ -551,7 +551,7 @@ index 12b9a3b..7fa09a4 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 0164a57..ca04e40 100644
+index 0164a57..0468a77 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1270,7 +1270,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
@@ -655,7 +655,25 @@ index 0164a57..ca04e40 100644
      ggml_vk_create_pipeline(device, device->pipeline_concat_i64, "concat_i64", concat_i64_len, concat_i64_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
  
      ggml_vk_create_pipeline(device, device->pipeline_upscale_nearest_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_NEAREST}, 1);
-@@ -4326,11 +4361,23 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -3767,6 +3802,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     for (uint32_t s = 0; s < CONV_SHAPE_COUNT; ++s) {
+         // smaller WG for the small-tile fallback gives more concurrent WGs per SM
+         uint32_t conv2d_WG_SIZE  = (s == CONV_SHAPE_64x32) ? 128 : 256;
++        // KCPP_GCN_CONV_WG: preserve data reuse while reducing accumulators per lane.
++        static const bool wider_gcn_conv=[](){const char* v=std::getenv("GGML_VK_GCN_CONV_WG");return v && std::strcmp(v,"512")==0;}();
++        if (wider_gcn_conv && s==CONV_SHAPE_128x128 && device->vendor_id==VK_VENDOR_ID_AMD &&
++            device->architecture==vk_device_architecture::AMD_GCN && device->subgroup_size==64 &&
++            device->properties.limits.maxComputeWorkGroupInvocations>=512 &&
++            device->properties.limits.maxComputeSharedMemorySize>=32768 &&
++            (device->properties.deviceID==0x6fdf || device->properties.deviceID==0x67df)) {
++            conv2d_WG_SIZE=512;
++            GGML_LOG_INFO("KCPP: Polaris convolution512-lane candidate active\n");
++        }
++
+         uint32_t use_collectives = 0;  // Enables subgroup ops for preventing the re-calculation of indices.
+         uint32_t conv2d_TS_K     = (s == CONV_SHAPE_64x32) ? 4 : 8;
+         uint32_t conv2d_SHMEM_PAD = 4;
+@@ -4326,11 +4372,23 @@ vk_device ggml_vk_get_device(size_t idx) {
          // Allow overriding avoiding the graphics queue because it can increase performance on RADV
          const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
          const vk::QueueFlagBits graphics_flag = allow_graphics_queue ? (vk::QueueFlagBits)0 : vk::QueueFlagBits::eGraphics;
@@ -682,7 +700,7 @@ index 0164a57..ca04e40 100644
  
          std::vector<vk::DeviceQueueCreateInfo> device_queue_create_infos;
          vk::DeviceCreateInfo device_create_info{};
-@@ -4342,12 +4389,12 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4342,12 +4400,12 @@ vk_device ggml_vk_get_device(size_t idx) {
          device_features2.pNext = nullptr;
          device_features2.features = (VkPhysicalDeviceFeatures)device_features;
  
@@ -697,7 +715,7 @@ index 0164a57..ca04e40 100644
          vk12_features.pNext = nullptr;
          vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
          vk11_features.pNext = &vk12_features;
-@@ -4803,7 +4850,19 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4803,7 +4861,19 @@ vk_device ggml_vk_get_device(size_t idx) {
              .setQueueCreateInfos(device_queue_create_infos)
              .setPEnabledExtensionNames(device_extensions);
          device_create_info.setPNext(&device_features2);
@@ -718,7 +736,7 @@ index 0164a57..ca04e40 100644
  
          if (device->device_fault) {
              device->pfn_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT)
-@@ -5069,12 +5128,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+@@ -5069,12 +5139,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
      device_features2.pNext = nullptr;
  
@@ -733,7 +751,7 @@ index 0164a57..ca04e40 100644
      vk12_features.pNext = nullptr;
      vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
      vk11_features.pNext = &vk12_features;
-@@ -5660,6 +5719,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
+@@ -5660,6 +5730,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
          }
      }
  
@@ -751,7 +769,7 @@ index 0164a57..ca04e40 100644
      if (b_type == GGML_TYPE_Q8_1) {
          if (ctx->device->vendor_id == VK_VENDOR_ID_INTEL) {
              dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
-@@ -8717,6 +8787,17 @@ static vk_conv_shapes ggml_vk_conv_select_shape(ggml_backend_vk_context * ctx, u
+@@ -8717,6 +8798,17 @@ static vk_conv_shapes ggml_vk_conv_select_shape(ggml_backend_vk_context * ctx, u
      }
  }
  
@@ -769,7 +787,7 @@ index 0164a57..ca04e40 100644
  static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * dst, ggml_op op) {
      switch (op) {
      case GGML_OP_GET_ROWS:
-@@ -8809,6 +8890,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -8809,6 +8901,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
          if (!ggml_vk_concat_supported(src0, src1, dst)) {
              return nullptr;
          }
@@ -779,7 +797,7 @@ index 0164a57..ca04e40 100644
          switch (ggml_vk_concat_unit_size(src0->type)) {
          case 1:
              return ctx->device->pipeline_concat_i8;
-@@ -9741,6 +9825,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -9741,6 +9836,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
      case GGML_OP_GLU:
      case GGML_OP_CONV_2D_DW:
          {
@@ -790,7 +808,7 @@ index 0164a57..ca04e40 100644
              uint32_t ne = ggml_nelements(dst);
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
-@@ -14409,6 +14497,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14409,6 +14508,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
      }
      uint64_t flops_per_submit = std::min(flops_cap, ctx->last_total_flops / 40u);
  
@@ -803,7 +821,7 @@ index 0164a57..ca04e40 100644
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -14433,7 +14527,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14433,7 +14538,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -812,7 +830,7 @@ index 0164a57..ca04e40 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -14720,7 +14814,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14720,7 +14825,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -821,7 +839,7 @@ index 0164a57..ca04e40 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -16380,7 +16474,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -16380,7 +16485,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  
@@ -1234,6 +1252,243 @@ index 786d9cb..dfe85f9 100644
      advparser.add_argument("--moe-cache-mib", "--moecache", dest="moe_cache_mib", type=check_range(int, 0, 2147483647), default=0, metavar="MiB", help="Experimental GPU cache size in MiB for CPU-resident MoE experts. Split among GPUs like layers. Uses additional VRAM; combine with --moecpu or --autofit (default=0, disabled).")
      advparser.add_argument("--moecpu","--n-cpu-moe", "-ncmoe", metavar=('[layers affected]'), help="Keep the Mixture of Experts (MoE) weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
      advparser.add_argument("--ffncpu","--n-cpu-ffn", "-ncffn", metavar=('[layers affected]'), help="Keep the dense FFN weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
+diff --git a/otherarch/sdcpp/SDCPP_LICENSE b/otherarch/sdcpp/SDCPP_LICENSE
+index 56e1e5a..33293a1 100644
+--- a/otherarch/sdcpp/SDCPP_LICENSE
++++ b/otherarch/sdcpp/SDCPP_LICENSE
+@@ -18,4 +18,27 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+-SOFTWARE.
+\ No newline at end of file
++SOFTWARE.
++
++KCPP_TAEHV_SUPER MIT attribution: madebyollin/taehv, reference011dfc2112197741c540e0bdd5b7b67bcc930771.
++MIT License
++
++Copyright (c) 2025 Ollin Boer Bohan
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
+index e588044..f21e631 100644
+--- a/otherarch/sdcpp/sdtype_adapter.cpp
++++ b/otherarch/sdcpp/sdtype_adapter.cpp
+@@ -889,6 +889,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
+         params.photo_maker_path = "";
+     }
+ 
++    // KCPP_WAN_SPLIT_VAE: worker validates the independent decoder path/hash.
++    const char* kcpp_wan_tae_decoder = std::getenv("KCPP_WAN_TAE_DECODER");
++    const bool kcpp_wan_split_vae = tempver == VERSION_WAN2_2_TI2V && kcpp_wan_tae_decoder && *kcpp_wan_tae_decoder;
++    if (kcpp_wan_split_vae) {
++        if (!file_exists(kcpp_wan_tae_decoder) || path_empty(params.vae_path)) {
++            printf("KCPP: split Wan VAE requires a full VAE and the reviewed external Tiny decoder.\n");
++            GGML_ABORT("Reviewed split Wan decoder unavailable");
++        }
++        kcpp_taesd_path = kcpp_wan_tae_decoder;
++        params.tae_preview_only = true;
++        printf("KCPP: Wan5B full image encoder / independent Tiny video decoder enabled.\n");
++    }
+     //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
+     if(kcpp_taesd_path=="" && !path_empty(params.vae_path) && toLowerCase(params.vae_path).rfind("tae")!=std::string::npos)
+     {
+@@ -2465,7 +2477,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+             }
+             if(output_avi)
+             {
+-                status2 = create_mjpg_avi_membuf_from_sd_images(results, generated_num_results, vid_fps, 40, &out_data2,&out_len2, generated_audio);
++                status2 = create_mjpg_avi_membuf_from_sd_images(results, generated_num_results, vid_fps, 95, &out_data2,&out_len2, generated_audio);
+             }
+ 
+             if(generated_num_results>1)
+diff --git a/otherarch/sdcpp/src/model/vae/tae.hpp b/otherarch/sdcpp/src/model/vae/tae.hpp
+index 84dd4d1..05c7d67 100644
+--- a/otherarch/sdcpp/src/model/vae/tae.hpp
++++ b/otherarch/sdcpp/src/model/vae/tae.hpp
+@@ -529,6 +529,63 @@ public:
+     }
+ };
+ 
++
++// KCPP_TAEHV_SUPER: madebyollin/taehv SuperMemBlock / _super decoder, MIT.
++// Matches the published1x1 stem, depthwise7x7 temporal residuals and PixelShuffle.
++class KCPPTAEHVSuperMemBlock : public GGMLBlock {
++public:
++    explicit KCPPTAEHVSuperMemBlock(int c) {
++        blocks["conv.0"] = std::shared_ptr<GGMLBlock>(new Conv2d_grouped(2*c, 2*c, 2*c, {7,7}, {1,1}, {3,3}, {1,1}, false));
++        blocks["conv.1"] = std::shared_ptr<GGMLBlock>(new Conv2d(2*c, 4*c, {1,1}, {1,1}, {0,0}));
++        blocks["conv.3"] = std::shared_ptr<GGMLBlock>(new Conv2d(4*c, c, {1,1}, {1,1}, {0,0}, {1,1}, false));
++    }
++    ggml_tensor* forward(GGMLRunnerContext* ctx, ggml_tensor* x, ggml_tensor* past) {
++        auto h = ggml_concat(ctx->ggml_ctx, x, past, 2);
++        h = std::dynamic_pointer_cast<Conv2d_grouped>(blocks["conv.0"])->forward(ctx,h);
++        h = std::dynamic_pointer_cast<Conv2d>(blocks["conv.1"])->forward(ctx,h);
++        h = ggml_relu_inplace(ctx->ggml_ctx,h);
++        h = std::dynamic_pointer_cast<Conv2d>(blocks["conv.3"])->forward(ctx,h);
++        return ggml_add(ctx->ggml_ctx,h,x); // Super has no post-add ReLU or latent Clamp.
++    }
++};
++
++class KCPPTAEHVSuperDecoder : public TinyVideoDecoder {
++    int patch;
++public:
++    KCPPTAEHVSuperDecoder(int z, int p, const std::vector<bool>& temporal)
++        : TinyVideoDecoder(z,p,temporal,false), patch(p) {
++        blocks.clear();
++        const int c[4]={512,256,128,64};
++        blocks["0"] = std::shared_ptr<GGMLBlock>(new Conv2d(z,c[0],{1,1},{1,1},{0,0},{1,1},false));
++        int index=1;
++        for(int i=0;i<3;++i) {
++            for(int j=0;j<3;++j) blocks[std::to_string(index++)]=std::shared_ptr<GGMLBlock>(new KCPPTAEHVSuperMemBlock(c[i]));
++            blocks[std::to_string(index++)]=std::shared_ptr<GGMLBlock>(new Conv2d(c[i],4*c[i+1],{3,3},{1,1},{1,1}));
++            index+=2; // ReLU, PixelShuffle2: no checkpoint tensors.
++            blocks[std::to_string(index++)]=std::shared_ptr<GGMLBlock>(new TGrow(c[i+1],temporal[i]?2:1));
++        }
++        blocks[std::to_string(index)]=std::shared_ptr<GGMLBlock>(new Conv2d(c[3],3*p*p,{3,3},{1,1},{1,1}));
++    }
++    ggml_tensor* forward(GGMLRunnerContext* ctx, ggml_tensor* z) override {
++        auto h=std::dynamic_pointer_cast<Conv2d>(blocks["0"])->forward(ctx,z);
++        int index=1;
++        for(int i=0;i<3;++i) {
++            for(int j=0;j<3;++j) {
++                auto memory=ggml_ext_pad_ext(ctx->ggml_ctx,ctx->backend,h,0,0,0,0,0,0,1,0);
++                memory=ggml_view_4d(ctx->ggml_ctx,memory,h->ne[0],h->ne[1],h->ne[2],h->ne[3],h->nb[1],h->nb[2],h->nb[3],0);
++                h=std::dynamic_pointer_cast<KCPPTAEHVSuperMemBlock>(blocks[std::to_string(index++)])->forward(ctx,h,memory);
++            }
++            h=std::dynamic_pointer_cast<Conv2d>(blocks[std::to_string(index++)])->forward(ctx,h);
++            h=ggml_relu_inplace(ctx->ggml_ctx,h);++index;
++            h=unpatchify(ctx->ggml_ctx,ggml_cont(ctx->ggml_ctx,h),2);++index;
++            h=std::dynamic_pointer_cast<TGrow>(blocks[std::to_string(index++)])->forward(ctx,h);
++        }
++        h=std::dynamic_pointer_cast<Conv2d>(blocks[std::to_string(index)])->forward(ctx,h);
++        if(patch>1)h=unpatchify(ctx->ggml_ctx,h,patch);
++        return ggml_view_4d(ctx->ggml_ctx,h,h->ne[0],h->ne[1],h->ne[2],h->ne[3]-(t_upscale-1),h->nb[1],h->nb[2],h->nb[3],(t_upscale-1)*h->nb[3]);
++    }
++};
++
+ class TAEHV : public GGMLBlock {
+ protected:
+     bool decode_only;
+@@ -541,7 +598,7 @@ public:
+     std::vector<bool> time_upscale   = {false, true, true};
+ 
+ public:
+-    TAEHV(bool decode_only = true, SDVersion version = VERSION_WAN2, bool is_wide = false)
++    TAEHV(bool decode_only = true, SDVersion version = VERSION_WAN2, bool is_wide = false, bool is_super = false)
+         : decode_only(decode_only), version(version), is_wide(is_wide) {
+         int patch = 1;
+         if (version == VERSION_WAN2_2_TI2V) {
+@@ -560,7 +617,7 @@ public:
+             patch          = 2;
+             time_downscale = {true, true, false};
+         }
+-        blocks["decoder"] = std::shared_ptr<GGMLBlock>(new TinyVideoDecoder(z_channels, patch, time_upscale, is_wide));
++        blocks["decoder"] = is_super ? std::shared_ptr<GGMLBlock>(new KCPPTAEHVSuperDecoder(z_channels,patch,time_upscale)) : std::shared_ptr<GGMLBlock>(new TinyVideoDecoder(z_channels, patch, time_upscale, is_wide));
+         if (!decode_only) {
+             blocks["encoder"] = std::shared_ptr<GGMLBlock>(new TinyVideoEncoder(z_channels, patch, time_downscale));
+         }
+@@ -912,6 +969,7 @@ struct TinyVideoAutoEncoder : public VAE {
+     TAEHV taehv;
+     bool decode_only = false;
+     bool is_wide     = false;
++    bool is_super    = false;
+ 
+     TinyVideoAutoEncoder(ggml_backend_t backend,
+                          const String2TensorStorage& tensor_storage_map,
+@@ -927,13 +985,21 @@ struct TinyVideoAutoEncoder : public VAE {
+                 break;
+             }
+         }
+-        taehv       = TAEHV(decoder_only, version, is_wide);
++        // The Super decoder has a bias-free1x1 stem at0 and a depthwise7x7 block at1.
++        bool stem=false,depthwise=false;
++        for(const auto& entry:tensor_storage_map) {
++            const auto& name=entry.first;
++            stem=stem || name.find(".decoder.0.weight")!=std::string::npos;
++            depthwise=depthwise || name.find(".decoder.1.conv.0.weight")!=std::string::npos;
++        }
++        is_super=version==VERSION_WAN2_2_TI2V && stem && depthwise;
++        taehv = TAEHV(decoder_only,version,is_wide,is_super);
+         scale_input = false;
+         taehv.init(params_ctx, tensor_storage_map, prefix);
+     }
+ 
+     std::string get_desc() override {
+-        return "taehv";
++        return is_super ? "taehv-super" : "taehv";
+     }
+ 
+     bool supports_temporal_tiling(VAETemporalDirection direction) const override {
+@@ -973,7 +1039,7 @@ struct TinyVideoAutoEncoder : public VAE {
+     }
+ 
+     ggml_cgraph* build_graph(const sd::Tensor<float>& z_tensor, bool decode_graph) {
+-        ggml_cgraph* gf  = decode_graph && is_wide ? ggml_new_graph_custom(compute_ctx, 4096, false)
++        ggml_cgraph* gf  = decode_graph && (is_wide || is_super) ? ggml_new_graph_custom(compute_ctx, 4096, false)
+                                                    : ggml_new_graph(compute_ctx);
+         ggml_tensor* z   = make_input(z_tensor);
+         auto runner_ctx  = get_context();
+diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
+index ec435bc..cd235e5 100644
+--- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
++++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
+@@ -3150,24 +3150,32 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
+     if (sd_version_is_pid(version) || sd_version_is_minit2i(version) || version == VERSION_IRIS) {
+         return sd::ops::clamp((x + 1.f) * 0.5f, 0.0f, 1.0f);
+     }
+-    auto latents                      = first_stage_model->diffusion_to_vae_latents(x);
+-    auto tiling_params                = first_stage_model->resolve_tiling_params(vae_tiling_params);
++    // KCPP_WAN_SPLIT_DECODE: preserve the full encoder/latent normalization.
++    // Only final video decoding uses the already-loaded independent TAE runner.
++    auto decode_model = first_stage_model;
++    const char* decoder_override = std::getenv("KCPP_WAN_TAE_DECODER");
++    if (decode_video && version == VERSION_WAN2_2_TI2V && decoder_override && *decoder_override && preview_vae) {
++        decode_model = preview_vae;
++        LOG_INFO("KCPP split VAE: final video decoder=%s", decode_model->get_desc().c_str());
++    }
++    auto latents                      = decode_model->diffusion_to_vae_latents(x);
++    auto tiling_params                = decode_model->resolve_tiling_params(vae_tiling_params);
+     const bool prefer_temporal_tiling = decode_video && latents.dim() == 5 && latents.shape()[2] > 1 &&
+-                                        first_stage_model->can_temporal_tile_decode();
++                                        decode_model->can_temporal_tile_decode();
+     for (;;) {
+         int tile_size_w = static_cast<int>(latents.shape()[0]);
+         int tile_size_h = static_cast<int>(latents.shape()[1]);
+         float tile_overlap;
+         if (tiling_params.enabled &&
+-            !first_stage_model->get_tile_sizes(tile_size_w, tile_size_h, tile_overlap, tiling_params,
++            !decode_model->get_tile_sizes(tile_size_w, tile_size_h, tile_overlap, tiling_params,
+                                                latents.shape()[0], latents.shape()[1])) {
+             return {};
+         }
+-        auto decoded = first_stage_model->decode(n_threads, latents, tiling_params, decode_video, circular_x, circular_y);
++        auto decoded = decode_model->decode(n_threads, latents, tiling_params, decode_video, circular_x, circular_y);
+         if (!decoded.empty() ||
+             !sd::backend_fit::prepare_vae_decode_retry_tiling(tiling_params, prefer_temporal_tiling,
+-                                                              first_stage_model->last_compute_status(),
+-                                                              tile_size_w, tile_size_h, first_stage_model->get_scale_factor())) {
++                                                              decode_model->last_compute_status(),
++                                                              tile_size_w, tile_size_h, decode_model->get_scale_factor())) {
+             return decoded;
+         }
+     }
 diff --git a/src/llama-context.cpp b/src/llama-context.cpp
 index 0e7e34b..100182f 100644
 --- a/src/llama-context.cpp

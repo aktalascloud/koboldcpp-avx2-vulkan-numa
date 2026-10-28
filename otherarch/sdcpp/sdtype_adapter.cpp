@@ -889,6 +889,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
         params.photo_maker_path = "";
     }
 
+    // KCPP_WAN_SPLIT_VAE: worker validates the independent decoder path/hash.
+    const char* kcpp_wan_tae_decoder = std::getenv("KCPP_WAN_TAE_DECODER");
+    const bool kcpp_wan_split_vae = tempver == VERSION_WAN2_2_TI2V && kcpp_wan_tae_decoder && *kcpp_wan_tae_decoder;
+    if (kcpp_wan_split_vae) {
+        if (!file_exists(kcpp_wan_tae_decoder) || path_empty(params.vae_path)) {
+            printf("KCPP: split Wan VAE requires a full VAE and the reviewed external Tiny decoder.\n");
+            GGML_ABORT("Reviewed split Wan decoder unavailable");
+        }
+        kcpp_taesd_path = kcpp_wan_tae_decoder;
+        params.tae_preview_only = true;
+        printf("KCPP: Wan5B full image encoder / independent Tiny video decoder enabled.\n");
+    }
     //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
     if(kcpp_taesd_path=="" && !path_empty(params.vae_path) && toLowerCase(params.vae_path).rfind("tae")!=std::string::npos)
     {
@@ -2465,7 +2477,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
             }
             if(output_avi)
             {
-                status2 = create_mjpg_avi_membuf_from_sd_images(results, generated_num_results, vid_fps, 40, &out_data2,&out_len2, generated_audio);
+                status2 = create_mjpg_avi_membuf_from_sd_images(results, generated_num_results, vid_fps, 95, &out_data2,&out_len2, generated_audio);
             }
 
             if(generated_num_results>1)

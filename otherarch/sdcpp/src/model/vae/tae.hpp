@@ -529,6 +529,63 @@ public:
     }
 };
 
+
+// KCPP_TAEHV_SUPER: madebyollin/taehv SuperMemBlock / _super decoder, MIT.
+// Matches the published1x1 stem, depthwise7x7 temporal residuals and PixelShuffle.
+class KCPPTAEHVSuperMemBlock : public GGMLBlock {
+public:
+    explicit KCPPTAEHVSuperMemBlock(int c) {
+        blocks["conv.0"] = std::shared_ptr<GGMLBlock>(new Conv2d_grouped(2*c, 2*c, 2*c, {7,7}, {1,1}, {3,3}, {1,1}, false));
+        blocks["conv.1"] = std::shared_ptr<GGMLBlock>(new Conv2d(2*c, 4*c, {1,1}, {1,1}, {0,0}));
+        blocks["conv.3"] = std::shared_ptr<GGMLBlock>(new Conv2d(4*c, c, {1,1}, {1,1}, {0,0}, {1,1}, false));
+    }
+    ggml_tensor* forward(GGMLRunnerContext* ctx, ggml_tensor* x, ggml_tensor* past) {
+        auto h = ggml_concat(ctx->ggml_ctx, x, past, 2);
+        h = std::dynamic_pointer_cast<Conv2d_grouped>(blocks["conv.0"])->forward(ctx,h);
+        h = std::dynamic_pointer_cast<Conv2d>(blocks["conv.1"])->forward(ctx,h);
+        h = ggml_relu_inplace(ctx->ggml_ctx,h);
+        h = std::dynamic_pointer_cast<Conv2d>(blocks["conv.3"])->forward(ctx,h);
+        return ggml_add(ctx->ggml_ctx,h,x); // Super has no post-add ReLU or latent Clamp.
+    }
+};
+
+class KCPPTAEHVSuperDecoder : public TinyVideoDecoder {
+    int patch;
+public:
+    KCPPTAEHVSuperDecoder(int z, int p, const std::vector<bool>& temporal)
+        : TinyVideoDecoder(z,p,temporal,false), patch(p) {
+        blocks.clear();
+        const int c[4]={512,256,128,64};
+        blocks["0"] = std::shared_ptr<GGMLBlock>(new Conv2d(z,c[0],{1,1},{1,1},{0,0},{1,1},false));
+        int index=1;
+        for(int i=0;i<3;++i) {
+            for(int j=0;j<3;++j) blocks[std::to_string(index++)]=std::shared_ptr<GGMLBlock>(new KCPPTAEHVSuperMemBlock(c[i]));
+            blocks[std::to_string(index++)]=std::shared_ptr<GGMLBlock>(new Conv2d(c[i],4*c[i+1],{3,3},{1,1},{1,1}));
+            index+=2; // ReLU, PixelShuffle2: no checkpoint tensors.
+            blocks[std::to_string(index++)]=std::shared_ptr<GGMLBlock>(new TGrow(c[i+1],temporal[i]?2:1));
+        }
+        blocks[std::to_string(index)]=std::shared_ptr<GGMLBlock>(new Conv2d(c[3],3*p*p,{3,3},{1,1},{1,1}));
+    }
+    ggml_tensor* forward(GGMLRunnerContext* ctx, ggml_tensor* z) override {
+        auto h=std::dynamic_pointer_cast<Conv2d>(blocks["0"])->forward(ctx,z);
+        int index=1;
+        for(int i=0;i<3;++i) {
+            for(int j=0;j<3;++j) {
+                auto memory=ggml_ext_pad_ext(ctx->ggml_ctx,ctx->backend,h,0,0,0,0,0,0,1,0);
+                memory=ggml_view_4d(ctx->ggml_ctx,memory,h->ne[0],h->ne[1],h->ne[2],h->ne[3],h->nb[1],h->nb[2],h->nb[3],0);
+                h=std::dynamic_pointer_cast<KCPPTAEHVSuperMemBlock>(blocks[std::to_string(index++)])->forward(ctx,h,memory);
+            }
+            h=std::dynamic_pointer_cast<Conv2d>(blocks[std::to_string(index++)])->forward(ctx,h);
+            h=ggml_relu_inplace(ctx->ggml_ctx,h);++index;
+            h=unpatchify(ctx->ggml_ctx,ggml_cont(ctx->ggml_ctx,h),2);++index;
+            h=std::dynamic_pointer_cast<TGrow>(blocks[std::to_string(index++)])->forward(ctx,h);
+        }
+        h=std::dynamic_pointer_cast<Conv2d>(blocks[std::to_string(index)])->forward(ctx,h);
+        if(patch>1)h=unpatchify(ctx->ggml_ctx,h,patch);
+        return ggml_view_4d(ctx->ggml_ctx,h,h->ne[0],h->ne[1],h->ne[2],h->ne[3]-(t_upscale-1),h->nb[1],h->nb[2],h->nb[3],(t_upscale-1)*h->nb[3]);
+    }
+};
+
 class TAEHV : public GGMLBlock {
 protected:
     bool decode_only;
@@ -541,7 +598,7 @@ public:
     std::vector<bool> time_upscale   = {false, true, true};
 
 public:
-    TAEHV(bool decode_only = true, SDVersion version = VERSION_WAN2, bool is_wide = false)
+    TAEHV(bool decode_only = true, SDVersion version = VERSION_WAN2, bool is_wide = false, bool is_super = false)
         : decode_only(decode_only), version(version), is_wide(is_wide) {
         int patch = 1;
         if (version == VERSION_WAN2_2_TI2V) {
@@ -560,7 +617,7 @@ public:
             patch          = 2;
             time_downscale = {true, true, false};
         }
-        blocks["decoder"] = std::shared_ptr<GGMLBlock>(new TinyVideoDecoder(z_channels, patch, time_upscale, is_wide));
+        blocks["decoder"] = is_super ? std::shared_ptr<GGMLBlock>(new KCPPTAEHVSuperDecoder(z_channels,patch,time_upscale)) : std::shared_ptr<GGMLBlock>(new TinyVideoDecoder(z_channels, patch, time_upscale, is_wide));
         if (!decode_only) {
             blocks["encoder"] = std::shared_ptr<GGMLBlock>(new TinyVideoEncoder(z_channels, patch, time_downscale));
         }
@@ -912,6 +969,7 @@ struct TinyVideoAutoEncoder : public VAE {
     TAEHV taehv;
     bool decode_only = false;
     bool is_wide     = false;
+    bool is_super    = false;
 
     TinyVideoAutoEncoder(ggml_backend_t backend,
                          const String2TensorStorage& tensor_storage_map,
@@ -927,13 +985,21 @@ struct TinyVideoAutoEncoder : public VAE {
                 break;
             }
         }
-        taehv       = TAEHV(decoder_only, version, is_wide);
+        // The Super decoder has a bias-free1x1 stem at0 and a depthwise7x7 block at1.
+        bool stem=false,depthwise=false;
+        for(const auto& entry:tensor_storage_map) {
+            const auto& name=entry.first;
+            stem=stem || name.find(".decoder.0.weight")!=std::string::npos;
+            depthwise=depthwise || name.find(".decoder.1.conv.0.weight")!=std::string::npos;
+        }
+        is_super=version==VERSION_WAN2_2_TI2V && stem && depthwise;
+        taehv = TAEHV(decoder_only,version,is_wide,is_super);
         scale_input = false;
         taehv.init(params_ctx, tensor_storage_map, prefix);
     }
 
     std::string get_desc() override {
-        return "taehv";
+        return is_super ? "taehv-super" : "taehv";
     }
 
     bool supports_temporal_tiling(VAETemporalDirection direction) const override {
@@ -973,7 +1039,7 @@ struct TinyVideoAutoEncoder : public VAE {
     }
 
     ggml_cgraph* build_graph(const sd::Tensor<float>& z_tensor, bool decode_graph) {
-        ggml_cgraph* gf  = decode_graph && is_wide ? ggml_new_graph_custom(compute_ctx, 4096, false)
+        ggml_cgraph* gf  = decode_graph && (is_wide || is_super) ? ggml_new_graph_custom(compute_ctx, 4096, false)
                                                    : ggml_new_graph(compute_ctx);
         ggml_tensor* z   = make_input(z_tensor);
         auto runner_ctx  = get_context();

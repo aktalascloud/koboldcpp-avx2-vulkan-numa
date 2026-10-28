@@ -34,3 +34,14 @@ Already in upstream and retained: [Soprano include fix PR2557](https://github.co
 |Startup credential masking|[PR2566](https://github.com/LostRuins/koboldcpp/pull/2566), [source](../koboldcpp.py)|Masks4 fields in a copied Namespace; live credentials unchanged. Synthetic check passed.|
 
 User explicitly authorized these compute ports without a prior speed gate. [Correctness scope](benchmarks/compute-correctness.json). Historic stock/latest speed tables do not measure these additions.
+
+## Native video ports
+
+|Port|Source|Scope|
+|---|---|---|
+|JPEG95 Native AVI output|[Adapter](../otherarch/sdcpp/sdtype_adapter.cpp)|Replaces the previous hardcoded JPEG40. Actual AVI quantizer checked; MP4 cannot restore details already lost.|
+|Super-Tiny Wan5B decoder|[MIT reference](https://github.com/madebyollin/taehv/tree/011dfc2112197741c540e0bdd5b7b67bcc930771), [native port](../otherarch/sdcpp/src/model/vae/tae.hpp)|ConvNeXt memory blocks, PixelShuffle and checkpoint detection. Structural tests and actual 17/49-frame generation; full numerical parity with original Torch was not tested. Approximate VAE can soften detail.|
+|Full encoder / independent Tiny decoder|[Workflow idea](https://github.com/advanced-lvl-up/Rx470-Vega10-Rx580-gfx803-gfx900-fix-AMD-GPU/blob/6547664db8732305530b969b54c9b7d3806c02e1/New-Wan5B-image2vid-workflow-VAE-FIX.json), [local code](../otherarch/sdcpp/src/pipeline/diffusion_engine.cpp)|Opt-in KCPP_WAN_TAE_DECODER; the video Worker validates path/SHA. Normal Wan encoder remains unchanged. Local semantic implementation, no vendor binaries.|
+|Optional Polaris convolution WG512|[Local Vulkan tuning](../ggml/src/ggml-vulkan/ggml-vulkan.cpp)|Preserves the 128×128 tile, with AMD GCN/subgroup64/known Polaris/device-limit gates. GGML_VK_GCN_CONV_WG=512; default 256. A small 17-frame gain did not repeat on 49 frames, so it is not globally enabled. AVI was bit-identical in both comparisons.|
+
+The separate 64-tile convolution candidate was slower and removed. ROCm/Tensile patches and coopmat2-only RTX optimizations are not presented as RX580 Vulkan gains. Video pipeline measurements and codec quality limits belong to the [media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline/blob/main/benchmarks/video.json). The historical token table does not measure these ports.
