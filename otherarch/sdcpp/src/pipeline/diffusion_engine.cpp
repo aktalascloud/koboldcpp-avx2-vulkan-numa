@@ -1,3 +1,6 @@
+#include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include "diffusion_engine.h"
 
 #include <algorithm>
@@ -3157,6 +3160,42 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
     if (decode_video && version == VERSION_WAN2_2_TI2V && decoder_override && *decoder_override && preview_vae) {
         decode_model = preview_vae;
         LOG_INFO("KCPP split VAE: final video decoder=%s", decode_model->get_desc().c_str());
+    }
+    // KCPP_WAN_LATENT_CAPTURE: the Worker validates a private, unique output path.
+    const char* capture_path = std::getenv("KCPP_WAN_LATENT_SNAPSHOT");
+    if (decode_video && capture_path && *capture_path) {
+        if (version != VERSION_WAN2_2_TI2V || first_stage_model->get_desc() != "wan_vae") {
+            LOG_ERROR("Wan latent capture requires the full Wan5B encoder");
+            return {};
+        }
+        auto raw = first_stage_model->diffusion_to_vae_latents(x);
+        if (raw.dim()!=5 || raw.shape()[3]!=48 || raw.shape()[4]!=1 || raw.numel()<=0 || raw.numel()>33554432) {
+            LOG_ERROR("Wan latent capture rejected unsupported tensor geometry");
+            return {};
+        }
+        const auto target=std::filesystem::u8path(capture_path);
+        auto partial=target;partial+=".partial";
+        std::error_code error;
+        if (std::filesystem::exists(target,error) || error) {
+            LOG_ERROR("Wan latent capture target already exists or cannot be checked");
+            return {};
+        }
+        std::ofstream stream(partial,std::ios::binary|std::ios::trunc);
+        const char magic[8]={'K','C','P','P','W','L','A','T'};
+        const uint32_t dimensions=5;
+        const uint64_t count=static_cast<uint64_t>(raw.numel());
+        stream.write(magic,8);stream.write(reinterpret_cast<const char*>(&dimensions),sizeof(dimensions));
+        stream.write(reinterpret_cast<const char*>(&count),sizeof(count));
+        stream.write(reinterpret_cast<const char*>(raw.shape().data()),5*sizeof(int64_t));
+        stream.write(reinterpret_cast<const char*>(raw.data()),static_cast<std::streamsize>(count*sizeof(float)));
+        stream.flush();const bool complete=stream.good();stream.close();
+        if (!complete) {
+            std::filesystem::remove(partial,error);
+            LOG_ERROR("Wan latent capture write failed");return {};
+        }
+        std::filesystem::rename(partial,target,error);
+        if (error) { std::filesystem::remove(partial,error);LOG_ERROR("Wan latent capture commit failed");return {}; }
+        LOG_INFO("Saved Wan5B raw posterior snapshot: %llu float32 values",static_cast<unsigned long long>(count));
     }
     auto latents                      = decode_model->diffusion_to_vae_latents(x);
     auto tiling_params                = decode_model->resolve_tiling_params(vae_tiling_params);
