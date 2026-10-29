@@ -37,6 +37,17 @@ User explicitly authorized these compute ports without a prior speed gate. [Corr
 
 ## Native video ports
 
+### 29 October 2026 fixes (KoboldCpp 1.124)
+
+| Fix | Source | Evidence and scope |
+|---|---|---|
+| Forward video cache settings | [Video adapter](../otherarch/sdcpp/sdtype_adapter.cpp) | Previously parsed cache settings were not copied into video parameters. In one 17-frame Wan5B trial, Cache-DiT0.08 skipped1/4 steps: sampling34.98 to25.85s; Native56.62 to46.62s. The output changes. This is not a lossless or general LLM speed claim. |
+| GCC13/MinGW LTO audio destructors | [OmniVoice](../otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp), [VibeVoice](../otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp) | Emit virtual destructors out of line to avoid duplicate COMDAT thunk definitions. CPU and Vulkan DLLs link with LTO; no class layout or virtual-slot changes. No performance gain claimed. |
+
+The new upstream grammar cache already uses candidate indices; its implementation supersedes the earlier local lifetime repair. Upstream startup credential redaction is preserved without a duplicate patch.
+
+[Video cache measurements, exact SHA and all tested configurations](benchmarks/video-cache-20261029.json). These video tests were requested manually; daily builds still perform no generation or speed benchmarks.
+
 |Port|Source|Scope|
 |---|---|---|
 |JPEG95 Native AVI output|[Adapter](../otherarch/sdcpp/sdtype_adapter.cpp)|Replaces the previous hardcoded JPEG40. Actual AVI quantizer checked; MP4 cannot restore details already lost.|

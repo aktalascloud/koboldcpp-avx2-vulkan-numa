@@ -26,6 +26,8 @@ class OmniVoiceSession final
     , public runtime::IOfflineVoiceTaskSession
     , public runtime::IStreamingVoiceTaskSession {
 public:
+    ~OmniVoiceSession() override;
+
     OmniVoiceSession(
         runtime::TaskSpec task,
         runtime::SessionOptions options,

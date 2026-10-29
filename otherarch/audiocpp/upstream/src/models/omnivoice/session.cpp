@@ -14,6 +14,9 @@
 #include <vector>
 
 namespace engine::models::omnivoice {
+
+// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
+OmniVoiceSession::~OmniVoiceSession() = default;
 namespace {
 
 constexpr size_t kDefaultAudioTokenizerGraphArenaBytes = 128ull * 1024ull * 1024ull;

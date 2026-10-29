@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-29",
+  "official_commit": "ac19fdb07f2496de3e86a0125a238e7a914ca125",
+  "hardware": "Windows, XeonE5-2696v3, RX5802048SP8GB Polaris/gfx803, Vulkan",
+  "settings": {
+    "resolution": [
+      480,
+      832
+    ],
+    "frames": 17,
+    "fps": 24,
+    "steps": 4,
+    "cfg_scale": 1,
+    "eta": 0,
+    "shift": 5,
+    "seed": 424242,
+    "WG": 512,
+    "vae_threshold": 576,
+    "vram_limit_mib": 6500,
+    "decoder": "full encoder + Super-Tiny"
+  },
+  "scope": "Separate process per arm. Native request excludes model load, SR and faces. Single run per configuration; preserve all listed arms. Cache changes output/pose. No LLM/CPU speed claim.",
+  "rows": [
+    {
+      "executable_sha256": "6f63b2a3866f6d3dbfc9b7b966a2ae89906ccaa13386ab426050a53eb41cf3cb",
+      "model_sha256": "8aa3a98c254bd02a9cc7e4f1db37720fe291cef8b0c32fb78e7a2391125d6b28",
+      "native_seconds": 56.616610900033265,
+      "load_seconds": 19.050546300015412,
+      "sampler": "euler",
+      "scheduler": "simple",
+      "cache": "disabled",
+      "cache_options": "",
+      "sampling_seconds_logged": 34.98,
+      "skipped_steps": 0,
+      "avi_sha256": "e77ff6b5f49b5bdc409af51b56a1f28daf29a3fb5432e54b8afb76592da3ce2b",
+      "latents_sha256": "68170690a3d860b497ced6446007937307c3799f1ef2f3693b577aa1e9e34d04"
+    },
+    {
+      "executable_sha256": "6f63b2a3866f6d3dbfc9b7b966a2ae89906ccaa13386ab426050a53eb41cf3cb",
+      "model_sha256": "8aa3a98c254bd02a9cc7e4f1db37720fe291cef8b0c32fb78e7a2391125d6b28",
+      "native_seconds": 46.62166790000629,
+      "load_seconds": 12.049899799982086,
+      "sampler": "euler",
+      "scheduler": "simple",
+      "cache": "cache-dit",
+      "cache_options": "threshold=0.08,warmup=1,Fn=16,Bn=2",
+      "sampling_seconds_logged": 25.85,
+      "skipped_steps": 1,
+      "avi_sha256": "b56b7eca17f3969e99a2525caa77022f528ed058b3ee0da9daba1032f4e921c1",
+      "latents_sha256": "ca76e4d6f7f4a0cf5c98d6423c7c2cbe29e5e9b5f7cfa5f0891e15a3cea50963"
+    },
+    {
+      "executable_sha256": "6f63b2a3866f6d3dbfc9b7b966a2ae89906ccaa13386ab426050a53eb41cf3cb",
+      "model_sha256": "8aa3a98c254bd02a9cc7e4f1db37720fe291cef8b0c32fb78e7a2391125d6b28",
+      "native_seconds": 46.86855369992554,
+      "load_seconds": 18.561927399947308,
+      "sampler": "euler",
+      "scheduler": "simple",
+      "cache": "cache-dit",
+      "cache_options": "threshold=0.08,warmup=2,Fn=16,Bn=2",
+      "sampling_seconds_logged": 25.82,
+      "skipped_steps": 1,
+      "avi_sha256": "b56b7eca17f3969e99a2525caa77022f528ed058b3ee0da9daba1032f4e921c1",
+      "latents_sha256": "ca76e4d6f7f4a0cf5c98d6423c7c2cbe29e5e9b5f7cfa5f0891e15a3cea50963"
+    },
+    {
+      "executable_sha256": "6f63b2a3866f6d3dbfc9b7b966a2ae89906ccaa13386ab426050a53eb41cf3cb",
+      "model_sha256": "8aa3a98c254bd02a9cc7e4f1db37720fe291cef8b0c32fb78e7a2391125d6b28",
+      "native_seconds": 55.849014100036584,
+      "load_seconds": 12.043212700053118,
+      "sampler": "euler",
+      "scheduler": "simple",
+      "cache": "easycache",
+      "cache_options": "threshold=0.2,start=0.15,end=0.85",
+      "sampling_seconds_logged": 34.35,
+      "skipped_steps": 0,
+      "avi_sha256": "e77ff6b5f49b5bdc409af51b56a1f28daf29a3fb5432e54b8afb76592da3ce2b",
+      "latents_sha256": "68170690a3d860b497ced6446007937307c3799f1ef2f3693b577aa1e9e34d04"
+    }
+  ]
+}

@@ -18,6 +18,9 @@
 #include <vector>
 
 namespace engine::models::vibevoice {
+
+// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
+VibeVoiceSession::~VibeVoiceSession() = default;
 namespace {
 
 using Clock = std::chrono::steady_clock;

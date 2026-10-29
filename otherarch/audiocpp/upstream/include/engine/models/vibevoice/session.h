@@ -21,6 +21,8 @@ class VibeVoiceSession final
     , public runtime::IOfflineVoiceTaskSession
     , public runtime::StreamingTtsSessionBase {
 public:
+    ~VibeVoiceSession() override;
+
     VibeVoiceSession(
         runtime::TaskSpec task,
         runtime::SessionOptions options,
