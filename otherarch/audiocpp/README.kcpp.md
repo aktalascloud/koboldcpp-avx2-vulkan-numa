@@ -19,6 +19,9 @@ Run the repository script against an Audio.cpp checkout or source snapshot:
 ./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component kitten_tts2
 ./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component soprano_tts
 ./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component cosyvoice3
+./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component voxcpm2
+./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component voxcpm1
+./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component omnivoice
 ./scripts/sync-audiocpp.ps1 -SourceRoot C:\path\to\audio.cpp -Component yue2 -ModelSourcesOnly
 ```
 
@@ -69,6 +72,16 @@ exact upstream commit cannot be recorded until a real checkout is supplied.
 - `cosyvoice3`: multilingual zero-shot, cross-lingual, and
   instruction-conditioned TTS. Every request uses a reference recording;
   zero-shot mode additionally uses its transcript.
+- `voxcpm2`: multilingual offline TTS, short-reference voice cloning, and
+  voice design. KoboldCpp maps its instruction field to VoxCPM2's native
+  parenthesized text prefix and supports reference transcripts for ultimate
+  cloning.
+- `voxcpm1`: the legacy 0.5B multilingual VoxCPM runtime, with offline TTS
+  and short-reference cloning. It remains a separate community family because
+  its GGUF tensor layout and 16 kHz output differ from VoxCPM2.
+- `omnivoice`: massively multilingual offline TTS, optional short-reference
+  voice cloning, and instruction-driven voice design. Reference transcripts
+  are optional, and VoiceTut-TTS packages use the same runtime.
 - Later candidates should be added only when their framework closure is small
   and measurable. Existing KoboldCpp Qwen3-TTS, MiniMax H3, ACE-Step, Kokoro,
   OuteTTS, Parler, Dia, and Orpheus implementations are not imported.
@@ -96,7 +109,10 @@ be supplied directly as JSON arrays.
 Pass `fish-audio-s2-pro-q8_0.gguf` as the normal TTS model. Plain TTS requires
 no other file. For cloning, select a WAV or MP3 from KoboldCpp's voice
 directory. Send `reference_text` containing its transcript when available;
-otherwise KoboldCpp supplies the adapter's neutral fallback transcript.
+otherwise KoboldCpp supplies the adapter's neutral fallback transcript. The
+shared `instruction` field is prepended using Fish S2 Pro's native free-form
+bracket syntax, so `professional broadcast tone` becomes
+`[professional broadcast tone]` before the text.
 
 Pass `maya1-q8_0.gguf` (or `maya1-orig.gguf`) as the normal TTS model. Supply a
 voice description with the existing `instruction` request field; when omitted,
@@ -141,6 +157,27 @@ controls include `top_k`,
 `min_tokens`, `max_tokens`, `num_inference_steps`, and `seed`. Supported target
 languages are Chinese, English, Japanese, Korean, German, Spanish, French,
 Italian, Russian, and Cantonese.
+
+Pass a VoxCPM2 GGUF such as `voxcpm2-q8_0.gguf` as the normal TTS model.
+Plain TTS needs no reference. The existing `instruction` field enables voice
+design and is wrapped in VoxCPM2's native parenthesized prefix. Selecting a
+WAV/MP3 enables voice cloning; supplying its exact `reference_text` enables
+the model's transcript-conditioned ultimate-clone path. Common generation and
+memory controls can be sent through `audiocpp_extra_params_json`.
+
+Pass `voxcpm-0.5b-q8_0-audiovae-f16.gguf` for VoxCPM1. It supports plain
+offline TTS and reference-audio cloning; provide `reference_text` when
+available. VoxCPM1 produces 16 kHz mono output and does not support VoxCPM2
+voice-design instructions.
+
+Pass an OmniVoice GGUF package as the normal TTS model. Plain synthesis needs
+no reference. Selecting a WAV/MP3 enables 24 kHz voice cloning, with an
+optional exact transcript in `reference_text`. KoboldCpp maps its existing
+`instruction` field to OmniVoice's native `instruct` voice-design option.
+Language selection and advanced diffusion, duration, chunking, and sampling
+controls remain available through `audiocpp_extra_params_json`.
+Streaming is intentionally not exposed because upstream implements it as
+text-chunked event delivery rather than a distinct streaming model runtime.
 
 ## Intentional compatibility changes
 

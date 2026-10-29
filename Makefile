@@ -1,6 +1,25 @@
 # Add custom options to Makefile.local rather than editing this file.
 -include $(abspath $(lastword ${MAKEFILE_LIST})).local
 
+# GNU Make's ifdef considers command-line values such as FOO=0 to be enabled.
+# Accept the conventional explicit disable form before evaluating feature flags.
+ifeq ($(strip $(LLAMA_CUBLAS)),0)
+override undefine LLAMA_CUBLAS
+endif
+ifeq ($(strip $(LLAMA_HIPBLAS)),0)
+override undefine LLAMA_HIPBLAS
+endif
+# Keep cleanup available even when both flags came from the environment or
+# Makefile.local; neither backend is needed to remove their shared objects.
+ifeq ($(strip $(MAKECMDGOALS)),clean)
+override undefine LLAMA_CUBLAS
+override undefine LLAMA_HIPBLAS
+else
+ifneq ($(and $(LLAMA_CUBLAS),$(LLAMA_HIPBLAS)),)
+$(error LLAMA_CUBLAS and LLAMA_HIPBLAS share object files; enable only one and run make clean when switching backends)
+endif
+endif
+
 .PHONY: finishedmsg tinylibwebp tinylibwebp-smoke
 
 default: koboldcpp_default koboldcpp_failsafe koboldcpp_noavx2 koboldcpp_vulkan_failsafe koboldcpp_cublas koboldcpp_hipblas koboldcpp_vulkan koboldcpp_vulkan_noavx2 finishedmsg
@@ -55,8 +74,8 @@ ifdef KCPP_SANITIZE
 CFLAGS += -fsanitize=undefined -fsanitize-undefined-trap-on-error
 CXXFLAGS += -fsanitize=undefined -fsanitize-undefined-trap-on-error
 endif
-CFLAGS   += -I. -Iggml/include -Iggml/src -Iggml/src/ggml-cpu -Iinclude -Isrc -I./common -I./vendor -I./vendor/stb -I./include -I./otherarch -I./otherarch/tools -I./tools/mtmd -I./otherarch/sdcpp -I./otherarch/ttscpp/include -I./otherarch/ttscpp/src -I./otherarch/qwen3tts -I./otherarch/sdcpp/thirdparty -I./include/vulkan -O3 -fno-finite-math-only -std=c11 -fPIC -DLOG_DISABLE_LOGS -D_GNU_SOURCE -DGGML_USE_CPU -DGGML_USE_CPU_REPACK -DGGML_USE_RPC
-CXXFLAGS += -I. -I./kcpp_src -Iggml/include -Iggml/src -Iggml/src/ggml-cpu -Iinclude -Isrc -I./common -I./vendor -I./vendor/stb -I./include -I./otherarch -I./otherarch/tools -I./tools/mtmd -I./otherarch/sdcpp -I./otherarch/ttscpp/include -I./otherarch/ttscpp/src -I./otherarch/qwen3tts -I./otherarch/audiocpp/upstream/include -I./otherarch/audiocpp/upstream/generated -I./otherarch/audiocpp/upstream/external/cJSON -I./otherarch/audiocpp/upstream/external/llama_tokenizer -I./otherarch/sdcpp/thirdparty -I./include/vulkan -O3 -fno-finite-math-only -std=c++17 -fPIC -DLOG_DISABLE_LOGS -D_GNU_SOURCE -DGGML_USE_CPU -DGGML_USE_CPU_REPACK -DGGML_USE_RPC
+CFLAGS   += -I. -Iggml/include -Iggml/src -Iggml/src/ggml-cpu -Iinclude -Isrc -I./common -I./vendor -I./vendor/stb -I./include -I./otherarch -I./otherarch/tools -I./tools/mtmd -I./otherarch/sdcpp -I./otherarch/ttscpp/include -I./otherarch/ttscpp/src -I./otherarch/qwen3tts -I./otherarch/audiocpp/upstream/external/libyaml/include -I./otherarch/sdcpp/thirdparty -I./include/vulkan -O3 -fno-finite-math-only -std=c11 -fPIC -DLOG_DISABLE_LOGS -D_GNU_SOURCE -DGGML_USE_CPU -DGGML_USE_CPU_REPACK -DGGML_USE_RPC
+CXXFLAGS += -I. -I./kcpp_src -Iggml/include -Iggml/src -Iggml/src/ggml-cpu -Iinclude -Isrc -I./common -I./vendor -I./vendor/stb -I./include -I./otherarch -I./otherarch/tools -I./tools/mtmd -I./otherarch/sdcpp -I./otherarch/ttscpp/include -I./otherarch/ttscpp/src -I./otherarch/qwen3tts -I./otherarch/audiocpp/upstream/include -I./otherarch/audiocpp/upstream/generated -I./otherarch/audiocpp/upstream/external/cJSON -I./otherarch/audiocpp/upstream/external/llama_tokenizer -I./otherarch/audiocpp/upstream/external/libyaml/include -I./otherarch/audiocpp/upstream/external/sentencepiece -I./otherarch/audiocpp/upstream/external/sentencepiece/src -I./otherarch/audiocpp/upstream/external/sentencepiece/src/builtin_pb -I./otherarch/audiocpp/upstream/external/sentencepiece/third_party -I./otherarch/audiocpp/upstream/external/sentencepiece/third_party/protobuf-lite -I./otherarch/sdcpp/thirdparty -I./include/vulkan -O3 -fno-finite-math-only -std=c++17 -fPIC -DLOG_DISABLE_LOGS -D_GNU_SOURCE -DGGML_USE_CPU -DGGML_USE_CPU_REPACK -DGGML_USE_RPC
 
 ifndef KCPP_DEBUG
 CFLAGS += -DNDEBUG -s
@@ -283,33 +302,62 @@ endif # LLAMA_CUBLAS
 ifdef LLAMA_HIPBLAS
 ifeq ($(wildcard /opt/rocm),)
 ROCM_PATH   ?= /usr
-ifdef LLAMA_PORTABLE
-GPU_TARGETS ?= gfx803 gfx900 gfx906 gfx908 gfx90a gfx942 gfx1010 gfx1030 gfx1031 gfx1032 gfx1100 gfx1101 gfx1102 gfx1200 gfx1201 $(shell $(shell which amdgpu-arch))
-else
-GPU_TARGETS ?= $(shell $(shell which amdgpu-arch))
-endif
-HCC         := $(ROCM_PATH)/bin/hipcc
-HCXX        := $(ROCM_PATH)/bin/hipcc
 else
 ROCM_PATH   ?= /opt/rocm
-ifdef LLAMA_PORTABLE
-GPU_TARGETS ?= gfx803 gfx900 gfx906 gfx908 gfx90a gfx942 gfx1010 gfx1030 gfx1031 gfx1032 gfx1100 gfx1101 gfx1102 gfx1200 gfx1201 $(shell $(ROCM_PATH)/llvm/bin/amdgpu-arch)
-else
-GPU_TARGETS ?= $(shell $(ROCM_PATH)/llvm/bin/amdgpu-arch)
-endif
-HCC         := $(ROCM_PATH)/llvm/bin/clang
-HCXX        := $(ROCM_PATH)/llvm/bin/clang++
 endif
 
-HIPFLAGS   += -DGGML_USE_HIP -DGGML_HIP_NO_VMM -DGGML_USE_CUDA $(shell $(ROCM_PATH)/bin/hipconfig -C)
-HIPLDFLAGS    += -L$(ROCM_PATH)/lib -Wl,-rpath=$(ROCM_PATH)/lib
-HIPLDFLAGS    += -L$(ROCM_PATH)/lib64 -Wl,-rpath=$(ROCM_PATH)/lib64
-HIPLDFLAGS    += -lhipblas -lamdhip64 -lrocblas
+# Prefer the selected SDK over PATH. Legacy AMD SDKs use llvm/bin, newer
+# SDKs use lib/llvm/bin, and distro packages put hipcc/hipconfig in /usr/bin.
+ROCM_TOOL_DIRS := $(ROCM_PATH)/bin $(ROCM_PATH)/lib/llvm/bin $(ROCM_PATH)/llvm/bin
+HIPCC       ?= $(or $(firstword $(foreach dir,$(ROCM_TOOL_DIRS),$(wildcard $(dir)/hipcc))),$(shell command -v hipcc 2>/dev/null),hipcc)
+HIPCC       := $(HIPCC)
+HIPCONFIG   ?= $(or $(firstword $(wildcard $(dir $(HIPCC))hipconfig) $(foreach dir,$(ROCM_TOOL_DIRS),$(wildcard $(dir)/hipconfig))),$(shell command -v hipconfig 2>/dev/null))
+HIPCONFIG   := $(HIPCONFIG)
+HCC         ?= $(HIPCC)
+HCXX        ?= $(HIPCC)
+# LLAMA_HIPBLAS is specifically the AMD backend, even on CUDA-equipped hosts.
+export HIP_PLATFORM := amd
+ROCM_CPPFLAGS := $(if $(HIPCONFIG),$(shell HIP_PLATFORM=amd $(HIPCONFIG) --cpp_config))
+ROCM_CLANG_DIR := $(if $(HIPCONFIG),$(shell HIP_PLATFORM=amd $(HIPCONFIG) --hipclangpath))
+AMDGPU_ARCH ?= $(or $(firstword $(if $(ROCM_CLANG_DIR),$(wildcard $(ROCM_CLANG_DIR)/amdgpu-arch)) $(foreach dir,$(ROCM_TOOL_DIRS),$(wildcard $(dir)/amdgpu-arch))),$(shell command -v amdgpu-arch 2>/dev/null))
+
+# Query once, and skip detection altogether when GPU_TARGETS is supplied.
+ifeq ($(origin GPU_TARGETS),undefined)
+ROCM_DETECTED_TARGETS := $(if $(AMDGPU_ARCH),$(shell $(AMDGPU_ARCH)))
+ifdef LLAMA_PORTABLE
+GPU_TARGETS := $(sort gfx803 gfx900 gfx906 gfx908 gfx90a gfx942 gfx1010 gfx1030 gfx1031 gfx1032 gfx1100 gfx1101 gfx1102 gfx1200 gfx1201 $(ROCM_DETECTED_TARGETS))
+else
+GPU_TARGETS := $(sort $(ROCM_DETECTED_TARGETS))
+endif
+endif
+
+ROCM_INCLUDE_PATH ?= $(ROCM_PATH)/include
+HIPFLAGS   += -DGGML_USE_HIP -DGGML_HIP_NO_VMM -DGGML_USE_CUDA -D__HIP_PLATFORM_AMD__= -I$(ROCM_INCLUDE_PATH) $(ROCM_CPPFLAGS)
+# Match the packaging search: an explicit library directory is authoritative.
+ifneq ($(strip $(ROCM_LIB_PATH)),)
+ROCM_LIB_DIRS := $(ROCM_LIB_PATH)
+else
+ROCM_LIB_DIRS := $(ROCM_PATH)/lib $(ROCM_PATH)/lib64
+ifneq ($(filter /usr /usr/,$(ROCM_PATH)),)
+ROCM_MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH 2>/dev/null || $(CXX) -print-multiarch 2>/dev/null)
+ROCM_LIB_DIRS += $(addprefix /usr/lib/,$(ROCM_MULTIARCH))
+endif
+endif
+HIPLDFLAGS  += $(foreach dir,$(ROCM_LIB_DIRS),-L$(dir) -Wl,-rpath=$(dir)) -lhipblas -lamdhip64 -lrocblas
 HIP_OBJS      += ggml-cuda.o ggml_v3-cuda.o ggml_v2-cuda.o ggml_v2-cuda-legacy.o
 HIP_OBJS      += $(patsubst %.cu,%.o,$(filter-out ggml/src/ggml-cuda/ggml-cuda.cu, $(wildcard ggml/src/ggml-cuda/*.cu)))
 HIP_OBJS      += $(OBJS_CUDA_TEMP_INST)
 
 HIPFLAGS2    += $(addprefix --offload-arch=,$(GPU_TARGETS))
+
+# Order-only prerequisites run once per invocation without forcing recompiles.
+# Keep these checks out of parse-time conditionals so make clean still works.
+.PHONY: rocm-check
+rocm-check:
+	@test -n "$(strip $(GPU_TARGETS))" || { echo "Error: no AMD GPU targets detected. Set GPU_TARGETS (for example gfx1100), or set AMDGPU_ARCH to the matching LLVM amdgpu-arch tool." >&2; exit 1; }
+	@printf '#include <rocblas/rocblas.h>\n#include <hipblas/hipblas.h>\n' | $(CXX) $(CXXFLAGS) $(HIPFLAGS) -x c++ -E - >/dev/null || { echo "Error: ROCm headers are unavailable to $(CXX). Install the matching rocBLAS/hipBLAS development packages, or set ROCM_INCLUDE_PATH to the directory containing rocblas/ and hipblas/." >&2; exit 1; }
+
+$(HIP_OBJS) kcpp_backend_cublas.o: | rocm-check
 
 ggml/src/ggml-cuda/%.o: ggml/src/ggml-cuda/%.cu ggml/include/ggml.h ggml/src/ggml-common.h ggml/src/ggml-cuda/common.cuh
 	$(HCXX) $(CXXFLAGS) $(HIPFLAGS) $(HIPFLAGS2) -x hip -c -o $@ $<
@@ -763,7 +811,7 @@ otherarch/sdcpp/thirdparty/zip.o: otherarch/sdcpp/thirdparty/zip.c
 OBJS_SDTYPE := otherarch/sdcpp/sdtype_adapter.o kcpp_sdcpp_tokenizer.o $(OBJS_SDCOMMON) $(LIB_TINYLIBWEBP)
 LDFLAGS += -lm
 
-LLAMASERVER_SRCS := tools/server/main.cpp tools/server/server.cpp tools/server/server-schema.cpp tools/server/server-chat.cpp tools/server/server-common.cpp tools/server/server-context.cpp tools/server/server-connect.cpp tools/server/server-http.cpp tools/server/server-models.cpp tools/server/server-queue.cpp tools/server/server-task.cpp tools/server/server-tools.cpp tools/server/server-mcp.cpp tools/server/server-decision.cpp tools/server/ui.cpp tools/server/server-stream.cpp common/subproc.cpp
+LLAMASERVER_SRCS := tools/server/main.cpp tools/server/server.cpp tools/server/server-schema.cpp tools/server/server-chat.cpp tools/server/server-common.cpp tools/server/server-context.cpp tools/server/server-connect.cpp tools/server/server-realtime.cpp tools/server/server-models-sched.cpp tools/server/server-http.cpp tools/server/server-models.cpp tools/server/server-queue.cpp tools/server/server-task.cpp tools/server/server-tools.cpp tools/server/server-mcp.cpp tools/server/server-decision.cpp tools/server/ui.cpp tools/server/server-stream.cpp common/subproc.cpp
 COMMON_DOWNLOAD_SRCS := common/download.cpp common/hf-cache.cpp common/file-lock.cpp vendor/cpp-httplib/httplib.cpp
 LLAMASERVER_COMMON_SRCS := common/arg.cpp common/preset.cpp $(COMMON_DOWNLOAD_SRCS)
 LLAMASERVER_CXXFLAGS := -I./tools/mtmd
@@ -775,13 +823,15 @@ whispercpp_default.o: otherarch/whispercpp/whisper_adapter.cpp otherarch/whisper
 
 # Audio.cpp sources as one integration unit.
 AUDIOCPP_COMMON_BASENAMES := $(sort $(shell cd otherarch/audiocpp/upstream && find src external -type f -name '*.cpp') \
+	$(shell cd otherarch/audiocpp/upstream && find src external -type f -name '*.cc') \
 	$(shell cd otherarch/audiocpp/upstream && find src external -type f -name '*.c'))
 AUDIOCPP_HEADER_BASENAMES := $(sort $(shell cd otherarch/audiocpp/upstream && find include src external -type f -name '*.h') \
-	$(shell cd otherarch/audiocpp/upstream && find include src external -type f -name '*.hpp'))
+	$(shell cd otherarch/audiocpp/upstream && find include src external -type f -name '*.hpp') \
+	$(shell cd otherarch/audiocpp/upstream && find include src external -type f -name '*.inc'))
 
 SOURCES_AUDIOCPP := $(foreach f,$(AUDIOCPP_COMMON_BASENAMES),otherarch/audiocpp/upstream/$(f))
 HEADERS_AUDIOCPP := $(foreach f,$(AUDIOCPP_HEADER_BASENAMES),otherarch/audiocpp/upstream/$(f))
-OBJS_AUDIOCPP := $(patsubst %.cpp,%.o,$(filter %.cpp,$(SOURCES_AUDIOCPP))) $(patsubst %.c,%.o,$(filter %.c,$(SOURCES_AUDIOCPP)))
+OBJS_AUDIOCPP := $(patsubst %.cpp,%.o,$(filter %.cpp,$(SOURCES_AUDIOCPP))) $(patsubst %.cc,%.o,$(filter %.cc,$(SOURCES_AUDIOCPP))) $(patsubst %.c,%.o,$(filter %.c,$(SOURCES_AUDIOCPP)))
 
 $(OBJS_AUDIOCPP): $(HEADERS_AUDIOCPP)
 
@@ -789,9 +839,11 @@ $(OBJS_AUDIOCPP): $(HEADERS_AUDIOCPP)
 otherarch/audiocpp/upstream/external/cJSON/cJSON.o otherarch/audiocpp/upstream/src/framework/io/json.o: Makefile
 otherarch/audiocpp/upstream/src/framework/model_spec/package.o: otherarch/audiocpp/upstream/generated/model_specs.inc
 otherarch/audiocpp/upstream/%.o: otherarch/audiocpp/upstream/%.cpp
-	$(CXX) -DCJSON_HIDE_SYMBOLS $(CXXFLAGS) -c $< -o $@
+	$(CXX) -DCJSON_HIDE_SYMBOLS -D_USE_INTERNAL_STRING_VIEW -DHAVE_PTHREAD=1 -D_POSIX_C_SOURCE=200809L -DYAML_DECLARE_STATIC=1 -DYAML_VERSION_MAJOR=0 -DYAML_VERSION_MINOR=2 -DYAML_VERSION_PATCH=5 -DYAML_VERSION_STRING=\"0.2.5\" $(CXXFLAGS) -c $< -o $@
+otherarch/audiocpp/upstream/%.o: otherarch/audiocpp/upstream/%.cc
+	$(CXX) -DCJSON_HIDE_SYMBOLS -D_USE_INTERNAL_STRING_VIEW -DHAVE_PTHREAD=1 -D_POSIX_C_SOURCE=200809L -DYAML_DECLARE_STATIC=1 -DYAML_VERSION_MAJOR=0 -DYAML_VERSION_MINOR=2 -DYAML_VERSION_PATCH=5 -DYAML_VERSION_STRING=\"0.2.5\" $(CXXFLAGS) -c $< -o $@
 otherarch/audiocpp/upstream/%.o: otherarch/audiocpp/upstream/%.c
-	$(CC) -DCJSON_HIDE_SYMBOLS $(CFLAGS) -c $< -o $@
+	$(CC) -DCJSON_HIDE_SYMBOLS -D_POSIX_C_SOURCE=200809L -DYAML_DECLARE_STATIC=1 -DYAML_VERSION_MAJOR=0 -DYAML_VERSION_MINOR=2 -DYAML_VERSION_PATCH=5 -DYAML_VERSION_STRING=\"0.2.5\" $(CFLAGS) -c $< -o $@
 
 tts_default.o: otherarch/tts_adapter.cpp otherarch/audiocpp/upstream/generated/kcpp_tts_registry_headers.inc otherarch/audiocpp/upstream/generated/kcpp_tts_registry_loaders.inc otherarch/ttscpp/src/ttscpp.cpp otherarch/ttscpp/src/ttstokenizer.cpp otherarch/ttscpp/src/ttssampler.cpp otherarch/ttscpp/src/parler_model.cpp otherarch/ttscpp/src/dac_model.cpp otherarch/ttscpp/src/ttsutil.cpp otherarch/ttscpp/src/ttsargs.cpp otherarch/ttscpp/src/ttst5_encoder_model.cpp otherarch/ttscpp/src/phonemizer.cpp otherarch/ttscpp/src/tts_model.cpp otherarch/ttscpp/src/kokoro_model.cpp otherarch/ttscpp/src/dia_model.cpp otherarch/ttscpp/src/orpheus_model.cpp otherarch/ttscpp/src/snac_model.cpp otherarch/ttscpp/src/general_neural_audio_codec.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

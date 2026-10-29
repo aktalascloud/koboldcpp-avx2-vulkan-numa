@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $SourceRoot,
 
-    [ValidateSet("supertonic", "yue2", "fish_audio", "maya1", "chatterbox", "chatterbox_turbo", "kitten_tts2", "soprano_tts", "cosyvoice3", "all")]
+    [ValidateSet("supertonic", "yue2", "fish_audio", "maya1", "chatterbox", "chatterbox_turbo", "kitten_tts2", "soprano_tts", "cosyvoice3", "pocket_tts", "vibevoice", "voxcpm2", "voxcpm1", "omnivoice", "all")]
     [string[]] $Component = @("all"),
 
     [switch] $ModelSourcesOnly
@@ -270,6 +270,134 @@ $cosyVoice3Files = @(
     "src/models/cosyvoice3/tokenizer_text.cpp"
 )
 
+# PocketTTS uses SentencePiece's inference API and libyaml. Keep the imported
+# dependency slices explicit: in particular, do not synchronize SentencePiece's
+# 40 MB data directory, trainer, command-line tools, tests, or benchmarks.
+$sentencePieceInferenceFiles = @(
+    "external/sentencepiece/LICENSE",
+    "external/sentencepiece/src/bpe_model.h",
+    "external/sentencepiece/src/common.h",
+    "external/sentencepiece/src/normalizer.h",
+    "external/sentencepiece/src/util.h",
+    "external/sentencepiece/src/freelist.h",
+    "external/sentencepiece/src/filesystem.h",
+    "external/sentencepiece/src/init.h",
+    "external/sentencepiece/src/sentencepiece_processor.h",
+    "external/sentencepiece/src/word_model.h",
+    "external/sentencepiece/src/model_factory.h",
+    "external/sentencepiece/src/char_model.h",
+    "external/sentencepiece/src/model_interface.h",
+    "external/sentencepiece/src/unigram_model.h",
+    "external/sentencepiece/src/bpe_model.cc",
+    "external/sentencepiece/src/char_model.cc",
+    "external/sentencepiece/src/error.cc",
+    "external/sentencepiece/src/filesystem.cc",
+    "external/sentencepiece/src/model_factory.cc",
+    "external/sentencepiece/src/model_interface.cc",
+    "external/sentencepiece/src/normalizer.cc",
+    "external/sentencepiece/src/sentencepiece_processor.cc",
+    "external/sentencepiece/src/unigram_model.cc",
+    "external/sentencepiece/src/util.cc",
+    "external/sentencepiece/src/word_model.cc",
+    "external/sentencepiece/src/builtin_pb/sentencepiece.pb.h",
+    "external/sentencepiece/src/builtin_pb/sentencepiece.pb.cc",
+    "external/sentencepiece/src/builtin_pb/sentencepiece_model.pb.h",
+    "external/sentencepiece/src/builtin_pb/sentencepiece_model.pb.cc"
+)
+
+$pocketTtsFiles = @(
+    "model_specs/pocket_tts.json",
+    "src/framework/io/yaml.cpp",
+    "src/framework/modules/attention/cross_attention.cpp",
+    "src/framework/modules/attention/self_attention.cpp",
+    "src/framework/modules/transformers/transformer_blocks.cpp",
+    "src/framework/tokenizers/sentencepiece.cpp",
+    "src/models/pocket_tts/assets.cpp",
+    "src/models/pocket_tts/backend_weights.cpp",
+    "src/models/pocket_tts/acoustic_model.cpp",
+    "src/models/pocket_tts/audio_decoder.cpp",
+    "src/models/pocket_tts/flow_lm.cpp",
+    "src/models/pocket_tts/graph_common.h",
+    "src/models/pocket_tts/mimi_decoder.cpp",
+    "src/models/pocket_tts/mimi_encoder.cpp",
+    "src/models/pocket_tts/text_conditioner.cpp",
+    "src/models/pocket_tts/voice_state_assets.cpp",
+    "src/models/pocket_tts/voice_conditioner.cpp",
+    "src/models/pocket_tts/loader.cpp",
+    "src/models/pocket_tts/session.cpp"
+)
+
+$vibeVoiceFiles = @(
+    "model_specs/vibevoice.json",
+    "src/models/vibevoice/assets.cpp",
+    "src/models/vibevoice/connector.cpp",
+    "src/models/vibevoice/decoder.cpp",
+    "src/models/vibevoice/diffusion_head.cpp",
+    "src/models/vibevoice/diffusion_sampler.cpp",
+    "src/models/vibevoice/generator.cpp",
+    "src/models/vibevoice/loader.cpp",
+    "src/models/vibevoice/lora.cpp",
+    "src/models/vibevoice/scheduler.cpp",
+    "src/models/vibevoice/session.cpp",
+    "src/models/vibevoice/tokenizer_audio.cpp",
+    "src/models/vibevoice/tokenizer_text.cpp"
+)
+
+# VoxCPM2 and the legacy VoxCPM1 implementation share the MiniCPM/AudioVAE
+# shape, but remain separate upstream families and model formats.
+$voxCpmSharedFiles = @(
+    "src/framework/audio/conversion.cpp",
+    "src/framework/audio/resampling.cpp",
+    "src/framework/audio/waveform_ops.cpp",
+    "src/framework/modules/optimizations/fast_kv_modules.cpp",
+    "src/framework/runtime/kv_cache.cpp",
+    "src/framework/sampling/torch_random.cpp"
+)
+
+$voxCpm2Files = @(
+    "model_specs/voxcpm2.json",
+    "src/models/voxcpm2/assets.cpp",
+    "src/models/voxcpm2/audiovae.cpp",
+    "src/models/voxcpm2/generator.cpp",
+    "src/models/voxcpm2/loader.cpp",
+    "src/models/voxcpm2/minicpm.cpp",
+    "src/models/voxcpm2/minicpm_blocks.h",
+    "src/models/voxcpm2/session.cpp",
+    "src/models/voxcpm2/tokenizer_text.cpp"
+)
+
+$voxCpm1Files = @(
+    "model_specs/voxcpm1.json",
+    "src/framework/model_spec/metadata.cpp",
+    "src/framework/text/chinese_variant.cpp",
+    "src/framework/text/chinese_variant_data.inc",
+    "src/community_models/voxcpm1/assets.cpp",
+    "src/community_models/voxcpm1/audiovae.cpp",
+    "src/community_models/voxcpm1/generator.cpp",
+    "src/community_models/voxcpm1/minicpm.cpp",
+    "src/community_models/voxcpm1/minicpm_blocks.h",
+    "src/community_models/voxcpm1/session.cpp",
+    "src/community_models/voxcpm1/tokenizer_text.cpp"
+)
+
+# OmniVoice's Higgs-derived audio tokenizer and diffusion generator are
+# self-contained model code. Their shared framework closure is already kept by
+# the selected TTS models, so do not refresh KoboldCpp-patched foundation files
+# when synchronizing this component alone.
+$omniVoiceFiles = @(
+    "model_specs/omnivoice.json",
+    "src/models/omnivoice/assets.cpp",
+    "src/models/omnivoice/audio_tokenizer.cpp",
+    "src/models/omnivoice/generator.cpp",
+    "src/models/omnivoice/generator_layerwise.inc",
+    "src/models/omnivoice/language_map.inc",
+    "src/models/omnivoice/loader.cpp",
+    "src/models/omnivoice/postprocess.cpp",
+    "src/models/omnivoice/prompt_builder.cpp",
+    "src/models/omnivoice/session.cpp",
+    "src/models/omnivoice/tokenizer_text.cpp"
+)
+
 # YuE2 is intentionally a separate import tier. Its framework closure is larger
 # than Supertonic's, but it still avoids Audio.cpp's server, CLI, converters,
 # unrelated models, bundled GGML, sentencepiece, and YAML dependencies.
@@ -320,6 +448,11 @@ foreach ($name in $Component) {
         [void] $selected.Add("kitten_tts2")
         [void] $selected.Add("soprano_tts")
         [void] $selected.Add("cosyvoice3")
+        [void] $selected.Add("pocket_tts")
+        [void] $selected.Add("vibevoice")
+        [void] $selected.Add("voxcpm2")
+        [void] $selected.Add("voxcpm1")
+        [void] $selected.Add("omnivoice")
     } else {
         [void] $selected.Add($name)
     }
@@ -329,6 +462,70 @@ foreach ($name in $Component) {
 # and reference-conditioning implementation rather than duplicating them.
 if ($selected.Contains("kitten_tts2")) {
     [void] $selected.Add("chatterbox")
+}
+
+if ($selected.Contains("pocket_tts")) {
+    Copy-AudioCppTree "include/engine/models/pocket_tts"
+    Copy-AudioCppTree "external/libyaml/include"
+    Copy-AudioCppTree "external/libyaml/src"
+    Copy-AudioCppFile "external/libyaml/LICENSE"
+    Copy-AudioCppTree "external/sentencepiece/third_party/absl"
+    Copy-AudioCppTree "external/sentencepiece/third_party/darts_clone"
+    Copy-AudioCppTree "external/sentencepiece/third_party/protobuf-lite"
+    foreach ($relativePath in $sentencePieceInferenceFiles) {
+        Copy-AudioCppFile $relativePath
+    }
+    $sentencePieceConfig = @"
+#ifndef CONFIG_H_
+#define CONFIG_H_
+#define VERSION "0.2.1"
+#define PACKAGE "sentencepiece"
+#define PACKAGE_STRING "sentencepiece"
+#define INSTALL_DATADIR ""
+#endif
+"@
+    [System.IO.File]::WriteAllText(
+        (Join-Path $vendorRoot "external/sentencepiece/config.h"),
+        $sentencePieceConfig,
+        (New-Object System.Text.UTF8Encoding($false)))
+    foreach ($relativePath in $pocketTtsFiles) {
+        Copy-AudioCppFile $relativePath
+    }
+}
+
+if ($selected.Contains("vibevoice")) {
+    Copy-AudioCppTree "include/engine/models/vibevoice"
+    foreach ($relativePath in $vibeVoiceFiles) {
+        Copy-AudioCppFile $relativePath
+    }
+}
+
+$hasVoxCpm = $selected.Contains("voxcpm2") -or $selected.Contains("voxcpm1")
+if ($hasVoxCpm) {
+    foreach ($relativePath in $voxCpmSharedFiles) {
+        Copy-AudioCppFile $relativePath
+    }
+}
+
+if ($selected.Contains("voxcpm2")) {
+    Copy-AudioCppTree "include/engine/models/voxcpm2"
+    foreach ($relativePath in $voxCpm2Files) {
+        Copy-AudioCppFile $relativePath
+    }
+}
+
+if ($selected.Contains("voxcpm1")) {
+    Copy-AudioCppTree "include/engine/community_models/voxcpm1"
+    foreach ($relativePath in $voxCpm1Files) {
+        Copy-AudioCppFile $relativePath
+    }
+}
+
+if ($selected.Contains("omnivoice")) {
+    Copy-AudioCppTree "include/engine/models/omnivoice"
+    foreach ($relativePath in $omniVoiceFiles) {
+        Copy-AudioCppFile $relativePath
+    }
 }
 
 if ($selected.Contains("soprano_tts")) {
@@ -426,6 +623,40 @@ if ($selected.Contains("kitten_tts2")) {
 
 $generatedDirectory = Join-Path $vendorRoot "generated"
 New-Item -ItemType Directory -Force -Path $generatedDirectory | Out-Null
+
+function ConvertTo-AudioCppSpecLiterals {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Json
+    )
+
+    # MSVC limits each string literal to 16,380 single-byte characters. Keep
+    # each adjacent raw-string chunk comfortably below that limit even after a
+    # Windows checkout expands LF to CRLF or a future spec gains UTF-8 text.
+    $maxChunkBytes = 12000
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    $remaining = $Json
+    $literals = New-Object System.Collections.Generic.List[string]
+    while ($utf8.GetByteCount($remaining) -gt $maxChunkBytes) {
+        $cut = [Math]::Min($remaining.Length, $maxChunkBytes)
+        while ($cut -gt 0 -and $utf8.GetByteCount($remaining.Substring(0, $cut)) -gt $maxChunkBytes) {
+            $cut--
+        }
+        if ($cut -le 0) {
+            throw "Unable to split model spec into an MSVC-safe string literal"
+        }
+        $newline = $remaining.LastIndexOf("`n", $cut - 1)
+        if ($newline -ge 0) {
+            $cut = $newline + 1
+        }
+        $chunk = $remaining.Substring(0, $cut)
+        [void] $literals.Add("R`"AUDIOCPP_SPEC($chunk)AUDIOCPP_SPEC`"")
+        $remaining = $remaining.Substring($cut)
+    }
+    [void] $literals.Add("R`"AUDIOCPP_SPEC($remaining)AUDIOCPP_SPEC`"")
+    return [string]::Join(" ", $literals)
+}
+
 $modelSpecEntries = ""
 Get-ChildItem -LiteralPath (Join-Path $vendorRoot "model_specs") -Filter "*.json" -File |
     Sort-Object Name |
@@ -435,7 +666,8 @@ Get-ChildItem -LiteralPath (Join-Path $vendorRoot "model_specs") -Filter "*.json
         if ($json.Contains(")AUDIOCPP_SPEC`"")) {
             throw "Model spec contains the reserved C++ raw-string delimiter: $($_.FullName)"
         }
-        $modelSpecEntries += "    {`"$family`", R`"AUDIOCPP_SPEC($json)AUDIOCPP_SPEC`"},`n"
+        $literals = ConvertTo-AudioCppSpecLiterals -Json $json
+        $modelSpecEntries += "    {`"$family`", $literals},`n"
     }
 $utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText(
@@ -478,6 +710,11 @@ $ttsLoaders = @(
         Factory = "engine::models::maya1::make_maya1_loader"
     },
     @{
+        Family = "pocket_tts"
+        Header = "engine/models/pocket_tts/loader.h"
+        Factory = "engine::models::pocket_tts::make_pocket_tts_loader"
+    },
+    @{
         Family = "soprano_tts"
         Header = "engine/community_models/soprano_tts/session.h"
         Factory = "engine::community_models::soprano_tts::make_soprano_tts_loader"
@@ -486,6 +723,26 @@ $ttsLoaders = @(
         Family = "supertonic"
         Header = "engine/models/supertonic/loader.h"
         Factory = "engine::models::supertonic::make_supertonic_loader"
+    },
+    @{
+        Family = "vibevoice"
+        Header = "engine/models/vibevoice/loader.h"
+        Factory = "engine::models::vibevoice::make_vibevoice_loader"
+    },
+    @{
+        Family = "voxcpm2"
+        Header = "engine/models/voxcpm2/loader.h"
+        Factory = "engine::models::voxcpm2::make_voxcpm2_loader"
+    },
+    @{
+        Family = "voxcpm1"
+        Header = "engine/community_models/voxcpm1/session.h"
+        Factory = "engine::community_models::voxcpm1::make_voxcpm1_loader"
+    },
+    @{
+        Family = "omnivoice"
+        Header = "engine/models/omnivoice/loader.h"
+        Factory = "engine::models::omnivoice::make_omnivoice_loader"
     }
 )
 $ttsRegistryHeaders = ""
