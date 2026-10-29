@@ -2282,11 +2282,40 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
 
         fflush(stdout);
 
+        // KCPP_WAN_LATENT_ONLY_RESULT: fail closed on stale/missing snapshots.
+        const char* latent_only_env=std::getenv("KCPP_WAN_LATENT_ONLY");
+        const char* latent_path_env=std::getenv("KCPP_WAN_LATENT_SNAPSHOT");
+        const bool latent_only=latent_only_env && std::string(latent_only_env)=="1";
+        if (latent_only && (!latent_path_env || !*latent_path_env || std::filesystem::exists(std::filesystem::u8path(latent_path_env)))) {
+            return sd_generation.error("KCPP: latent-only video requires a fresh owned capture path");
+        }
         results = nullptr;
         int output_fps = vid_fps;
         if (!generate_video(sd_ctx, &vid_gen_params, &results, &generated_num_results, &generated_audio, &output_fps)) {
             results = nullptr;
             generated_audio = nullptr;
+        }
+        if (latent_only) {
+            std::ifstream snapshot(std::filesystem::u8path(latent_path_env),std::ios::binary|std::ios::ate);
+            const auto length=snapshot.tellg();snapshot.seekg(0);
+            char magic[8]={};uint32_t dimensions=0;uint64_t count=0;int64_t shape[5]={};
+            snapshot.read(magic,8);snapshot.read(reinterpret_cast<char*>(&dimensions),4);
+            snapshot.read(reinterpret_cast<char*>(&count),8);snapshot.read(reinterpret_cast<char*>(shape),40);
+            const bool valid=snapshot.good() && std::string(magic,8)=="KCPPWLAT" && dimensions==5 && count>0 && count<=33554432 &&
+                length==static_cast<std::streamoff>(60+count*4) && shape[0]>0 && shape[0]<=256 && shape[1]>0 && shape[1]<=256 &&
+                shape[2]>0 && shape[2]<=31 && shape[3]==48 && shape[4]==1 &&
+                count==static_cast<uint64_t>(shape[0]*shape[1]*shape[2]*48) &&
+                shape[0]*16==params.width && shape[1]*16==params.height && (shape[2]-1)*4+1==vid_req_frames;
+            if (!valid) return sd_generation.error("KCPP: incomplete or incompatible Wan latent export");
+            if (results) {
+                for (int i=0;i<generated_num_results;i++) free(results[i].data);
+                free(results);results=nullptr;
+            }
+            sd_generation.reset();
+            sd_generation.info=nlohmann::json({{"operation","wan_latents"},{"kcpp_wan_latents_ready",true},{"seed",params.seed},
+                {"frames",vid_req_frames},{"width",params.width},{"height",params.height}}).dump();
+            printf("KCPP: Wan latent-only operation complete; no RGB decoder executed.\n");
+            return sd_generation.outputs(1);
         }
         if(!sd_is_quiet && sddebugmode==1)
         {

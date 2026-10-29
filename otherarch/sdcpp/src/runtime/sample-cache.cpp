@@ -112,6 +112,7 @@ namespace sd_sample {
         }
 
         DBCacheConfig dbcfg;
+        dbcfg.strict_runtime_gates = (version == VERSION_WAN2_2_TI2V);
         dbcfg.enabled                     = (cache_params.mode == SD_CACHE_DBCACHE || cache_params.mode == SD_CACHE_CACHE_DIT);
         dbcfg.Fn_compute_blocks           = cache_params.Fn_compute_blocks;
         dbcfg.Bn_compute_blocks           = cache_params.Bn_compute_blocks;

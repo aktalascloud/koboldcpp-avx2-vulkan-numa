@@ -8883,6 +8883,9 @@ Change Mode<br>
                             genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                         else:
                             genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
+                        # KCPP_WAN_LATENT_ONLY_RESPONSE: export metadata, never a fake PNG/AVI.
+                        if gen["info"].get("kcpp_wan_latents_ready") is True:
+                            genresp=json.dumps({"operation":"wan_latents","status":"ready","images":[],"animated":False,"info":geninfo}).encode()
                         if not keepalive_started:
                             self.send_response(200)
                             self.send_header('content-length', str(len(genresp)))

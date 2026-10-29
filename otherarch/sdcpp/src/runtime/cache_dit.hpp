@@ -13,6 +13,8 @@
 #include "runtime/condition_cache_utils.hpp"
 
 struct DBCacheConfig {
+    // KCPP_WAN_CACHE_GATES: defaultfalse preserves existing photo behavior.
+    bool strict_runtime_gates = false;
     bool enabled                        = false;
     int Fn_compute_blocks               = 8;
     int Bn_compute_blocks               = 0;
@@ -643,6 +645,7 @@ struct CacheDitConditionState {
     int current_step_index = -1;
     bool step_active       = false;
     bool skip_current_step = false;
+    bool reuse_allowed_this_step = false;
     bool initial_step      = true;
     int warmup_remaining   = 0;
     std::vector<int> cached_steps;
@@ -668,6 +671,7 @@ struct CacheDitConditionState {
     void reset_runtime() {
         current_step_index = -1;
         step_active        = false;
+        reuse_allowed_this_step = false;
         skip_current_step  = false;
         initial_step       = true;
         warmup_remaining   = config.max_warmup_steps;
@@ -728,6 +732,7 @@ struct CacheDitConditionState {
         current_step_index = step_index;
         skip_current_step  = false;
         step_active        = false;
+        reuse_allowed_this_step = false;
 
         if (sigma > start_sigma)
             return;
@@ -758,6 +763,7 @@ struct CacheDitConditionState {
             continuous_cached_steps >= config.max_continuous_cached_steps) {
             return;
         }
+        reuse_allowed_this_step = true;
     }
 
     bool step_is_active() const {
@@ -818,6 +824,8 @@ struct CacheDitConditionState {
             anchor_condition = cond;
             initial_step     = false;
         }
+
+        if (config.strict_runtime_gates && !reuse_allowed_this_step) return false;
 
         bool is_anchor = (cond == anchor_condition);
 

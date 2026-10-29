@@ -3196,6 +3196,12 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
         std::filesystem::rename(partial,target,error);
         if (error) { std::filesystem::remove(partial,error);LOG_ERROR("Wan latent capture commit failed");return {}; }
         LOG_INFO("Saved Wan5B raw posterior snapshot: %llu float32 values",static_cast<unsigned long long>(count));
+        // KCPP_WAN_LATENT_ONLY_EXPORT: deliberate export completion, no RGB decode.
+        const char* latent_only=std::getenv("KCPP_WAN_LATENT_ONLY");
+        if (latent_only && std::string(latent_only)=="1") {
+            LOG_INFO("Wan5B latent export complete; external Pro decoder required");
+            return {};
+        }
     }
     auto latents                      = decode_model->diffusion_to_vae_latents(x);
     auto tiling_params                = decode_model->resolve_tiling_params(vae_tiling_params);

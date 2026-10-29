@@ -39,6 +39,14 @@ User explicitly authorized these compute ports without a prior speed gate. [Corr
 
 ### 29 October 2026 fixes (KoboldCpp 1.124)
 
+Current additions:
+
+- [Wan5B latent-only export](../otherarch/sdcpp/src/pipeline/diffusion_engine.cpp): full encoder/diffusion, atomic bounded48-channel posterior capture, explicit `wan_latents` operation and empty media. No placeholder RGB, Tiny decoder or C ABI change. The external Pro decoder is part of the separate media pipeline.
+- [Wan5B cache runtime gates](../otherarch/sdcpp/src/runtime/cache_dit.hpp): enforce warmup, computation-mask and cache-count restrictions before reusing a condition. Warmup still records full computations for later reuse. Enabled only for Wan5B; photo behavior is unchanged. Real-header C++ controls cover warmup, mask, max-cache and legacy-photo behavior.
+- Local Pro+user-adapter/720p/face/RIFE/YuE2 complete API calls finished in190.76s and258.05s for17native frames, not17seconds of footage. These are media-pipeline measurements, not LLM/token or kernel gains. The second call includes82.55s queue/profile readiness; do not attribute that difference to the scheduler.
+
+The initial cache-forwarding comparison below predates the runtime-gate repair. Retain it as historical evidence: it changed pose/appearance and did not establish lossless acceleration. With repaired gates, the tested light0.04/0.08 configurations produced the same latent SHA as the control in one scene; observed native times55.55/64.27s vs57.23s do not prove a consistent cache benefit.
+
 | Fix | Source | Evidence and scope |
 |---|---|---|
 | Forward video cache settings | [Video adapter](../otherarch/sdcpp/sdtype_adapter.cpp) | Previously parsed cache settings were not copied into video parameters. In one 17-frame Wan5B trial, Cache-DiT0.08 skipped1/4 steps: sampling34.98 to25.85s; Native56.62 to46.62s. The output changes. This is not a lossless or general LLM speed claim. |
