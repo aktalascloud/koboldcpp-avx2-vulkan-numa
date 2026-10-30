@@ -1102,7 +1102,7 @@ index 6a817c0..211456c 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 0e2f964..c254beb 100644
+index 0e2f964..0d051a2 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -1212,43 +1212,148 @@ index 0e2f964..c254beb 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9397,7 +9456,7 @@ def show_gui():
+@@ -9397,7 +9456,27 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
 -    root.title(f"KoboldCpp v{KcppVersion}")
 +    root.title(f"KoboldCpp v{KcppWindowVersion}")
++    _media_editor=None
++    _gui_locale=None
++    import pathlib
++    _media_root=pathlib.Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else pathlib.Path(__file__).resolve().parent
++    if os.name=='nt':
++        _icon=pathlib.Path(getattr(sys,'_MEIPASS',pathlib.Path(__file__).resolve().parent))/'niko.ico'
++        if _icon.is_file():root.iconbitmap(str(_icon))
++    try:
++        if (_media_root/'tools/GuiLocale.py').is_file():
++            sys.path.insert(0,str(_media_root/'tools'))
++            from GuiLocale import Localizer
++            _preferred='ru'
++            if (_media_root/'Helper.kcpps').is_file():
++                _h=json.loads((_media_root/'Helper.kcpps').read_text(encoding='utf-8-sig'));_g=_h['gendefaults'];_g=json.loads(_g) if isinstance(_g,str) else _g;_preferred=_g.get('kcpp_proxy',{}).get('ui_language','ru')
++            _gui_locale=Localizer(root,_preferred)
++            import tkinter.filedialog as _dialogs
++            for _name in ('askopenfilename','askopenfilenames','asksaveasfilename','askdirectory'):
++                setattr(_dialogs,_name,_gui_locale.dialog(getattr(_dialogs,_name)))
++    except Exception:pass
++
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9509,7 +9568,7 @@ def show_gui():
+@@ -9482,6 +9561,7 @@ def show_gui():
+ 
+     # trigger empty tooltip then remove it
+     def show_tooltip(event, tooltip_text=None):
++        if tooltip_text and _gui_locale is not None:tooltip_text=_gui_locale.tooltip(tooltip_text)
+         nonlocal gtooltip_box, gtooltip_label
+         if not gtooltip_box and not gtooltip_label:
+             gtooltip_box = ctk.CTkToplevel(root)
+@@ -9509,7 +9589,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
 -    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Agent","Admin","Extra"]
-+    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Media","Agent","Admin","Extra"]
++    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Video","Agent","Admin","Extra"]
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9725,6 +9784,17 @@ def show_gui():
+@@ -9725,7 +9805,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
-+    # KCPP_MEDIA_GUI: shared web forms cover the complete media chain.
-+    def open_media_workbench():
-+        def run():
-+            try:kcpp_media_launch()
-+            except Exception as error:root.after(0,lambda message=str(error):show_gui_msgbox('KoboldCpp Media',message))
-+        threading.Thread(target=run,daemon=True).start()
-+    ctk.CTkLabel(tabcontent['Media'],text='Images · Music · Video',font=ctk.CTkFont(None,18,'bold')).grid(row=1,padx=12,pady=16,sticky='w')
-+    ctk.CTkLabel(tabcontent['Media'],text='Automatic model switching\nFace restoration · ClearReality upscale\nPro VAE · RIFE FPS · YuE2 soundtrack\nOne Helper.kcpps',justify='left').grid(row=2,padx=12,pady=12,sticky='w')
-+    ctk.CTkButton(tabcontent['Media'],text='Start / open media workbench',command=open_media_workbench).grid(row=3,padx=12,pady=12,sticky='w')
-+    ctk.CTkLabel(tabcontent['Media'],text='The portable media kit supplies the runtime.\nMain model weights are downloaded separately.',justify='left').grid(row=4,padx=12,pady=12,sticky='w')
-+
-     tabbuttonaction(tabnames[0])
+-    tabbuttonaction(tabnames[0])
++    tabbuttonaction('Image Gen' if os.environ.get('KCPP_MEDIA_SETTINGS_GUI')=='1' else tabnames[0])
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
-@@ -12932,7 +13002,7 @@ def main(launch_args, default_args):
+ 
+@@ -10655,6 +10735,8 @@ def show_gui():
+     # Image Gen Tab
+ 
+     images_tab = tabcontent["Image Gen"]
++    images_tab = ctk.CTkScrollableFrame(images_tab,width=440,height=440)
++    images_tab.grid(row=1,padx=3,pady=2,sticky="nsew")
+     makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
+ 
+     def togglesdlora(a,b,c):
+@@ -10695,7 +10777,7 @@ def show_gui():
+     makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
+     makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
+     makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
+-    makefileentry(images_tab, "Upscaler:", "Select Optional Upscaling model file (ESRGAN)",sd_upscaler_var, 32, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.pth","*.safetensors *.gguf *.pth")],tooltiptxt="Select an upscaler model file.\nCurrently only ESRGAN is supported.")
++    makefileentry(images_tab, "Upscaler:", "Select Optional Upscaling model file (ESRGAN)",sd_upscaler_var, 32, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.pth *.onnx","*.safetensors *.gguf *.pth *.onnx")],tooltiptxt="Select an upscaler model file.\nCurrently only ESRGAN is supported.")
+ 
+ 
+     sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
+@@ -10723,6 +10805,8 @@ def show_gui():
+ 
+     # audio tab
+     audio_tab = tabcontent["Audio"]
++    audio_tab = ctk.CTkScrollableFrame(audio_tab,width=440,height=440)
++    audio_tab.grid(row=1,padx=3,pady=2,sticky="nsew")
+     makefileentry(audio_tab, "Whisper Model (Speech-To-Text):", "Select Whisper .bin Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin","*.bin")], tooltiptxt="Select a Whisper .bin model file on disk to be loaded for Voice Recognition.")
+     whisper_model_var.trace_add("write", gui_changed_modelfile)
+     makefileentry(audio_tab, "TTS Model (Text-To-Speech):", "Select TTS GGUF Model File", tts_model_var, 3, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a TTS GGUF model file on disk to be loaded for Narration.")
+@@ -10808,6 +10892,8 @@ def show_gui():
+ 
+     # extra tab
+     extra_tab = tabcontent["Extra"]
++    extra_tab = ctk.CTkScrollableFrame(extra_tab,width=440,height=440)
++    extra_tab.grid(row=1,padx=3,pady=2,sticky="nsew")
+     makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
+     ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
+     makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
+@@ -10873,6 +10959,8 @@ def show_gui():
+ 
+     # launch
+     def guilaunch():
++        if _media_editor is not None and (os.environ.get('KCPP_MEDIA_SETTINGS_GUI')=='1' or tabnames[curr_tab_idx]=='Video'):
++            _media_editor.launch(); return
+         if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
+             # prevent launch without at least one valid model
+             givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
+@@ -11462,6 +11550,8 @@ def show_gui():
+             auto_set_backend_gui(True)
+ 
+     def save_config_gui():
++        if _media_editor is not None and (os.environ.get('KCPP_MEDIA_SETTINGS_GUI')=='1' or tabnames[curr_tab_idx]=='Video'):
++            _media_editor.save_dialog(); return
+         nonlocal kcpp_exporting_template
+         kcpp_exporting_template = False
+         export_vars()
+@@ -11477,6 +11567,8 @@ def show_gui():
+         pass
+ 
+     def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
++        if _media_editor is not None and (os.environ.get('KCPP_MEDIA_SETTINGS_GUI')=='1' or tabnames[curr_tab_idx]=='Video'):
++            _media_editor.load_dialog(); return
+         file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
+         global runmode_untouched, zenity_permitted
+         filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
+@@ -11597,6 +11689,22 @@ def show_gui():
+             mydict = vars(args)
+             import_vars(mydict)
+ 
++    # KCPP_INTEGRATED_MEDIA: no separate Media tab and no alternative file browser.
++    try:
++        if (_media_root/'tools/NativeMediaEditor.py').is_file() and (_media_root/'Helper.kcpps').is_file():
++            sys.path.insert(0,str(_media_root/'tools'))
++            from NativeMediaEditor import Editor
++            if os.environ.get('KCPP_MEDIA_SETTINGS_GUI')=='1':
++                import_vars(json.loads((_media_root/'Helper.kcpps').read_text(encoding='utf-8-sig')))
++            _video_parent=ctk.CTkScrollableFrame(tabcontent['Video'],width=440,height=440)
++            _video_parent.grid(row=1,padx=3,pady=2,sticky='nsew')
++            _vars={'sdmodel':sd_model_var,'sdllm':sd_llm_var,'sdclip1':sd_clip1_var,'sdclip2':sd_clip2_var,'sdvae':sd_vae_var,'sdlora':sd_lora_var,'sdloramult':sd_loramult_var,'sdupscaler':sd_upscaler_var,'musicllm':musicllm_var,'musicvae':musicvae_var,'musicdiffusion':musicdiffusion_var,'musicembeddings':musicembeddings_var}
++            _parents={'Фото':images_tab,'Апскейл':images_tab,'Лица':images_tab,'Видео':_video_parent,'Музыка':audio_tab,'Система':extra_tab}
++            _media_editor=Editor(ctk,_parents,_vars,makefileentry,show_tooltip,hide_tooltip,{'save':zentk_asksaveasfilename,'open':zentk_askopenfilename},_gui_locale,_media_root)
++            if _gui_locale is not None:_gui_locale.apply(root)
++    except Exception as _editor_error:
++        ctk.CTkLabel(tabcontent['Video'],text=str(_editor_error),wraplength=350).grid(row=1,padx=12,pady=12)
++
+     # runs main loop until closed or launch clicked
+     try:
+         root.mainloop()
+@@ -12932,7 +13040,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -1257,7 +1362,7 @@ index 0e2f964..c254beb 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14425,8 +14495,40 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14425,8 +14533,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  
@@ -1293,12 +1398,14 @@ index 0e2f964..c254beb 100644
 +
  if __name__ == '__main__':
      multiprocessing.freeze_support()
++    if '--media-settings' in sys.argv:
++        sys.argv.remove('--media-settings'); os.environ['KCPP_MEDIA_SETTINGS_GUI']='1'
 +    if '--media' in sys.argv:
 +        raise SystemExit(kcpp_media_launch(open_browser='--no-browser' not in sys.argv))
  
      def check_range(value_type, min_value, max_value):
          def range_checker(arg: str):
-@@ -14470,6 +14572,7 @@ if __name__ == '__main__':
+@@ -14470,6 +14612,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -1306,7 +1413,7 @@ index 0e2f964..c254beb 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14504,6 +14607,9 @@ if __name__ == '__main__':
+@@ -14504,6 +14647,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")

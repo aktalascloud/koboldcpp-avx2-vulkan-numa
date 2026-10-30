@@ -52,3 +52,5 @@ Daily 08:00 Asia/Bishkek maintenance checks PRs/issues independently of upstream
 <!-- native-video-ports -->
 
 Native video: JPEG95, optional Super-TinyVAE and full-encoder/Tiny-decoder split. Approximate decoding may soften details; [ports and attribution](performance/PATCHES.md#native-video-ports). No new token-throughput claim.
+
+Optional media integration now uses the original Image Gen and Audio tabs plus Video; Extra has RU/EN and logon startup. Load/Save uses user-selected .kcpps files. The standalone executable retains the original model selectors and icon; media dependencies are in the separate [media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline). No new CPU/Vulkan speed measurement accompanies this GUI update.
