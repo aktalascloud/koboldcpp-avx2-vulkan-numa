@@ -4,6 +4,8 @@
 
 Форк [оригинального KoboldCpp](https://github.com/LostRuins/koboldcpp), ветка **concedo_experimental**. Windows x64, Haswell/AVX2, RX580 Polaris/gfx803, Vulkan и Windows NUMA. **O3 + LTO, без PGO.** Основные модели в пакет не включены.
 
+30октября: experimental `f7eb772d`, исправление LTO-деструктора Qwen3-TTS и вкладка **Media** (`--media`). [Решения и источники](performance/daily-review.json). Новых замеров скорости нет.
+
 Сборка28октября: включены параллельное копирование строкCPU и кэш/предзагрузка VulkanRMS по запросу пользователя. Прирост пока не измерен; прежняя таблица сохраняет исходные даты/SHA.
 
 

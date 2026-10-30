@@ -74,3 +74,7 @@ Additional numerical check: Native Super-Tiny and the pinned MIT PyTorch referen
 - GCC13/MinGW LTO destructor port extended to new Qwen3TTSSession after an actual duplicate-thunk link failure. LTO remains enabled; no layout or speed claim.
 - Optional Media GUI launcher and `--media` entry open the portable workbench. Core stays directly runnable; model switching/postprocessing live in the separate media kit.
 - [PR/issue/fork decisions](daily-review.json):24 configured sources,21 selected forks, no audit errors. No scheduled inference/benchmarks.
+
+## 30 October2026
+
+Extended the out-of-line virtual destructor fix to new Qwen3TTSSession after an actual GCC13/MinGW LTO duplicate-thunk failure. LTO retained; no new speed claim. Optional Media launcher tab / `--media` opens the separately installed portable workbench. [Upstream fixes and all daily PR/fork decisions](daily-review.json).

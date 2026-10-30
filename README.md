@@ -4,6 +4,8 @@
 
 Performance fork of [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp), based on **concedo_experimental**. Windows x64, Haswell/AVX2, RX580 Polaris/gfx803, Vulkan and optional Windows NUMA. **O3 + LTO, no PGO.** No main model weights included.
 
+30October: official experimental `f7eb772d`, Qwen3-TTS LTO thunk fix and optional **Media** launcher (`--media`). [Daily decisions](performance/daily-review.json). No new speed tests.
+
 30October update: official experimental `f7eb772d`, Qwen3-TTS LTO thunk fix and optional **Media** launcher tab (`--media`). [Daily review and source links](performance/daily-review.json). The portable media kit supplies unified APIs, faces/upscale/video/FPS/audio; no new speed tests.
 
 Daily28October: CPU row-copy parallelism and bounded Vulkan RMS cache/prefetch are enabled by user request; speed impact is unmeasured. [Checks/scope](performance/benchmarks/compute-correctness.json).
