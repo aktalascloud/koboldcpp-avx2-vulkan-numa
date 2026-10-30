@@ -50,3 +50,5 @@ CPU: `--usecpu --threads 16 --blasthreads 20 --numa auto`. [Настройки �
 <!-- native-video-ports -->
 
 Видео Native: JPEG95, опциональный Super-TinyVAE и разделение полного энкодера/лёгкого декодера. Возможна потеря мелких деталей; [патчи и источники](performance/PATCHES.md#native-video-ports). Новых замеров выдачи токенов не было.
+
+Исправления автозапуска и отдельный SFX API находятся в [медиа-комплекте](https://github.com/aktalascloud/koboldcpp-media-pipeline): восстановление после перезагрузки, повторы атомарной записи при конфликте Windows, защита от повторного запуска. Native EXE и доказательные замерыCPU/Vulkan не изменились.
