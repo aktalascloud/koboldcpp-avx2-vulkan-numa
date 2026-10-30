@@ -1866,7 +1866,7 @@ def read_gguf_metadata(file_path):
     except Exception:
         return None
 
-def extract_modelfile_params(filepath,sdfilepath,whisperfilepath,mmprojfilepath,draftmodelpath,ttsmodelpath,embdmodelpath,musicllmpath,musicditpath):
+def extract_modelfile_params(filepath,sdfilepath,whisperfilepath,mmprojfilepath,draftmodelpath,ttsmodelpath,embdmodelpath,musicllmpath,musicditpath,musicvaepath):
     global modelfile_extracted_meta
     modelfile_extracted_meta = None
     sdfsize = 0
@@ -1877,6 +1877,7 @@ def extract_modelfile_params(filepath,sdfilepath,whisperfilepath,mmprojfilepath,
     embdmodelsize = 0
     musicllmsize = 0
     musicditsize = 0
+    musicvaesize = 0
     if sdfilepath and os.path.exists(sdfilepath):
         sdfsize = os.path.getsize(sdfilepath)
     if whisperfilepath and os.path.exists(whisperfilepath):
@@ -1893,12 +1894,14 @@ def extract_modelfile_params(filepath,sdfilepath,whisperfilepath,mmprojfilepath,
         musicllmsize = os.path.getsize(musicllmpath)
     if musicditpath and os.path.exists(musicditpath):
         musicditsize = os.path.getsize(musicditpath)
+    if musicvaepath and os.path.exists(musicvaepath):
+        musicvaesize = os.path.getsize(musicvaepath)
     if filepath and os.path.exists(filepath):
         try:
             fsize = os.path.getsize(filepath)
             if fsize>10000000: #dont bother with models < 10mb as they are probably bad
                 ggufmeta = read_gguf_metadata(filepath)
-                modelfile_extracted_meta = [filepath,ggufmeta,fsize,sdfsize,whisperfsize,mmprojsize,draftmodelsize,ttsmodelsize,embdmodelsize,musicllmsize,musicditsize] #extract done. note that meta may be null
+                modelfile_extracted_meta = [filepath,ggufmeta,fsize,sdfsize,whisperfsize,mmprojsize,draftmodelsize,ttsmodelsize,embdmodelsize,musicllmsize,musicditsize,musicvaesize] #extract done. note that meta may be null
         except Exception:
             modelfile_extracted_meta = None
 
@@ -1935,6 +1938,7 @@ def autoset_gpu_layers(ctxsize, sdquanted, bbs, musiclowvram): #shitty algo to d
             unsubmitted_overhead = 0 #this overhead is used to calculate for local estimate but not sent to backend
             musicoh1 = 0
             musicoh2 = 0
+            musicoh3 = 0
             if modelfile_extracted_meta[3] > 1024*1024*1024*5: #sdxl tax
                 calulated_gpu_overhead += 1024*1024*1024*(9 - sdquanted * 1.5) # 9, 7.5, 6
             elif modelfile_extracted_meta[3] > 1024*1024*512: #normal sd tax
@@ -1953,13 +1957,15 @@ def autoset_gpu_layers(ctxsize, sdquanted, bbs, musiclowvram): #shitty algo to d
             if modelfile_extracted_meta[8] > 1024*1024*10: #embeddings model tax
                 calulated_gpu_overhead += max(350*1024*1024, modelfile_extracted_meta[8] * 1.5)
             if modelfile_extracted_meta[9] > 1024*1024*10: #music llm tax
-                musicoh1 = modelfile_extracted_meta[9] * 1.05
+                musicoh1 = modelfile_extracted_meta[9] * 1.05 + (300*1024*1024)
             if modelfile_extracted_meta[10] > 1024*1024*10: #music dit tax
-                musicoh2 = modelfile_extracted_meta[10] * 1.05 + (600*1024*1024)
+                musicoh2 = modelfile_extracted_meta[10] * 1.05 + (300*1024*1024)
+            if modelfile_extracted_meta[11] > 1024*1024*10: #music vae tax
+                musicoh3 = modelfile_extracted_meta[11] * 1.05
             if musiclowvram:
-                calulated_gpu_overhead += max(musicoh1,musicoh2)
+                calulated_gpu_overhead += max(musicoh1,musicoh2,musicoh3)
             else:
-                calulated_gpu_overhead += musicoh1 + musicoh2
+                calulated_gpu_overhead += musicoh1 + musicoh2 + musicoh3
 
             mem -= calulated_gpu_overhead
             mem -= unsubmitted_overhead
@@ -3493,10 +3499,15 @@ def tts_generate(genparams):
         voice = simple_lcg_hash(voicestr.strip()) if voicestr else 1
     inputs = tts_generation_inputs()
     inputs.custom_speaker_voice = normalized_voice.encode("UTF-8")
-    ttsinstruction = genparams.get("instruction", "")
+    # OpenAI's /v1/audio/speech schema calls this field `instructions`.
+    # Keep KoboldCpp's historical singular spelling as a compatibility alias.
+    ttsinstruction = genparams.get("instructions", "")
+    if not isinstance(ttsinstruction, str) or not ttsinstruction:
+        legacy_instruction = genparams.get("instruction", "")
+        ttsinstruction = legacy_instruction if isinstance(legacy_instruction, str) else ""
     ttslang = genparams.get("language", "en")
     # if no instruction provided, extract from text
-    if not genparams.get("instruction", ""):
+    if not ttsinstruction:
         prompt, ttsinstruction = tts_extract_instruction(prompt)
     inputs.speaker_instruction = ttsinstruction.encode("UTF-8")
     inputs.language = ttslang.encode("UTF-8")
@@ -3527,7 +3538,10 @@ def tts_generate(genparams):
         "min_p", "top_p", "top_k", "flow_guidance_scale", "max_tokens",
         "max_new_tokens", "do_sample", "stop_on_eos", "num_inference_steps",
         "text_chunk_size", "text_chunk_mode", "preset", "voice_id", "eos_bias",
-        "min_tokens", "template_name", "instruct")
+        "min_tokens", "template_name", "instruct", "emotion",
+        "x_vector_only_mode", "subtalker_do_sample", "subtalker_temperature",
+        "subtalker_top_k", "subtalker_top_p", "stream_chunk_policy",
+        "stream_frames_per_event")
     audiocpp_options = {
         key: genparams[key] for key in audiocpp_option_names
         if key in genparams and isinstance(genparams[key], (str, int, float, bool))
@@ -5644,6 +5658,10 @@ ws ::= | " " | "\n" [ \t]{0,20}
         # Normalize Anthropic-format tool definitions to OpenAI format before delegating
         if genparams.get("tools"):
             genparams["tools"] = normalize_anthropic_tools_input(genparams["tools"])
+        # Anthropic tool_choice is an object; map auto/any/none to the OpenAI strings. {"type":"tool","name":...} works as is.
+        tool_choice = genparams.get("tool_choice")
+        if isinstance(tool_choice, dict) and tool_choice.get("type") in ("auto", "any", "none"):
+            genparams["tool_choice"] = {"auto": "auto", "any": "required", "none": "none"}[tool_choice["type"]]
         transform_genparams(genparams, 4, use_jinja) # Delegate to oai chat completions
         return genparams
 
@@ -8907,6 +8925,32 @@ Change Mode<br>
                 elif is_transcribe:
                     try:
                         global fullwhispermodelpath, has_audio_support
+                        voice_name = genparams.get("voice", "")
+                        if not genparams.get("audio_data", "") and voice_name:
+                            voice_name = voice_name.strip() if isinstance(voice_name, str) else ""
+                            voice_ext = os.path.splitext(voice_name)[1].lower()
+                            voice_audio = voicebank.get(voice_name, "") if voice_name else ""
+                            if voice_ext not in (".wav", ".mp3") or not voice_audio:
+                                genresp = json.dumps({"detail": {
+                                    "msg": "The selected voice is not a WAV/MP3 file loaded from the TTS voices directory.",
+                                    "type": "bad_input",
+                                }}).encode()
+                                self.send_response(400)
+                                self.send_header('content-length', str(len(genresp)))
+                                self.end_headers(content_type='application/json')
+                                self.wfile.write(genresp)
+                                return
+                            if fullwhispermodelpath == "":
+                                genresp = json.dumps({"detail": {
+                                    "msg": "A Whisper model is not currently available to transcribe the selected voice.",
+                                    "type": "model_unavailable",
+                                }}).encode()
+                                self.send_response(503)
+                                self.send_header('content-length', str(len(genresp)))
+                                self.end_headers(content_type='application/json')
+                                self.wfile.write(genresp)
+                                return
+                            genparams["audio_data"] = voice_audio
                         gendat = None
                         if genparams.get("audio_data","") and fullwhispermodelpath=="" and has_audio_support: #if we have no whisper model but an audio-capable projector, use that instead
                             adapter_obj = {} if chatcompl_adapter is None else chatcompl_adapter
@@ -10059,7 +10103,8 @@ def show_gui():
             embdmodelpath = embeddings_model_var.get() if embeddings_gpu_var.get()==1 else ""
             musicllmpath = musicllm_var.get()
             musicditpath = musicdiffusion_var.get()
-            extract_modelfile_params(filepath,sdfilepath,whisperfilepath,mmprojfilepath,draftmodelpath,ttsmodelpath,embdmodelpath,musicllmpath,musicditpath)
+            musicvaepath = musicvae_var.get()
+            extract_modelfile_params(filepath,sdfilepath,whisperfilepath,mmprojfilepath,draftmodelpath,ttsmodelpath,embdmodelpath,musicllmpath,musicditpath,musicvaepath)
             changed_gpulayers_estimate()
         pass
 
@@ -13070,7 +13115,7 @@ def main(launch_args, default_args):
 
     if not args.admin: #run in single process mode
         if args.remotetunnel and not args.prompt and not args.benchmark and not args.cli:
-            setuptunnel(global_memory, True if args.sdmodel else False, True if (args.musicdiffusion or args.musicllm or args.ttsmodel) else False)
+            setuptunnel(global_memory, True if args.sdmodel else False, True if (args.musicdiffusion or args.musicllm or args.ttsmodel or args.whispermodel) else False)
         kcpp_main_process(args,global_memory,using_gui_launcher)
         if global_memory["input_to_exit"]:
             print("===")
@@ -13082,7 +13127,7 @@ def main(launch_args, default_args):
             global_memory = mp_manager.dict({"tunnel_url": "", "restart_target":"", "input_to_exit":False, "load_complete":False, "restart_override_base_config":"", "last_active_timestamp":datetime.now(), "triggered_sleeping":False, "current_model":initial_model, "base_config":"", "swapReqType": None, "loadedReqTypes": [], "autoswapmode": False})
 
             if args.remotetunnel and not args.prompt and not args.benchmark and not args.cli:
-                setuptunnel(global_memory, True if args.sdmodel else False, True if (args.musicdiffusion or args.musicllm or args.ttsmodel) else False)
+                setuptunnel(global_memory, True if args.sdmodel else False, True if (args.musicdiffusion or args.musicllm or args.ttsmodel or args.whispermodel) else False)
 
             # invoke the main koboldcpp process
             original_args = copy.deepcopy(args)
@@ -13744,7 +13789,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
             if args.gpulayers==-1 and args.model_param and os.path.exists(args.model_param):
                 if (not args.usecpu) and ((args.usecuda is not None) or (args.usevulkan is not None) or sys.platform=="darwin"):
                     if MaxMemory[0] > 0:
-                        extract_modelfile_params(args.model_param,args.sdmodel,args.whispermodel,args.mmproj,args.draftmodel,args.ttsmodel if args.ttsgpu else "",args.embeddingsmodel if args.embeddingsgpu else "", args.musicllm, args.musicdiffusion)
+                        extract_modelfile_params(args.model_param,args.sdmodel,args.whispermodel,args.mmproj,args.draftmodel,args.ttsmodel if args.ttsgpu else "",args.embeddingsmodel if args.embeddingsgpu else "", args.musicllm, args.musicdiffusion, args.musicvae)
                         layeramt = autoset_gpu_layers(args.contextsize,args.sdquant,args.batchsize,args.musiclowvram)
                         print(f"Auto Recommended GPU Layers: {layeramt}")
                         args.gpulayers = layeramt
@@ -14140,7 +14185,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
         with open(os.path.join(embddir, "kcpp_musicui.embd"), mode='rb') as f:
             embedded_musicui = f.read()
             embedded_musicui_gz = gzip.compress(embedded_musicui)
-            if args.musicllm or args.musicdiffusion or args.ttsmodel:
+            if args.musicllm or args.musicdiffusion or args.ttsmodel or args.whispermodel:
                 print("Embedded MusicUI loaded.")
     except Exception:
         print("Could not find Embedded MusicUI.")
@@ -14251,7 +14296,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
             print(f"Starting llama.cpp secondary WebUI at {endpoint_url}/lcpp/")
             if args.sdmodel:
                 print(f"StableUI is available at {endpoint_url}/sdui/")
-            if args.musicdiffusion or args.musicllm or args.ttsmodel:
+            if args.musicdiffusion or args.musicllm or args.ttsmodel or args.whispermodel:
                 print(f"MusicUI is available at {endpoint_url}/musicui/")
         elif global_memory:
             val = global_memory["tunnel_url"]
@@ -14263,7 +14308,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
                 print(f"Starting llama.cpp secondary WebUI at {endpoint_url}/lcpp/")
                 if args.sdmodel:
                     print(f"StableUI is available at {endpoint_url}/sdui/")
-                if args.musicdiffusion or args.musicllm or args.ttsmodel:
+                if args.musicdiffusion or args.musicllm or args.ttsmodel or args.whispermodel:
                     print(f"MusicUI is available at {endpoint_url}/musicui/")
             global_memory["load_complete"] = True
         if args.launch:
