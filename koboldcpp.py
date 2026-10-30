@@ -9568,7 +9568,7 @@ def show_gui():
 
     tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
     tabs.grid(row=0, stick="nsew")
-    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Agent","Admin","Extra"]
+    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Media","Agent","Admin","Extra"]
     navbuttons = {}
     navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
     navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
@@ -9783,6 +9783,17 @@ def show_gui():
 
         navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
         navbuttons[name].grid(row=idx)
+
+    # KCPP_MEDIA_GUI: shared web forms cover the complete media chain.
+    def open_media_workbench():
+        def run():
+            try:kcpp_media_launch()
+            except Exception as error:root.after(0,lambda message=str(error):show_gui_msgbox('KoboldCpp Media',message))
+        threading.Thread(target=run,daemon=True).start()
+    ctk.CTkLabel(tabcontent['Media'],text='Images · Music · Video',font=ctk.CTkFont(None,18,'bold')).grid(row=1,padx=12,pady=16,sticky='w')
+    ctk.CTkLabel(tabcontent['Media'],text='Automatic model switching\nFace restoration · ClearReality upscale\nPro VAE · RIFE FPS · YuE2 soundtrack\nOne Helper.kcpps',justify='left').grid(row=2,padx=12,pady=12,sticky='w')
+    ctk.CTkButton(tabcontent['Media'],text='Start / open media workbench',command=open_media_workbench).grid(row=3,padx=12,pady=12,sticky='w')
+    ctk.CTkLabel(tabcontent['Media'],text='The portable media kit supplies the runtime.\nMain model weights are downloaded separately.',justify='left').grid(row=4,padx=12,pady=12,sticky='w')
 
     tabbuttonaction(tabnames[0])
     # Quick Launch Tab
@@ -14484,8 +14495,40 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
         if not args.prompt or args.benchmark or args.cli:
             print("Server was not started, main function complete. Idling.", flush=True)
 
+
+# KCPP_MEDIA_GUI: optional portable media kit, no model loading on import.
+def kcpp_media_launch(open_browser=True):
+    import pathlib, threading, urllib.request, webbrowser
+    media_root=pathlib.Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else pathlib.Path(__file__).resolve().parent
+    helper=media_root/'Helper.kcpps'
+    python=media_root/'runtime/python/pythonw.exe'
+    launch=media_root/'tools/AutoStart.py'
+    if not helper.is_file() or not python.is_file() or not launch.is_file():
+        raise RuntimeError('Portable media kit is missing. Extract the media bundle beside KoboldCpp; models remain external.')
+    data=json.loads(helper.read_text(encoding='utf-8-sig'))
+    gd=data['gendefaults'];gd=json.loads(gd) if isinstance(gd,str) else gd
+    port=int(gd['kcpp_proxy']['port'])
+    url='http://127.0.0.1:'+str(port)
+    try:
+        with urllib.request.urlopen(url+'/v1/media/capabilities',timeout=2) as response:
+            if json.load(response).get('backend')!='KoboldCpp':raise RuntimeError('Media port belongs to another service')
+    except urllib.error.URLError:
+        subprocess.Popen([str(python),'-I','-B',str(launch)],cwd=media_root,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    deadline=time.monotonic()+180
+    while time.monotonic()<deadline:
+        try:
+            with urllib.request.urlopen(url+'/v1/media/capabilities',timeout=2) as response:
+                if json.load(response).get('backend')=='KoboldCpp':
+                    if open_browser:webbrowser.open(url+'/media')
+                    return 0
+        except OSError:pass
+        time.sleep(.5)
+    raise RuntimeError('Media startup timed out; inspect the portable logs directory')
+
 if __name__ == '__main__':
     multiprocessing.freeze_support()
+    if '--media' in sys.argv:
+        raise SystemExit(kcpp_media_launch(open_browser='--no-browser' not in sys.argv))
 
     def check_range(value_type, min_value, max_value):
         def range_checker(arg: str):

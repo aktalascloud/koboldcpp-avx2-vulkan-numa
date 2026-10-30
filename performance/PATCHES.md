@@ -67,3 +67,10 @@ The new upstream grammar cache already uses candidate indices; its implementatio
 The separate 64-tile convolution candidate was slower and removed. ROCm/Tensile patches and coopmat2-only RTX optimizations are not presented as RX580 Vulkan gains. Video pipeline measurements and codec quality limits belong to the [media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline/blob/main/benchmarks/video.json). The historical token table does not measure these ports.
 
 Additional numerical check: Native Super-Tiny and the pinned MIT PyTorch reference decoded the same generated latent. The last PNG of the17-frame run differed by at most1 RGB level (mean0.0000543);99% of values matched. This is an RGB8 comparison,not full floating-point tensor parity. The snapshot-enabled candidate also retained the prior AVI bytes for the same control. No new Vulkan-kernel speedup is claimed.
+
+##30October2026
+
+- Fresh official experimental `f7eb772d`: YuE2 estimates, portable BF16 audio casts, Qwen3-TTS/Breeze/Ming/NeuTTS integration and Anthropic tool_choice fix.
+- GCC13/MinGW LTO destructor port extended to new Qwen3TTSSession after an actual duplicate-thunk link failure. LTO remains enabled; no layout or speed claim.
+- Optional Media GUI launcher and `--media` entry open the portable workbench. Core stays directly runnable; model switching/postprocessing live in the separate media kit.
+- [PR/issue/fork decisions](daily-review.json):24 configured sources,21 selected forks, no audit errors. No scheduled inference/benchmarks.

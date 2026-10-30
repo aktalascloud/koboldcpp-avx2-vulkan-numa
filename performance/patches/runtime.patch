@@ -1102,7 +1102,7 @@ index 6a817c0..211456c 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 7b906c6..25c9b81 100644
+index 0e2f964..c254beb 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -1187,7 +1187,7 @@ index 7b906c6..25c9b81 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -2131,6 +2179,14 @@ def load_model(model_filename):
+@@ -2137,6 +2185,14 @@ def load_model(model_filename):
      inputs = load_model_inputs()
      inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
      inputs.moe_cache_mib = args.moe_cache_mib
@@ -1202,7 +1202,7 @@ index 7b906c6..25c9b81 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -8827,6 +8883,9 @@ Change Mode<br>
+@@ -8845,6 +8901,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -1212,7 +1212,7 @@ index 7b906c6..25c9b81 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9353,7 +9412,7 @@ def show_gui():
+@@ -9397,7 +9456,7 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -1221,7 +1221,34 @@ index 7b906c6..25c9b81 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -12887,7 +12946,7 @@ def main(launch_args, default_args):
+@@ -9509,7 +9568,7 @@ def show_gui():
+ 
+     tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
+     tabs.grid(row=0, stick="nsew")
+-    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Agent","Admin","Extra"]
++    tabnames= ["Quick Launch", "Hardware", "Context", "Loaded Files", "Network", "Horde Worker","Image Gen","Audio","Media","Agent","Admin","Extra"]
+     navbuttons = {}
+     navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
+     navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
+@@ -9725,6 +9784,17 @@ def show_gui():
+         navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
+         navbuttons[name].grid(row=idx)
+ 
++    # KCPP_MEDIA_GUI: shared web forms cover the complete media chain.
++    def open_media_workbench():
++        def run():
++            try:kcpp_media_launch()
++            except Exception as error:root.after(0,lambda message=str(error):show_gui_msgbox('KoboldCpp Media',message))
++        threading.Thread(target=run,daemon=True).start()
++    ctk.CTkLabel(tabcontent['Media'],text='Images · Music · Video',font=ctk.CTkFont(None,18,'bold')).grid(row=1,padx=12,pady=16,sticky='w')
++    ctk.CTkLabel(tabcontent['Media'],text='Automatic model switching\nFace restoration · ClearReality upscale\nPro VAE · RIFE FPS · YuE2 soundtrack\nOne Helper.kcpps',justify='left').grid(row=2,padx=12,pady=12,sticky='w')
++    ctk.CTkButton(tabcontent['Media'],text='Start / open media workbench',command=open_media_workbench).grid(row=3,padx=12,pady=12,sticky='w')
++    ctk.CTkLabel(tabcontent['Media'],text='The portable media kit supplies the runtime.\nMain model weights are downloaded separately.',justify='left').grid(row=4,padx=12,pady=12,sticky='w')
++
+     tabbuttonaction(tabnames[0])
+     # Quick Launch Tab
+     quick_tab = tabcontent["Quick Launch"]
+@@ -12932,7 +13002,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -1230,7 +1257,48 @@ index 7b906c6..25c9b81 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14425,6 +14484,7 @@ if __name__ == '__main__':
+@@ -14425,8 +14495,40 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+         if not args.prompt or args.benchmark or args.cli:
+             print("Server was not started, main function complete. Idling.", flush=True)
+ 
++
++# KCPP_MEDIA_GUI: optional portable media kit, no model loading on import.
++def kcpp_media_launch(open_browser=True):
++    import pathlib, threading, urllib.request, webbrowser
++    media_root=pathlib.Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else pathlib.Path(__file__).resolve().parent
++    helper=media_root/'Helper.kcpps'
++    python=media_root/'runtime/python/pythonw.exe'
++    launch=media_root/'tools/AutoStart.py'
++    if not helper.is_file() or not python.is_file() or not launch.is_file():
++        raise RuntimeError('Portable media kit is missing. Extract the media bundle beside KoboldCpp; models remain external.')
++    data=json.loads(helper.read_text(encoding='utf-8-sig'))
++    gd=data['gendefaults'];gd=json.loads(gd) if isinstance(gd,str) else gd
++    port=int(gd['kcpp_proxy']['port'])
++    url='http://127.0.0.1:'+str(port)
++    try:
++        with urllib.request.urlopen(url+'/v1/media/capabilities',timeout=2) as response:
++            if json.load(response).get('backend')!='KoboldCpp':raise RuntimeError('Media port belongs to another service')
++    except urllib.error.URLError:
++        subprocess.Popen([str(python),'-I','-B',str(launch)],cwd=media_root,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
++    deadline=time.monotonic()+180
++    while time.monotonic()<deadline:
++        try:
++            with urllib.request.urlopen(url+'/v1/media/capabilities',timeout=2) as response:
++                if json.load(response).get('backend')=='KoboldCpp':
++                    if open_browser:webbrowser.open(url+'/media')
++                    return 0
++        except OSError:pass
++        time.sleep(.5)
++    raise RuntimeError('Media startup timed out; inspect the portable logs directory')
++
+ if __name__ == '__main__':
+     multiprocessing.freeze_support()
++    if '--media' in sys.argv:
++        raise SystemExit(kcpp_media_launch(open_browser='--no-browser' not in sys.argv))
+ 
+     def check_range(value_type, min_value, max_value):
+         def range_checker(arg: str):
+@@ -14470,6 +14572,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -1238,7 +1306,7 @@ index 7b906c6..25c9b81 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14459,6 +14519,9 @@ if __name__ == '__main__':
+@@ -14504,6 +14607,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -1259,6 +1327,19 @@ index 3b12bf8..464b8d6 100644
 +    ~OmniVoiceSession() override;
 +
      OmniVoiceSession(
+         runtime::TaskSpec task,
+         runtime::SessionOptions options,
+diff --git a/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h b/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h
+index f1afbd1..109276a 100644
+--- a/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h
++++ b/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h
+@@ -25,6 +25,8 @@ class Qwen3TTSSession final
+     , public runtime::IOfflineVoiceTaskSession
+     , public runtime::StreamingTtsSessionBase {
+ public:
++    ~Qwen3TTSSession() override;
++
+     Qwen3TTSSession(
          runtime::TaskSpec task,
          runtime::SessionOptions options,
 diff --git a/otherarch/audiocpp/upstream/include/engine/models/vibevoice/session.h b/otherarch/audiocpp/upstream/include/engine/models/vibevoice/session.h
@@ -1288,6 +1369,20 @@ index 6434e72..349c61b 100644
  namespace {
  
  constexpr size_t kDefaultAudioTokenizerGraphArenaBytes = 128ull * 1024ull * 1024ull;
+diff --git a/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp b/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp
+index dc916fa..bc8c377 100644
+--- a/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp
++++ b/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp
+@@ -16,6 +16,9 @@
+ #include <utility>
+ 
+ namespace engine::models::qwen3_tts {
++
++// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
++Qwen3TTSSession::~Qwen3TTSSession() = default;
+ namespace {
+ 
+ using Clock = std::chrono::steady_clock;
 diff --git a/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp b/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp
 index 9c218ca..96f0eb4 100644
 --- a/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp

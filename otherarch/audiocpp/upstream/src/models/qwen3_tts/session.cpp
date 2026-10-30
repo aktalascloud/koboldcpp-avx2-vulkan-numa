@@ -16,6 +16,9 @@
 #include <utility>
 
 namespace engine::models::qwen3_tts {
+
+// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
+Qwen3TTSSession::~Qwen3TTSSession() = default;
 namespace {
 
 using Clock = std::chrono::steady_clock;

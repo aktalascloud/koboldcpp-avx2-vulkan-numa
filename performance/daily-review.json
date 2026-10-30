@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-30",
+  "official_commit": "f7eb772d08ea7a592f7693d2cc065ce3bfb97860",
+  "sources": 24,
+  "selected_forks": 21,
+  "audit_errors": [],
+  "scope": "Paginated/incremental PR+issue inventory of24 configured repositories plus bounded review of21 selected active forks; relevant cards/comments/file diffs and changed-source comparisons. Not every file/PR/fork semantically audited.",
+  "reviewed": [
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/commit/f7eb772d08ea7a592f7693d2cc065ce3bfb97860",
+      "decision": "Included official YuE2 progress/estimate improvement; existing media parameters preserved."
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/commit/f0d781bf11c93c3cb2be42f1330fcd7d6748705d",
+      "decision": "Included F16-to-F32-to-BF16 compatibility lowering in Audio.cpp Vulkan paths, not a new BF16 hardware capability."
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2571",
+      "decision": "Included official Anthropic tool_choice auto/any behavior and upstream regression test source; daily inference not run."
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2574",
+      "decision": "Read GCN async-readback corruption report and targeted opt-out; R9 390/Gemma4 evidence is not RX580/Qwen evidence. Do not force global async-off or legacy noAVX2 flags."
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2562",
+      "decision": "Reviewed fresh comments and relevant diff: MOSS position/modulation/layout reuse and Wan grouped decode are promising; large pending SD API refactor not copied wholesale. Preserve working Pro latent-only ABI/legacy photo cache behavior."
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2796",
+      "decision": "IQK activation quantization uses iqk_quantize_any and fused up-gate implementation absent in current KCPP backend; no blind port of 1% claim."
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2789",
+      "decision": "Pool1d row parallelism candidate confirmed; KCPP has a different general padded-kernel implementation, not the upstream specialized sk-p0 kernel. Deferred separate geometry/correctness port, not imported by textual replacement."
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2716",
+      "decision": "Async MoE cache uses CUDA provider/MMVQ interfaces; not a drop-in Vulkan cache. Preserve existing opt-in HybridMoE."
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2794",
+      "decision": "FMA introduces GGML operation plus backend/graph integration; no enum/ABI transplant from monolithic IQK tree."
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2800",
+      "decision": "Random media marker fix belongs to ik server/Jinja/mtmd context absent in KCPP server; no unrelated marker port."
+    },
+    {
+      "url": "https://github.com/AvilaCarlosDev/polaris-local-ai/pull/8",
+      "decision": "Documentation/model recommendations update only."
+    },
+    {
+      "url": "https://github.com/dhaern/VelociQ8/commit/dc6d2c7cdd2ec65b09129f1ce4dda80d27c01840",
+      "decision": "Changed files are documentation; no new Haswell/Polaris kernel."
+    },
+    {
+      "url": "https://github.com/HarshaVardhan3002/ROCmFPX/commit/642acd3951bf30d604a24fa73fb6405cf2bb34b0",
+      "decision": "Reviewed scale-count loader and LFM/Clover graph changes; Strix/FPX model-specific support does not fix Windows Polaris HIP. Not ported into unrelated loaders."
+    },
+    {
+      "url": "https://github.com/pauldmartinphd/llm-performance-engineering-notebook/commit/1a982f117f95ae55f9ad934abd997026d706ee3c",
+      "decision": "Notebook/bench experiments for Maya and high-end CUDA machines; no transferable measured Haswell/RX580 patch."
+    }
+  ],
+  "new_local_compute_ports": [],
+  "speed": "No scheduled benchmarks or inference. Speed effect of new upstream changes unmeasured.",
+  "release_summary": "Official update: [YuE2 progress estimates](https://github.com/LostRuins/koboldcpp/commit/f7eb772d08ea7a592f7693d2cc065ce3bfb97860), [Vulkan-safe BF16 audio casts](https://github.com/LostRuins/koboldcpp/commit/f0d781bf11c93c3cb2be42f1330fcd7d6748705d), Qwen3-TTS/Breeze/Ming/NeuTTS integration and [Anthropic tool_choice fix](https://github.com/LostRuins/koboldcpp/pull/2571). Existing Ray/YuE2/Pro media recipes are preserved. No new speed claim. Local build fix: emit the new Qwen3TTSSession destructor out of line to resolve GCC13/MinGW LTO duplicate thunks; LTO stays enabled.",
+  "local_fix": "Extended existing GCC13/MinGW out-of-line virtual-destructor port to new upstream Qwen3TTSSession after actual LTO COMDAT/thunk duplicate definitions. Keeps mandatory LTO and implicit destructor ABI; no new speed claim.",
+  "local_media_gui": "Optional Media launcher tab and --media/--no-browser; standalone core requires separately installed portable media runtime."
+}

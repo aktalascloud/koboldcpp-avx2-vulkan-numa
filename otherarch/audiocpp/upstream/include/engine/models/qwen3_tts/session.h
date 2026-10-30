@@ -25,6 +25,8 @@ class Qwen3TTSSession final
     , public runtime::IOfflineVoiceTaskSession
     , public runtime::StreamingTtsSessionBase {
 public:
+    ~Qwen3TTSSession() override;
+
     Qwen3TTSSession(
         runtime::TaskSpec task,
         runtime::SessionOptions options,
