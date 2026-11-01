@@ -7,6 +7,8 @@ Use the full tagged source on a Haswell-compatible AVX2/FMA/F16C CPU. Install:
 
 Run: python performance/build.py --jobs 4.
 
+For upstream1.124.1 the builder explicitly uses its supported `KCPP_COMMONIZE=0` monolithic layout. This keeps full backend LTO and the explicit MinGW C ABI export recipe. The new split-common layout needs a different export/packaging recipe; do not mix its backend targets with this monolithic `.def` file. Numerical model code is unchanged by this link-layout selection.
+
 The policy in cpu-policy.json selects O3/Haswell/AVX2 + LTO, without PGO. CPU tiled flags and Vulkan host flags are separate. Shaders compile separately with at most four workers; backend LTO links run sequentially. Objects rebuild so no instrumented/stale flags leak into the link.
 
 Preserve explicit C ABI exports, static runtimes, -mstackrealign, no-AVX expose.o, always-inline AVX exp/silu and shader dependency invalidation. No blanket fast-math, reduced precision, AVX512/VNNI assumptions or driver/BIOS/clock changes.

@@ -56,7 +56,7 @@ def main():
     environment=os.environ.copy()
     environment['PATH']=str(compiler)+os.pathsep+str(make.parent)+os.pathsep+environment['PATH']
     common=[str(make),'-f','Makefile','CC='+str(compiler/'gcc.exe').replace('\\','/'),
-            'CXX='+str(compiler/'g++.exe').replace('\\','/'),'LLAMA_VULKAN=1']
+            'CXX='+str(compiler/'g++.exe').replace('\\','/'),'LLAMA_VULKAN=1','KCPP_COMMONIZE=0']
     # Force shader regeneration separately. The generator is capped to4 workers.
     run([*common,'-B','-j1','ggml/src/ggml-vulkan-shaders.cpp'],environment,'shaders.log')
     shader_object=SRC/'ggml-vulkan-shaders.o'
