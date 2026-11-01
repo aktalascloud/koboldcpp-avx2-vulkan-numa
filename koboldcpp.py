@@ -91,7 +91,7 @@ dry_seq_break_max = 128
 extra_images_max = 4 # for kontext/qwen img
 
 # global vars
-KcppVersion = "1.124"
+KcppVersion = "1.124.1"
 # KCPP_BUILD_DATE_PORT: package.py embeds the build day; launch time is not used.
 def _kcpp_packaged_build_day():
     try:
@@ -111,6 +111,8 @@ using_gui_launcher = False
 cli_arg_overrides = set()
 
 handle = None
+common_backend_handle = None
+dll_directory_handles = []
 friendlymodelname = "inactive"
 friendlysdmodelname = "inactive"
 friendlyembeddingsmodelname = "inactive"
@@ -188,8 +190,6 @@ multiplayer_dataformat = "" # used to tell what is the data payload in saved sto
 multiplayer_lastactive = {} # timestamp of last activity for each unique player
 websearch_lastquery = ""
 websearch_lastresponse = []
-websearch_cache_until = 0.0
-websearch_cache_lock = threading.Lock()
 preloaded_story = None
 chatcompl_adapter = None
 chatcompl_adapter_list = None #if using autoguess, will populate this will potential adapters
@@ -979,6 +979,7 @@ lib_cublas = pick_existant_file("koboldcpp_cublas.dll","koboldcpp_cublas.so")
 lib_hipblas = pick_existant_file("koboldcpp_hipblas.dll","koboldcpp_hipblas.so")
 lib_vulkan = pick_existant_file("koboldcpp_vulkan.dll","koboldcpp_vulkan.so")
 lib_vulkan_noavx2 = pick_existant_file("koboldcpp_vulkan_noavx2.dll","koboldcpp_vulkan_noavx2.so")
+lib_common = pick_existant_file("koboldcpp_common.dll","koboldcpp_common.so")
 libname = ""
 lib_option_pairs = [
     (lib_default, "Use CPU"),
@@ -1007,7 +1008,7 @@ def _kcpp_set_native_environment(name, value):
             raise RuntimeError('Native CRT environment verification failed: '+name)
 
 def init_library():
-    global handle, args, libname
+    global handle, args, libname, common_backend_handle, dll_directory_handles
     global lib_default,lib_failsafe,lib_noavx2,lib_vulkan_failsafe,lib_cublas,lib_hipblas,lib_vulkan,lib_vulkan_noavx2
 
     # KCPP_WINDOWS_NUMA_POLICY: configured before native library initialization.
@@ -1056,19 +1057,49 @@ def init_library():
 
     #add all potential paths
     if os.name=='nt':
-        os.add_dll_directory(dir_path)
-        os.add_dll_directory(abs_path)
-        os.add_dll_directory(os.getcwd())
+        dll_directory_handles.append(os.add_dll_directory(dir_path))
+        dll_directory_handles.append(os.add_dll_directory(abs_path))
+        dll_directory_handles.append(os.add_dll_directory(os.getcwd()))
         if libname == lib_cublas and "CUDA_PATH" in os.environ:
             newpath = os.path.join(os.environ["CUDA_PATH"], "bin")
             if os.path.exists(newpath):
-                os.add_dll_directory(newpath)
+                dll_directory_handles.append(os.add_dll_directory(newpath))
         if libname == lib_hipblas and "HIP_PATH" in os.environ:
             newpath = os.path.join(os.environ["HIP_PATH"], "bin")
             if os.path.exists(newpath):
-                os.add_dll_directory(newpath)
+                dll_directory_handles.append(os.add_dll_directory(newpath))
 
-    handle = ctypes.CDLL(os.path.join(dir_path, libname))
+    # GNU/MinGW variants contain only the ISA/backend-specific runtime.  The
+    # public API and all portable model code live in koboldcpp_common.  CUDA and
+    # HIP remain monolithic for now, as do older/pre-commonized distributions.
+    use_common_library = (
+        file_exists(lib_common)
+        and libname not in (lib_cublas, lib_hipblas)
+    )
+
+    if use_common_library:
+        backend_path = os.path.join(dir_path, libname)
+        common_path = os.path.join(dir_path, lib_common)
+        if os.name == 'nt':
+            # Each backend directory contains a tiny, fixed-name PE forwarder.
+            # It routes common's imports to the selected, descriptively named
+            # backend DLL without creating or renaming anything at runtime.
+            backend_stem = os.path.splitext(os.path.basename(libname))[0]
+            route_dir = os.path.join(dir_path, "backend_routes", backend_stem)
+            route_path = os.path.join(route_dir, "koboldcpp_backend.dll")
+            if not os.path.isfile(route_path):
+                raise FileNotFoundError("Missing backend route DLL: " + route_path)
+            dll_directory_handles.append(os.add_dll_directory(route_dir))
+            common_backend_handle = ctypes.CDLL(route_path)
+            handle = ctypes.CDLL(common_path)
+        else:
+            # Every variant has the common koboldcpp_backend.so SONAME. Loading
+            # the selected file globally satisfies koboldcpp_common's dependency.
+            common_backend_handle = ctypes.CDLL(backend_path, mode=ctypes.RTLD_GLOBAL)
+            handle = ctypes.CDLL(common_path)
+        print("Loaded shared common library: " + lib_common)
+    else:
+        handle = ctypes.CDLL(os.path.join(dir_path, libname))
 
     handle.load_model.argtypes = [load_model_inputs]
     handle.load_model.restype = ctypes.c_bool
@@ -1162,10 +1193,23 @@ def init_library():
     handle.last_logprobs.restype = last_logprobs_outputs
     handle.detokenize.argtypes = [detokenize_inputs]
     handle.detokenize.restype = ctypes.c_char_p
-    handle.launch_rpc_server.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+    handle.launch_rpc_server.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p]
     handle.launch_rpc_server.restype = ctypes.c_bool
     handle.set_environment_variable.restype = ctypes.c_int
     handle.set_environment_variable.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+
+def prepare_rpc_cache_dir(cache_dir):
+    if not cache_dir:
+        return ""
+    cache_dir = os.path.abspath(cache_dir)
+    try:
+        os.makedirs(cache_dir, exist_ok=True)
+    except OSError as e:
+        print(f"Could not create RPC cache directory {cache_dir}: {e}. RPC cache disabled.")
+        return ""
+    print(f"RPC tensor cache directory: {cache_dir}")
+    print("Warning: RPC tensor cache is enabled. Cached tensors are never deleted, so this\ndirectory grows by roughly the offloaded size of each new model clients load.\nAny client that connects can write to the cache and could poison it for other\nclients, so only enable it if you trust every client that can reach this server.")
+    return cache_dir
 
 def set_backend_props(inputs):
     # we must force an explicit tensor split
@@ -1957,11 +2001,11 @@ def autoset_gpu_layers(ctxsize, sdquanted, bbs, musiclowvram): #shitty algo to d
             if modelfile_extracted_meta[8] > 1024*1024*10: #embeddings model tax
                 calulated_gpu_overhead += max(350*1024*1024, modelfile_extracted_meta[8] * 1.5)
             if modelfile_extracted_meta[9] > 1024*1024*10: #music llm tax
-                musicoh1 = modelfile_extracted_meta[9] * 1.05 + (300*1024*1024)
+                musicoh1 = modelfile_extracted_meta[9] * 1.1 + (400*1024*1024)
             if modelfile_extracted_meta[10] > 1024*1024*10: #music dit tax
-                musicoh2 = modelfile_extracted_meta[10] * 1.05 + (300*1024*1024)
+                musicoh2 = modelfile_extracted_meta[10] * 1.1 + (400*1024*1024)
             if modelfile_extracted_meta[11] > 1024*1024*10: #music vae tax
-                musicoh3 = modelfile_extracted_meta[11] * 1.05
+                musicoh3 = modelfile_extracted_meta[11] * 1.1
             if musiclowvram:
                 calulated_gpu_overhead += max(musicoh1,musicoh2,musicoh3)
             else:
@@ -3718,7 +3762,7 @@ def _websearch_url(url):
         urllib.parse.quote(parts.query, safe="%/:?@!$&'()*+,;=-._~"), ""))
 
 
-def _websearch_fetch(url):
+def _websearch_fetch(url, random_agent=False):
     """Fetch bounded HTML/plain text, honoring the server's encoding."""
     class PublicRedirectHandler(urllib.request.HTTPRedirectHandler):
         max_redirections = 5
@@ -3730,30 +3774,44 @@ def _websearch_fetch(url):
         url = _websearch_url(url)
         if not os.environ.get('SSL_CERT_DIR') and not nocertify and os.name != 'nt':
             os.environ['SSL_CERT_DIR'] = '/etc/ssl/certs'
-        request = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
-            "Accept": "text/html, application/xhtml+xml, text/plain;q=0.9",
-            "Accept-Encoding": "identity",
-        })
+        user_agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+        if random_agent:
+            user_agent = random.choice([
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_2) Gecko/20100101 Firefox/114.0",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.1823.79 Safari/537.36 Edg/114.0.1823.79",
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.132 Safari/537.36",
+            ])
+        user_agents = [user_agent,
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"]
         opener = urllib.request.build_opener(PublicRedirectHandler())
-        with opener.open(request, timeout=20) as response:
-            content_type = response.headers.get_content_type().lower()
-            if content_type not in {"text/html", "application/xhtml+xml", "text/plain"}:
-                raise ValueError(f"unsupported content type: {content_type}")
-            limit = 4 * 1024 * 1024
-            body = response.read(limit + 1)
-            if len(body) > limit:
-                raise ValueError(f"page exceeds {limit} bytes")
-            charset = response.headers.get_content_charset()
-            if not charset and content_type != "text/plain":
-                # Older pages sometimes declare the encoding only in a meta tag.
-                match = re.search(br'<meta\b[^>]*\bcharset\s*=\s*[\x22\x27\s]*([\w-]+)', body[:4096], re.I)
-                charset = match.group(1).decode('ascii') if match else None
+        for attempt, current_agent in enumerate(user_agents):
+            request = urllib.request.Request(url, headers={
+                "User-Agent": current_agent,
+            })
             try:
-                text = body.decode(charset or 'utf-8-sig', errors='replace')
-            except LookupError:
-                text = body.decode('utf-8-sig', errors='replace')
-            return text, content_type
+                with opener.open(request, timeout=20) as response:
+                    content_type = response.headers.get_content_type().lower()
+                    if content_type not in {"text/html", "application/xhtml+xml", "text/plain"}:
+                        raise ValueError(f"unsupported content type: {content_type}")
+                    limit = 4 * 1024 * 1024
+                    body = response.read(limit + 1)
+                    if len(body) > limit:
+                        raise ValueError(f"page exceeds {limit} bytes")
+                    charset = response.headers.get_content_charset()
+                    if not charset and content_type != "text/plain":
+                        # Older pages sometimes declare the encoding only in a meta tag.
+                        match = re.search(br'<meta\b[^>]*\bcharset\s*=\s*[\x22\x27\s]*([\w-]+)', body[:4096], re.I)
+                        charset = match.group(1).decode('ascii') if match else None
+                    try:
+                        text = body.decode(charset or 'utf-8-sig', errors='replace')
+                    except LookupError:
+                        text = body.decode('utf-8-sig', errors='replace')
+                    return text, content_type
+            except urllib.error.HTTPError:
+                if attempt + 1 == len(user_agents):
+                    raise
     except Exception as e:
         utfprint(f"WebSearch fetch failed for {url}: {e}", 1)
         return "", ""
@@ -3955,19 +4013,18 @@ def _websearch_excerpt(text, query, title, desc, max_chars=2800):
 
 # Performs a web search using DuckDuckGo and extracts relevant passages from the top results.
 def websearch(query):
-    global websearch_lastquery, websearch_lastresponse, websearch_cache_until
+    global websearch_lastquery, websearch_lastresponse
     query = ' '.join(query.split())
     query = query.encode('utf-8', errors='ignore')[:500].decode('utf-8', errors='ignore').strip()
     if not query:
         return []
-    with websearch_cache_lock:
-        if query == websearch_lastquery and time.monotonic() < websearch_cache_until:
-            print("\nReturning cached websearch...")
-            return websearch_lastresponse
+    if query == websearch_lastquery:
+        print("\nReturning cached websearch...")
+        return websearch_lastresponse
     utfprint("\nPerforming new websearch...", 1)
     search_url = 'https://html.duckduckgo.com/html/?q=' + urllib.parse.quote_plus(query)
     try:
-        search_html, _ = _websearch_fetch(search_url)
+        search_html, _ = _websearch_fetch(search_url, random_agent=True)
         results = _websearch_parse_results(search_html, search_url)[:6]
         if not results:
             utfprint("WebSearch returned no results (the search engine may be unavailable or blocking requests).", 1)
@@ -3996,11 +4053,8 @@ def websearch(query):
     except Exception as e:
         utfprint(f"WebSearch failed: {e}", 1)
         return []
-    with websearch_cache_lock:
-        websearch_lastquery = query
-        websearch_lastresponse = results
-        # Retry partial results soon; even complete searches should not stay stale forever.
-        websearch_cache_until = time.monotonic() + (300 if all(r['content'] for r in results) else 30)
+    websearch_lastquery = query
+    websearch_lastresponse = results
     return results
 
 def is_port_in_use(portNum):
@@ -6832,7 +6886,7 @@ class KcppServerRequestHandler(http.server.SimpleHTTPRequestHandler):
                                         await self.send_ollama_stream_event(event_str)
                                 elif api_format == 9:
                                     if anthropic_first_loop:
-                                        await self.send_anthropic_sse_event("message_start", json.dumps({"type":"message_start","message":{"type":"message","id":f"msg_A{req_id_suffix}","role":"assistant","model":modelNameToReturn,"usage":{"input_tokens":prompttokens,"output_tokens":0}}}))
+                                        await self.send_anthropic_sse_event("message_start", json.dumps({"type":"message_start","message":{"type":"message","id":f"msg_A{req_id_suffix}","role":"assistant","model":modelNameToReturn,"content":[],"stop_reason":None,"stop_sequence":None,"usage":{"input_tokens":prompttokens,"output_tokens":0}}}))
                                         anthropic_first_loop = False
                                     reasoning = delta.get("reasoning_content", "")
                                     content = delta.get("content", "")
@@ -6946,7 +7000,7 @@ class KcppServerRequestHandler(http.server.SimpleHTTPRequestHandler):
                                         await self.send_oai_responses_sse_event("response.completed",completed_event)
                             elif api_format == 9: # Anthropic Streaming Format
                                 if anthropic_first_loop:
-                                    await self.send_anthropic_sse_event("message_start", json.dumps({"type":"message_start","message":{"type":"message","id":f"msg_A{req_id_suffix}","role":"assistant","model":modelNameToReturn,"usage":{"input_tokens":prompttokens,"output_tokens":0}}}))
+                                    await self.send_anthropic_sse_event("message_start", json.dumps({"type":"message_start","message":{"type":"message","id":f"msg_A{req_id_suffix}","role":"assistant","model":modelNameToReturn,"content":[],"stop_reason":None,"stop_sequence":None,"usage":{"input_tokens":prompttokens,"output_tokens":0}}}))
                                     anthropic_first_loop = False
                                 if not genparams.get("sync_toolcall_potential_triggered", False) or sync_potential_toolcall_splitmatch:
                                     reasoning = delta.get("reasoning_content", "")
@@ -8475,6 +8529,10 @@ Change Mode<br>
                         }}).encode())
                         return
 
+                # Embedded Horde chat jobs mandate jinja
+                if genparams.get("is_chat_job") is True:
+                    use_jinja = True
+
                 gendefaults = gendefaults_parse_meta_field(args.gendefaults or '')
                 gen_new_keys = {k: v for k, v in gendefaults.items() if k not in genparams}
                 #special handling for some params that should be overwritten if equal to literal string default
@@ -9718,6 +9776,7 @@ def show_gui():
     rpc_host_var = ctk.StringVar(value="0.0.0.0")
     rpc_port_var = ctk.StringVar(value=str(default_rpc_port))
     rpc_device_var = ctk.StringVar()
+    rpc_cache_dir_var = ctk.StringVar()
 
     sd_model_var = ctk.StringVar()
     sd_lora_var = ctk.StringVar()
@@ -10665,37 +10724,21 @@ def show_gui():
     toggle_parallel_total_context()
 
 
+    def set_rpc_widgets_visible(widgets, visible):
+        for widget in widgets:
+            widget.grid() if visible else widget.grid_remove()
+
     def togglerpcmode(a,b,c):
-        if rpcmode_var.get()=="connect":
-            rpcepbox.grid()
-            rpceplbl.grid()
-            rpchostbox.grid_remove()
-            rpchostlbl.grid_remove()
-            rpcportbox.grid_remove()
-            rpcportlbl.grid_remove()
-            rpcdevicebox.grid_remove()
-            rpcdevicelbl.grid_remove()
-            rpcdesc.configure(text="Connect to one or more remote RPC endpoints (ip:port), comma seperated")
-        elif rpcmode_var.get()=="host":
-            rpcepbox.grid_remove()
-            rpceplbl.grid_remove()
-            rpchostbox.grid()
-            rpchostlbl.grid()
-            rpcportbox.grid()
-            rpcportlbl.grid()
-            rpcdevicebox.grid()
-            rpcdevicelbl.grid()
-            rpcdesc.configure(text="Run a RPC server that others can connect to. Disables local models and API.")
-        else:
-            rpcepbox.grid_remove()
-            rpceplbl.grid_remove()
-            rpchostbox.grid_remove()
-            rpchostlbl.grid_remove()
-            rpcportbox.grid_remove()
-            rpcportlbl.grid_remove()
-            rpcdevicebox.grid_remove()
-            rpcdevicelbl.grid_remove()
-            rpcdesc.configure(text="RPC is disabled and will not be used")
+        mode = rpcmode_var.get()
+        set_rpc_widgets_visible((rpcepbox, rpceplbl), mode=="connect")
+        set_rpc_widgets_visible((rpchostbox, rpchostlbl, rpcportbox, rpcportlbl,
+                                 rpcdevicebox, rpcdevicelbl, rpccachelabel,
+                                 rpccachebox, rpccachebutton), mode=="host")
+        descriptions = {
+            "connect": "Connect to one or more remote RPC endpoints (ip:port), comma separated",
+            "host": "Run an RPC server that others can connect to. Disables local models and API.",
+        }
+        rpcdesc.configure(text=descriptions.get(mode, "RPC is disabled and will not be used"))
         update_runmode_gui()
     makelabelcombobox(network_tab, "RPC Mode:", rpcmode_var, row=40, padx=(100), width=90, command=togglerpcmode, tooltiptxt="RPC functionality to connect to remote RPC instances or host one, allowing GPUs to be shared over a network.", values=["disabled","connect","host"])
     rpcdesc = makelabel(network_tab, "RPC is disabled and will not be used", row=42)
@@ -10703,6 +10746,7 @@ def show_gui():
     rpchostbox, rpchostlbl = makelabelentry(network_tab, "RPC Host IP: ", rpc_host_var, row=46, width=150, padx=(100), singleline=True,tooltip="IP address for RPC server to listen on. Use 0.0.0.0 for all interfaces, 127.0.0.1 for localhost only.")
     rpcportbox, rpcportlbl = makelabelentry(network_tab, "RPC Host Port: ", rpc_port_var, row=46, width=100, padx=(360), singleline=True,tooltip=f"Port for RPC server to listen on. (default:{default_rpc_port})",labelpadx=260)
     rpcdevicebox, rpcdevicelbl = makelabelentry(network_tab, "RPC Devices: ", rpc_device_var, row=48, padx=(100), width=200, singleline=True,tooltip="Set specific devices to use for RPC server. Comma separated. Overrides normal RPC device choices.")
+    rpccachelabel, rpccachebox, rpccachebutton = makefileentry(network_tab, "RPC Cache:", "Select RPC tensor cache directory", rpc_cache_dir_var, row=50, width=240, singlerow=True, dialog_type=2, tooltiptxt="Optional directory for caching large weight tensors received from RPC clients. Leave blank to disable caching. Cache files are never deleted; only use this with trusted clients.")
 
 
     # Horde Tab
@@ -10988,7 +11032,7 @@ def show_gui():
         args.nofastforward = fastforward_var.get()==0
         args.noswa = swa_var.get()==0
         args.swapadding = int(swa_padding_var.get()) if swa_padding_var.get()!="" else swa_padding_default
-        args.smartcache = (0 if smartcache_var.get()!=1 else int(smartcacheslots_var.get()))
+        args.smartcache = (0 if smartcache_var.get()!=1 else tryparseint(smartcacheslots_var.get(), savestate_limit_default))
         args.remotetunnel = remotetunnel_var.get()==1
         args.foreground = keepforeground.get()==1
         args.cli = terminalonly.get()==1
@@ -11062,11 +11106,11 @@ def show_gui():
         args.contextsize = int(contextsize_text[context_var.get()])
         if customrope_var.get()==1:
             if manualrope_var.get()==1:
-                args.ropeconfig = [float(customrope_scale.get()),float(customrope_base.get())]
+                args.ropeconfig = [tryparsefloat(customrope_scale.get(), 1.0), tryparsefloat(customrope_base.get(), 10000.0)]
                 args.overridenativecontext = 0
             else:
                 args.ropeconfig = [0.0, 10000.0]
-                args.overridenativecontext = int(customrope_nativectx.get())
+                args.overridenativecontext = tryparseint(customrope_nativectx.get(), default_native_ctx)
         else:
             args.ropeconfig = [0.0, 10000.0]
             args.overridenativecontext = 0
@@ -11148,11 +11192,12 @@ def show_gui():
         args.rpcport = int(rpc_port_var.get()) if (args.rpcmode=="host" and rpc_port_var.get()) else default_rpc_port
         args.rpctargets = rpcendpoints_var.get() if (args.rpcmode=="connect" and rpcendpoints_var.get()) else ""
         args.rpcdevice = rpc_device_var.get() if (args.rpcmode=="host" and rpc_device_var.get()) else ""
+        args.rpccache = rpc_cache_dir_var.get() if args.rpcmode=="host" else ""
 
         if usehorde_var.get() != 0:
             args.hordemodelname = horde_name_var.get()
-            args.hordegenlen = int(horde_gen_var.get())
-            args.hordemaxctx = int(horde_context_var.get())
+            args.hordegenlen = tryparseint(horde_gen_var.get(), maxhordelen)
+            args.hordemaxctx = tryparseint(horde_context_var.get(), maxhordectx)
             if horde_apikey_var.get()!="" and horde_workername_var.get()!="":
                 args.hordekey = horde_apikey_var.get()
                 args.hordeworkername = horde_workername_var.get()
@@ -11164,8 +11209,8 @@ def show_gui():
         args.sdclipdevice = sd_resolve_device(sd_clip_device_var.get())
         args.sdthreads = (0 if sd_threads_var.get()=="" else int(sd_threads_var.get()))
         args.sdvramlimit = (0 if sd_vram_limit_var.get()=="" else int(sd_vram_limit_var.get()))
-        args.sdclamped = (0 if int(sd_clamped_var.get())<=0 else int(sd_clamped_var.get()))
-        args.sdclampedsoft = (0 if int(sd_clamped_soft_var.get())<=0 else int(sd_clamped_soft_var.get()))
+        args.sdclamped = max(0, tryparseint(sd_clamped_var.get(), 0))
+        args.sdclampedsoft = max(0, tryparseint(sd_clamped_soft_var.get(), 0))
         args.sdtiledvae = (default_vae_tile_threshold if sd_tiled_vae_var.get()=="" else int(sd_tiled_vae_var.get()))
         if sd_vaeauto_var.get()==1:
             args.sdvaeauto = True
@@ -11477,6 +11522,7 @@ def show_gui():
         rpc_port_var.set(mydict["rpcport"] if ("rpcport" in mydict and mydict["rpcport"]) else str(default_rpc_port))
         rpcendpoints_var.set(mydict["rpctargets"] if ("rpctargets" in mydict and mydict["rpctargets"]) else "")
         rpc_device_var.set(mydict["rpcdevice"] if ("rpcdevice" in mydict and mydict["rpcdevice"]) else "")
+        rpc_cache_dir_var.set(mydict["rpccache"] if ("rpccache" in mydict and mydict["rpccache"]) else "")
 
         sd_model_var.set(mydict["sdmodel"] if ("sdmodel" in mydict and mydict["sdmodel"]) else "")
         sd_clamped_var.set(int(mydict["sdclamped"]) if ("sdclamped" in mydict and mydict["sdclamped"]) else 0)
@@ -11865,9 +11911,9 @@ def run_horde_worker(args, api_key, worker_name, worker_id, parallel_batching_th
             if messages_url:
                 with urllib.request.urlopen(messages_url, timeout=10) as response:
                     source = gzip.GzipFile(fileobj=response) if response.headers.get('Content-Encoding', '').lower() == 'gzip' else response
-                    body = source.read(32 * 1024 * 1024 + 1)
-                if len(body) > 32 * 1024 * 1024:
-                    raise ValueError("messages exceed the 32 MiB limit")
+                    body = source.read(36 * 1024 * 1024 + 1)
+                if len(body) > 36 * 1024 * 1024:
+                    raise ValueError("messages exceed the 36 MiB limit")
                 payload["messages"] = json.loads(body)
                 if not isinstance(payload["messages"], list):
                     raise ValueError("messages_url did not contain a messages array")
@@ -12005,7 +12051,7 @@ def run_horde_worker(args, api_key, worker_name, worker_id, parallel_batching_th
     session_starttime = datetime.now()
     sleepy_counter = 0 #if this exceeds a value, worker becomes sleepy (slower)
     exitcounter = 0
-    print(f"===\nEmbedded Horde Worker '{worker_name}' Starting...\n(To use your own Horde Bridge/Scribe worker instead, don't set your API key)\n")
+    print(f"\n===\nEmbedded Horde Worker '{worker_name}' Starting...\n(To use your own Horde Bridge/Scribe worker instead, don't set your API key)\n")
     BRIDGE_AGENT = "KoboldCppEmbedWorker:2:https://github.com/LostRuins/koboldcpp"
     cluster = "https://aihorde.net"
     while exitcounter < 10:
@@ -12064,7 +12110,7 @@ def run_horde_worker(args, api_key, worker_name, worker_id, parallel_batching_th
             "tools_max_temperature": tools_max_temperature,
         }
         gen_dict["chat_jobs"] = True
-        gen_dict["chat_features"] = ["seed", "presence_penalty", "tools", "json_object", "json_schema"]
+        gen_dict["chat_features"] = ["seed", "presence_penalty", "tools", "json_object", "json_schema", "reasoning_effort"]
         gen_dict["image_transports"] = ["messages_url"]
         if has_vision_support:
             gen_dict["chat_features"].append("vision")
@@ -12102,6 +12148,7 @@ def run_horde_worker(args, api_key, worker_name, worker_id, parallel_batching_th
                 current_payload['genkey'] = f"HORDEREQ_{current_id}" if is_chat_job else f"HORDEREQ_{random.randint(100, 999)}"
                 genurl = f'{epurl}/v1/chat/completions' if is_chat_job else f'{epurl}/api/v1/generate'
                 if is_chat_job:
+                    current_payload['is_chat_job'] = True
                     submit_dict = horde_chat_job(genurl, current_payload, current_id)
                     break # A failed chat job is faulted, never regenerated after publishing partial text.
                 current_generation = make_url_request_horde(genurl, current_payload, method='POST',addmykey=True)
@@ -12342,7 +12389,7 @@ def reload_from_new_args(newargs):
     try:
         args.istemplate = False
         newargs = convert_invalid_args(newargs)
-        protected_args = ["remotetunnel","showgui","port","host","port_param","admin","adminpassword","password","adminunloadtimeout","routermode","admindir","ssl","nocertify","benchmark","prompt","config","baseconfig","downloaddir","rpcmode","rpchost","rpcport","rpcdevice","allow_config_onready"]
+        protected_args = ["remotetunnel","showgui","port","host","port_param","admin","adminpassword","password","adminunloadtimeout","routermode","admindir","ssl","nocertify","benchmark","prompt","config","baseconfig","downloaddir","rpcmode","rpchost","rpcport","rpcdevice","rpccache","allow_config_onready"]
         for key, value in newargs.items(): #do not overwrite certain values
             if key == "onready" and getattr(args, "allow_config_onready", False):
                 setattr(args, key, value)
@@ -13888,8 +13935,9 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
     if args.rpcmode=="host":
         rpc_endpt = f"{args.rpchost}:{args.rpcport}"
         rpc_devices = args.rpcdevice
+        rpc_cache_dir = prepare_rpc_cache_dir(args.rpccache)
         print(f"Initialize RPC server as host mode at {rpc_endpt}.")
-        handle.launch_rpc_server(rpc_endpt.encode("UTF-8"),rpc_devices.encode("UTF-8"))
+        handle.launch_rpc_server(rpc_endpt.encode("UTF-8"),rpc_devices.encode("UTF-8"),rpc_cache_dir.encode("UTF-8"))
         time.sleep(1)
         return
 
@@ -14765,6 +14813,7 @@ if __name__ == '__main__':
     rpcgroupA.add_argument("--rpcport", metavar=('[portnumber]'), help=f"RPC host mode only. Port for RPC server to listen on (default: {default_rpc_port}).", default=default_rpc_port, type=int)
     rpcgroup.add_argument("--rpchost", metavar=('[IP address]'), help="RPC host mode only. IP address for RPC server to listen on. Use 0.0.0.0 for all interfaces, 127.0.0.1 for localhost only.", default="0.0.0.0", type=str)
     rpcgroup.add_argument("--rpcdevice", metavar=('<dev1,dev2,..>'), help="RPC host mode only. Set specific devices to use for RPC server. Comma separated. Overrides normal RPC device choices.", default="")
+    rpcgroup.add_argument("--rpccache", metavar="<directory>", help="RPC host mode only. Cache large weight tensors received from clients in the explicitly provided directory, so reloading the same model skips sending them over the network. Cache files are never deleted, and any connected client can write to the cache, so only use with trusted clients.", default="")
     rpcgroupA.add_argument("--rpctargets", metavar=('[remotehost1:port1,remotehost2:port2]'), help="RPC connect mode only. Specify a comma separated list of remote RPC endpoints to connect to e.g. 127.0.0.1:5551,127.0.0.1:5552", default="", type=str)
 
     admingroup = parser.add_argument_group('Administration Commands')

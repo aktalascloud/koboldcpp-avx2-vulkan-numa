@@ -78,12 +78,12 @@ static int create_animated_webp_buf_from_sd_images(sd_image_t* images,
         return -1;
     }
 
-    // Favor compact output over encode speed. Mixed mode lets the animation
-    // encoder choose lossless coding for frames where it is actually smaller.
-    anim_options.minimize_size = 1;
+    // Avoid exhaustively encoding every compression/disposal candidate. Mixed
+    // mode still uses heuristics to choose lossless coding when appropriate.
+    anim_options.minimize_size = 0;
     anim_options.allow_mixed   = 1;
-    config.method              = 4;
-    config.thread_level        = 0;  // The vendored scalar build has no workers.
+    config.method              = 3;
+    config.thread_level        = 1;
     if (!WebPValidateConfig(&config)) {
         fprintf(stderr, "Invalid animated WebP encoder configuration.\n");
         return -1;
@@ -708,8 +708,9 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
     bool is_sefi = sd_version_is_sefi_image(tempver);
     bool is_mageflow = sd_version_is_mage_flow(tempver);
     bool is_minimaxh3 = sd_version_is_minimax_h3(tempver);
-    bool conditioner_is_llm = (is_qwenimg || is_zimg || is_flux2 || is_flux3 || is_mosi || is_ovis || is_anima || is_ernie || is_longcat || is_lens || is_llada || is_ltx || is_ideogram || is_boogu || is_krea2 || is_sefi || is_mageflow || is_minimaxh3 || is_pid || is_ming || is_zimg_l2p || is_iris);
-    bool has_llm_vision = (is_qwenimg || is_longcat || is_boogu);
+    bool is_fibo2 = (tempver == VERSION_FIBO2);
+    bool conditioner_is_llm = (is_qwenimg || is_zimg || is_flux2 || is_flux3 || is_mosi || is_ovis || is_anima || is_ernie || is_longcat || is_lens || is_llada || is_ltx || is_ideogram || is_boogu || is_krea2 || is_sefi || is_mageflow || is_minimaxh3 || is_pid || is_ming || is_zimg_l2p || is_iris || is_fibo2);
+    bool has_llm_vision = (is_qwenimg || is_longcat || is_boogu || is_fibo2);
     bool has_tokenizer = (is_lens || is_pid || is_ming || is_mosi || is_llada);
 
     //kcpp qol fallback: if a llm was loaded as t5 by mistake
