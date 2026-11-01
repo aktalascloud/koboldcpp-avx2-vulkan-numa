@@ -4,6 +4,8 @@ The checkout already contains these changes. Do not reapply [runtime.patch](patc
 
 | Patch | Source / implementation | Scope |
 |---|---|---|
+| MOSS QKV views, shared modulation slices, keyed CPU position cache | [PR2576 / fc458925](https://github.com/LostRuins/koboldcpp/commit/fc458925f3410b5922f2e0aeade229846394d2a6), [MOSS](../otherarch/sdcpp/src/model/diffusion/moss_image.hpp) | Selected compatible changes, not the full SD sync. Original MIT source retained. |
+| Independent legacy Vulkan readback fallback | [PR2564](https://github.com/LostRuins/koboldcpp/pull/2564) | `GGML_VK_DISABLE_GET_TENSOR_ASYNC=1`; AVX2/FMA, allocator and existing MMVQ policy preserved. Not a guaranteed speedup. |
 | O3 / Haswell / AVX2 / LTO, no PGO | [Build recipe](build.py), [CPU policy](cpu-policy.json) | Strict math; CPU and Vulkan recipes kept separate. |
 | Win64 C ABI, stack alignment, no-AVX FFI, inline AVX exp/silu | [ABI/stack diff](patches/runtime.patch), [exports](export_abi.py) | Correctness and portable Haswell execution. |
 | Polaris queue/device initialization | [Polaris research](https://github.com/andrewdhannah/vulkan-polaris-llama), [implementation](../ggml/src/ggml-vulkan/ggml-vulkan.cpp) | Feature checks retained; graphics queue itself is an upstream option. |

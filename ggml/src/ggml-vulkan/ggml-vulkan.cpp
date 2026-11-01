@@ -15480,7 +15480,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
         /* .context = */ ctx,
     };
 
-    if (!ctx->device->support_async) {
+    // KCPP_LEGACY_READBACK: independent opt-in legacy-driver readback fallback (PR2564).
+    if (!ctx->device->support_async || getenv("GGML_VK_DISABLE_GET_TENSOR_ASYNC") != nullptr) {
         vk_backend->iface.get_tensor_async = nullptr;
     }
 

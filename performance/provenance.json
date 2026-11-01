@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "ed587d0beef557e10aa78a26b38b286e70c29e85",
+  "commit": "91831fafa1ca81ce1bc2904b8f6b5eb4369a4bbb",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,18 +20,18 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "ca9e5127cc03caba04bb0943ff353be9aac788ba531a04da57ee0f7d5434992a",
-  "patch_sha256": "14eeae79bf625698e98c449edbf5d141941335c259de143c5b24be9e84a7f1aa",
-  "seconds": 787.1410801410675,
+  "executable_sha256": "71e8aeca0c55ac4fe994b8fc30997061faf4359fdc82bdfedaa9e31b7959fca9",
+  "patch_sha256": "383e85827f04f01d9313c33b37e8f127fbb6b99f9a147ea655b64074eb044984",
+  "seconds": 43.57406997680664,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "7bc627f054a803a5c36e409292ef5d6fb78fe066bedba812d2de3efd5dc648c0",
-  "native_input_count": 3224,
-  "native_dlls_reused": false,
-  "native_validation_parent_sha256": null,
+  "native_source_signature": "6a563872c1280668bc1b52b5c4d8f6af0369ee61b41fcbf5debdc4787f819a90",
+  "native_input_count": 3226,
+  "native_dlls_reused": true,
+  "native_validation_parent_sha256": "170854b1e0bd4e8195c8ec50aaaa4266ee79b4d70a618893562a7110d611cf11",
   "build_date": "2026-11-01",
   "native_link_layout": "upstream-supported monolithic; KCPP_COMMONIZE=0; full backend LTO and explicit C ABI",
   "build_verified": true,
@@ -39,8 +39,8 @@
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "5ae20429def41b6213a1b0260e93d375dd8081b8268d42225c9cae9d53b62683",
-    "koboldcpp_vulkan.dll": "bda1db9a02c3c8a01bad1b6a88857e11db078eb3d50fe124569198e5c01b9f4e"
+    "koboldcpp_default.dll": "47e48592976b245c8a394d1bfcf4fe7a3960d0d0c945b859159d33b1d4f36246",
+    "koboldcpp_vulkan.dll": "4b69756b15c8b789eba447ef0203752babdfee682fb92cc52b8b9ab9b0112c30"
   },
   "cpu_threads": {
     "threads": 16,

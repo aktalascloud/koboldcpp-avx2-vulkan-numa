@@ -1,7 +1,16 @@
 diff --git a/Makefile b/Makefile
-index 284a70e..e9c2482 100644
+index 284a70e..2b8daae 100644
 --- a/Makefile
 +++ b/Makefile
+@@ -754,7 +754,7 @@ budget.o: common/reasoning-budget.cpp common/reasoning-budget.h
+ chat.o: common/chat.cpp common/chat.h
+ 	$(CXX) $(CXXFLAGS) -c $< -o $@
+ 
+-SDCPP_COMMON_BASENAMES := include/stable-diffusion.h src/conditioning/conditioner.hpp src/conditioning/conditioning_cache.h src/conditioning/wan_audio.cpp src/conditioning/wan_audio.h src/core/backend_fit.cpp src/core/backend_fit.h src/core/compute_workspace.cpp src/core/compute_workspace.h src/core/ggml_extend_backend.cpp src/core/ggml_extend_backend.h src/core/ggml_extend.cpp src/core/ggml_extend.h src/core/ggml_graph_cut.cpp src/core/ggml_graph_cut.h src/core/ggml_runner.cpp src/core/ggml_runner.h src/core/ggml_tensor_utils.cpp src/core/ggml_tensor_utils.h src/core/layer_split_partition.cpp src/core/layer_split_partition.h src/core/ordered_map.hpp src/core/parallel.cpp src/core/parallel.h src/core/probe/backend_probe.cpp src/core/probe/backend_probe.h src/core/probe/conv_direct.cpp src/core/probe/conv_direct.h src/core/probe/flash_attn.cpp src/core/probe/flash_attn.h src/core/regex.cpp src/core/regex.h src/core/rng.hpp src/core/rng_mt19937.hpp src/core/rng_philox.hpp src/core/runner_cache.cpp src/core/runner_cache.h src/core/segment_graph_bindings.cpp src/core/segment_graph_bindings.h src/core/segment_weight_pipeline.cpp src/core/segment_weight_pipeline.h src/core/tensor_ggml.hpp src/core/tensor.hpp src/core/util.cpp src/core/util.h src/detailer.cpp src/detailer.h src/device_residency_manager.h src/extensions/generation_extension.h src/extensions/photomaker_extension.cpp src/extensions/pulid_extension.cpp src/kcpp_sd_extensions.h src/model/adapter/ip_adapter.hpp src/model/adapter/lora.hpp src/model/adapter/lora_ops.cpp src/model/adapter/lora_ops.h src/model/adapter/pmid.hpp src/model/adapter/pulid.hpp src/model/audio/wav2vec2.hpp src/model/common/block.hpp src/model/common/ggml_block.hpp src/model/common/rope_circular.hpp src/model/common/rope.hpp src/model_component.h src/model/detector/yolov8.h src/model/diffusion/anima.hpp src/model/diffusion/animatediff.hpp src/model/diffusion/boogu.hpp src/model/diffusion/control.hpp src/model/diffusion/dit.hpp src/model/diffusion/ernie_image.hpp src/model/diffusion/flux3.hpp src/model/diffusion/flux.hpp src/model/diffusion/hidream_o1.hpp src/model/diffusion/hunyuan.hpp src/model/diffusion/ideogram4.hpp src/model/diffusion/iris.hpp src/model/diffusion/krea2.hpp src/model/diffusion/lens.hpp src/model/diffusion/lingbot_video.hpp src/model/diffusion/llada_image.hpp src/model/diffusion/ltxv.hpp src/model/diffusion/mage_flow.hpp src/model/diffusion/ming_image.hpp src/model/diffusion/minimax_h3.hpp src/model/diffusion/minit2i.hpp src/model/diffusion/mmdit.hpp src/model/diffusion/model.hpp src/model/diffusion/pid.hpp src/model/diffusion/pixart.hpp src/model/diffusion/qwen_image_2_1.hpp src/model/diffusion/qwen_image.hpp src/model/diffusion/sefi_image.hpp src/model/diffusion/sensenova_u1.h src/model/diffusion/unet.hpp src/model/diffusion/wan_audio.hpp src/model/diffusion/wan.hpp src/model/diffusion/z_image.hpp src/model/diffusion/z_image_l2p.hpp src/model.h src/model_io/binary_io.h src/model_io/gguf_io.cpp src/model_io/gguf_io.h src/model_io/gguf_reader_ext.h src/model_io/kcpp_sdcpp_quantized_safetensors.hpp src/model_io/pickle_io.cpp src/model_io/pickle_io.h src/model_io/safetensors_io.cpp src/model_io/safetensors_io.h src/model_io/streaming_writer.h src/model_io/tensor_storage.h src/model_io/torch_legacy_io.cpp src/model_io/torch_legacy_io.h src/model_io/torch_zip_io.cpp src/model_io/torch_zip_io.h src/model_loader.cpp src/model_loader_files.cpp src/model_loader.h src/model_manager.cpp src/model_manager_files.cpp src/model_manager.h src/model_manager_prefetch.cpp src/model/te/clip.hpp src/model/te/llada_image_te.hpp src/model/te/llm.hpp src/model/te/ming_image_te.hpp src/model/te/t5.hpp src/model/upscaler/esrgan.hpp src/model/upscaler/ltx_latent_upscaler.hpp src/model/upscaler/mosr.hpp src/model/vae/audio_vae.hpp src/model/vae/auto_encoder_kl.hpp src/model/vae/hunyuan_vae.hpp src/model/vae/ltx_audio_vae.hpp src/model/vae/ltx_vae.hpp src/model/vae/mage_vae.hpp src/model/vae/minimax_h3_audio_vae.hpp src/model/vae/minimax_h3_vae.hpp src/model/vae/tae.hpp src/model/vae/vae.hpp src/model/vae/vae_tiling.hpp src/model/vae/wan_vae.hpp src/name_conversion.cpp src/name_conversion.h src/pipeline/diffusion_engine.cpp src/pipeline/diffusion_engine.h src/pipeline/generation.h src/pipeline/image.cpp src/pipeline/model_builders.cpp src/pipeline/model_builders.h src/pipeline/request.cpp src/pipeline/request.h src/pipeline/video.cpp src/runtime/audio_processing.cpp src/runtime/audio_processing.h src/runtime/cache_dit.hpp src/runtime/condition_cache_utils.hpp src/runtime/denoiser.hpp src/runtime/easycache.hpp src/runtime/gits_noise.h src/runtime/guidance.cpp src/runtime/guidance.h src/runtime/image_preprocess.cpp src/runtime/image_preprocess.h src/runtime/imatrix.cpp src/runtime/imatrix.h src/runtime/latent-preview.h src/runtime/preprocessing.hpp src/runtime/preview_interval.h src/runtime/sample-cache.cpp src/runtime/sample-cache.h src/runtime/spectrum.hpp src/runtime/tiling.cpp src/runtime/tiling.h src/runtime/ucache.hpp src/stable-diffusion.cpp src/tokenizers/bpe_tokenizer.cpp src/tokenizers/bpe_tokenizer.h src/tokenizers/clip_tokenizer.cpp src/tokenizers/clip_tokenizer.h src/tokenizers/gemma_tokenizer.cpp src/tokenizers/gemma_tokenizer.h src/tokenizers/hf_tokenizer.cpp src/tokenizers/hf_tokenizer.h src/tokenizers/mistral_tokenizer.cpp src/tokenizers/mistral_tokenizer.h src/tokenizers/qwen2_tokenizer.cpp src/tokenizers/qwen2_tokenizer.h src/tokenizers/sensenova_u1_tokenizer.cpp src/tokenizers/sensenova_u1_tokenizer.h src/tokenizers/t5_unigram_tokenizer.cpp src/tokenizers/t5_unigram_tokenizer.h src/tokenizers/tokenizer_config.cpp src/tokenizers/tokenizer_config.h src/tokenizers/tokenizer.cpp src/tokenizers/tokenizer.h src/tokenizers/tokenize_util.cpp src/tokenizers/tokenize_util.h src/tokenizers/vocab/vocab.h src/upscaler.cpp src/upscaler.h thirdparty/darts.h thirdparty/miniz.h thirdparty/oniguruma/ascii.c thirdparty/oniguruma/oniguruma.h thirdparty/oniguruma/regcomp.c thirdparty/oniguruma/regenc.c thirdparty/oniguruma/regenc.h thirdparty/oniguruma/regerror.c thirdparty/oniguruma/regexec.c thirdparty/oniguruma/regint.h thirdparty/oniguruma/regparse.c thirdparty/oniguruma/regparse.h thirdparty/oniguruma/st.c thirdparty/oniguruma/st.h thirdparty/oniguruma/unicode.c thirdparty/oniguruma/unicode_fold1_key.c thirdparty/oniguruma/unicode_fold2_key.c thirdparty/oniguruma/unicode_fold3_key.c thirdparty/oniguruma/unicode_unfold_key.c thirdparty/oniguruma/utf8.c thirdparty/stb_image_resize.h thirdparty/stb_image_write.h thirdparty/utf8proc/utf8proc.c thirdparty/utf8proc/utf8proc.h thirdparty/zip.c thirdparty/zip.h
++SDCPP_COMMON_BASENAMES := src/core/pe_cache.cpp src/core/pe_cache.h include/stable-diffusion.h src/conditioning/conditioner.hpp src/conditioning/conditioning_cache.h src/conditioning/wan_audio.cpp src/conditioning/wan_audio.h src/core/backend_fit.cpp src/core/backend_fit.h src/core/compute_workspace.cpp src/core/compute_workspace.h src/core/ggml_extend_backend.cpp src/core/ggml_extend_backend.h src/core/ggml_extend.cpp src/core/ggml_extend.h src/core/ggml_graph_cut.cpp src/core/ggml_graph_cut.h src/core/ggml_runner.cpp src/core/ggml_runner.h src/core/ggml_tensor_utils.cpp src/core/ggml_tensor_utils.h src/core/layer_split_partition.cpp src/core/layer_split_partition.h src/core/ordered_map.hpp src/core/parallel.cpp src/core/parallel.h src/core/probe/backend_probe.cpp src/core/probe/backend_probe.h src/core/probe/conv_direct.cpp src/core/probe/conv_direct.h src/core/probe/flash_attn.cpp src/core/probe/flash_attn.h src/core/regex.cpp src/core/regex.h src/core/rng.hpp src/core/rng_mt19937.hpp src/core/rng_philox.hpp src/core/runner_cache.cpp src/core/runner_cache.h src/core/segment_graph_bindings.cpp src/core/segment_graph_bindings.h src/core/segment_weight_pipeline.cpp src/core/segment_weight_pipeline.h src/core/tensor_ggml.hpp src/core/tensor.hpp src/core/util.cpp src/core/util.h src/detailer.cpp src/detailer.h src/device_residency_manager.h src/extensions/generation_extension.h src/extensions/photomaker_extension.cpp src/extensions/pulid_extension.cpp src/kcpp_sd_extensions.h src/model/adapter/ip_adapter.hpp src/model/adapter/lora.hpp src/model/adapter/lora_ops.cpp src/model/adapter/lora_ops.h src/model/adapter/pmid.hpp src/model/adapter/pulid.hpp src/model/audio/wav2vec2.hpp src/model/common/block.hpp src/model/common/ggml_block.hpp src/model/common/rope_circular.hpp src/model/common/rope.hpp src/model_component.h src/model/detector/yolov8.h src/model/diffusion/anima.hpp src/model/diffusion/animatediff.hpp src/model/diffusion/boogu.hpp src/model/diffusion/control.hpp src/model/diffusion/dit.hpp src/model/diffusion/ernie_image.hpp src/model/diffusion/flux3.hpp src/model/diffusion/flux.hpp src/model/diffusion/hidream_o1.hpp src/model/diffusion/hunyuan.hpp src/model/diffusion/ideogram4.hpp src/model/diffusion/iris.hpp src/model/diffusion/krea2.hpp src/model/diffusion/lens.hpp src/model/diffusion/lingbot_video.hpp src/model/diffusion/llada_image.hpp src/model/diffusion/ltxv.hpp src/model/diffusion/mage_flow.hpp src/model/diffusion/ming_image.hpp src/model/diffusion/minimax_h3.hpp src/model/diffusion/minit2i.hpp src/model/diffusion/mmdit.hpp src/model/diffusion/model.hpp src/model/diffusion/pid.hpp src/model/diffusion/pixart.hpp src/model/diffusion/qwen_image_2_1.hpp src/model/diffusion/qwen_image.hpp src/model/diffusion/sefi_image.hpp src/model/diffusion/sensenova_u1.h src/model/diffusion/unet.hpp src/model/diffusion/wan_audio.hpp src/model/diffusion/wan.hpp src/model/diffusion/z_image.hpp src/model/diffusion/z_image_l2p.hpp src/model.h src/model_io/binary_io.h src/model_io/gguf_io.cpp src/model_io/gguf_io.h src/model_io/gguf_reader_ext.h src/model_io/kcpp_sdcpp_quantized_safetensors.hpp src/model_io/pickle_io.cpp src/model_io/pickle_io.h src/model_io/safetensors_io.cpp src/model_io/safetensors_io.h src/model_io/streaming_writer.h src/model_io/tensor_storage.h src/model_io/torch_legacy_io.cpp src/model_io/torch_legacy_io.h src/model_io/torch_zip_io.cpp src/model_io/torch_zip_io.h src/model_loader.cpp src/model_loader_files.cpp src/model_loader.h src/model_manager.cpp src/model_manager_files.cpp src/model_manager.h src/model_manager_prefetch.cpp src/model/te/clip.hpp src/model/te/llada_image_te.hpp src/model/te/llm.hpp src/model/te/ming_image_te.hpp src/model/te/t5.hpp src/model/upscaler/esrgan.hpp src/model/upscaler/ltx_latent_upscaler.hpp src/model/upscaler/mosr.hpp src/model/vae/audio_vae.hpp src/model/vae/auto_encoder_kl.hpp src/model/vae/hunyuan_vae.hpp src/model/vae/ltx_audio_vae.hpp src/model/vae/ltx_vae.hpp src/model/vae/mage_vae.hpp src/model/vae/minimax_h3_audio_vae.hpp src/model/vae/minimax_h3_vae.hpp src/model/vae/tae.hpp src/model/vae/vae.hpp src/model/vae/vae_tiling.hpp src/model/vae/wan_vae.hpp src/name_conversion.cpp src/name_conversion.h src/pipeline/diffusion_engine.cpp src/pipeline/diffusion_engine.h src/pipeline/generation.h src/pipeline/image.cpp src/pipeline/model_builders.cpp src/pipeline/model_builders.h src/pipeline/request.cpp src/pipeline/request.h src/pipeline/video.cpp src/runtime/audio_processing.cpp src/runtime/audio_processing.h src/runtime/cache_dit.hpp src/runtime/condition_cache_utils.hpp src/runtime/denoiser.hpp src/runtime/easycache.hpp src/runtime/gits_noise.h src/runtime/guidance.cpp src/runtime/guidance.h src/runtime/image_preprocess.cpp src/runtime/image_preprocess.h src/runtime/imatrix.cpp src/runtime/imatrix.h src/runtime/latent-preview.h src/runtime/preprocessing.hpp src/runtime/preview_interval.h src/runtime/sample-cache.cpp src/runtime/sample-cache.h src/runtime/spectrum.hpp src/runtime/tiling.cpp src/runtime/tiling.h src/runtime/ucache.hpp src/stable-diffusion.cpp src/tokenizers/bpe_tokenizer.cpp src/tokenizers/bpe_tokenizer.h src/tokenizers/clip_tokenizer.cpp src/tokenizers/clip_tokenizer.h src/tokenizers/gemma_tokenizer.cpp src/tokenizers/gemma_tokenizer.h src/tokenizers/hf_tokenizer.cpp src/tokenizers/hf_tokenizer.h src/tokenizers/mistral_tokenizer.cpp src/tokenizers/mistral_tokenizer.h src/tokenizers/qwen2_tokenizer.cpp src/tokenizers/qwen2_tokenizer.h src/tokenizers/sensenova_u1_tokenizer.cpp src/tokenizers/sensenova_u1_tokenizer.h src/tokenizers/t5_unigram_tokenizer.cpp src/tokenizers/t5_unigram_tokenizer.h src/tokenizers/tokenizer_config.cpp src/tokenizers/tokenizer_config.h src/tokenizers/tokenizer.cpp src/tokenizers/tokenizer.h src/tokenizers/tokenize_util.cpp src/tokenizers/tokenize_util.h src/tokenizers/vocab/vocab.h src/upscaler.cpp src/upscaler.h thirdparty/darts.h thirdparty/miniz.h thirdparty/oniguruma/ascii.c thirdparty/oniguruma/oniguruma.h thirdparty/oniguruma/regcomp.c thirdparty/oniguruma/regenc.c thirdparty/oniguruma/regenc.h thirdparty/oniguruma/regerror.c thirdparty/oniguruma/regexec.c thirdparty/oniguruma/regint.h thirdparty/oniguruma/regparse.c thirdparty/oniguruma/regparse.h thirdparty/oniguruma/st.c thirdparty/oniguruma/st.h thirdparty/oniguruma/unicode.c thirdparty/oniguruma/unicode_fold1_key.c thirdparty/oniguruma/unicode_fold2_key.c thirdparty/oniguruma/unicode_fold3_key.c thirdparty/oniguruma/unicode_unfold_key.c thirdparty/oniguruma/utf8.c thirdparty/stb_image_resize.h thirdparty/stb_image_write.h thirdparty/utf8proc/utf8proc.c thirdparty/utf8proc/utf8proc.h thirdparty/zip.c thirdparty/zip.h
+ 
+ SDCPP_MAIN_BASENAMES := examples/cli/image_metadata.cpp examples/cli/image_metadata.h examples/cli/main.cpp examples/common/common.cpp examples/common/common.h examples/common/log.cpp examples/common/log.h examples/common/media_io.cpp examples/common/media_io.h examples/common/resource_owners.hpp src/tokenizers/vocab/clip_merges.hpp src/tokenizers/vocab/gemma_merges.hpp src/tokenizers/vocab/gemma_vocab.hpp src/tokenizers/vocab/mistral_merges.hpp src/tokenizers/vocab/mistral_vocab.hpp src/tokenizers/vocab/qwen_merges.hpp src/tokenizers/vocab/t5.hpp src/tokenizers/vocab/umt5.hpp src/tokenizers/vocab/vocab.cpp src/convert.cpp src/version.cpp
+ 
 @@ -913,15 +913,17 @@ llamaserver: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml.o
  llamaservervk: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml_v4_vulkan.o ggml-cpu.o ggml-ops.o ggml-vec.o ggml-binops.o ggml-tiled.o ggml-tiled-kernel.o ggml-unops.o llama.o chat.o llama-model.o console.o clip_default.o mtmd.o mtmd-helper.o mtmd-helper-gen.o mtmd-image.o ggml-backend.o ggml-backend-meta.o ggml-backend-reg_vulkan.o ggml-vulkan.o ggml-vulkan-shaders.o ggml-repack.o $(OBJS_FULL) $(OBJS)
  	$(CXX) $(CXXFLAGS) $(LLAMASERVER_CXXFLAGS) -DGGML_USE_VULKAN $(filter-out %.h,$^) $(VULKAN_LIB) -o $@ $(LDFLAGS)
@@ -551,7 +560,7 @@ index b717070..971d234 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 44d8393..a7c281f 100644
+index 44d8393..068810d 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1270,7 +1270,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
@@ -839,7 +848,17 @@ index 44d8393..a7c281f 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -16452,7 +16557,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -15375,7 +15480,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+         /* .context = */ ctx,
+     };
+ 
+-    if (!ctx->device->support_async) {
++    // KCPP_LEGACY_READBACK: independent opt-in legacy-driver readback fallback (PR2564).
++    if (!ctx->device->support_async || getenv("GGML_VK_DISABLE_GET_TENSOR_ASYNC") != nullptr) {
+         vk_backend->iface.get_tensor_async = nullptr;
+     }
+ 
+@@ -16452,7 +16558,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  
@@ -1621,6 +1640,252 @@ index 3cebd9c..086cc45 100644
              }
  
              if(generated_num_results>1)
+diff --git a/otherarch/sdcpp/src/core/pe_cache.cpp b/otherarch/sdcpp/src/core/pe_cache.cpp
+new file mode 100644
+index 0000000..df4aa62
+--- /dev/null
++++ b/otherarch/sdcpp/src/core/pe_cache.cpp
+@@ -0,0 +1,30 @@
++#include "core/pe_cache.h"
++
++namespace sd {
++    PECacheKey& PECacheKey::add_shape(const ggml_tensor* tensor) {
++        add(tensor != nullptr);
++        if (tensor != nullptr) {
++            for (int i = 0; i < GGML_MAX_DIMS; ++i) {
++                add(tensor->ne[i]);
++            }
++        }
++        return *this;
++    }
++
++    PECacheKey& PECacheKey::add_shapes(const std::vector<ggml_tensor*>& tensors) {
++        add(tensors.size());
++        for (const auto* tensor : tensors) {
++            add_shape(tensor);
++        }
++        return *this;
++    }
++
++    const Tensor<float>& PECache::get_or_create(const PECacheKey& key, const std::function<Tensor<float>()>& build) {
++        auto entry = entries_.find(key.name());
++        if (entry != entries_.end() && entry->second.key == key) {
++            return entry->second.value;
++        }
++        auto value = build();
++        return entries_.insert_or_assign(key.name(), Entry{key, std::move(value)}).first->second.value;
++    }
++}
+diff --git a/otherarch/sdcpp/src/core/pe_cache.h b/otherarch/sdcpp/src/core/pe_cache.h
+new file mode 100644
+index 0000000..3539707
+--- /dev/null
++++ b/otherarch/sdcpp/src/core/pe_cache.h
+@@ -0,0 +1,82 @@
++#ifndef __SD_CORE_PE_CACHE_H__
++#define __SD_CORE_PE_CACHE_H__
++
++#include <functional>
++#include <map>
++#include <set>
++#include <type_traits>
++
++#include "core/tensor.hpp"
++#include "ggml.h"
++
++namespace sd {
++    class PECacheKey {
++        std::string name_;
++        std::string fields_;
++
++    public:
++        explicit PECacheKey(std::string name)
++            : name_(std::move(name)) {}
++        const std::string& name() const { return name_; }
++
++        template <typename T, std::enable_if_t<std::is_arithmetic_v<T> || std::is_enum_v<T>, int> = 0>
++        PECacheKey& add(T value) {
++            if constexpr (std::is_floating_point_v<T>) {
++                const double field = static_cast<double>(value);
++                fields_.push_back('f');
++                fields_.append(reinterpret_cast<const char*>(&field), sizeof(field));
++            } else {
++                const uint64_t field = static_cast<uint64_t>(value);
++                fields_.push_back('i');
++                fields_.append(reinterpret_cast<const char*>(&field), sizeof(field));
++            }
++            return *this;
++        }
++
++        template <typename T>
++        PECacheKey& add(const std::vector<T>& values) {
++            fields_.push_back('v');
++            add(values.size());
++            for (const auto& value : values) {
++                add(value);
++            }
++            return *this;
++        }
++
++        template <typename T>
++        PECacheKey& add(const std::set<T>& values) {
++            return add(std::vector<T>(values.begin(), values.end()));
++        }
++
++        template <typename T>
++        PECacheKey& add(const Tensor<T>& values) {
++            add(values.shape());
++            for (int64_t i = 0; i < values.numel(); ++i) {
++                add(values.data()[i]);
++            }
++            return *this;
++        }
++
++        PECacheKey& add_shape(const ggml_tensor* tensor);
++        PECacheKey& add_shapes(const std::vector<ggml_tensor*>& tensors);
++
++        bool operator==(const PECacheKey& other) const {
++            return name_ == other.name_ && fields_ == other.fields_;
++        }
++    };
++
++    class PECache {
++        struct Entry {
++            PECacheKey key;
++            Tensor<float> value;
++        };
++
++        std::map<std::string, Entry> entries_;
++
++    public:
++        const Tensor<float>& get_or_create(const PECacheKey& key, const std::function<Tensor<float>()>& build);
++    };
++
++}
++
++#endif  // __SD_CORE_PE_CACHE_H__
+diff --git a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
+index f1cbbc7..188c741 100644
+--- a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
++++ b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
+@@ -2,7 +2,9 @@
+ #define __SD_MODEL_DIFFUSION_MOSS_IMAGE_HPP__
+ 
+ #include <algorithm>
++#include <array>
+ #include <cinttypes>
++#include "core/pe_cache.h"
+ 
+ #include "model/common/ggml_block.hpp"
+ #include "model/common/rope.hpp"
+@@ -113,16 +115,17 @@ namespace MOSSImage {
+             blocks["proj.ffn_down"]    = std::make_shared<Linear>(config.ffn_dim, config.dim, false);
+         }
+ 
+-        ggml_tensor* forward(GGMLRunnerContext* ctx, ggml_tensor* x, ggml_tensor* pe, ggml_tensor* mod) {
++        ggml_tensor* forward(GGMLRunnerContext* ctx, ggml_tensor* x, ggml_tensor* pe, const std::array<ggml_tensor*, 6>& mod) {
+             auto c      = ctx->ggml_ctx;
+             auto linear = [&](const char* name, ggml_tensor* h) { return std::dynamic_pointer_cast<Linear>(blocks[name])->forward(ctx, h); };
+             auto norm   = [&](const char* name, ggml_tensor* h) { return std::dynamic_pointer_cast<RMSNorm>(blocks[name])->forward(ctx, h); };
+-            auto part   = [&](int i) { return ggml_ext_slice(c, mod, 0, i * config.dim, (i + 1) * config.dim); };
++            auto part   = [&](int i) { return mod[i]; };
+             auto y      = norm("norm1", x);
+             y           = ggml_add(c, ggml_add(c, y, ggml_mul(c, y, part(1))), part(0));
+             auto qkv    = linear("proj.qkv", y);
+             auto split  = [&](int i) {
+-                return ggml_reshape_4d(c, ggml_ext_slice(c, qkv, 0, i * config.dim, (i + 1) * config.dim), config.head_dim, config.dim / config.head_dim, x->ne[1], x->ne[2]);
++                return ggml_view_4d(c, qkv, config.head_dim, config.dim / config.head_dim, x->ne[1], x->ne[2],
++                                    config.head_dim * qkv->nb[0], qkv->nb[1], qkv->nb[2], i * config.dim * qkv->nb[0]);
+             };
+             auto q       = norm("q_norm", split(0));
+             auto k       = norm("k_norm", split(1));
+@@ -175,10 +178,17 @@ namespace MOSSImage {
+             time      = linear("time_embedding.2", ggml_silu(c, linear("time_embedding.0", time)));
+             auto mod  = linear("shared_block_modulation", time);
+             auto head = linear("video_head_modulation", time);
+-            x         = ggml_concat(c, x, text, 1);
++            std::array<ggml_tensor*, 6> parts;
++            for (int i = 0; i < 6; ++i) {
++                parts[i] = ggml_ext_slice(c, mod, 0, i * config.dim, (i + 1) * config.dim);
++                if (ctx->graph != nullptr) {
++                    ggml_build_forward_expand(ctx->graph, parts[i]);
++                }
++            }
++            x = ggml_concat(c, x, text, 1);
+             for (int64_t i = 0; i < config.depth; ++i) {
+                 if (std::find(skip.begin(), skip.end(), i) == skip.end()) {
+-                    x = std::dynamic_pointer_cast<Block>(blocks["layers." + std::to_string(i)])->forward(ctx, x, pe, mod);
++                    x = std::dynamic_pointer_cast<Block>(blocks["layers." + std::to_string(i)])->forward(ctx, x, pe, parts);
+                     sd::ggml_graph_cut::mark_graph_cut(x, "moss_image.layers." + std::to_string(i), "x");
+                 }
+             }
+@@ -193,9 +203,10 @@ namespace MOSSImage {
+     };
+ 
+     struct MOSSImageRunner : public DiffusionModelRunner {
++        sd::PECache pe_cache_;
+         MOSSImageConfig config;
+         Model model;
+-        std::vector<float> pe_data, time_data;
++        std::vector<float> time_data;
+ 
+         MOSSImageRunner(ggml_backend_t backend, const String2TensorStorage& weights, const std::string& prefix, std::shared_ptr<RunnerWeightManager> weight_manager = nullptr)
+             : DiffusionModelRunner(backend, prefix, weight_manager), config(MOSSImageConfig::detect_from_weights(weights, prefix)), model(config) {
+@@ -224,33 +235,36 @@ namespace MOSSImage {
+                 auto text = make_input(*inputs.context);
+                 GGML_ASSERT(x->ne[3] == 1 && x->ne[2] == config.channels && text->ne[0] == config.text_dim);
+                 int64_t h = x->ne[1], w = x->ne[0], nt = text->ne[1];
+-                Rope::Embedding embedding;
+-                embedding.positions.append_image(static_cast<int>(h), static_cast<int>(w));
+-                embedding.positions.images.back().height_axis = 2;
+-                embedding.positions.images.back().width_axis  = 3;
+-                embedding.positions.append_tokens(nt);
+-                for (int64_t token = 0; token < h * w + nt; ++token) {
+-                    float pos[4] = {0.f, float(token - h * w), 0.f, 0.f};
+-                    if (token < h * w) {
+-                        pos[1] = float(nt);
+-                        pos[2] = float(token / w) - float(h - 1) / 2.f;
+-                        pos[3] = float(token % w) - float(w - 1) / 2.f;
++                sd::PECacheKey pe_key("moss_image.pe");
++                pe_key.add(h).add(w).add(nt).add(config.head_dim).add(circular_x_enabled).add(circular_y_enabled);
++                auto pe = make_input(pe_cache_.get_or_create(pe_key, [&]() {
++                    Rope::Embedding embedding;
++                    embedding.positions.append_image(static_cast<int>(h), static_cast<int>(w));
++                    embedding.positions.images.back().height_axis = 2;
++                    embedding.positions.images.back().width_axis  = 3;
++                    embedding.positions.append_tokens(nt);
++                    for (int64_t token = 0; token < h * w + nt; ++token) {
++                        float pos[4] = {0.f, float(token - h * w), 0.f, 0.f};
++                        if (token < h * w) {
++                            pos[1] = float(nt);
++                            pos[2] = float(token / w) - float(h - 1) / 2.f;
++                            pos[3] = float(token % w) - float(w - 1) / 2.f;
++                        }
++                        embedding.ids.push_back({pos[0], pos[1], pos[2], pos[3]});
+                     }
+-                    embedding.ids.push_back({pos[0], pos[1], pos[2], pos[3]});
+-                }
+-                embedding.values = Rope::embed_nd(embedding.ids, 1, 10000.f, std::vector<int>(4, static_cast<int>(config.head_dim / 4)), embedding.layout, &embedding.frequencies);
+-                pe_data          = finish_rope_pe(std::move(embedding));
++                    embedding.values = Rope::embed_nd(embedding.ids, 1, 10000.f, std::vector<int>(4, static_cast<int>(config.head_dim / 4)), embedding.layout, &embedding.frequencies);
++                    auto values      = finish_rope_pe(std::move(embedding));
++                    return sd::Tensor<float>({2, 2, config.head_dim / 2, h * w + nt}, std::move(values));
++                }));
+                 time_data.resize(config.freq_dim);
+                 for (int64_t i = 0; i < config.freq_dim / 2; ++i) {
+                     double angle                       = inputs.timesteps->values()[0] * std::pow(10000.0, -double(i) / double(config.freq_dim / 2));
+                     time_data[i]                       = float(std::cos(angle));
+                     time_data[i + config.freq_dim / 2] = float(std::sin(angle));
+                 }
+-                auto pe   = ggml_new_tensor_4d(compute_ctx, GGML_TYPE_F32, 2, 2, config.head_dim / 2, h * w + nt);
+                 auto time = ggml_new_tensor_3d(compute_ctx, GGML_TYPE_F32, config.freq_dim, 1, 1);
+-                set_backend_tensor_data(pe, pe_data.data());
+                 set_backend_tensor_data(time, time_data.data());
+-                auto ctx = get_context();
++                auto ctx = get_context(gf);
+                 ggml_build_forward_expand(gf, model.forward(&ctx, x, time, text, pe, skip));
+                 return gf;
+             };
 diff --git a/otherarch/sdcpp/src/model/vae/tae.hpp b/otherarch/sdcpp/src/model/vae/tae.hpp
 index 84dd4d1..05c7d67 100644
 --- a/otherarch/sdcpp/src/model/vae/tae.hpp

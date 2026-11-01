@@ -1,6 +1,5 @@
-Windows64 Haswell/AVX2 · RX580 Polaris/gfx803 · O3+LTO, noPGO.
-
-- Native1.124.1, official experimental `SOURCE_COMMIT`; explicit C ABI and upstream-supported monolithic linking.
-- Registered startup, visible build date and GET APIs checked; no new inference/speed benchmark. [Last original-stock/comparable measurements](results/measurements.json).
-- [Patch catalog/credits](performance/PATCHES.md) · [One-command source build](performance/BUILD.md) · [Licenses](performance/NOTICE.md).
-- Direct launch: koboldcpp-nocuda.exe. No models or private state. EXE SHA256: `NATIVE_SHA256`.
+Haswell / Polaris maintenance update
+- Official experimental source: `SOURCE_COMMIT`. EXE SHA256: `NATIVE_SHA256`.
+- Selected MOSS QKV/slice/position-cache optimizations ([PR2576](https://github.com/LostRuins/koboldcpp/pull/2576)); independent legacy AMD readback fallback ([PR2564](https://github.com/LostRuins/koboldcpp/pull/2564)). AVX2 + O3 + LTO, no PGO.
+- [All retained patches and licenses](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/concedo_experimental/performance/PATCHES.md). No new token-speed claim; dated stock/latest evidence stays in README/results.
+- Run the EXE directly. Models are not included. [Media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline).

@@ -1,9 +1,11 @@
 # KoboldCpp · Haswell AVX2 / Polaris Vulkan / NUMA
 [English](README.md) · [Сборка](performance/BUILD.md) · [Патчи](performance/PATCHES.md) · [Медиакомплект](https://github.com/aktalascloud/koboldcpp-media-pipeline)
 
-Форк [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), только concedo_experimental. Windows64, Haswell/AVX2 и RX580 Polaris/gfx803. Запуск напрямую **koboldcpp-nocuda.exe**, моделей в пакете нет. O3+LTO, безPGO/fast-math. Монолитная линковка KCPP_COMMONIZE=0 сохраняет LTO и явныеC ABI exports.
+Форк [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), ветка concedo_experimental. Windows x64, Haswell/AVX2 и RX 580 Polaris/gfx803. Запуск напрямую **koboldcpp-nocuda.exe**, без весов моделей в пакете. O3 + LTO, без PGO и fast-math. Монолитная линковка KCPP_COMMONIZE=0 сохраняет LTO и явный C ABI.
 
-Последний сопоставимый ручной замер: **2026-10-25**, одна модель/параметры, CPU4/Vulkan2 повтора:
+Новое: выбранные оптимизации копирований и позиционного кэша MOSS из [PR2576](https://github.com/LostRuins/koboldcpp/pull/2576), отдельный обход асинхронного чтения старых Vulkan-драйверов из [PR2564](https://github.com/LostRuins/koboldcpp/pull/2564). Все патчи и ограничения перечислены в [каталоге](performance/PATCHES.md).
+
+Последний сопоставимый замер токенов: **2026-10-25**, одинаковые модель и параметры, по 4 повтора CPU и 2 Vulkan:
 
 | Этап, токенов/с | Исходный сток | Последний измеренный | Разница |
 |---|---:|---:|---:|
@@ -12,8 +14,8 @@
 | Vulkan prompt | 411.010 | 712.810 | +73.4% |
 | Vulkan output | 17.035 | 23.655 | +38.9% |
 
-[Все исходные повторы/диапазоны, настройки и SHA](results/measurements.json). ДиапазоныCPU перекрываются. **Для установленной1.124.1/ed587d0b новой скорости нет: проверялся запуск.** Ускорение отдельной операции не равно ускорению всей генерации. HIP/ROCm не выбран из-за падения медиа; физическая dual-NUMA не измерена.
+[Все повторы, диапазоны, настройки и SHA](results/measurements.json). Диапазоны CPU перекрываются. **Для текущей 1.124.1 / 91831fa нового замера токенов нет.** Исторические числа не приписываются свежему EXE. Ускорение операции не равно ускорению всей генерации. HIP/ROCm не выбран из-за падения медиа; физическая двухсокетная NUMA не измерена.
 
-Стартовые настройки Vulkan6/4, batch/ubatch1024, gpulayers99, NUMAauto; CPU16/20, SD-энкодер20 отдельно. [Параметры](performance/RUN.txt). [Патчи/источники](performance/PATCHES.md).
+Стартовые настройки: Vulkan — потоки 6/4, batch/ubatch 1024, gpulayers 99, NUMA auto; CPU — 16/20, SD-энкодер — отдельно 20. [Параметры](performance/RUN.txt).
 
-Сборка одной командой: `py -3.12 performance/setup.py --build`. Оригинальные инструменты с SHA скачиваются локально; максимум4 компилятора. [Правила](AGENTS.md). Не менять модели, драйверы, BIOS, частоты и напряжения. [Лицензии](performance/NOTICE.md). Все текущие замеры — в `results/`.
+Сборка: `py -3.12 performance/setup.py --build`. Инструменты с проверкой SHA скачиваются локально; максимум 4 компилятора. [Правила](AGENTS.md) · [Лицензии](performance/NOTICE.md). Все замеры находятся в `results/`.
