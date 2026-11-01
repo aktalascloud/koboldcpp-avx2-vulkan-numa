@@ -23,7 +23,7 @@ The checkout already contains these changes. Do not reapply [runtime.patch](patc
 
 Already in upstream and retained: [Soprano include fix PR2557](https://github.com/LostRuins/koboldcpp/pull/2557), [AVX2 reduction PR30296](https://github.com/ggml-org/llama.cpp/pull/30296), [F16C lookup fix PR30343](https://github.com/ggml-org/llama.cpp/pull/30343), [tokenization/logprob stability](https://github.com/henk717/koboldcpp/commit/874f833a54). These are not presented as new local inventions.
 
-[Stock versus latest proof](benchmarks/latest.json) · [Operation A/B tests and rejected probe](benchmarks/operations.json) · [Research decisions](RESEARCH.md) · [Licenses](NOTICE.md). Individual patch multipliers are not added or attributed to full-model throughput.
+[Stock versus latest proof](../results/measurements.json) · [Operation A/B tests and rejected probe](../results/operations.json) · [Research decisions](PATCHES.md) · [Licenses](NOTICE.md). Individual patch multipliers are not added or attributed to full-model throughput.
 
 ## 28 October2026 additions — speed impact unmeasured
 
@@ -33,7 +33,7 @@ Already in upstream and retained: [Soprano include fix PR2557](https://github.co
 |Vulkan RMS4 cache + partial prefetch|[ROCmFPX commit](https://github.com/HarshaVardhan3002/ROCmFPX/commit/1fe09ec4e3), [shader](../ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp)|At most4 values per lane, unchanged workgroup/reduction order and large-row fallback. Compile/startup checked; no measured speed claim.|
 |Startup credential masking|[PR2566](https://github.com/LostRuins/koboldcpp/pull/2566), [source](../koboldcpp.py)|Masks4 fields in a copied Namespace; live credentials unchanged. Synthetic check passed.|
 
-User explicitly authorized these compute ports without a prior speed gate. [Correctness scope](benchmarks/compute-correctness.json). Historic stock/latest speed tables do not measure these additions.
+User explicitly authorized these compute ports without a prior speed gate. [Correctness scope](../results/operations.json). Historic stock/latest speed tables do not measure these additions.
 
 ## Native video ports
 
@@ -54,7 +54,7 @@ The initial cache-forwarding comparison below predates the runtime-gate repair. 
 
 The new upstream grammar cache already uses candidate indices; its implementation supersedes the earlier local lifetime repair. Upstream startup credential redaction is preserved without a duplicate patch.
 
-[Video cache measurements, exact SHA and all tested configurations](benchmarks/video-cache-20261029.json). These video tests were requested manually; daily builds still perform no generation or speed benchmarks.
+[Video cache measurements, exact SHA and all tested configurations](https://github.com/aktalascloud/koboldcpp-media-pipeline/blob/main/results/measurements.json). These video tests were requested manually; daily builds still perform no generation or speed benchmarks.
 
 |Port|Source|Scope|
 |---|---|---|
@@ -64,7 +64,7 @@ The new upstream grammar cache already uses candidate indices; its implementatio
 |Optional Polaris convolution WG512|[Local Vulkan tuning](../ggml/src/ggml-vulkan/ggml-vulkan.cpp)|Preserves the 128×128 tile, with AMD GCN/subgroup64/known Polaris/device-limit gates. GGML_VK_GCN_CONV_WG=512; default 256. A small 17-frame gain did not repeat on 49 frames, so it is not globally enabled. AVI was bit-identical in both comparisons.|
 |Bounded Wan5B latent snapshot|[Local pipeline](../otherarch/sdcpp/src/pipeline/diffusion_engine.cpp)|Opt-in KCPP_WAN_LATENT_SNAPSHOT captures raw posterior means for decoder comparisons. Worker restricts this to owned video jobs and unique portable paths. Versioned binary,48channels,batch1,at most128MiB. No C ABI change;off by default.|
 
-The separate 64-tile convolution candidate was slower and removed. ROCm/Tensile patches and coopmat2-only RTX optimizations are not presented as RX580 Vulkan gains. Video pipeline measurements and codec quality limits belong to the [media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline/blob/main/benchmarks/video.json). The historical token table does not measure these ports.
+The separate 64-tile convolution candidate was slower and removed. ROCm/Tensile patches and coopmat2-only RTX optimizations are not presented as RX580 Vulkan gains. Video pipeline measurements and codec quality limits belong to the [media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline/blob/main/results/measurements.json). The historical token table does not measure these ports.
 
 Additional numerical check: Native Super-Tiny and the pinned MIT PyTorch reference decoded the same generated latent. The last PNG of the17-frame run differed by at most1 RGB level (mean0.0000543);99% of values matched. This is an RGB8 comparison,not full floating-point tensor parity. The snapshot-enabled candidate also retained the prior AVI bytes for the same control. No new Vulkan-kernel speedup is claimed.
 

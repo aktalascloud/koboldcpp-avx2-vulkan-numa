@@ -1,20 +1,10 @@
-# Reproduce the Windows build
+# Windows build
+Prerequisites: Git checkout of this fork, Windows64, Python3.12 x64 (`py -3.12`), internet for first setup, Haswell/AVX2 CPU. No models required.
 
-Use the full tagged source on a Haswell-compatible AVX2/FMA/F16C CPU. Install:
-- WinLibs GCC13.2 MSVCRT POSIX SEH with LTO: performance/toolchain/winlibs/mingw64.
-- Make/shell from w64devkit: performance/toolchain/stable/w64devkit.
-- Python dependencies from requirements-build.txt. Upstream Vulkan glslc/headers are included.
+```powershell
+py -3.12 performance/setup.py --build
+```
 
-Run: python performance/build.py --jobs 4.
+setup.py downloads original WinLibsGCC13.2r8/MSVCRT and w64devkit1.22.0 after SHA256 verification, creates performance/.venv, installs requirements-build.txt and runs build.py --jobs 4. Subsequent offline builds: performance/.venv/Scripts/python.exe performance/build.py --jobs 4.
 
-For upstream1.124.1 the builder explicitly uses its supported `KCPP_COMMONIZE=0` monolithic layout. This keeps full backend LTO and the explicit MinGW C ABI export recipe. The new split-common layout needs a different export/packaging recipe; do not mix its backend targets with this monolithic `.def` file. Numerical model code is unchanged by this link-layout selection.
-
-The policy in cpu-policy.json selects O3/Haswell/AVX2 + LTO, without PGO. CPU tiled flags and Vulkan host flags are separate. Shaders compile separately with at most four workers; backend LTO links run sequentially. Objects rebuild so no instrumented/stale flags leak into the link.
-
-Preserve explicit C ABI exports, static runtimes, -mstackrealign, no-AVX expose.o, always-inline AVX exp/silu and shader dependency invalidation. No blanket fast-math, reduced precision, AVX512/VNNI assumptions or driver/BIOS/clock changes.
-
-merge_upstream.py merges only official LostRuins/koboldcpp concedo_experimental into patched history. Resolve conflicts by meaning; never force-push or replace with stable.
-
-Daily maintenance builds, deploys, checks source/SHA/registered startup/visible window/GET APIs, then publishes. Benchmarks and media generation are manual only. New unmeasured releases do not inherit old numerical claims; the last measured proof keeps its SHA/date. Public comparisons show only original stock and latest achieved result.
-
-The EXE launches directly through GUI/CLI. No models are bundled. Window titles show the packaged build day; API version is unchanged.
+Output: performance/candidate/koboldcpp-nocuda.exe. Build receipts: performance/results (local, ignored). Do not commit toolchains/build caches. CPU/Vulkan both use O3/Haswell/LTO withoutPGO; full backend LTO requires upstream KCPP_COMMONIZE=0. Explicit exports and static runtimes stay enabled. Shader changes invalidate embedded objects. Max4 workers, links sequential. Full guardrails: ../AGENTS.md. Successful compilation is not a speed/quality benchmark.
