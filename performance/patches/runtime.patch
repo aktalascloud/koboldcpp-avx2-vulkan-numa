@@ -560,7 +560,7 @@ index b717070..971d234 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 7bac81e..fe1e9a0 100644
+index 7bac81e..5284134 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1270,7 +1270,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
@@ -817,7 +817,27 @@ index 7bac81e..fe1e9a0 100644
              uint32_t ne = ggml_nelements(dst);
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
-@@ -14489,6 +14588,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -10667,6 +10766,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+     vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
+     p.param1 = ggml_get_op_params_f32(dst, 0);
+     p.param2 = ggml_get_op_params_f32(dst, 1);
++    // KCPP_POLARIS_SCALE_ROWS: support is limited below to packed 2D rows.
++    p.param3 = ggml_is_contiguous(src0) ? 0.0f : 1.0f;
+ 
+     ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
+ }
+@@ -13697,7 +13798,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+     const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
+ 
+     // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
+-    return ggml_get_unary_op(sigmoid) == GGML_UNARY_OP_SIGMOID &&
++    // KCPP_SCALE_ROWS_FUSION_GUARD: HC fusion still uses contiguous flat input.
++    return ggml_is_contiguous(scale_in->src[0]) &&
++           ggml_get_unary_op(sigmoid) == GGML_UNARY_OP_SIGMOID &&
+            ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
+            ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
+            scale_in->src[0]->type == GGML_TYPE_F32 &&
+@@ -14489,6 +14592,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
      }
      uint64_t flops_per_submit = std::min(flops_cap, ctx->last_total_flops / 40u);
  
@@ -830,7 +850,7 @@ index 7bac81e..fe1e9a0 100644
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -14513,7 +14618,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14513,7 +14622,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -839,7 +859,7 @@ index 7bac81e..fe1e9a0 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -14800,7 +14905,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14800,7 +14909,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -848,7 +868,7 @@ index 7bac81e..fe1e9a0 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -15375,7 +15480,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -15375,7 +15484,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  
@@ -858,7 +878,26 @@ index 7bac81e..fe1e9a0 100644
          vk_backend->iface.get_tensor_async = nullptr;
      }
  
-@@ -16452,7 +16558,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -15961,8 +16071,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+             return op->type == GGML_TYPE_F32;
+         case GGML_OP_FILL:
+             return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
+-        case GGML_OP_SCALE:
+-            return ggml_is_contiguous(op->src[0]) && op->src[0]->type == GGML_TYPE_F32;
++        case GGML_OP_SCALE: {
++            // KCPP_POLARIS_SCALE_SUPPORT: keep untested layouts/devices upstream.
++            const ggml_tensor * source = op->src[0];
++            const bool polaris_rows = device->vendor_id == VK_VENDOR_ID_AMD &&
++                device->architecture == AMD_GCN && device->subgroup_size == 64 &&
++                (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
++                source->ne[2] == 1 && source->ne[3] == 1 && source->nb[0] == sizeof(float) &&
++                source->nb[1] >= size_t(source->ne[0]) * sizeof(float) && ggml_is_contiguous(op);
++            return source->type == GGML_TYPE_F32 && (ggml_is_contiguous(source) || polaris_rows);
++        }
+         case GGML_OP_PAD:
+         case GGML_OP_PAD_REFLECT_1D:
+         case GGML_OP_ROLL:
+@@ -16452,7 +16570,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  
@@ -1038,6 +1077,25 @@ index cf7ab21..9a8094a 100644
      } else {
 -        data_d[d_offset + col] = D_TYPE(scale * FLOAT_TYPE(data_a[a_offset + col]));
 +        data_d[d_offset + col] = D_TYPE(scale * kcpp_x);
+     }
+ }
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
+index 35ec726..0dc989d 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
+@@ -18,7 +18,13 @@ void main() {
+             continue;
+         }
+ 
+-        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
++        // KCPP_POLARIS_SCALE_ROWS: contiguous path retains the original expression.
++        uint source_idx = idx;
++        if (p.param3 != 0.0f) {
++            const uint row = fastdiv(idx, p.ne0_0mp, fastdiv_L(p.ne0_Ls, 2));
++            source_idx += row * (p.nb01 - p.ne00);
++        }
++        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + source_idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
+         idx += num_threads;
      }
  }
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
@@ -1765,7 +1823,7 @@ index 0000000..3539707
 +
 +#endif  // __SD_CORE_PE_CACHE_H__
 diff --git a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
-index f1cbbc7..188c741 100644
+index f1cbbc7..37891d8 100644
 --- a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
 +++ b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
 @@ -2,7 +2,9 @@
@@ -1799,7 +1857,27 @@ index f1cbbc7..188c741 100644
              };
              auto q       = norm("q_norm", split(0));
              auto k       = norm("k_norm", split(1));
-@@ -175,10 +178,17 @@ namespace MOSSImage {
+@@ -134,7 +137,18 @@ namespace MOSSImage {
+             y            = norm("norm2", x);
+             y            = ggml_add(c, ggml_add(c, y, ggml_mul(c, y, part(4))), part(3));
+             auto up_gate = linear("proj.ffn_up_gate", y);
+-            y            = situ(c, ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim), ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim));
++            // KCPP_MOSS_FFN_VIEWS: avoid copies only when the backend accepts the consumers.
++            auto hidden = ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim, false);
++            auto gate = ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim, false);
++            const bool use_views = ctx->backend != nullptr &&
++                ggml_backend_dev_type(ggml_backend_get_device(ctx->backend)) == GGML_BACKEND_DEVICE_TYPE_GPU &&
++                ggml_backend_supports_op(ctx->backend, ggml_scale(c, hidden, 1.f / 25.f)) &&
++                ggml_backend_supports_op(ctx->backend, ggml_sigmoid(c, gate));
++            if (!use_views) {
++                hidden = ggml_cont(c, hidden);
++                gate = ggml_cont(c, gate);
++            }
++            y = situ(c, hidden, gate);
+             y            = linear("proj.ffn_down", y);
+             y            = ggml_mul(c, y, part(5));
+             return ggml_add(c, x, y);
+@@ -175,10 +189,17 @@ namespace MOSSImage {
              time      = linear("time_embedding.2", ggml_silu(c, linear("time_embedding.0", time)));
              auto mod  = linear("shared_block_modulation", time);
              auto head = linear("video_head_modulation", time);
@@ -1819,7 +1897,7 @@ index f1cbbc7..188c741 100644
                      sd::ggml_graph_cut::mark_graph_cut(x, "moss_image.layers." + std::to_string(i), "x");
                  }
              }
-@@ -193,9 +203,10 @@ namespace MOSSImage {
+@@ -193,9 +214,10 @@ namespace MOSSImage {
      };
  
      struct MOSSImageRunner : public DiffusionModelRunner {
@@ -1831,7 +1909,7 @@ index f1cbbc7..188c741 100644
  
          MOSSImageRunner(ggml_backend_t backend, const String2TensorStorage& weights, const std::string& prefix, std::shared_ptr<RunnerWeightManager> weight_manager = nullptr)
              : DiffusionModelRunner(backend, prefix, weight_manager), config(MOSSImageConfig::detect_from_weights(weights, prefix)), model(config) {
-@@ -224,33 +235,36 @@ namespace MOSSImage {
+@@ -224,33 +246,36 @@ namespace MOSSImage {
                  auto text = make_input(*inputs.context);
                  GGML_ASSERT(x->ne[3] == 1 && x->ne[2] == config.channels && text->ne[0] == config.text_dim);
                  int64_t h = x->ne[1], w = x->ne[0], nt = text->ne[1];

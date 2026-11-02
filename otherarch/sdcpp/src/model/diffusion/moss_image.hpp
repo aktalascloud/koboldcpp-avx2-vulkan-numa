@@ -137,7 +137,18 @@ namespace MOSSImage {
             y            = norm("norm2", x);
             y            = ggml_add(c, ggml_add(c, y, ggml_mul(c, y, part(4))), part(3));
             auto up_gate = linear("proj.ffn_up_gate", y);
-            y            = situ(c, ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim), ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim));
+            // KCPP_MOSS_FFN_VIEWS: avoid copies only when the backend accepts the consumers.
+            auto hidden = ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim, false);
+            auto gate = ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim, false);
+            const bool use_views = ctx->backend != nullptr &&
+                ggml_backend_dev_type(ggml_backend_get_device(ctx->backend)) == GGML_BACKEND_DEVICE_TYPE_GPU &&
+                ggml_backend_supports_op(ctx->backend, ggml_scale(c, hidden, 1.f / 25.f)) &&
+                ggml_backend_supports_op(ctx->backend, ggml_sigmoid(c, gate));
+            if (!use_views) {
+                hidden = ggml_cont(c, hidden);
+                gate = ggml_cont(c, gate);
+            }
+            y = situ(c, hidden, gate);
             y            = linear("proj.ffn_down", y);
             y            = ggml_mul(c, y, part(5));
             return ggml_add(c, x, y);

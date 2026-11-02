@@ -1,5 +1,11 @@
 # Retained patches and sources
 
+## Manual photo optimization · 2 November 2026
+
+Local [Polaris row-SCALE](../ggml/src/ggml-vulkan/ggml-vulkan.cpp), [shader](../ggml/src/ggml-vulkan/vulkan-shaders/scale.comp) and [MOSS FFN views](../otherarch/sdcpp/src/model/diffusion/moss_image.hpp) remove two materializations per computed MOSS FFN. Additional SCALE support requires F32,2D packed rows, contiguous output, AMD GCN/subgroup64 and known Polaris IDs; other layouts/devices keep upstream support. MOSS checks backend support and retains the materialized fallback. HC fusion still requires contiguous input. SiTU arithmetic, precision, model/cache/LoRA settings and C ABI are unchanged.
+
+Measured on RX5802048SP:504 fewer CONT calls; Normal warm Native0.47% /pipeline0.37% less time versus prior fork. [Complete stock/fork/return controls, first calls, SHA and limits](../results/photo-latest.json). [184 real CPU/Vulkan bit-exact SCALE cases](tests/check_photo_scale.cpp);17 unprofiled real photo outputs were RGB-identical. This small incremental result is separate from the full fork versus official stock. Diagnostic GPU time is dominated by FlashAttention34.5% and the four large Q8 matmuls41.4%; no reduction of steps, cache threshold, or precision is used to improve these figures.
+
 The checkout already contains these changes. Do not reapply [runtime.patch](patches/runtime.patch). [Exact source/EXE hashes and flags](provenance.json).
 
 | Patch | Source / implementation | Scope |

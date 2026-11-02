@@ -18,7 +18,13 @@ void main() {
             continue;
         }
 
-        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
+        // KCPP_POLARIS_SCALE_ROWS: contiguous path retains the original expression.
+        uint source_idx = idx;
+        if (p.param3 != 0.0f) {
+            const uint row = fastdiv(idx, p.ne0_0mp, fastdiv_L(p.ne0_Ls, 2));
+            source_idx += row * (p.nb01 - p.ne00);
+        }
+        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + source_idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
         idx += num_threads;
     }
 }

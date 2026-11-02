@@ -10766,6 +10766,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
     vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
     p.param1 = ggml_get_op_params_f32(dst, 0);
     p.param2 = ggml_get_op_params_f32(dst, 1);
+    // KCPP_POLARIS_SCALE_ROWS: support is limited below to packed 2D rows.
+    p.param3 = ggml_is_contiguous(src0) ? 0.0f : 1.0f;
 
     ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
 }
@@ -13796,7 +13798,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
     const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
 
     // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
-    return ggml_get_unary_op(sigmoid) == GGML_UNARY_OP_SIGMOID &&
+    // KCPP_SCALE_ROWS_FUSION_GUARD: HC fusion still uses contiguous flat input.
+    return ggml_is_contiguous(scale_in->src[0]) &&
+           ggml_get_unary_op(sigmoid) == GGML_UNARY_OP_SIGMOID &&
            ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
            ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
            scale_in->src[0]->type == GGML_TYPE_F32 &&
@@ -16067,8 +16071,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
             return op->type == GGML_TYPE_F32;
         case GGML_OP_FILL:
             return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
-        case GGML_OP_SCALE:
-            return ggml_is_contiguous(op->src[0]) && op->src[0]->type == GGML_TYPE_F32;
+        case GGML_OP_SCALE: {
+            // KCPP_POLARIS_SCALE_SUPPORT: keep untested layouts/devices upstream.
+            const ggml_tensor * source = op->src[0];
+            const bool polaris_rows = device->vendor_id == VK_VENDOR_ID_AMD &&
+                device->architecture == AMD_GCN && device->subgroup_size == 64 &&
+                (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
+                source->ne[2] == 1 && source->ne[3] == 1 && source->nb[0] == sizeof(float) &&
+                source->nb[1] >= size_t(source->ne[0]) * sizeof(float) && ggml_is_contiguous(op);
+            return source->type == GGML_TYPE_F32 && (ggml_is_contiguous(source) || polaris_rows);
+        }
         case GGML_OP_PAD:
         case GGML_OP_PAD_REFLECT_1D:
         case GGML_OP_ROLL:

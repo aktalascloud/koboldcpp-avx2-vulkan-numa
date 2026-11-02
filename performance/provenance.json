@@ -20,15 +20,15 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "3c080a84accb58b764a39aae1449c0daad3cea3137c6d901117e706778439b91",
-  "patch_sha256": "f6e4eb8da48a8861ae7b66b0de014bb0e0c4f9a9eae9920fabbe68b6bfb7a001",
-  "seconds": 880.311755657196,
+  "executable_sha256": "cb260832775124d2fb2bdc7021222a1f6526c82e64456dfdb469bb4c2419ff61",
+  "patch_sha256": "bd1ee613f4d3053cc54a5b65cccc42a1786985fc3c70e861d59592031694620c",
+  "seconds": 893.9999129772186,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "6c2b3159249349451e9580a028f855b2c68b7c718245ec63eb98d5f556d44e8a",
+  "native_source_signature": "d78cdbd838162d6dcd1d77bef688353be00c554dad212076a57a665e2a8b8d78",
   "native_input_count": 3236,
   "native_dlls_reused": false,
   "native_validation_parent_sha256": null,
@@ -39,8 +39,8 @@
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "affc07946f011c41e4e83d7e91d12a937e6107efaf93318f32f17c6b407acf12",
-    "koboldcpp_vulkan.dll": "dd7c79f7bc99a57c197e0b68be13d246f3f155547d933c44c265d4e9ff7e9d08"
+    "koboldcpp_default.dll": "124ece7ea082e9b4d74e2254b15ae762d1cd861fd022212bb474c290c0b34db4",
+    "koboldcpp_vulkan.dll": "76b3d7f81979817cb5aea3acdc59d091a42e298e70bf5b8cbdc3c9000c10e384"
   },
   "cpu_threads": {
     "threads": 16,

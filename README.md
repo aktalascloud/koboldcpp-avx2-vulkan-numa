@@ -7,7 +7,20 @@ Goal: maximize correct AVX2/Polaris generation throughput while continuously mer
 
 O3/Haswell + LTO, no PGO/fast-math. November 2: official YuE2 VRAM lifetime fixes, SheetSage2 engine support, WebP input and reasoning-budget grammar repair. [Review and limits](performance/daily-review.json). Retained: selected [MOSS copy/cache ports](https://github.com/LostRuins/koboldcpp/pull/2576), independent [legacy readback fallback](https://github.com/LostRuins/koboldcpp/pull/2564), Polaris queue/FP32-tile/IQ4 tuning, CPU sampling/grammar and Win64 ABI fixes, optional HybridMoE/SLRU and Windows NUMA. [Every retained patch and attribution](performance/PATCHES.md). Native uses the upstream-supported monolithic layout (`KCPP_COMMONIZE=0`) for full LTO and explicit C ABI.
 
-## Original stock versus last measured build
+## Manual photo comparison · 2026-11-02
+
+Current Ray Q8 + Afterlight0.25/RealismEnhancer1, unchanged encoder/VAE/settings: Normal736×1104,8 Euler/simple, Cache-DiT0.08. Official rolling1.124.2 (`c66550f4`) versus this build (`cb260832`). Warm model-ready medians,2 repeats per final arm:
+
+| Time | Official stock | Latest | Less time |
+|---|---:|---:|---:|
+| Native photo |176.670s|146.815s|16.90%|
+| Native + faces/Gater |184.423s|154.698s|16.12%|
+
+The new Polaris row-SCALE/MOSS FFN-view patch adds **0.47% Native /0.37% pipeline** versus the previous fork, separately from the whole-fork gains. It removes504 materializations in this workload;184 CPU/Vulkan cases and17 unprofiled real generations retained identical RGB. [All repeats, SHA, models, profiler data and limits](results/photo-latest.json) · [Patch](performance/PATCHES.md#manual-photo-optimization--2-november-2026).
+
+The matched table uses common PNG6. The [media backend](https://github.com/aktalascloud/koboldcpp-media-pipeline) separately adds lossless PNG3:4x encoding1.566→1.052s, payload+1.4%, exact RGB/text. Whole SR HTTP ranges overlap; this is not a whole-request gain claim. First calls and return controls are retained, including the trial's slower first Native151.229s versus149.658/149.732s. Model loading/return, public HTTP queue and diagnostic runs are excluded from the table. One prompt/seed and this hardware/model set; no new LLM/video benchmark.
+
+## Last LLM token comparison · 2026-10-25
 Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, CPU 4 / Vulkan 2 repeats per arm. Tokens/s means:
 
 | Stage | Original stock | Last measured | Change |
