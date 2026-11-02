@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 284a70e..2b8daae 100644
+index 24efd75..7c9557d 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -754,7 +754,7 @@ budget.o: common/reasoning-budget.cpp common/reasoning-budget.h
@@ -560,7 +560,7 @@ index b717070..971d234 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 44d8393..068810d 100644
+index 7bac81e..fe1e9a0 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1270,7 +1270,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
@@ -1092,10 +1092,10 @@ index 07d4a3d..ca10e81 100644
  struct generation_inputs
  {
 diff --git a/kcpp_src/gpttype_adapter.cpp b/kcpp_src/gpttype_adapter.cpp
-index 8241bc8..b716aa6 100644
+index 99d1944..7efdc3c 100644
 --- a/kcpp_src/gpttype_adapter.cpp
 +++ b/kcpp_src/gpttype_adapter.cpp
-@@ -989,6 +989,7 @@ static void mtp_decoding_setup(llama_model * main_model, llama_context * main_ct
+@@ -990,6 +990,7 @@ static void mtp_decoding_setup(llama_model * main_model, llama_context * main_ct
      llama_context_params mtp_ctx_params = base_ctx_params;
      // Match upstream: only the target context owns an expert cache.
      mtp_ctx_params.moe_cache_size = 0;
@@ -1103,7 +1103,7 @@ index 8241bc8..b716aa6 100644
      mtp_ctx_params.ctx_type = LLAMA_CONTEXT_TYPE_MTP;
      mtp_ctx_params.ctx_other = main_ctx;
      mtp_ctx_params.n_rs_seq = 0;
-@@ -3442,6 +3443,8 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
+@@ -3456,6 +3457,8 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
          llama_context_params llama_ctx_params = llama_context_default_params();
          model_params.lazy_mode = static_cast<llama_lazy_mode>(inputs.lazy_mode);
          llama_ctx_params.moe_cache_size = static_cast<size_t>(inputs.moe_cache_mib) * 1024 * 1024;
@@ -1112,7 +1112,7 @@ index 8241bc8..b716aa6 100644
          const bool configure_batch_cache = continuous_batching_slots > 1 &&
              !inputs.use_mtp && draftmodel_filename.empty() && !load_guidance &&
              !kcpp_data->use_smartcontext && !kcpp_data->use_contextshift;
-@@ -3891,6 +3894,7 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
+@@ -3905,6 +3908,7 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
              // accounts for the target context.
              llama_context_params guidance_ctx_params = llama_ctx_params;
              guidance_ctx_params.moe_cache_size = 0;
@@ -1121,13 +1121,13 @@ index 8241bc8..b716aa6 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 924fb1b..eebd09d 100644
+index 33422e3..874887c 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
  
  # global vars
- KcppVersion = "1.124.1"
+ KcppVersion = "1.124.2"
 +# KCPP_BUILD_DATE_PORT: package.py embeds the build day; launch time is not used.
 +def _kcpp_packaged_build_day():
 +    try:
@@ -1231,7 +1231,7 @@ index 924fb1b..eebd09d 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9455,7 +9514,27 @@ def show_gui():
+@@ -9458,7 +9517,27 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -1260,7 +1260,7 @@ index 924fb1b..eebd09d 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9540,6 +9619,7 @@ def show_gui():
+@@ -9543,6 +9622,7 @@ def show_gui():
  
      # trigger empty tooltip then remove it
      def show_tooltip(event, tooltip_text=None):
@@ -1268,7 +1268,7 @@ index 924fb1b..eebd09d 100644
          nonlocal gtooltip_box, gtooltip_label
          if not gtooltip_box and not gtooltip_label:
              gtooltip_box = ctk.CTkToplevel(root)
-@@ -9567,7 +9647,7 @@ def show_gui():
+@@ -9570,7 +9650,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
@@ -1277,7 +1277,7 @@ index 924fb1b..eebd09d 100644
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9784,7 +9864,7 @@ def show_gui():
+@@ -9787,7 +9867,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
@@ -1286,7 +1286,7 @@ index 924fb1b..eebd09d 100644
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
  
-@@ -10699,6 +10779,8 @@ def show_gui():
+@@ -10702,6 +10782,8 @@ def show_gui():
      # Image Gen Tab
  
      images_tab = tabcontent["Image Gen"]
@@ -1295,7 +1295,7 @@ index 924fb1b..eebd09d 100644
      makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
  
      def togglesdlora(a,b,c):
-@@ -10739,7 +10821,7 @@ def show_gui():
+@@ -10742,7 +10824,7 @@ def show_gui():
      makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
      makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
      makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
@@ -1304,16 +1304,16 @@ index 924fb1b..eebd09d 100644
  
  
      sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
-@@ -10767,6 +10849,8 @@ def show_gui():
+@@ -10770,6 +10852,8 @@ def show_gui():
  
      # audio tab
      audio_tab = tabcontent["Audio"]
 +    audio_tab = ctk.CTkScrollableFrame(audio_tab,width=440,height=440)
 +    audio_tab.grid(row=1,padx=3,pady=2,sticky="nsew")
-     makefileentry(audio_tab, "Whisper Model (Speech-To-Text):", "Select Whisper .bin Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin","*.bin")], tooltiptxt="Select a Whisper .bin model file on disk to be loaded for Voice Recognition.")
+     makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or SheetSage2 Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
      whisper_model_var.trace_add("write", gui_changed_modelfile)
      makefileentry(audio_tab, "TTS Model (Text-To-Speech):", "Select TTS GGUF Model File", tts_model_var, 3, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a TTS GGUF model file on disk to be loaded for Narration.")
-@@ -10852,6 +10936,8 @@ def show_gui():
+@@ -10855,6 +10939,8 @@ def show_gui():
  
      # extra tab
      extra_tab = tabcontent["Extra"]
@@ -1322,7 +1322,7 @@ index 924fb1b..eebd09d 100644
      makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
      ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
      makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
-@@ -10917,6 +11003,8 @@ def show_gui():
+@@ -10920,6 +11006,8 @@ def show_gui():
  
      # launch
      def guilaunch():
@@ -1331,7 +1331,7 @@ index 924fb1b..eebd09d 100644
          if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
              # prevent launch without at least one valid model
              givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
-@@ -11508,6 +11596,8 @@ def show_gui():
+@@ -11511,6 +11599,8 @@ def show_gui():
              auto_set_backend_gui(True)
  
      def save_config_gui():
@@ -1340,7 +1340,7 @@ index 924fb1b..eebd09d 100644
          nonlocal kcpp_exporting_template
          kcpp_exporting_template = False
          export_vars()
-@@ -11523,6 +11613,8 @@ def show_gui():
+@@ -11526,6 +11616,8 @@ def show_gui():
          pass
  
      def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
@@ -1349,7 +1349,7 @@ index 924fb1b..eebd09d 100644
          file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
          global runmode_untouched, zenity_permitted
          filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
-@@ -11643,6 +11735,22 @@ def show_gui():
+@@ -11646,6 +11738,22 @@ def show_gui():
              mydict = vars(args)
              import_vars(mydict)
  
@@ -1372,7 +1372,7 @@ index 924fb1b..eebd09d 100644
      # runs main loop until closed or launch clicked
      try:
          root.mainloop()
-@@ -12979,7 +13087,7 @@ def main(launch_args, default_args):
+@@ -12982,7 +13090,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -1381,7 +1381,7 @@ index 924fb1b..eebd09d 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14473,8 +14581,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14476,8 +14584,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  
@@ -1424,7 +1424,7 @@ index 924fb1b..eebd09d 100644
  
      def check_range(value_type, min_value, max_value):
          def range_checker(arg: str):
-@@ -14518,6 +14660,7 @@ if __name__ == '__main__':
+@@ -14521,6 +14663,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -1432,7 +1432,7 @@ index 924fb1b..eebd09d 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14552,6 +14695,9 @@ if __name__ == '__main__':
+@@ -14555,6 +14698,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -1558,10 +1558,10 @@ index 56e1e5a..33293a1 100644
 +OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 +SOFTWARE.
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 3cebd9c..086cc45 100644
+index bb6d27e..9316c4f 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -890,6 +890,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
+@@ -891,6 +891,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
          params.photo_maker_path = "";
      }
  
@@ -1580,7 +1580,7 @@ index 3cebd9c..086cc45 100644
      //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
      if(kcpp_taesd_path=="" && !path_empty(params.vae_path) && toLowerCase(params.vae_path).rfind("tae")!=std::string::npos)
      {
-@@ -2212,6 +2224,8 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2217,6 +2229,8 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
          vid_gen_params.video_frames = vid_req_frames;
          vid_gen_params.fps = vid_fps;
          vid_gen_params.vae_tiling_params = params.vae_tiling_params;
@@ -1589,7 +1589,7 @@ index 3cebd9c..086cc45 100644
          vid_gen_params.loras = params.loras;
          vid_gen_params.lora_count = params.lora_count;
          if (!info.is_minimaxh3 && ref_audio_data.size()>0) {
-@@ -2269,12 +2283,41 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2274,12 +2288,41 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
  
          fflush(stdout);
  
@@ -1631,7 +1631,7 @@ index 3cebd9c..086cc45 100644
          if(!sd_is_quiet && sddebugmode==1)
          {
              printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",vid_req_frames, generated_num_results);
-@@ -2466,7 +2509,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2471,7 +2514,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              }
              if(output_avi)
              {
