@@ -33,6 +33,7 @@
 #include <thread>
 
 #include "utils.h"
+#include "webp_image.h"
 #include "llmutils.h"
 #include "kcpp_src/kcpp_backend.h"
 
@@ -2506,6 +2507,19 @@ const std::vector<int> & think_start_seq, const std::vector<int> & think_end_seq
         candidates[newid].logit += 99999;
         sample_top_k(&candidates_p, 1);
         id = sample_token(&candidates_p, rng);
+        // The injected budget message is outside the grammar. Only replay its
+        // final end-of-thinking marker, which may be required before EOS.
+        const bool forced_end_think = think_end_phrase_toks.empty() &&
+                                      think_end_seq.size() == 1 &&
+                                      id == think_end_seq[0];
+        if (grammar != nullptr && forced_end_think) {
+            llama_token_data forced_token = {id, 0.0f, 0.0f};
+            llama_token_data_array forced_candidates = {&forced_token, 1, false};
+            sample_grammar(file_format, n_vocab, &forced_candidates, grammar);
+            if (forced_candidates.size != 0) {
+                grammar_accept_token(file_format, n_vocab, grammar, id);
+            }
+        }
         return id;
     }
 
@@ -2599,7 +2613,7 @@ const std::vector<int> & think_start_seq, const std::vector<int> & think_end_seq
         id = sample_adaptive_p(adaptive_target, adaptive_p_weighted_sum, adaptive_p_total_weight, &candidates_p, adaptive_decay, rng);
     }
 
-    // Only advance the grammar for sampled tokens, not forced reasoning-budget tokens.
+    // Normally sampled tokens have already passed grammar filtering.
     if (grammar != nullptr) {
         grammar_accept_token(file_format, n_vocab, grammar, id);
     }
@@ -6614,6 +6628,10 @@ static mtmd_bitmap * kcpp_mtmd_bitmap_init_image_from_buf(const unsigned char * 
     int ny = 0;
     int nc = 0;
     uint8_t * data = stbi_load_from_memory(buf, (int)len, &nx, &ny, &nc, 3);
+    if(data == nullptr)
+    {
+        data = kcpp_decode_webp_from_memory(buf, len, &nx, &ny, &nc, 3);
+    }
     if(data == nullptr)
     {
         printf("\nError: MTMD image failed to decode bytes.");
