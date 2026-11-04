@@ -13,6 +13,7 @@
 #include "ggml-vulkan-common.h"
 #include "ggml-vulkan-buffers.cpp" //kcpp: dirty include
 #include "ggml-vulkan-debug.cpp" //kcpp: dirty include
+#include "ggml-vulkan-comm.cpp" //kcpp: dirty include; PR2581
 
 static vk_device_architecture get_device_architecture(const vk::PhysicalDevice& device) {
     vk::PhysicalDeviceProperties props = device.getProperties();
@@ -14622,7 +14623,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
 
     // KCPP_BATCHED_SUBMITS_PORT: reduce host submit overhead, retain watchdog cap.
     static const bool batched_submits = getenv("GGML_VK_BATCHED_SUBMITS") != nullptr;
-    if (batched_submits) {
+    if (batched_submits && flops_per_submit != 0) {
         flops_per_submit = flops_cap;
     }
 

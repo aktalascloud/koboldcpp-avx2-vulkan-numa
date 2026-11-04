@@ -1,97 +1,81 @@
 {
-  "date": "2026-11-02",
-  "official_commit": "6d2fedf8624e5f05926af3191f9efdcb13c4133c",
-  "previous_official_commit": "91831fafa1ca81ce1bc2904b8f6b5eb4369a4bbb",
-  "new_official_commits": 9,
+  "date": "2026-11-04",
+  "official_commit": "ab00ee527009d8f4cd2c6da9fbf21045d22c98d2",
+  "previous_official_commit": "6d2fedf8624e5f05926af3191f9efdcb13c4133c",
+  "official_new_commits": 82,
+  "official_changed_files": 206,
   "sources": 24,
-  "indexed_pull_requests": 2500,
-  "indexed_issues": 2388,
-  "selected_forks": 13,
+  "indexed_pull_requests": 2516,
+  "indexed_issues": 2390,
+  "selected_forks": 14,
   "fork_activity_days": 14,
-  "audit_errors": ["wbruna/koboldcpp metadata returned HTTP 404; no code imported from this unavailable fork"],
-  "scope": "Refreshed paginated/incremental PR+issue inventory of 24 configured sources; bounded selection of 13 forks active within 14 days. Examined the nine-commit official change list and relevant cards, comments and diffs. Inventory is not a semantic audit of every indexed discussion, file or fork.",
+  "audit_errors": [
+    "wbruna/koboldcpp metadata HTTP404; unavailable fork not imported"
+  ],
+  "scope": "Refreshed paginated/incremental discussion inventory of24 configured sources; bounded active-fork selection. Read relevant commit/file diffs and PR/comments; not every indexed issue, file or fork semantically audited.",
   "reviewed": [
     {
-      "url": "https://github.com/LostRuins/koboldcpp/compare/91831fafa1ca81ce1bc2904b8f6b5eb4369a4bbb...6d2fedf8624e5f05926af3191f9efdcb13c4133c",
-      "decision": "Included all nine official commits through ancestry-preserving fast-forward in the build checkout. Retained exact guarded local ports and the monolithic Haswell/LTO layout."
+      "url": "https://github.com/LostRuins/koboldcpp/compare/6d2fedf8624e5f05926af3191f9efdcb13c4133c...ab00ee527009d8f4cd2c6da9fbf21045d22c98d2",
+      "decision": "Included official1.125 by ancestry-preserving fast-forward;82 commits/206 files including upstream model, KV/FA, media and build changes."
     },
     {
-      "url": "https://github.com/LostRuins/koboldcpp/commit/3b55ec4",
-      "decision": "Included YuE2 graph/weight lifetime fixes: release replaced caches before allocating replacements, release AR generation resources before NAR, release VAE between requests. No new VRAM or speed measurement claimed."
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2581",
+      "decision": "Read file diff/comments. Include missing ggml-vulkan-comm.cpp in the existing amalgamation; required by new upstream tensor-parallel collective implementation. No new collective enabled by default."
     },
     {
-      "url": "https://github.com/LostRuins/koboldcpp/commit/c820c50",
-      "decision": "Included official YuE2 cover-mode and resource integration. Existing user music parameters are preserved."
-    },
-    {
-      "url": "https://github.com/LostRuins/koboldcpp/commit/7454e4d",
-      "decision": "Included upstream SheetSage2 music-to-ABC engine support and model selection. No weights downloaded, profile selected or new model inference performed."
-    },
-    {
-      "url": "https://github.com/LostRuins/koboldcpp/commit/b157771",
-      "decision": "Included static WebP decode bridge for image and multimodal input; reviewed format, allocation-overflow, channels and ownership checks plus Makefile dependencies. Existing media request validation remains in place."
-    },
-    {
-      "url": "https://github.com/LostRuins/koboldcpp/issues/2578",
-      "decision": "Read reasoning-budget/custom grammar discussion and included official eae63a3 final end-thinking marker replay. No grammar behavior changes beyond the official fix."
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2580",
+      "decision": "Read card/comments. Linux ISA auto-selection/common-library route does not apply to this Windows monolithic Haswell/LTO build; not ported."
     },
     {
       "url": "https://github.com/LostRuins/koboldcpp/pull/2564",
-      "decision": "Read updated author/maintainer comments. Retained independent readback fallback and included official OTHER architecture async-disable detection. Do not copy Bulldozer/no-AVX2 flags, allocator policy, forced GCN or MMVQ changes into Haswell/Polaris. R9 390 evidence is not an RX580 benchmark."
+      "decision": "Read updated discussion: maintainer/author consider remaining warning pinned-memory-related. Preserve existing independent readback fallback; no Bulldozer/noAVX2/allocator changes."
     },
     {
-      "url": "https://github.com/LostRuins/koboldcpp/pull/2434",
-      "decision": "Compared pointer-cache lifetime repair with current source. Current upstream position/content-key cache already supersedes the old pointer repair; existing port correctly leaves it upstream."
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2562",
+      "decision": "Officially merged model-factory/ref-image support refactor reviewed at adapter and pipeline boundaries. Existing Pro latent export, cache gates, selected MOSS PE/copy and FFN views remain ported."
     },
     {
       "url": "https://github.com/LostRuins/koboldcpp/pull/2576",
-      "decision": "Reviewed current card/comments and retained previously accepted selected MOSS QKV/shared-slice/position-cache ports. Full 135-file SD refactor is not imported without separate ABI/latent-only compatibility work."
+      "decision": "Reviewed fresh commit list and related discussion. Pending GLU/CUDA/workspace sync not copied wholesale into different MOSS SiTU/Pro pipeline. Existing selected MOSS runtime and bit-exact row-view ports retained; no new speed claim."
     },
     {
-      "url": "https://github.com/LostRuins/koboldcpp/pull/2575",
-      "decision": "Reviewed commit list: grouped Wan temporal decode and large model factory/API changes are separate work; current full Pro DirectML post path and photo cache stay intact."
+      "url": "https://github.com/LostRuins/koboldcpp/commit/fac3a894fc04901c3e5abaff457e024c6b52e04f",
+      "decision": "Included upstream non-compute tensor/view size-check fix. Allocation limits and source/compute validation remain; useful for legacy GCN expert-cache banks."
     },
     {
-      "url": "https://github.com/LostRuins/koboldcpp/pull/2359",
-      "decision": "Read VLM video-input design, Windows feeder-thread deadlock limit and adapter diff. Current adapter already initializes mtmd text_len. Do not import broad video ingestion/CUDA-tested changes as a simple speed patch."
+      "url": "https://github.com/LostRuins/koboldcpp/commit/37b0f9c36ae910c5a445b3934e840084ebc9b132",
+      "decision": "Read complete fix and included expanded256-entry NVFP4 UE4M3 scale LUT/init/shared-memory budgets, preventing shared-memory out-of-bounds reads for accepted scale bytes."
     },
     {
-      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2807",
-      "decision": "Read kernel proposal: reported Q8_0_R16 gains use AVX-512 registers and IQK data layouts, not this Haswell/AVX2 backend. Not ported."
+      "url": "https://github.com/LostRuins/koboldcpp/commit/ded816427",
+      "decision": "Included final official YuE2 sequence, including upstream revert of an audible-seam-inducing resource optimization and subsequent owned prefix K/V storage lifetime fix. No local audio inference run."
     },
     {
-      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2815",
-      "decision": "Read fallback diff: still guarded HAVE_FANCY_SIMD and __m512 kernels; not an AVX2 fallback. Not ported."
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2829",
+      "decision": "Read file diffs. IQK-specific matrix work splitting, AVX512 SiLU and ik delta-net in-place changes do not directly match current backend; no unmeasured transplant."
     },
     {
-      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2811",
-      "decision": "Read delimiter/server-diff exception patches. They target ik's LFM2.5/MiniCPM PEG/server flow; current KCPP path is different. No blind parser transplant."
-    },
-    {
-      "url": "https://github.com/sirfyyn/FastLocalExperts/pull/10",
-      "decision": "Read mmap and expert prefetch diff: WILLNEED work is POSIX-only, Windows function is a no-op. Do not add its detached worker/queue or enable expert cache by default."
-    },
-    {
-      "url": "https://github.com/AvilaCarlosDev/polaris-local-ai/commit/0b1054b7c5c5fb6ea0469d423dc2b119b125a8b3",
-      "decision": "Inspected latest commit metadata/files: documentation refresh, no native kernels to import. External hardware/model benchmark numbers are not attributed to this build."
-    },
-    {
-      "url": "https://github.com/dhaern/VelociQ8/commit/dc6d2c7cdd2ec65b09129f1ce4dda80d27c01840",
-      "decision": "Inspected latest commit metadata/files: LFM3 docs/benchmark updates, no native source change to port."
-    },
-    {
-      "url": "https://github.com/tazlin/koboldcpp",
-      "decision": "Fork inventory exposes a 240/480 video-frame limit change; not ported because current native architecture/budgets and explicit 121-frame contract must not be bypassed."
+      "url": "https://github.com/sirfyyn/FastLocalExperts/pull/14",
+      "decision": "Read detached WILLNEED-worker shutdown fix. That POSIX-only queue was never imported here; no Windows no-op worker or intentionally leaked global state added."
     }
   ],
-  "local_maintenance_fixes": [
-    "Fetch without depth-1 ancestry truncation; fast-forward preserves accepted source ancestry and refuses divergence.",
-    "Correct documented jobs=12 to the enforced maximum of four.",
-    "Only inspect selected fork histories if pushed within 14 days; retain unavailable-fork errors.",
-    "Deployment preserves current Helper parameters and exact profile bytes instead of applying historical thread/runtime results.",
-    "Add standalone before/after settings and exact inline/profile SHA verification."
+  "adaptations": [
+    "Batched submit port follows new upstream small-graph zero threshold and clamped FLOP heuristic; retains explicit batching for large graphs and watchdog cap.",
+    "HybridMoE context/cparams insertions now match upstream fused-KV and layer-embedding fields; preserve no_alloc constructor, small-batch/SLRU handling, synchronization and opt-in/dense-off semantics.",
+    "PR2581 missing Vulkan comm implementation include."
   ],
+  "build_policy": "O3/Haswell/AVX2 + LTO, no PGO/fast-math/AVX512/VNNI, max4 compiler workers, separate shader generation and sequential links",
   "inference_tests_run": false,
   "benchmarks_run": false,
-  "new_speedup_claim": false
+  "new_speedup_claimed": false,
+  "operational_fix": {
+    "trigger": "Stale recorded listener PID was reused by a later protected sandbox service; querying it with process rights returned WinError5 and safe deployment stopped.",
+    "change": "Only on access denied, read CIM name/creation time. Retire the stale record only for a demonstrably later non-Native/non-Python process. Ambiguity or occupied port remains blocked; no process termination or permission changes.",
+    "offline_checks": {
+      "protected_pid_cases": 6,
+      "existing_boot_recovery_cases": 5,
+      "all_passed": true,
+      "inference_started": false
+    }
+  }
 }

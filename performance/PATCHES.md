@@ -1,5 +1,10 @@
 # Retained patches and sources
 
+## Maintenance4November2026
+
+Official1.125 / ab00ee52 is merged with history. [PR2581](https://github.com/LostRuins/koboldcpp/pull/2581) supplies the new Vulkan comm implementation include. Batched submits preserve upstream small-graph0/clamped FLOP handling; HybridMoE context fields and synchronization are adapted to new KV/embedding metadata, still opt-in. [Fresh review](daily-review.json). Build/startup/GET acceptance only; the manual photo results below belong to cb260832 from2November.
+
+
 ## Manual photo optimization · 2 November 2026
 
 Local [Polaris row-SCALE](../ggml/src/ggml-vulkan/ggml-vulkan.cpp), [shader](../ggml/src/ggml-vulkan/vulkan-shaders/scale.comp) and [MOSS FFN views](../otherarch/sdcpp/src/model/diffusion/moss_image.hpp) remove two materializations per computed MOSS FFN. Additional SCALE support requires F32,2D packed rows, contiguous output, AMD GCN/subgroup64 and known Polaris IDs; other layouts/devices keep upstream support. MOSS checks backend support and retains the materialized fallback. HC fusion still requires contiguous input. SiTU arithmetic, precision, model/cache/LoRA settings and C ABI are unchanged.

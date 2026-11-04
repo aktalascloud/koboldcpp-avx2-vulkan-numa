@@ -5,13 +5,13 @@ Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **
 
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
-O3/Haswell + LTO, no PGO/fast-math. November 2: official YuE2 VRAM lifetime fixes, SheetSage2 engine support, WebP input and reasoning-budget grammar repair. [Review and limits](performance/daily-review.json). Retained: selected [MOSS copy/cache ports](https://github.com/LostRuins/koboldcpp/pull/2576), independent [legacy readback fallback](https://github.com/LostRuins/koboldcpp/pull/2564), Polaris queue/FP32-tile/IQ4 tuning, CPU sampling/grammar and Win64 ABI fixes, optional HybridMoE/SLRU and Windows NUMA. [Every retained patch and attribution](performance/PATCHES.md). Native uses the upstream-supported monolithic layout (`KCPP_COMMONIZE=0`) for full LTO and explicit C ABI.
+O3/Haswell + LTO, no PGO/fast-math. **Current1.125 / ab00ee52,2026-11-04: build/source/hash, cold startup, visible window and GET acceptance only; no new generation/speed tests.** Official KV/FA, Vulkan safety, model/SDCPP and YuE2 fixes included; [PR2581 Vulkan build fix](https://github.com/LostRuins/koboldcpp/pull/2581), [review/limits](performance/daily-review.json). Retained [ports and attribution](performance/PATCHES.md), monolithic `KCPP_COMMONIZE=0` and explicit C ABI.
 
 ## Manual photo comparison · 2026-11-02
 
-Current Ray Q8 + Afterlight0.25/RealismEnhancer1, unchanged encoder/VAE/settings: Normal736×1104,8 Euler/simple, Cache-DiT0.08. Official rolling1.124.2 (`c66550f4`) versus this build (`cb260832`). Warm model-ready medians,2 repeats per final arm:
+Current Ray Q8 + Afterlight0.25/RealismEnhancer1, unchanged encoder/VAE/settings: Normal736×1104,8 Euler/simple, Cache-DiT0.08. Official rolling1.124.2 (`c66550f4`) versus the last measured fork (`cb260832`). Warm model-ready medians,2 repeats per final arm:
 
-| Time | Official stock | Latest | Less time |
+| Time | Official stock | Measured cb260832 | Less time |
 |---|---:|---:|---:|
 | Native photo |176.670s|146.815s|16.90%|
 | Native + faces/Gater |184.423s|154.698s|16.12%|
@@ -30,7 +30,7 @@ Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, 
 | Vulkan prompt | 411.010 | 712.810 | +73.4% |
 | Vulkan output | 17.035 | 23.655 | +38.9% |
 
-Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **The current 1.124.2 / 6d2fedf build has no new token benchmark; these historical speeds are not its benchmark.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
+Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **The current1.125 / ab00ee52 build has no new token benchmark; these historical speeds are not its benchmark.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
 
 Vulkan starting point: threads 6 / BLAS 4, batch/ubatch 1024, GPU layers 99, NUMA auto. CPU-only 16/20; media encoder 20 separately. Graphics queue 1, batched submits 1, node 100 and gated Polaris controls are described in [RUN.txt](performance/RUN.txt).
 

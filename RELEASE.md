@@ -1,5 +1,5 @@
-Manual photo speed · 2026-11-02
-- Official experimental: `SOURCE_COMMIT`; EXE SHA256: `NATIVE_SHA256`. O3/Haswell/AVX2 + LTO, no PGO.
-- Current Normal736×1104, same Ray/text/VAE/LoRAs/settings: official stock→latest Native176.670→146.815s; model-ready faces/Gater pipeline184.423→154.698s. Warm2 repeats per arm; [all initial calls, return controls, SHA and limits](results/photo-latest.json).
-- New gated Polaris SCALE/MOSS FFN views: incremental0.47% Native /0.37% pipeline versus prior fork,504 materializations removed.184 CPU/Vulkan cases and17 unprofiled generations retained identical RGB. [All patches/source/licenses](performance/PATCHES.md).
-- Separate media lossless PNG3:4x encoding1.566→1.052s, payload+1.4%, identical RGB/text. Whole SR HTTP ranges overlap; no whole-request gain claimed. No new LLM/video benchmark or user-settings change.
+Haswell / Polaris maintenance · 2026-11-04
+- Official experimental1.125: `SOURCE_COMMIT`; EXE SHA256 `NATIVE_SHA256`.82 new official commits/206 files; ancestry and local ports preserved. O3/Haswell/AVX2 + LTO, no PGO, max4 workers.
+- Upstream KV/FlashAttention, Vulkan view-buffer/NVFP4 bounds, model/SDCPP and YuE2 fixes. Include [PR2581 Vulkan comm fix](https://github.com/LostRuins/koboldcpp/pull/2581); adapt batched-submit and opt-in HybridMoE bindings. [Review and limits](performance/daily-review.json).
+- Source/hash, cold startup, dated visible window and GET APIs verified; user settings and exact profiles preserved. No inference benchmarks. [November2 photo evidence](results/photo-latest.json) retains its own cb260832 SHA and is not a benchmark of this release.
+- [All retained patches/licenses](performance/PATCHES.md) · [Media](https://github.com/aktalascloud/koboldcpp-media-pipeline). No weights or private owner bundle mirrored.

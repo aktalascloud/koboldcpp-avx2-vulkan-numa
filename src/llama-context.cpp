@@ -595,8 +595,7 @@ llama_context::llama_context(
         }
 
         if (cparams.moe_cache_size > 0) {
-            moe_cache = std::make_unique<llama_moe_cache>(model, model.no_alloc(), backend_ptrs, backend_buft, cparams.moe_cache_size,
-                cparams.moe_hybrid_threads, cparams.moe_hybrid_uploads);
+            moe_cache = std::make_unique<llama_moe_cache>(model, model.no_alloc(), backend_ptrs, backend_buft, cparams.moe_cache_size, cparams.moe_hybrid_threads, cparams.moe_hybrid_uploads);
         }
 
         sched_reserve();

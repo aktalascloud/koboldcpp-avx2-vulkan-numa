@@ -1,17 +1,17 @@
 diff --git a/Makefile b/Makefile
-index 24efd75..7c9557d 100644
+index c76ed6e..b686ad2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -754,7 +754,7 @@ budget.o: common/reasoning-budget.cpp common/reasoning-budget.h
- chat.o: common/chat.cpp common/chat.h
- 	$(CXX) $(CXXFLAGS) -c $< -o $@
+@@ -767,7 +767,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel
  
--SDCPP_COMMON_BASENAMES := include/stable-diffusion.h src/conditioning/conditioner.hpp src/conditioning/conditioning_cache.h src/conditioning/wan_audio.cpp src/conditioning/wan_audio.h src/core/backend_fit.cpp src/core/backend_fit.h src/core/compute_workspace.cpp src/core/compute_workspace.h src/core/ggml_extend_backend.cpp src/core/ggml_extend_backend.h src/core/ggml_extend.cpp src/core/ggml_extend.h src/core/ggml_graph_cut.cpp src/core/ggml_graph_cut.h src/core/ggml_runner.cpp src/core/ggml_runner.h src/core/ggml_tensor_utils.cpp src/core/ggml_tensor_utils.h src/core/layer_split_partition.cpp src/core/layer_split_partition.h src/core/ordered_map.hpp src/core/parallel.cpp src/core/parallel.h src/core/probe/backend_probe.cpp src/core/probe/backend_probe.h src/core/probe/conv_direct.cpp src/core/probe/conv_direct.h src/core/probe/flash_attn.cpp src/core/probe/flash_attn.h src/core/regex.cpp src/core/regex.h src/core/rng.hpp src/core/rng_mt19937.hpp src/core/rng_philox.hpp src/core/runner_cache.cpp src/core/runner_cache.h src/core/segment_graph_bindings.cpp src/core/segment_graph_bindings.h src/core/segment_weight_pipeline.cpp src/core/segment_weight_pipeline.h src/core/tensor_ggml.hpp src/core/tensor.hpp src/core/util.cpp src/core/util.h src/detailer.cpp src/detailer.h src/device_residency_manager.h src/extensions/generation_extension.h src/extensions/photomaker_extension.cpp src/extensions/pulid_extension.cpp src/kcpp_sd_extensions.h src/model/adapter/ip_adapter.hpp src/model/adapter/lora.hpp src/model/adapter/lora_ops.cpp src/model/adapter/lora_ops.h src/model/adapter/pmid.hpp src/model/adapter/pulid.hpp src/model/audio/wav2vec2.hpp src/model/common/block.hpp src/model/common/ggml_block.hpp src/model/common/rope_circular.hpp src/model/common/rope.hpp src/model_component.h src/model/detector/yolov8.h src/model/diffusion/anima.hpp src/model/diffusion/animatediff.hpp src/model/diffusion/boogu.hpp src/model/diffusion/control.hpp src/model/diffusion/dit.hpp src/model/diffusion/ernie_image.hpp src/model/diffusion/flux3.hpp src/model/diffusion/flux.hpp src/model/diffusion/hidream_o1.hpp src/model/diffusion/hunyuan.hpp src/model/diffusion/ideogram4.hpp src/model/diffusion/iris.hpp src/model/diffusion/krea2.hpp src/model/diffusion/lens.hpp src/model/diffusion/lingbot_video.hpp src/model/diffusion/llada_image.hpp src/model/diffusion/ltxv.hpp src/model/diffusion/mage_flow.hpp src/model/diffusion/ming_image.hpp src/model/diffusion/minimax_h3.hpp src/model/diffusion/minit2i.hpp src/model/diffusion/mmdit.hpp src/model/diffusion/model.hpp src/model/diffusion/pid.hpp src/model/diffusion/pixart.hpp src/model/diffusion/qwen_image_2_1.hpp src/model/diffusion/qwen_image.hpp src/model/diffusion/sefi_image.hpp src/model/diffusion/sensenova_u1.h src/model/diffusion/unet.hpp src/model/diffusion/wan_audio.hpp src/model/diffusion/wan.hpp src/model/diffusion/z_image.hpp src/model/diffusion/z_image_l2p.hpp src/model.h src/model_io/binary_io.h src/model_io/gguf_io.cpp src/model_io/gguf_io.h src/model_io/gguf_reader_ext.h src/model_io/kcpp_sdcpp_quantized_safetensors.hpp src/model_io/pickle_io.cpp src/model_io/pickle_io.h src/model_io/safetensors_io.cpp src/model_io/safetensors_io.h src/model_io/streaming_writer.h src/model_io/tensor_storage.h src/model_io/torch_legacy_io.cpp src/model_io/torch_legacy_io.h src/model_io/torch_zip_io.cpp src/model_io/torch_zip_io.h src/model_loader.cpp src/model_loader_files.cpp src/model_loader.h src/model_manager.cpp src/model_manager_files.cpp src/model_manager.h src/model_manager_prefetch.cpp src/model/te/clip.hpp src/model/te/llada_image_te.hpp src/model/te/llm.hpp src/model/te/ming_image_te.hpp src/model/te/t5.hpp src/model/upscaler/esrgan.hpp src/model/upscaler/ltx_latent_upscaler.hpp src/model/upscaler/mosr.hpp src/model/vae/audio_vae.hpp src/model/vae/auto_encoder_kl.hpp src/model/vae/hunyuan_vae.hpp src/model/vae/ltx_audio_vae.hpp src/model/vae/ltx_vae.hpp src/model/vae/mage_vae.hpp src/model/vae/minimax_h3_audio_vae.hpp src/model/vae/minimax_h3_vae.hpp src/model/vae/tae.hpp src/model/vae/vae.hpp src/model/vae/vae_tiling.hpp src/model/vae/wan_vae.hpp src/name_conversion.cpp src/name_conversion.h src/pipeline/diffusion_engine.cpp src/pipeline/diffusion_engine.h src/pipeline/generation.h src/pipeline/image.cpp src/pipeline/model_builders.cpp src/pipeline/model_builders.h src/pipeline/request.cpp src/pipeline/request.h src/pipeline/video.cpp src/runtime/audio_processing.cpp src/runtime/audio_processing.h src/runtime/cache_dit.hpp src/runtime/condition_cache_utils.hpp src/runtime/denoiser.hpp src/runtime/easycache.hpp src/runtime/gits_noise.h src/runtime/guidance.cpp src/runtime/guidance.h src/runtime/image_preprocess.cpp src/runtime/image_preprocess.h src/runtime/imatrix.cpp src/runtime/imatrix.h src/runtime/latent-preview.h src/runtime/preprocessing.hpp src/runtime/preview_interval.h src/runtime/sample-cache.cpp src/runtime/sample-cache.h src/runtime/spectrum.hpp src/runtime/tiling.cpp src/runtime/tiling.h src/runtime/ucache.hpp src/stable-diffusion.cpp src/tokenizers/bpe_tokenizer.cpp src/tokenizers/bpe_tokenizer.h src/tokenizers/clip_tokenizer.cpp src/tokenizers/clip_tokenizer.h src/tokenizers/gemma_tokenizer.cpp src/tokenizers/gemma_tokenizer.h src/tokenizers/hf_tokenizer.cpp src/tokenizers/hf_tokenizer.h src/tokenizers/mistral_tokenizer.cpp src/tokenizers/mistral_tokenizer.h src/tokenizers/qwen2_tokenizer.cpp src/tokenizers/qwen2_tokenizer.h src/tokenizers/sensenova_u1_tokenizer.cpp src/tokenizers/sensenova_u1_tokenizer.h src/tokenizers/t5_unigram_tokenizer.cpp src/tokenizers/t5_unigram_tokenizer.h src/tokenizers/tokenizer_config.cpp src/tokenizers/tokenizer_config.h src/tokenizers/tokenizer.cpp src/tokenizers/tokenizer.h src/tokenizers/tokenize_util.cpp src/tokenizers/tokenize_util.h src/tokenizers/vocab/vocab.h src/upscaler.cpp src/upscaler.h thirdparty/darts.h thirdparty/miniz.h thirdparty/oniguruma/ascii.c thirdparty/oniguruma/oniguruma.h thirdparty/oniguruma/regcomp.c thirdparty/oniguruma/regenc.c thirdparty/oniguruma/regenc.h thirdparty/oniguruma/regerror.c thirdparty/oniguruma/regexec.c thirdparty/oniguruma/regint.h thirdparty/oniguruma/regparse.c thirdparty/oniguruma/regparse.h thirdparty/oniguruma/st.c thirdparty/oniguruma/st.h thirdparty/oniguruma/unicode.c thirdparty/oniguruma/unicode_fold1_key.c thirdparty/oniguruma/unicode_fold2_key.c thirdparty/oniguruma/unicode_fold3_key.c thirdparty/oniguruma/unicode_unfold_key.c thirdparty/oniguruma/utf8.c thirdparty/stb_image_resize.h thirdparty/stb_image_write.h thirdparty/utf8proc/utf8proc.c thirdparty/utf8proc/utf8proc.h thirdparty/zip.c thirdparty/zip.h
-+SDCPP_COMMON_BASENAMES := src/core/pe_cache.cpp src/core/pe_cache.h include/stable-diffusion.h src/conditioning/conditioner.hpp src/conditioning/conditioning_cache.h src/conditioning/wan_audio.cpp src/conditioning/wan_audio.h src/core/backend_fit.cpp src/core/backend_fit.h src/core/compute_workspace.cpp src/core/compute_workspace.h src/core/ggml_extend_backend.cpp src/core/ggml_extend_backend.h src/core/ggml_extend.cpp src/core/ggml_extend.h src/core/ggml_graph_cut.cpp src/core/ggml_graph_cut.h src/core/ggml_runner.cpp src/core/ggml_runner.h src/core/ggml_tensor_utils.cpp src/core/ggml_tensor_utils.h src/core/layer_split_partition.cpp src/core/layer_split_partition.h src/core/ordered_map.hpp src/core/parallel.cpp src/core/parallel.h src/core/probe/backend_probe.cpp src/core/probe/backend_probe.h src/core/probe/conv_direct.cpp src/core/probe/conv_direct.h src/core/probe/flash_attn.cpp src/core/probe/flash_attn.h src/core/regex.cpp src/core/regex.h src/core/rng.hpp src/core/rng_mt19937.hpp src/core/rng_philox.hpp src/core/runner_cache.cpp src/core/runner_cache.h src/core/segment_graph_bindings.cpp src/core/segment_graph_bindings.h src/core/segment_weight_pipeline.cpp src/core/segment_weight_pipeline.h src/core/tensor_ggml.hpp src/core/tensor.hpp src/core/util.cpp src/core/util.h src/detailer.cpp src/detailer.h src/device_residency_manager.h src/extensions/generation_extension.h src/extensions/photomaker_extension.cpp src/extensions/pulid_extension.cpp src/kcpp_sd_extensions.h src/model/adapter/ip_adapter.hpp src/model/adapter/lora.hpp src/model/adapter/lora_ops.cpp src/model/adapter/lora_ops.h src/model/adapter/pmid.hpp src/model/adapter/pulid.hpp src/model/audio/wav2vec2.hpp src/model/common/block.hpp src/model/common/ggml_block.hpp src/model/common/rope_circular.hpp src/model/common/rope.hpp src/model_component.h src/model/detector/yolov8.h src/model/diffusion/anima.hpp src/model/diffusion/animatediff.hpp src/model/diffusion/boogu.hpp src/model/diffusion/control.hpp src/model/diffusion/dit.hpp src/model/diffusion/ernie_image.hpp src/model/diffusion/flux3.hpp src/model/diffusion/flux.hpp src/model/diffusion/hidream_o1.hpp src/model/diffusion/hunyuan.hpp src/model/diffusion/ideogram4.hpp src/model/diffusion/iris.hpp src/model/diffusion/krea2.hpp src/model/diffusion/lens.hpp src/model/diffusion/lingbot_video.hpp src/model/diffusion/llada_image.hpp src/model/diffusion/ltxv.hpp src/model/diffusion/mage_flow.hpp src/model/diffusion/ming_image.hpp src/model/diffusion/minimax_h3.hpp src/model/diffusion/minit2i.hpp src/model/diffusion/mmdit.hpp src/model/diffusion/model.hpp src/model/diffusion/pid.hpp src/model/diffusion/pixart.hpp src/model/diffusion/qwen_image_2_1.hpp src/model/diffusion/qwen_image.hpp src/model/diffusion/sefi_image.hpp src/model/diffusion/sensenova_u1.h src/model/diffusion/unet.hpp src/model/diffusion/wan_audio.hpp src/model/diffusion/wan.hpp src/model/diffusion/z_image.hpp src/model/diffusion/z_image_l2p.hpp src/model.h src/model_io/binary_io.h src/model_io/gguf_io.cpp src/model_io/gguf_io.h src/model_io/gguf_reader_ext.h src/model_io/kcpp_sdcpp_quantized_safetensors.hpp src/model_io/pickle_io.cpp src/model_io/pickle_io.h src/model_io/safetensors_io.cpp src/model_io/safetensors_io.h src/model_io/streaming_writer.h src/model_io/tensor_storage.h src/model_io/torch_legacy_io.cpp src/model_io/torch_legacy_io.h src/model_io/torch_zip_io.cpp src/model_io/torch_zip_io.h src/model_loader.cpp src/model_loader_files.cpp src/model_loader.h src/model_manager.cpp src/model_manager_files.cpp src/model_manager.h src/model_manager_prefetch.cpp src/model/te/clip.hpp src/model/te/llada_image_te.hpp src/model/te/llm.hpp src/model/te/ming_image_te.hpp src/model/te/t5.hpp src/model/upscaler/esrgan.hpp src/model/upscaler/ltx_latent_upscaler.hpp src/model/upscaler/mosr.hpp src/model/vae/audio_vae.hpp src/model/vae/auto_encoder_kl.hpp src/model/vae/hunyuan_vae.hpp src/model/vae/ltx_audio_vae.hpp src/model/vae/ltx_vae.hpp src/model/vae/mage_vae.hpp src/model/vae/minimax_h3_audio_vae.hpp src/model/vae/minimax_h3_vae.hpp src/model/vae/tae.hpp src/model/vae/vae.hpp src/model/vae/vae_tiling.hpp src/model/vae/wan_vae.hpp src/name_conversion.cpp src/name_conversion.h src/pipeline/diffusion_engine.cpp src/pipeline/diffusion_engine.h src/pipeline/generation.h src/pipeline/image.cpp src/pipeline/model_builders.cpp src/pipeline/model_builders.h src/pipeline/request.cpp src/pipeline/request.h src/pipeline/video.cpp src/runtime/audio_processing.cpp src/runtime/audio_processing.h src/runtime/cache_dit.hpp src/runtime/condition_cache_utils.hpp src/runtime/denoiser.hpp src/runtime/easycache.hpp src/runtime/gits_noise.h src/runtime/guidance.cpp src/runtime/guidance.h src/runtime/image_preprocess.cpp src/runtime/image_preprocess.h src/runtime/imatrix.cpp src/runtime/imatrix.h src/runtime/latent-preview.h src/runtime/preprocessing.hpp src/runtime/preview_interval.h src/runtime/sample-cache.cpp src/runtime/sample-cache.h src/runtime/spectrum.hpp src/runtime/tiling.cpp src/runtime/tiling.h src/runtime/ucache.hpp src/stable-diffusion.cpp src/tokenizers/bpe_tokenizer.cpp src/tokenizers/bpe_tokenizer.h src/tokenizers/clip_tokenizer.cpp src/tokenizers/clip_tokenizer.h src/tokenizers/gemma_tokenizer.cpp src/tokenizers/gemma_tokenizer.h src/tokenizers/hf_tokenizer.cpp src/tokenizers/hf_tokenizer.h src/tokenizers/mistral_tokenizer.cpp src/tokenizers/mistral_tokenizer.h src/tokenizers/qwen2_tokenizer.cpp src/tokenizers/qwen2_tokenizer.h src/tokenizers/sensenova_u1_tokenizer.cpp src/tokenizers/sensenova_u1_tokenizer.h src/tokenizers/t5_unigram_tokenizer.cpp src/tokenizers/t5_unigram_tokenizer.h src/tokenizers/tokenizer_config.cpp src/tokenizers/tokenizer_config.h src/tokenizers/tokenizer.cpp src/tokenizers/tokenizer.h src/tokenizers/tokenize_util.cpp src/tokenizers/tokenize_util.h src/tokenizers/vocab/vocab.h src/upscaler.cpp src/upscaler.h thirdparty/darts.h thirdparty/miniz.h thirdparty/oniguruma/ascii.c thirdparty/oniguruma/oniguruma.h thirdparty/oniguruma/regcomp.c thirdparty/oniguruma/regenc.c thirdparty/oniguruma/regenc.h thirdparty/oniguruma/regerror.c thirdparty/oniguruma/regexec.c thirdparty/oniguruma/regint.h thirdparty/oniguruma/regparse.c thirdparty/oniguruma/regparse.h thirdparty/oniguruma/st.c thirdparty/oniguruma/st.h thirdparty/oniguruma/unicode.c thirdparty/oniguruma/unicode_fold1_key.c thirdparty/oniguruma/unicode_fold2_key.c thirdparty/oniguruma/unicode_fold3_key.c thirdparty/oniguruma/unicode_unfold_key.c thirdparty/oniguruma/utf8.c thirdparty/stb_image_resize.h thirdparty/stb_image_write.h thirdparty/utf8proc/utf8proc.c thirdparty/utf8proc/utf8proc.h thirdparty/zip.c thirdparty/zip.h
+ # The vocab tables (.hpp) and vocab.cpp, together with convert.cpp and
+ # version.cpp, are only linked with sdmain
+-SDCPP_COMMON_BASENAMES := $(filter-out src/tokenizers/vocab/%.hpp src/tokenizers/vocab/vocab.cpp src/convert.cpp src/version.cpp,$(SDCPP_SRC_BASENAMES)) $(SDCPP_THIRDPARTY_BASENAMES)
++SDCPP_COMMON_BASENAMES := src/core/pe_cache.cpp src/core/pe_cache.h $(filter-out src/tokenizers/vocab/%.hpp src/tokenizers/vocab/vocab.cpp src/convert.cpp src/version.cpp,$(SDCPP_SRC_BASENAMES)) $(SDCPP_THIRDPARTY_BASENAMES)
+ SDCPP_MAIN_BASENAMES := $(SDCPP_EXAMPLES_BASENAMES) $(SDCPP_VOCAB_BASENAMES) src/convert.cpp src/version.cpp
  
- SDCPP_MAIN_BASENAMES := examples/cli/image_metadata.cpp examples/cli/image_metadata.h examples/cli/main.cpp examples/common/common.cpp examples/common/common.h examples/common/log.cpp examples/common/log.h examples/common/media_io.cpp examples/common/media_io.h examples/common/resource_owners.hpp src/tokenizers/vocab/clip_merges.hpp src/tokenizers/vocab/gemma_merges.hpp src/tokenizers/vocab/gemma_vocab.hpp src/tokenizers/vocab/mistral_merges.hpp src/tokenizers/vocab/mistral_vocab.hpp src/tokenizers/vocab/qwen_merges.hpp src/tokenizers/vocab/t5.hpp src/tokenizers/vocab/umt5.hpp src/tokenizers/vocab/vocab.cpp src/convert.cpp src/version.cpp
- 
-@@ -913,15 +913,17 @@ llamaserver: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml.o
+ include vendor/tinylibwebp/sources.mk
+@@ -925,15 +925,17 @@ llamaserver: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml.o
  llamaservervk: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml_v4_vulkan.o ggml-cpu.o ggml-ops.o ggml-vec.o ggml-binops.o ggml-tiled.o ggml-tiled-kernel.o ggml-unops.o llama.o chat.o llama-model.o console.o clip_default.o mtmd.o mtmd-helper.o mtmd-helper-gen.o mtmd-image.o ggml-backend.o ggml-backend-meta.o ggml-backend-reg_vulkan.o ggml-vulkan.o ggml-vulkan-shaders.o ggml-repack.o $(OBJS_FULL) $(OBJS)
  	$(CXX) $(CXXFLAGS) $(LLAMASERVER_CXXFLAGS) -DGGML_USE_VULKAN $(filter-out %.h,$^) $(VULKAN_LIB) -o $@ $(LDFLAGS)
  
@@ -32,7 +32,7 @@ index 24efd75..7c9557d 100644
  	@echo 'Vulkan shaders need to be regenerated. This can only be done on Windows or Linux. Please stand by...'
  	$(CXX) $(CXXFLAGS) $(VKGEN_NOEXT_ADD) $(filter-out %.h,$^) -o $@ $(LDFLAGS)
 diff --git a/common/arg.cpp b/common/arg.cpp
-index ccfa55e..166682d 100644
+index 15ae6bd..8178308 100644
 --- a/common/arg.cpp
 +++ b/common/arg.cpp
 @@ -2735,6 +2735,27 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
@@ -64,10 +64,10 @@ index ccfa55e..166682d 100644
          {"-ncffn", "--n-cpu-ffn"}, "N",
          "keep the dense FFN weights of the first N layers in the CPU\n"
 diff --git a/common/common.cpp b/common/common.cpp
-index ddc96c4..43a2be7 100644
+index 6e53b3f..c013386 100644
 --- a/common/common.cpp
 +++ b/common/common.cpp
-@@ -1797,6 +1797,8 @@ struct llama_context_params common_context_params_to_llama(const common_params &
+@@ -1791,6 +1791,8 @@ struct llama_context_params common_context_params_to_llama(const common_params &
      cparams.type_v = params.cache_type_v;
  
      cparams.moe_cache_size = params.moe_cache_size;
@@ -77,7 +77,7 @@ index ddc96c4..43a2be7 100644
      return cparams;
  }
 diff --git a/common/common.h b/common/common.h
-index e035f5d..3d3ca7a 100644
+index b0630a7..64d18eb 100644
 --- a/common/common.h
 +++ b/common/common.h
 @@ -599,6 +599,8 @@ struct common_params {
@@ -90,10 +90,10 @@ index e035f5d..3d3ca7a 100644
      common_conversation_mode conversation_mode = COMMON_CONVERSATION_MODE_AUTO;
  
 diff --git a/common/speculative.cpp b/common/speculative.cpp
-index 376feb9..0b1dbfb 100644
+index 0250541..984a4ec 100644
 --- a/common/speculative.cpp
 +++ b/common/speculative.cpp
-@@ -2671,6 +2671,7 @@ common_params common_base_params_to_speculative(const common_params & params) {
+@@ -2710,6 +2710,7 @@ common_params common_base_params_to_speculative(const common_params & params) {
  
      // the MoE cache is only used by the target context
      result.moe_cache_size = 0;
@@ -102,10 +102,10 @@ index 376feb9..0b1dbfb 100644
      // dflash/dspark decode the whole noise block in a single pass and sample every block position on the backend
      // TODO: refactor such properties to be announced by the speculative types
 diff --git a/ggml/include/ggml-backend.h b/ggml/include/ggml-backend.h
-index 735ed2c..ba4a529 100644
+index afb8633..039f4f0 100644
 --- a/ggml/include/ggml-backend.h
 +++ b/ggml/include/ggml-backend.h
-@@ -324,6 +324,8 @@ extern "C" {
+@@ -336,6 +336,8 @@ extern "C" {
      // if the user returns false the scheduler simply copies the entire weight
      // the callback is called only for input weights in host buffers
      // the callback is called after all non-weight inputs of the split have been copied
@@ -218,7 +218,7 @@ index 2987013..39e651b 100644
                  return ec;
              }
 diff --git a/ggml/src/ggml-cpu/ggml-cpu-impl.h b/ggml/src/ggml-cpu/ggml-cpu-impl.h
-index 0d48c9a..9b57f9d 100644
+index 865847a..19d9624 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu-impl.h
 +++ b/ggml/src/ggml-cpu/ggml-cpu-impl.h
 @@ -529,6 +529,15 @@ static __m256 __lasx_xvreplfr2vr_s(const float val) {
@@ -475,7 +475,7 @@ index 5277910..259109c 100644
  #endif
  
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index d3a156b..f5d10e0 100644
+index dbdde69..9783813 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
 @@ -1731,12 +1731,31 @@ static void ggml_compute_forward_repeat_f32(
@@ -548,10 +548,10 @@ index f24fa00..355f9c0 100644
      const __m256 zero = _mm256_setzero_ps();
      const __m256 neg_x = _mm256_sub_ps(zero, x);
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index b717070..971d234 100644
+index c9990b5..b0802e4 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -824,6 +824,7 @@ struct vk_device_struct {
+@@ -825,6 +825,7 @@ struct vk_device_struct {
      vk_pipeline pipeline_add_id_f32;
  
      vk_pipeline pipeline_concat_i8, pipeline_concat_i16, pipeline_concat_i32, pipeline_concat_i64;
@@ -560,10 +560,18 @@ index b717070..971d234 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 7bac81e..5284134 100644
+index 459deea..ce37692 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -1270,7 +1270,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
+@@ -13,6 +13,7 @@
+ #include "ggml-vulkan-common.h"
+ #include "ggml-vulkan-buffers.cpp" //kcpp: dirty include
+ #include "ggml-vulkan-debug.cpp" //kcpp: dirty include
++#include "ggml-vulkan-comm.cpp" //kcpp: dirty include; PR2581
+ 
+ static vk_device_architecture get_device_architecture(const vk::PhysicalDevice& device) {
+     vk::PhysicalDeviceProperties props = device.getProperties();
+@@ -1277,7 +1278,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
      // On AMD RDNA, for small head sizes and big batch size the shader uses few registers, so too many subgroups get scheduled
      // at once and end up thrashing the cache. Fix this by setting a large (unused) shmem buffer that reduces occupancy.
      // This targets an occupancy of 4 subgroups per SIMD.
@@ -572,7 +580,7 @@ index 7bac81e..5284134 100644
          if (device->architecture != AMD_GCN && n_rows >= 64 && hsk <= 128) {
              // 30kb target for hsk > 64, 26kb for <= 64 due to smaller workgroup size
              // Values are guessed, tested on RDNA2
-@@ -1854,7 +1854,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -1861,7 +1862,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          s_warptile_mmqid_int_k = { mul_mat_subgroup_size_32, 32,  32, 32, mul_mat_s_warptile_wm_16, 32, 1, 2, 1, 1, mul_mat_subgroup_size_16 };
  
          // chip specific tuning
@@ -582,7 +590,7 @@ index 7bac81e..5284134 100644
              m_warptile_mmq = m_warptile_mmq_int = { 256, 64, 64, 32, 16, 16, 2, 2, 2, 1, 16 };
              m_warptile_mmqid = m_warptile_mmqid_int = { 256, 64, 64, 32, 16, 16, 2, 2, 2, 1, 16 };
          } else if (device->vendor_id == VK_VENDOR_ID_AMD && device->coopmat_support && device->driver_id != vk::DriverId::eAmdProprietary) {
-@@ -1888,6 +1889,28 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -1895,6 +1897,28 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              }
          }
  
@@ -611,7 +619,7 @@ index 7bac81e..5284134 100644
          const bool use_cm1_int = device->coopmat_int_support &&
                                   (device->architecture == AMD_RDNA3 || device->architecture == AMD_RDNA4);
  
-@@ -2904,6 +2927,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2911,6 +2935,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          return is_rdna3_or_4 ? 4u : rows;
      };
      uint32_t rm_iq = 2 * rm_kq;
@@ -629,7 +637,7 @@ index 7bac81e..5284134 100644
  
      const bool use_subgroups = device->subgroup_arithmetic;
      // The Imagination proprietary compiler rejects the subgroup-only dequant mul_mat_vec
-@@ -2966,7 +3000,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2973,7 +3008,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ2_S][i],   "mul_mat_vec_iq2_s_f32_f32",   arr_dmmv_iq2_s_f32_f32_len[reduc16],   arr_dmmv_iq2_s_f32_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ3_XXS][i], "mul_mat_vec_iq3_xxs_f32_f32", arr_dmmv_iq3_xxs_f32_f32_len[reduc16], arr_dmmv_iq3_xxs_f32_f32_data[reduc16], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ3_S][i],   "mul_mat_vec_iq3_s_f32_f32",   arr_dmmv_iq3_s_f32_f32_len[reduc16],   arr_dmmv_iq3_s_f32_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -638,7 +646,7 @@ index 7bac81e..5284134 100644
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ4_NL][i],  "mul_mat_vec_iq4_nl_f32_f32",  arr_dmmv_iq4_nl_f32_f32_len[reduc16],  arr_dmmv_iq4_nl_f32_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_MXFP4][i],   "mul_mat_vec_mxfp4_f32_f32",   OCP_DMMV_LEN(arr_dmmv_mxfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_mxfp4_f32_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_NVFP4][i],   "mul_mat_vec_nvfp4_f32_f32",   OCP_DMMV_LEN(arr_dmmv_nvfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_nvfp4_f32_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
-@@ -2995,7 +3029,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3002,7 +3037,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ2_S][i],   "mul_mat_vec_iq2_s_f16_f32",   arr_dmmv_iq2_s_f16_f32_len[reduc16],   arr_dmmv_iq2_s_f16_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ3_XXS][i], "mul_mat_vec_iq3_xxs_f16_f32", arr_dmmv_iq3_xxs_f16_f32_len[reduc16], arr_dmmv_iq3_xxs_f16_f32_data[reduc16], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ3_S][i],   "mul_mat_vec_iq3_s_f16_f32",   arr_dmmv_iq3_s_f16_f32_len[reduc16],   arr_dmmv_iq3_s_f16_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -647,7 +655,7 @@ index 7bac81e..5284134 100644
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ4_NL][i],  "mul_mat_vec_iq4_nl_f16_f32",  arr_dmmv_iq4_nl_f16_f32_len[reduc16],  arr_dmmv_iq4_nl_f16_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_MXFP4][i],   "mul_mat_vec_mxfp4_f16_f32",   OCP_DMMV_LEN(arr_dmmv_mxfp4_f16_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_mxfp4_f16_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_NVFP4][i],   "mul_mat_vec_nvfp4_f16_f32",   OCP_DMMV_LEN(arr_dmmv_nvfp4_f16_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_nvfp4_f16_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
-@@ -3052,7 +3086,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3059,7 +3094,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ2_S],   "mul_mat_vec_id_iq2_s_f32",   arr_dmmv_id_iq2_s_f32_f32_len[reduc16],   arr_dmmv_id_iq2_s_f32_f32_data[reduc16],   "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ3_XXS], "mul_mat_vec_id_iq3_xxs_f32", arr_dmmv_id_iq3_xxs_f32_f32_len[reduc16], arr_dmmv_id_iq3_xxs_f32_f32_data[reduc16], "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ3_S],   "mul_mat_vec_id_iq3_s_f32",   arr_dmmv_id_iq3_s_f32_f32_len[reduc16],   arr_dmmv_id_iq3_s_f32_f32_data[reduc16],   "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -656,7 +664,7 @@ index 7bac81e..5284134 100644
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ4_NL],  "mul_mat_vec_id_iq4_nl_f32",  arr_dmmv_id_iq4_nl_f32_f32_len[reduc16],  arr_dmmv_id_iq4_nl_f32_f32_data[reduc16],  "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_MXFP4],   "mul_mat_vec_id_mxfp4_f32",   OCP_DMMV_LEN(arr_dmmv_id_mxfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_id_mxfp4_f32_f32, reduc16), "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_NVFP4],   "mul_mat_vec_id_nvfp4_f32",   OCP_DMMV_LEN(arr_dmmv_id_nvfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_id_nvfp4_f32_f32, reduc16), "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
-@@ -3406,6 +3440,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3413,6 +3448,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      ggml_vk_create_pipeline(device, device->pipeline_concat_i8, "concat_i8", concat_i8_len, concat_i8_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
      ggml_vk_create_pipeline(device, device->pipeline_concat_i16, "concat_i16", concat_i16_len, concat_i16_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
      ggml_vk_create_pipeline(device, device->pipeline_concat_i32, "concat_i32", concat_i32_len, concat_i32_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
@@ -664,7 +672,7 @@ index 7bac81e..5284134 100644
      ggml_vk_create_pipeline(device, device->pipeline_concat_i64, "concat_i64", concat_i64_len, concat_i64_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
  
      ggml_vk_create_pipeline(device, device->pipeline_upscale_nearest_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_NEAREST}, 1);
-@@ -3782,6 +3817,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3789,6 +3825,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      for (uint32_t s = 0; s < CONV_SHAPE_COUNT; ++s) {
          // smaller WG for the small-tile fallback gives more concurrent WGs per SM
          uint32_t conv2d_WG_SIZE  = (s == CONV_SHAPE_64x32) ? 128 : 256;
@@ -682,7 +690,7 @@ index 7bac81e..5284134 100644
          uint32_t use_collectives = 0;  // Enables subgroup ops for preventing the re-calculation of indices.
          uint32_t conv2d_TS_K     = (s == CONV_SHAPE_64x32) ? 4 : 8;
          uint32_t conv2d_SHMEM_PAD = 4;
-@@ -4342,11 +4388,23 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4351,11 +4398,23 @@ vk_device ggml_vk_get_device(size_t idx) {
          // Allow overriding avoiding the graphics queue because it can increase performance on RADV
          const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
          const vk::QueueFlagBits graphics_flag = allow_graphics_queue ? (vk::QueueFlagBits)0 : vk::QueueFlagBits::eGraphics;
@@ -709,7 +717,7 @@ index 7bac81e..5284134 100644
  
          std::vector<vk::DeviceQueueCreateInfo> device_queue_create_infos;
          vk::DeviceCreateInfo device_create_info{};
-@@ -4358,12 +4416,12 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4367,12 +4426,12 @@ vk_device ggml_vk_get_device(size_t idx) {
          device_features2.pNext = nullptr;
          device_features2.features = (VkPhysicalDeviceFeatures)device_features;
  
@@ -724,7 +732,7 @@ index 7bac81e..5284134 100644
          vk12_features.pNext = nullptr;
          vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
          vk11_features.pNext = &vk12_features;
-@@ -4819,7 +4877,19 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4831,7 +4890,19 @@ vk_device ggml_vk_get_device(size_t idx) {
              .setQueueCreateInfos(device_queue_create_infos)
              .setPEnabledExtensionNames(device_extensions);
          device_create_info.setPNext(&device_features2);
@@ -745,7 +753,7 @@ index 7bac81e..5284134 100644
  
          if (device->device_fault) {
              device->pfn_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT)
-@@ -5085,12 +5155,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+@@ -5097,12 +5168,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
      device_features2.pNext = nullptr;
  
@@ -760,7 +768,7 @@ index 7bac81e..5284134 100644
      vk12_features.pNext = nullptr;
      vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
      vk11_features.pNext = &vk12_features;
-@@ -5676,6 +5746,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
+@@ -5690,6 +5761,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
          }
      }
  
@@ -778,7 +786,7 @@ index 7bac81e..5284134 100644
      if (b_type == GGML_TYPE_Q8_1) {
          if (ctx->device->vendor_id == VK_VENDOR_ID_INTEL) {
              dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
-@@ -8796,6 +8877,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
+@@ -8820,6 +8902,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
      return pipelines[2];
  }
  
@@ -796,7 +804,7 @@ index 7bac81e..5284134 100644
  static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * dst, ggml_op op) {
      switch (op) {
      case GGML_OP_GET_ROWS:
-@@ -8888,6 +8980,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -8912,6 +9005,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
          if (!ggml_vk_concat_supported(src0, src1, dst)) {
              return nullptr;
          }
@@ -806,7 +814,7 @@ index 7bac81e..5284134 100644
          switch (ggml_vk_concat_unit_size(src0->type)) {
          case 1:
              return ctx->device->pipeline_concat_i8;
-@@ -9820,6 +9915,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -9844,6 +9940,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
      case GGML_OP_GLU:
      case GGML_OP_CONV_2D_DW:
          {
@@ -817,7 +825,7 @@ index 7bac81e..5284134 100644
              uint32_t ne = ggml_nelements(dst);
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
-@@ -10667,6 +10766,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -10691,6 +10791,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
@@ -826,7 +834,7 @@ index 7bac81e..5284134 100644
  
      ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
  }
-@@ -13697,7 +13798,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+@@ -13723,7 +13825,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
      const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
  
      // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
@@ -837,20 +845,20 @@ index 7bac81e..5284134 100644
             ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
             ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
             scale_in->src[0]->type == GGML_TYPE_F32 &&
-@@ -14489,6 +14592,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
-     }
-     uint64_t flops_per_submit = std::min(flops_cap, ctx->last_total_flops / 40u);
+@@ -14517,6 +14621,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+     uint64_t flops_per_submit = ctx->last_total_flops < 1'000'000'000ULL ? 0 :
+         std::clamp(ctx->last_total_flops / 40u, std::min<uint64_t>(100'000'000ULL, flops_cap), flops_cap);
  
 +    // KCPP_BATCHED_SUBMITS_PORT: reduce host submit overhead, retain watchdog cap.
 +    static const bool batched_submits = getenv("GGML_VK_BATCHED_SUBMITS") != nullptr;
-+    if (batched_submits) {
++    if (batched_submits && flops_per_submit != 0) {
 +        flops_per_submit = flops_cap;
 +    }
 +
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -14513,7 +14622,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14541,7 +14651,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -859,7 +867,7 @@ index 7bac81e..5284134 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -14800,7 +14909,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14828,7 +14938,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -868,7 +876,7 @@ index 7bac81e..5284134 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -15375,7 +15484,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -15403,7 +15513,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  
@@ -878,7 +886,7 @@ index 7bac81e..5284134 100644
          vk_backend->iface.get_tensor_async = nullptr;
      }
  
-@@ -15961,8 +16071,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -15994,8 +16105,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32;
          case GGML_OP_FILL:
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
@@ -897,7 +905,7 @@ index 7bac81e..5284134 100644
          case GGML_OP_PAD:
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
-@@ -16452,7 +16570,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -16503,7 +16622,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  
@@ -1179,13 +1187,13 @@ index 99d1944..7efdc3c 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 33422e3..874887c 100644
+index 7a723ab..4aae3f5 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
  
  # global vars
- KcppVersion = "1.124.2"
+ KcppVersion = "1.125"
 +# KCPP_BUILD_DATE_PORT: package.py embeds the build day; launch time is not used.
 +def _kcpp_packaged_build_day():
 +    try:
@@ -1201,7 +1209,7 @@ index 33422e3..874887c 100644
  showdebug = True
  kcpp_instance = None #global running instance
  global_memory = {"tunnel_url": "", "restart_target":"", "input_to_exit":False, "load_complete":False, "restart_override_base_config":"", "last_active_timestamp":datetime.now(), "triggered_sleeping":False, "current_model":"initial_model", "base_config":"", "swapReqType": None, "loadedReqTypes": [], "autoswapmode": False}
-@@ -384,7 +396,9 @@ class load_model_inputs(ctypes.Structure):
+@@ -385,7 +397,9 @@ class load_model_inputs(ctypes.Structure):
                  ("rpc_targets", ctypes.c_char_p),
                  ("lazy_mode", ctypes.c_int),
                  ("moe_cache_mib", ctypes.c_int),
@@ -1212,7 +1220,7 @@ index 33422e3..874887c 100644
  
  class generation_inputs(ctypes.Structure):
      _fields_ = [("seed", ctypes.c_int),
-@@ -914,6 +928,18 @@ def restore_stdout():
+@@ -915,6 +929,18 @@ def restore_stdout():
          saved_stdout = saved_stderr = saved_stdout_py = saved_stderr_py = stdout_nullfile = stdout_nullfile_py = None
  
  def get_default_threads():
@@ -1231,7 +1239,7 @@ index 33422e3..874887c 100644
      physical_core_limit = 1
      if os.cpu_count() is not None and os.cpu_count()>1:
          physical_core_limit = os.cpu_count() // 2
-@@ -967,10 +993,32 @@ lib_option_pairs = [
+@@ -968,10 +994,32 @@ lib_option_pairs = [
  default_option, cublas_option, hipblas_option, vulkan_option, noavx2_option, vulkan_noavx2_option, vulkan_failsafe_option, failsafe_option = (opt if file_exists(lib) or (os.name == 'nt' and file_exists(opt + ".dll")) else None for lib, opt in lib_option_pairs)
  runopts = [opt for lib, opt in lib_option_pairs if file_exists(lib)]
  
@@ -1264,7 +1272,7 @@ index 33422e3..874887c 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -2181,6 +2229,14 @@ def load_model(model_filename):
+@@ -2186,6 +2234,14 @@ def load_model(model_filename):
      inputs = load_model_inputs()
      inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
      inputs.moe_cache_mib = args.moe_cache_mib
@@ -1279,7 +1287,7 @@ index 33422e3..874887c 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -8903,6 +8959,9 @@ Change Mode<br>
+@@ -8918,6 +8974,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -1289,7 +1297,7 @@ index 33422e3..874887c 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9458,7 +9517,27 @@ def show_gui():
+@@ -9473,7 +9532,27 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -1318,7 +1326,7 @@ index 33422e3..874887c 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9543,6 +9622,7 @@ def show_gui():
+@@ -9558,6 +9637,7 @@ def show_gui():
  
      # trigger empty tooltip then remove it
      def show_tooltip(event, tooltip_text=None):
@@ -1326,7 +1334,7 @@ index 33422e3..874887c 100644
          nonlocal gtooltip_box, gtooltip_label
          if not gtooltip_box and not gtooltip_label:
              gtooltip_box = ctk.CTkToplevel(root)
-@@ -9570,7 +9650,7 @@ def show_gui():
+@@ -9585,7 +9665,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
@@ -1335,7 +1343,7 @@ index 33422e3..874887c 100644
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9787,7 +9867,7 @@ def show_gui():
+@@ -9802,7 +9882,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
@@ -1344,7 +1352,7 @@ index 33422e3..874887c 100644
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
  
-@@ -10702,6 +10782,8 @@ def show_gui():
+@@ -10717,6 +10797,8 @@ def show_gui():
      # Image Gen Tab
  
      images_tab = tabcontent["Image Gen"]
@@ -1353,7 +1361,7 @@ index 33422e3..874887c 100644
      makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
  
      def togglesdlora(a,b,c):
-@@ -10742,7 +10824,7 @@ def show_gui():
+@@ -10757,7 +10839,7 @@ def show_gui():
      makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
      makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
      makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
@@ -1362,7 +1370,7 @@ index 33422e3..874887c 100644
  
  
      sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
-@@ -10770,6 +10852,8 @@ def show_gui():
+@@ -10785,6 +10867,8 @@ def show_gui():
  
      # audio tab
      audio_tab = tabcontent["Audio"]
@@ -1371,7 +1379,7 @@ index 33422e3..874887c 100644
      makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or SheetSage2 Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
      whisper_model_var.trace_add("write", gui_changed_modelfile)
      makefileentry(audio_tab, "TTS Model (Text-To-Speech):", "Select TTS GGUF Model File", tts_model_var, 3, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a TTS GGUF model file on disk to be loaded for Narration.")
-@@ -10855,6 +10939,8 @@ def show_gui():
+@@ -10870,6 +10954,8 @@ def show_gui():
  
      # extra tab
      extra_tab = tabcontent["Extra"]
@@ -1380,7 +1388,7 @@ index 33422e3..874887c 100644
      makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
      ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
      makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
-@@ -10920,6 +11006,8 @@ def show_gui():
+@@ -10935,6 +11021,8 @@ def show_gui():
  
      # launch
      def guilaunch():
@@ -1389,7 +1397,7 @@ index 33422e3..874887c 100644
          if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
              # prevent launch without at least one valid model
              givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
-@@ -11511,6 +11599,8 @@ def show_gui():
+@@ -11526,6 +11614,8 @@ def show_gui():
              auto_set_backend_gui(True)
  
      def save_config_gui():
@@ -1398,7 +1406,7 @@ index 33422e3..874887c 100644
          nonlocal kcpp_exporting_template
          kcpp_exporting_template = False
          export_vars()
-@@ -11526,6 +11616,8 @@ def show_gui():
+@@ -11541,6 +11631,8 @@ def show_gui():
          pass
  
      def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
@@ -1407,7 +1415,7 @@ index 33422e3..874887c 100644
          file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
          global runmode_untouched, zenity_permitted
          filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
-@@ -11646,6 +11738,22 @@ def show_gui():
+@@ -11661,6 +11753,22 @@ def show_gui():
              mydict = vars(args)
              import_vars(mydict)
  
@@ -1430,7 +1438,7 @@ index 33422e3..874887c 100644
      # runs main loop until closed or launch clicked
      try:
          root.mainloop()
-@@ -12982,7 +13090,7 @@ def main(launch_args, default_args):
+@@ -12997,7 +13105,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -1439,7 +1447,7 @@ index 33422e3..874887c 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14476,8 +14584,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14492,8 +14600,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  
@@ -1482,7 +1490,7 @@ index 33422e3..874887c 100644
  
      def check_range(value_type, min_value, max_value):
          def range_checker(arg: str):
-@@ -14521,6 +14663,7 @@ if __name__ == '__main__':
+@@ -14537,6 +14679,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -1490,7 +1498,7 @@ index 33422e3..874887c 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14555,6 +14698,9 @@ if __name__ == '__main__':
+@@ -14571,6 +14714,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -1616,10 +1624,10 @@ index 56e1e5a..33293a1 100644
 +OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 +SOFTWARE.
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index bb6d27e..9316c4f 100644
+index f4c30d3..761a701 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -891,6 +891,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
+@@ -951,6 +951,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
          params.photo_maker_path = "";
      }
  
@@ -1638,7 +1646,7 @@ index bb6d27e..9316c4f 100644
      //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
      if(kcpp_taesd_path=="" && !path_empty(params.vae_path) && toLowerCase(params.vae_path).rfind("tae")!=std::string::npos)
      {
-@@ -2217,6 +2229,8 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2277,6 +2289,8 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
          vid_gen_params.video_frames = vid_req_frames;
          vid_gen_params.fps = vid_fps;
          vid_gen_params.vae_tiling_params = params.vae_tiling_params;
@@ -1647,7 +1655,7 @@ index bb6d27e..9316c4f 100644
          vid_gen_params.loras = params.loras;
          vid_gen_params.lora_count = params.lora_count;
          if (!info.is_minimaxh3 && ref_audio_data.size()>0) {
-@@ -2274,12 +2288,41 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2334,12 +2348,41 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
  
          fflush(stdout);
  
@@ -1689,7 +1697,7 @@ index bb6d27e..9316c4f 100644
          if(!sd_is_quiet && sddebugmode==1)
          {
              printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",vid_req_frames, generated_num_results);
-@@ -2471,7 +2514,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2531,7 +2574,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              }
              if(output_avi)
              {
@@ -2092,7 +2100,7 @@ index 84dd4d1..05c7d67 100644
          ggml_tensor* z   = make_input(z_tensor);
          auto runner_ctx  = get_context();
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
-index eee104a..d01b32a 100644
+index 13265b0..f955fff 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 +++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 @@ -1,3 +1,6 @@
@@ -2102,7 +2110,7 @@ index eee104a..d01b32a 100644
  #include "diffusion_engine.h"
  
  #include <algorithm>
-@@ -3159,24 +3162,74 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
+@@ -2967,24 +2970,74 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
      if (sd_version_is_pid(version) || sd_version_is_minit2i(version) || version == VERSION_IRIS) {
          return sd::ops::clamp((x + 1.f) * 0.5f, 0.0f, 1.0f);
      }
@@ -2251,7 +2259,7 @@ index 0b92c73..4ff4e5e 100644
          dbcfg.Fn_compute_blocks           = cache_params.Fn_compute_blocks;
          dbcfg.Bn_compute_blocks           = cache_params.Bn_compute_blocks;
 diff --git a/src/llama-context.cpp b/src/llama-context.cpp
-index 3d2437d..3673b1a 100644
+index 9ebe1ae..3b2e4ef 100644
 --- a/src/llama-context.cpp
 +++ b/src/llama-context.cpp
 @@ -1,3 +1,4 @@
@@ -2259,26 +2267,25 @@ index 3d2437d..3673b1a 100644
  #include "llama-context.h"
  
  #include "ggml.h"
-@@ -373,6 +374,8 @@ llama_context::llama_context(
+@@ -383,6 +384,8 @@ llama_context::llama_context(
      cparams.op_offload     = params.op_offload;
      cparams.kv_unified     = params.kv_unified;
      cparams.moe_cache_size = params.moe_cache_size;
 +    cparams.moe_hybrid_threads = params.moe_hybrid_threads;
 +    cparams.moe_hybrid_uploads = params.moe_hybrid_uploads;
  
-     // initialized later
-     cparams.pipeline_parallel = false;
-@@ -569,7 +572,8 @@ llama_context::llama_context(
+     // resolved after flash attention, see resolve_fused_ops()
+     {
+@@ -592,7 +595,7 @@ llama_context::llama_context(
          }
  
          if (cparams.moe_cache_size > 0) {
 -            moe_cache = std::make_unique<llama_moe_cache>(model, model.no_alloc(), backend_ptrs, backend_buft, cparams.moe_cache_size);
-+            moe_cache = std::make_unique<llama_moe_cache>(model, model.no_alloc(), backend_ptrs, backend_buft, cparams.moe_cache_size,
-+                cparams.moe_hybrid_threads, cparams.moe_hybrid_uploads);
++            moe_cache = std::make_unique<llama_moe_cache>(model, model.no_alloc(), backend_ptrs, backend_buft, cparams.moe_cache_size, cparams.moe_hybrid_threads, cparams.moe_hybrid_uploads);
          }
  
          sched_reserve();
-@@ -2813,6 +2817,25 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
+@@ -2983,6 +2986,25 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
      }
  
      const ggml_tensor * ids = node->src[2];
@@ -2304,7 +2311,7 @@ index 3d2437d..3673b1a 100644
      if (ggml_nelements(ids) == 0) {
          return true;
      }
-@@ -4081,6 +4104,8 @@ llama_context_params llama_context_default_params() {
+@@ -4251,6 +4273,8 @@ llama_context_params llama_context_default_params() {
          /*.type_k                      =*/ GGML_TYPE_F16,
          /*.type_v                      =*/ GGML_TYPE_F16,
          /*.moe_cache_size              =*/ 0,
@@ -2314,10 +2321,10 @@ index 3d2437d..3673b1a 100644
          /*.abort_callback_data         =*/ nullptr,
          /*.embeddings                  =*/ false,
 diff --git a/src/llama-cparams.h b/src/llama-cparams.h
-index 0c260f7..2d37bb7 100644
+index 9141cba..015501c 100644
 --- a/src/llama-cparams.h
 +++ b/src/llama-cparams.h
-@@ -58,6 +58,8 @@ struct llama_cparams {
+@@ -60,6 +60,8 @@ struct llama_cparams {
      bool training;           // set by llama_opt_init()
  
      size_t moe_cache_size;
@@ -2325,9 +2332,9 @@ index 0c260f7..2d37bb7 100644
 +    int32_t moe_hybrid_uploads;
  
      std::vector<bool> embeddings_layer_inp; // [n_layer()] extract input embeddings for layer
- 
+     bool embeddings_layer_inp_dev; // write enabled layer inputs to a device buffer instead of host
 diff --git a/src/llama-graph.cpp b/src/llama-graph.cpp
-index 483b451..167608c 100644
+index 30af1bc..77abfd4 100644
 --- a/src/llama-graph.cpp
 +++ b/src/llama-graph.cpp
 @@ -17,6 +17,7 @@
@@ -2338,7 +2345,7 @@ index 483b451..167608c 100644
  #include <cassert>
  #include <cmath>
  #include <cstring>
-@@ -2300,8 +2301,24 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
+@@ -2396,8 +2397,24 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
      //call early so that topk-moe can be used
      ggml_build_forward_expand(gf, weights);
  
@@ -2365,7 +2372,7 @@ index 483b451..167608c 100644
  
      cur = ggml_reshape_3d(ctx0, cur, n_embd, 1, n_tokens);
  
-@@ -2471,6 +2488,12 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
+@@ -2567,6 +2584,12 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
          }
      }
  
