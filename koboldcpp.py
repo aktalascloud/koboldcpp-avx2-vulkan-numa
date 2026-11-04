@@ -91,7 +91,7 @@ dry_seq_break_max = 128
 extra_images_max = 4 # for kontext/qwen img
 
 # global vars
-KcppVersion = "1.124.2"
+KcppVersion = "1.125"
 # KCPP_BUILD_DATE_PORT: package.py embeds the build day; launch time is not used.
 def _kcpp_packaged_build_day():
     try:
@@ -204,6 +204,7 @@ embedded_musicui = None
 embedded_musicui_gz = None
 preloaded_custom_jinja = ""
 voicebank = {}
+voice_transcript_cache = {}
 voicelist = ["kobo","cheery","sleepy","shouty","chatty"]
 sslvalid = False
 nocertify = False
@@ -1176,10 +1177,14 @@ def init_library():
     handle.whisper_load_model.restype = ctypes.c_bool
     handle.whisper_generate.argtypes = [whisper_generation_inputs]
     handle.whisper_generate.restype = whisper_generation_outputs
+    handle.whisper_is_speech_model_loaded.argtypes = []
+    handle.whisper_is_speech_model_loaded.restype = ctypes.c_bool
     handle.tts_load_model.argtypes = [tts_load_model_inputs]
     handle.tts_load_model.restype = ctypes.c_bool
     handle.tts_generate.argtypes = [tts_generation_inputs]
     handle.tts_generate.restype = tts_generation_outputs
+    handle.tts_requires_reference_text.argtypes = [tts_generation_inputs]
+    handle.tts_requires_reference_text.restype = ctypes.c_bool
     handle.embeddings_load_model.argtypes = [embeddings_load_model_inputs]
     handle.embeddings_load_model.restype = ctypes.c_bool
     handle.embeddings_generate.argtypes = [embeddings_generation_inputs]
@@ -3521,7 +3526,7 @@ def tts_extract_instruction(x):
     return x, ""
 
 def tts_generate(genparams):
-    global args, voicebank, voicelist
+    global args, voicebank, voice_transcript_cache, voicelist
     prompt = genparams.get("input", genparams.get("text", ""))
     prompt = prompt.strip()
     voice = 1
@@ -3594,6 +3599,16 @@ def tts_generate(genparams):
     # leaving the longstanding normalized field unchanged for legacy models.
     audiocpp_options["__kcpp_voice"] = voicestr.strip()
     inputs.audiocpp_extra_params_json = json.dumps(audiocpp_options).encode("UTF-8")
+    if (handle.tts_requires_reference_text(inputs) and
+            handle.whisper_is_speech_model_loaded()):
+        reference_text = voice_transcript_cache.get(reference_audio, "")
+        if not reference_text:
+            print("Reference text missing; transcribing the TTS reference audio with Whisper...")
+            reference_text = whisper_generate({"audio_data": reference_audio, "language": "auto"}).strip()
+            if reference_text:
+                voice_transcript_cache[reference_audio] = reference_text
+        if reference_text:
+            inputs.reference_text = reference_text.encode("UTF-8")
     ret = handle.tts_generate(inputs)
     outstr = ""
     if ret.status==1:
@@ -8988,9 +9003,9 @@ Change Mode<br>
                             voice_name = voice_name.strip() if isinstance(voice_name, str) else ""
                             voice_ext = os.path.splitext(voice_name)[1].lower()
                             voice_audio = voicebank.get(voice_name, "") if voice_name else ""
-                            if voice_ext not in (".wav", ".mp3") or not voice_audio:
+                            if voice_ext not in (".wav", ".mp3", ".flac") or not voice_audio:
                                 genresp = json.dumps({"detail": {
-                                    "msg": "The selected voice is not a WAV/MP3 file loaded from the TTS voices directory.",
+                                    "msg": "The selected voice is not a WAV/MP3/FLAC file loaded from the TTS voices directory.",
                                     "type": "bad_input",
                                 }}).encode()
                                 self.send_response(400)
@@ -14293,8 +14308,9 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
     # load all TTS audio files
     if args.ttsmodel or ttsName is not None:
         try:
-            global voicebank, voicelist
+            global voicebank, voice_transcript_cache, voicelist
             voicebank = {}
+            voice_transcript_cache = {}
             voicecount = 0
             voicelist = []
 
@@ -14314,7 +14330,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
 
             if args.ttsdir and os.path.isdir(args.ttsdir):
                 for filename in os.listdir(args.ttsdir):
-                    if filename.lower().endswith((".mp3", ".wav")):
+                    if filename.lower().endswith((".mp3", ".wav", ".flac")):
                         full_path = os.path.join(args.ttsdir, filename)
                         with open(full_path, "rb") as f:
                             encoded = base64.b64encode(f.read()).decode("utf-8")
