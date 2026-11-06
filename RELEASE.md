@@ -1,5 +1,6 @@
-Haswell / Polaris maintenance · 2026-11-04
-- Official experimental1.125: `SOURCE_COMMIT`; EXE SHA256 `NATIVE_SHA256`.82 new official commits/206 files; ancestry and local ports preserved. O3/Haswell/AVX2 + LTO, no PGO, max4 workers.
-- Upstream KV/FlashAttention, Vulkan view-buffer/NVFP4 bounds, model/SDCPP and YuE2 fixes. Include [PR2581 Vulkan comm fix](https://github.com/LostRuins/koboldcpp/pull/2581); adapt batched-submit and opt-in HybridMoE bindings. [Review and limits](performance/daily-review.json).
-- Source/hash, cold startup, dated visible window and GET APIs verified; user settings and exact profiles preserved. No inference benchmarks. [November2 photo evidence](results/photo-latest.json) retains its own cb260832 SHA and is not a benchmark of this release.
-- [All retained patches/licenses](performance/PATCHES.md) · [Media](https://github.com/aktalascloud/koboldcpp-media-pipeline). No weights or private owner bundle mirrored.
+Haswell / Polaris maintenance · 2026-11-06
+
+- Official KoboldCpp experimental 1.125 at `SOURCE_COMMIT`. Native SHA-256 `NATIVE_SHA256`. Ancestry preserved across 79 official commits.
+- Bit-exact operation tests retained Haswell Q8_0 GEMM and AVX2 Q5_K/Q6_K/IQ3, indexed KV rollback, buffered GGUF metadata, Polaris Q4_K prefill and Vulkan F16 value staging. [Individual patches](performance/patches/series/README.md) · [Two-month source review](performance/review-2026-11-06.md).
+- Warm Native Normal 146.905 s → 146.391 s. 4× public API 5.715 s → 5.482 s. All raw, finished and upscaled RGB samples matched exactly. [All repeats and scope](results/performance-2026-11-06.json).
+- Windows startup, visible window, profile hashes and API verified. [Licenses and corresponding source](performance/NOTICE.md).

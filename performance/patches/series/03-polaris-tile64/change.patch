@@ -1,0 +1,20 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 9a81743..a9613a9 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -1907,6 +1907,15 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+             }
+         }
+ 
++        // KCPP_GCN_TILE64_PORT: opt-in 64x64 tile, four wave64 groups, 16 accumulators/thread.
++        const bool polaris_id = device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df;
++        if (device->architecture == AMD_GCN && polaris_id && device->subgroup_size == 64 &&
++            !device->coopmat_support && getenv("GGML_VK_GCN_TILE64") != nullptr) {
++            l_warptile = m_warptile = { 256, 64, 64, 32, 16, 64, 1, 4, 4, 1, 64 };
++            l_wg_denoms = m_wg_denoms = { 64, 64, 1 };
++            GGML_LOG_INFO("ggml_vulkan: local Polaris 64x64 FP32 tile tuning enabled\n");
++        }
++
+         const bool use_cm1_int = device->coopmat_int_support &&
+                                  (device->architecture == AMD_RDNA3 || device->architecture == AMD_RDNA4);
+ 

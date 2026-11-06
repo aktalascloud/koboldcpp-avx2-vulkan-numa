@@ -1,0 +1,2686 @@
+{
+  "date": "2026-11-06",
+  "window": [
+    "2026-09-06",
+    "2026-11-06"
+  ],
+  "official_previous": "ab00ee527009d8f4cd2c6da9fbf21045d22c98d2",
+  "official_head": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
+  "official_new_commits": 79,
+  "official_changed_files": 264,
+  "configured_sources": [
+    {
+      "repository": "LostRuins/koboldcpp",
+      "head": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
+      "changed": true
+    },
+    {
+      "repository": "andrewdhannah/vulkan-polaris-llama",
+      "head": "e29790e07978c5826d23752d4416a173e5b731db",
+      "changed": false
+    },
+    {
+      "repository": "ponyol/llama.cpp.patch.speed",
+      "head": "4bcc0364b3ab8484b3693aa0b31739e63f635b9c",
+      "changed": false
+    },
+    {
+      "repository": "AvilaCarlosDev/polaris-local-ai",
+      "head": "0b1054b7c5c5fb6ea0469d423dc2b119b125a8b3",
+      "changed": true
+    },
+    {
+      "repository": "castlen3/rx580-llamacpp-vulkan-guide",
+      "head": "f89a119d79fe9c9ba8608613f2e296e1e974806d",
+      "changed": false
+    },
+    {
+      "repository": "doteyeso-ops/rx580-vulkan-agents",
+      "head": "14489d204c62bfe1de15628865753573ebde065c",
+      "changed": false
+    },
+    {
+      "repository": "cubetitled-ui/llama.cpp",
+      "head": "124ac98237f6701ffc30cb5708a7220207f14031",
+      "changed": false
+    },
+    {
+      "repository": "robertrosenbusch/gfx803_rocm",
+      "head": "3cd3cb880e20dd234fd25415019a71abbff47479",
+      "changed": false
+    },
+    {
+      "repository": "MohammadR3za/HybridMoE",
+      "head": "8d9951a787373a8396824abb0f321bdf926e9fee",
+      "changed": false
+    },
+    {
+      "repository": "lakitu12/vkblas",
+      "head": "b0bf6b40905e1ca2b1ae78f69f7e80d65d446777",
+      "changed": false
+    },
+    {
+      "repository": "Schaka/rocm-gfx803",
+      "head": "8fdcf7b1305d0cfc6fc8c1fc7b1bfb5f73494e78",
+      "changed": false
+    },
+    {
+      "repository": "lakitu12/rocm-gfx803-torch",
+      "head": "ba9ad01a423777841ac9990c38d119745b51df8a",
+      "changed": false
+    },
+    {
+      "repository": "dhaern/VelociQ8",
+      "head": "dc6d2c7cdd2ec65b09129f1ce4dda80d27c01840",
+      "changed": true
+    },
+    {
+      "repository": "chboishabba/gfx803_compat_graph",
+      "head": "d68917a01f65f284096ff6411bd2707e07beb201",
+      "changed": true
+    },
+    {
+      "repository": "lakitu12/rocm-gfx803",
+      "head": "0b94b30e5a2090e2feb964925bd07f5b6e1cbe66",
+      "changed": false
+    },
+    {
+      "repository": "superexp1/llama2c-avx2-tuning",
+      "head": "d04f9740b0aafbdee3f33edeb68c7ad3f846fc0e",
+      "changed": false
+    },
+    {
+      "repository": "ikawrakow/ik_llama.cpp",
+      "head": "0d5aaa826b24014dcd67fbdef6055410db7d8079",
+      "changed": true
+    },
+    {
+      "repository": "cjml555/llama-native",
+      "head": "98703b3536e00b4bf47b5c2d271832f701b6bda3",
+      "changed": false
+    },
+    {
+      "repository": "layfhaker/llama.cpp-x86-neon",
+      "head": "d79c52fcf72aec5e712502000f61cddab8bb2e4b",
+      "changed": false
+    },
+    {
+      "repository": "pauldmartinphd/llm-performance-engineering-notebook",
+      "head": "4d4905f3c5fe312a3388b2d02d5444e3188c32cd",
+      "changed": true
+    },
+    {
+      "repository": "nandyalu/rocm-llamacpp-cpu-fix",
+      "head": "0c1bb64b415e8e494bd661d3f6b7582b3fdcdcf5",
+      "changed": false
+    },
+    {
+      "repository": "sirfyyn/FastLocalExperts",
+      "head": "e6909b7550c9917194cd351998f3770717b34ce2",
+      "changed": true
+    },
+    {
+      "repository": "HarshaVardhan3002/ROCmFPX",
+      "head": "8a705e2f7f3a4681fa87355938a7f872565bb48c",
+      "changed": true
+    },
+    {
+      "repository": "advanced-lvl-up/Rx470-Vega10-Rx580-gfx803-gfx900-fix-AMD-GPU",
+      "head": "6547664db8732305530b969b54c9b7d3806c02e1",
+      "changed": false
+    }
+  ],
+  "discovered_forks": 183,
+  "active_forks": [
+    "lieselstand-stack/koboldcpp",
+    "Solenopsisbot/friend.cpp",
+    "kallewoof/koboldcpp",
+    "esolithe/esobold",
+    "stanley-fork/koboldcpp",
+    "yukawaii/koboldcpp",
+    "swoldanski/koboldcpp",
+    "alvinets/koboldcpp",
+    "Computador33/koboldcpp",
+    "InspectorCaracal/koboldcpp",
+    "tandemura/koboldcpp",
+    "yggdrasil75/koboldcpp",
+    "Khania93/koboldcpp",
+    "ervanjaeger-ui/koboldcpp",
+    "Zontomoka5934/koboldcpp_1.124.2",
+    "tk-shockwave/koboldcpp",
+    "dr-pr-anand25/koboldcpp"
+  ],
+  "global_search_queries": 113,
+  "global_search_unique_urls": 15783,
+  "capped_searches": 15,
+  "query_index": [
+    {
+      "name": "title-polaris",
+      "query": "is:pr in:title polaris updated:2026-09-06..2026-11-06",
+      "total": 2398,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-gfx803",
+      "query": "is:pr in:title gfx803 updated:2026-09-06..2026-11-06",
+      "total": 11,
+      "returned": 11,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-haswell",
+      "query": "is:pr in:title haswell updated:2026-09-06..2026-11-06",
+      "total": 56,
+      "returned": 56,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-vulkan",
+      "query": "is:pr in:title vulkan updated:2026-09-06..2026-11-06",
+      "total": 10369,
+      "returned": 998,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-gcn",
+      "query": "is:pr in:title gcn updated:2026-09-06..2026-11-06",
+      "total": 542,
+      "returned": 542,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-rx580",
+      "query": "is:pr in:title rx580 updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-wave64",
+      "query": "is:pr in:title wave64 updated:2026-09-06..2026-11-06",
+      "total": 141,
+      "returned": 141,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "body-gfx803",
+      "query": "is:pr gfx803 updated:2026-09-06..2026-11-06",
+      "total": 74,
+      "returned": 74,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "title-avx2",
+      "query": "is:pr in:title avx2 updated:2026-09-06..2026-11-06",
+      "total": 1979,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "body-haswell",
+      "query": "is:pr haswell updated:2026-09-06..2026-11-06",
+      "total": 2806,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "body-rx580",
+      "query": "is:pr rx580 updated:2026-09-06..2026-11-06",
+      "total": 31,
+      "returned": 31,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "body-polaris",
+      "query": "is:pr polaris updated:2026-09-06..2026-11-06",
+      "total": 13311,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "polaris-ggml",
+      "query": "is:pr polaris ggml updated:2026-09-06..2026-11-06",
+      "total": 18,
+      "returned": 18,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "polaris-inference",
+      "query": "is:pr polaris inference updated:2026-09-06..2026-11-06",
+      "total": 194,
+      "returned": 194,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "polaris-diffusion",
+      "query": "is:pr polaris diffusion updated:2026-09-06..2026-11-06",
+      "total": 34,
+      "returned": 34,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-inference",
+      "query": "is:pr gfx803 inference updated:2026-09-06..2026-11-06",
+      "total": 12,
+      "returned": 12,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-ggml",
+      "query": "is:pr gfx803 ggml updated:2026-09-06..2026-11-06",
+      "total": 6,
+      "returned": 6,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-diffusion",
+      "query": "is:pr gfx803 diffusion updated:2026-09-06..2026-11-06",
+      "total": 8,
+      "returned": 8,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "haswell-ggml",
+      "query": "is:pr haswell ggml updated:2026-09-06..2026-11-06",
+      "total": 134,
+      "returned": 134,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "haswell-diffusion",
+      "query": "is:pr haswell diffusion updated:2026-09-06..2026-11-06",
+      "total": 10,
+      "returned": 10,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "haswell-inference",
+      "query": "is:pr haswell inference updated:2026-09-06..2026-11-06",
+      "total": 143,
+      "returned": 143,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "avx2-ggml",
+      "query": "is:pr avx2 ggml updated:2026-09-06..2026-11-06",
+      "total": 965,
+      "returned": 965,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "avx2-inference",
+      "query": "is:pr avx2 inference updated:2026-09-06..2026-11-06",
+      "total": 2801,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "avx2-diffusion",
+      "query": "is:pr avx2 diffusion updated:2026-09-06..2026-11-06",
+      "total": 116,
+      "returned": 116,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "vulkan-ggml",
+      "query": "is:pr vulkan ggml updated:2026-09-06..2026-11-06",
+      "total": 5000,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "vulkan-inference",
+      "query": "is:pr vulkan inference updated:2026-09-06..2026-11-06",
+      "total": 4153,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/llama.cpp-vulkan",
+      "query": "repo:ggml-org/llama.cpp vulkan updated:2026-09-06..2026-11-06",
+      "total": 887,
+      "returned": 887,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/llama.cpp-avx2",
+      "query": "repo:ggml-org/llama.cpp avx2 updated:2026-09-06..2026-11-06",
+      "total": 129,
+      "returned": 129,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "vulkan-diffusion",
+      "query": "is:pr vulkan diffusion updated:2026-09-06..2026-11-06",
+      "total": 843,
+      "returned": 843,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/llama.cpp-haswell",
+      "query": "repo:ggml-org/llama.cpp haswell updated:2026-09-06..2026-11-06",
+      "total": 23,
+      "returned": 23,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/llama.cpp-polaris",
+      "query": "repo:ggml-org/llama.cpp polaris updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/llama.cpp-gfx803",
+      "query": "repo:ggml-org/llama.cpp gfx803 updated:2026-09-06..2026-11-06",
+      "total": 1,
+      "returned": 1,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/ggml-vulkan",
+      "query": "repo:ggml-org/ggml vulkan updated:2026-09-06..2026-11-06",
+      "total": 14,
+      "returned": 14,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/ggml-avx2",
+      "query": "repo:ggml-org/ggml avx2 updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/ggml-haswell",
+      "query": "repo:ggml-org/ggml haswell updated:2026-09-06..2026-11-06",
+      "total": 1,
+      "returned": 1,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/ggml-cpu",
+      "query": "repo:ggml-org/ggml cpu updated:2026-09-06..2026-11-06",
+      "total": 22,
+      "returned": 22,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/ggml-polaris",
+      "query": "repo:ggml-org/ggml polaris updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/ggml-gfx803",
+      "query": "repo:ggml-org/ggml gfx803 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "leejet/stable-diffusion.cpp-",
+      "query": "repo:leejet/stable-diffusion.cpp  updated:2026-09-06..2026-11-06",
+      "total": 401,
+      "returned": 401,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "LostRuins/koboldcpp-",
+      "query": "repo:LostRuins/koboldcpp  updated:2026-09-06..2026-11-06",
+      "total": 155,
+      "returned": 155,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/llama.cpp-cpu",
+      "query": "repo:ggml-org/llama.cpp cpu updated:2026-09-06..2026-11-06",
+      "total": 1651,
+      "returned": 1000,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ROCm/rocBLAS-gfx803",
+      "query": "repo:ROCm/rocBLAS gfx803 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ROCm/rocBLAS-polaris",
+      "query": "repo:ROCm/rocBLAS polaris updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ollama/ollama-vulkan",
+      "query": "repo:ollama/ollama vulkan updated:2026-09-06..2026-11-06",
+      "total": 92,
+      "returned": 92,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ollama/ollama-avx2",
+      "query": "repo:ollama/ollama avx2 updated:2026-09-06..2026-11-06",
+      "total": 26,
+      "returned": 26,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ollama/ollama-gfx803",
+      "query": "repo:ollama/ollama gfx803 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ikawrakow/ik_llama.cpp-",
+      "query": "repo:ikawrakow/ik_llama.cpp  updated:2026-09-06..2026-11-06",
+      "total": 506,
+      "returned": 506,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "Comfy-Org/ComfyUI-avx2",
+      "query": "repo:Comfy-Org/ComfyUI avx2 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "Comfy-Org/ComfyUI-vulkan",
+      "query": "repo:Comfy-Org/ComfyUI vulkan updated:2026-09-06..2026-11-06",
+      "total": 3,
+      "returned": 3,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "Comfy-Org/ComfyUI-gfx803",
+      "query": "repo:Comfy-Org/ComfyUI gfx803 updated:2026-09-06..2026-11-06",
+      "total": 5,
+      "returned": 5,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "Comfy-Org/ComfyUI-polaris",
+      "query": "repo:Comfy-Org/ComfyUI polaris updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "vllm-project/vllm-haswell",
+      "query": "repo:vllm-project/vllm haswell updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "vllm-project/vllm-gfx803",
+      "query": "repo:vllm-project/vllm gfx803 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "nihui/Real-ESRGAN-ncnn-vulkan-",
+      "query": "repo:nihui/Real-ESRGAN-ncnn-vulkan  updated:2026-09-06..2026-11-06",
+      "total": null,
+      "returned": 0,
+      "capped": false,
+      "incomplete": null,
+      "error": "HTTP 422"
+    },
+    {
+      "name": "Tencent/ncnn-vulkan",
+      "query": "repo:Tencent/ncnn vulkan updated:2026-09-06..2026-11-06",
+      "total": 146,
+      "returned": 146,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "Tencent/ncnn-avx2",
+      "query": "repo:Tencent/ncnn avx2 updated:2026-09-06..2026-11-06",
+      "total": 13,
+      "returned": 13,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ROCm/AMDMIGraphX-gfx803",
+      "query": "repo:ROCm/AMDMIGraphX gfx803 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ROCm/AMDMIGraphX-polaris",
+      "query": "repo:ROCm/AMDMIGraphX polaris updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggerganov/whisper.cpp-vulkan",
+      "query": "repo:ggerganov/whisper.cpp vulkan updated:2026-09-06..2026-11-06",
+      "total": null,
+      "returned": 0,
+      "capped": false,
+      "incomplete": null,
+      "error": "HTTP 422"
+    },
+    {
+      "name": "ggerganov/whisper.cpp-avx2",
+      "query": "repo:ggerganov/whisper.cpp avx2 updated:2026-09-06..2026-11-06",
+      "total": null,
+      "returned": 0,
+      "capped": false,
+      "incomplete": null,
+      "error": "HTTP 422"
+    },
+    {
+      "name": "vllm-project/vllm-avx2",
+      "query": "repo:vllm-project/vllm avx2 updated:2026-09-06..2026-11-06",
+      "total": 549,
+      "returned": 549,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggerganov/whisper.cpp-cpu",
+      "query": "repo:ggerganov/whisper.cpp cpu updated:2026-09-06..2026-11-06",
+      "total": null,
+      "returned": 0,
+      "capped": false,
+      "incomplete": null,
+      "error": "HTTP 422"
+    },
+    {
+      "name": "ggml-org/whisper.cpp-vulkan",
+      "query": "repo:ggml-org/whisper.cpp vulkan updated:2026-09-06..2026-11-06",
+      "total": 89,
+      "returned": 89,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/whisper.cpp-avx2",
+      "query": "repo:ggml-org/whisper.cpp avx2 updated:2026-09-06..2026-11-06",
+      "total": 109,
+      "returned": 109,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "FFmpeg/FFmpeg-vulkan",
+      "query": "repo:FFmpeg/FFmpeg vulkan updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "FFmpeg/FFmpeg-avx2",
+      "query": "repo:FFmpeg/FFmpeg avx2 updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "nihui/rife-ncnn-vulkan-",
+      "query": "repo:nihui/rife-ncnn-vulkan  updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-gfx803",
+      "query": "gfx803 pushed:2026-09-06..2026-11-06",
+      "total": 12,
+      "returned": 12,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "ggml-org/whisper.cpp-cpu",
+      "query": "repo:ggml-org/whisper.cpp cpu updated:2026-09-06..2026-11-06",
+      "total": 292,
+      "returned": 292,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-polaris inference",
+      "query": "polaris inference pushed:2026-09-06..2026-11-06",
+      "total": 1,
+      "returned": 1,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-polaris vulkan",
+      "query": "polaris vulkan pushed:2026-09-06..2026-11-06",
+      "total": 4,
+      "returned": 4,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-polaris llama",
+      "query": "polaris llama pushed:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-haswell inference",
+      "query": "haswell inference pushed:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-avx2 ggml",
+      "query": "avx2 ggml pushed:2026-09-06..2026-11-06",
+      "total": 4,
+      "returned": 4,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-vulkan diffusion",
+      "query": "vulkan diffusion pushed:2026-09-06..2026-11-06",
+      "total": 25,
+      "returned": 25,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-avx2 inference",
+      "query": "avx2 inference pushed:2026-09-06..2026-11-06",
+      "total": 74,
+      "returned": 74,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-vulkan upscaler",
+      "query": "vulkan upscaler pushed:2026-09-06..2026-11-06",
+      "total": 23,
+      "returned": 23,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-vulkan ggml",
+      "query": "vulkan ggml pushed:2026-09-06..2026-11-06",
+      "total": 64,
+      "returned": 64,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "rx580-inference",
+      "query": "is:pr rx580 inference updated:2026-09-06..2026-11-06",
+      "total": 3,
+      "returned": 3,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "rx580-vulkan",
+      "query": "is:pr rx580 vulkan updated:2026-09-06..2026-11-06",
+      "total": 10,
+      "returned": 10,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "rx580-diffusion",
+      "query": "is:pr rx580 diffusion updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "rx580-llama",
+      "query": "is:pr rx580 llama updated:2026-09-06..2026-11-06",
+      "total": 4,
+      "returned": 4,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "rx580-upscale",
+      "query": "is:pr rx580 upscale updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "rx580-shader",
+      "query": "is:pr rx580 shader updated:2026-09-06..2026-11-06",
+      "total": 3,
+      "returned": 3,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-rx580",
+      "query": "rx580 pushed:2026-09-06..2026-11-06",
+      "total": 30,
+      "returned": 30,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"rx 580\"-inference",
+      "query": "is:pr \"rx 580\" inference updated:2026-09-06..2026-11-06",
+      "total": 13810,
+      "returned": 998,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"rx 580\"-vulkan",
+      "query": "is:pr \"rx 580\" vulkan updated:2026-09-06..2026-11-06",
+      "total": 13880,
+      "returned": 998,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"rx 580\"-llama",
+      "query": "is:pr \"rx 580\" llama updated:2026-09-06..2026-11-06",
+      "total": 13820,
+      "returned": 999,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"rx 580\"-diffusion",
+      "query": "is:pr \"rx 580\" diffusion updated:2026-09-06..2026-11-06",
+      "total": 13793,
+      "returned": 999,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"rx 580\"-upscale",
+      "query": "is:pr \"rx 580\" upscale updated:2026-09-06..2026-11-06",
+      "total": 13795,
+      "returned": 999,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-\"rx 580\"",
+      "query": "\"rx 580\" pushed:2026-09-06..2026-11-06",
+      "total": 45,
+      "returned": 45,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-vulkan",
+      "query": "is:pr gfx803 vulkan updated:2026-09-06..2026-11-06",
+      "total": 15,
+      "returned": 15,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-inference",
+      "query": "is:pr gfx803 inference updated:2026-09-06..2026-11-06",
+      "total": 12,
+      "returned": 12,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-llama",
+      "query": "is:pr gfx803 llama updated:2026-09-06..2026-11-06",
+      "total": 19,
+      "returned": 19,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-diffusion",
+      "query": "is:pr gfx803 diffusion updated:2026-09-06..2026-11-06",
+      "total": 8,
+      "returned": 8,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"rx 580\"-shader",
+      "query": "is:pr \"rx 580\" shader updated:2026-09-06..2026-11-06",
+      "total": 13844,
+      "returned": 999,
+      "capped": true,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-upscale",
+      "query": "is:pr gfx803 upscale updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "gfx803-shader",
+      "query": "is:pr gfx803 shader updated:2026-09-06..2026-11-06",
+      "total": 3,
+      "returned": 3,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-gfx803",
+      "query": "gfx803 pushed:2026-09-06..2026-11-06",
+      "total": 12,
+      "returned": 12,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"gcn4\"-vulkan",
+      "query": "is:pr \"gcn4\" vulkan updated:2026-09-06..2026-11-06",
+      "total": 5,
+      "returned": 5,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"gcn4\"-inference",
+      "query": "is:pr \"gcn4\" inference updated:2026-09-06..2026-11-06",
+      "total": 7,
+      "returned": 7,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"gcn4\"-llama",
+      "query": "is:pr \"gcn4\" llama updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"gcn4\"-diffusion",
+      "query": "is:pr \"gcn4\" diffusion updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"gcn4\"-upscale",
+      "query": "is:pr \"gcn4\" upscale updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "\"gcn4\"-shader",
+      "query": "is:pr \"gcn4\" shader updated:2026-09-06..2026-11-06",
+      "total": 2,
+      "returned": 2,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "repo-\"gcn4\"",
+      "query": "\"gcn4\" pushed:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "KessokuNet/infr",
+      "query": "repo:KessokuNet/infr updated:2026-09-06..2026-11-06",
+      "total": 22,
+      "returned": 22,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "stew675/llama-cpp-rdna-boosts",
+      "query": "repo:stew675/llama-cpp-rdna-boosts updated:2026-09-06..2026-11-06",
+      "total": 243,
+      "returned": 243,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "leejet/ggml",
+      "query": "repo:leejet/ggml updated:2026-09-06..2026-11-06",
+      "total": 22,
+      "returned": 22,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "mirek190/ggml",
+      "query": "repo:mirek190/ggml updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "PrismML-Eng/llama.cpp",
+      "query": "repo:PrismML-Eng/llama.cpp updated:2026-09-06..2026-11-06",
+      "total": 292,
+      "returned": 292,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "overdoingism/llama-cpp-overdoing",
+      "query": "repo:overdoingism/llama-cpp-overdoing updated:2026-09-06..2026-11-06",
+      "total": 0,
+      "returned": 0,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    },
+    {
+      "name": "turboderp-org/exllamav3",
+      "query": "repo:turboderp-org/exllamav3 updated:2026-09-06..2026-11-06",
+      "total": 297,
+      "returned": 297,
+      "capped": false,
+      "incomplete": false,
+      "error": []
+    }
+  ],
+  "direct_paginated": [
+    {
+      "repository": "ggml-org/llama.cpp",
+      "pull_requests": 2934,
+      "issues": 1713
+    },
+    {
+      "repository": "leejet/stable-diffusion.cpp",
+      "pull_requests": 230,
+      "issues": 171
+    },
+    {
+      "repository": "LostRuins/koboldcpp",
+      "pull_requests": 57,
+      "issues": 98
+    },
+    {
+      "repository": "PrismML-Eng/llama.cpp",
+      "pull_requests": 238,
+      "issues": 55
+    },
+    {
+      "repository": "stew675/llama-cpp-rdna-boosts",
+      "pull_requests": 120,
+      "issues": 123
+    },
+    {
+      "repository": "Tencent/ncnn",
+      "pull_requests": 300,
+      "issues": 88
+    }
+  ],
+  "repository_sources": [
+    {
+      "repository": "0xShug0/audio.cpp",
+      "branch": "main",
+      "sha": "d2da530bf04ff9f9cb68688da0d5a363b76d6bc3",
+      "license": "NOASSERTION",
+      "pull_requests": 596,
+      "issues": 159,
+      "commits": 640,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "aivisionslab-studios/rx580-local-ai-guide",
+      "branch": "main",
+      "sha": "eaccea8deee1af7e94d24ffe330488d742d3b74b",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 0,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "andrewdhannah/vulkan-polaris-llama",
+      "branch": "main",
+      "sha": "e29790e07978c5826d23752d4416a173e5b731db",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 0,
+      "source_documents": 4,
+      "error": null
+    },
+    {
+      "repository": "aryan-nikzad/4x-rx580-sdserver-launcher",
+      "branch": "main",
+      "sha": "31e4437c889f7b637f57aa650a517a6540d3db66",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 2,
+      "source_documents": 0,
+      "error": null
+    },
+    {
+      "repository": "aryan-nikzad/qwen-image-rx580-launcher",
+      "branch": "main",
+      "sha": "322cc0b029a0f74d136721928577b2758d3574db",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 5,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "aryan-nikzad/rx580-llamacpp-launcher",
+      "branch": "main",
+      "sha": "a103036d6b1fea91e15b81a4df1145319c21b023",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 4,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "AvilaCarlosDev/polaris-local-ai",
+      "branch": "main",
+      "sha": "0b1054b7c5c5fb6ea0469d423dc2b119b125a8b3",
+      "license": "MIT",
+      "pull_requests": 8,
+      "issues": 0,
+      "commits": 48,
+      "source_documents": 4,
+      "error": null
+    },
+    {
+      "repository": "ayanoby/vega-igpu-diffusion",
+      "branch": "main",
+      "sha": "19d8d0f7bc4564591d0fa9df042e3054740c1ed8",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 22,
+      "source_documents": 3,
+      "error": null
+    },
+    {
+      "repository": "chboishabba/gfx803_compat_graph",
+      "branch": "master",
+      "sha": "d68917a01f65f284096ff6411bd2707e07beb201",
+      "license": null,
+      "pull_requests": 2,
+      "issues": 1,
+      "commits": 3,
+      "source_documents": 3,
+      "error": null
+    },
+    {
+      "repository": "dhaern/VelociQ8",
+      "branch": "main",
+      "sha": "dc6d2c7cdd2ec65b09129f1ce4dda80d27c01840",
+      "license": "NOASSERTION",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 12,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "dmalves/local-ai",
+      "branch": "main",
+      "sha": "92eddfd02ecb0997d6dea0a7979c350f39a221fa",
+      "license": "NOASSERTION",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 2,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "doteyeso-ops/rx580-vulkan-fa-lds",
+      "branch": "main",
+      "sha": "8dded0b41fb6d09cede2d76b2638d05cbcdd84c5",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 3,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "engival/yue2-eagle3-train",
+      "branch": "master",
+      "sha": "1badee8ef75cd89875f89d73d0801934f4723c80",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 2,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "engival/yue2.cpp",
+      "branch": "master",
+      "sha": "28bb2512aefac0646ef1210cfa9df3fe84c14779",
+      "license": "MIT",
+      "pull_requests": 1,
+      "issues": 2,
+      "commits": 35,
+      "source_documents": 3,
+      "error": null
+    },
+    {
+      "repository": "FFmpeg/FFmpeg",
+      "branch": "master",
+      "sha": "5d85b7bfb2b024fd367ae3a938b4ac46a39e3a26",
+      "license": "NOASSERTION",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 2098,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "gaigher/Polaris-multi-GPU-llama",
+      "branch": "main",
+      "sha": "a4a658bf95b672936b04054f2df97ab63c814f8c",
+      "license": "NOASSERTION",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 40,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "ggml-org/whisper.cpp",
+      "branch": "master",
+      "sha": "727d3e7666485e12450746b523bfb4e7f057cc5e",
+      "license": "MIT",
+      "pull_requests": 248,
+      "issues": 976,
+      "commits": 661,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "HarshaVardhan3002/ROCmFPX",
+      "branch": "main",
+      "sha": "8a705e2f7f3a4681fa87355938a7f872565bb48c",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 2,
+      "commits": 1023,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "ikawrakow/ik_llama.cpp",
+      "branch": "main",
+      "sha": "0d5aaa826b24014dcd67fbdef6055410db7d8079",
+      "license": "MIT",
+      "pull_requests": 411,
+      "issues": 95,
+      "commits": 321,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "JonPark0/krafla",
+      "branch": "main",
+      "sha": "609a5750c215db6d261514dc33852edad818eddf",
+      "license": "MIT",
+      "pull_requests": 72,
+      "issues": 0,
+      "commits": 272,
+      "source_documents": 3,
+      "error": null
+    },
+    {
+      "repository": "KessokuNet/infr",
+      "branch": "gcn4-tuning",
+      "sha": "1d6d5a759927c698a4ae87264a46bcc8e74862bd",
+      "license": "MIT",
+      "pull_requests": 7,
+      "issues": 15,
+      "commits": 65,
+      "source_documents": 4,
+      "error": null
+    },
+    {
+      "repository": "KessokuNet/infr",
+      "branch": "main",
+      "sha": "ea05b3e080b5a9395da83ba060e4cfcfb762fc3f",
+      "license": "MIT",
+      "pull_requests": 7,
+      "issues": 15,
+      "commits": 177,
+      "source_documents": 5,
+      "error": null
+    },
+    {
+      "repository": "lakitu12/rocm-gfx803-torch",
+      "branch": "master",
+      "sha": "ba9ad01a423777841ac9990c38d119745b51df8a",
+      "license": null,
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 15,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "lakitu12/vkblas",
+      "branch": "main",
+      "sha": "b0bf6b40905e1ca2b1ae78f69f7e80d65d446777",
+      "license": "Apache-2.0",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 29,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "leejet/stable-diffusion.cpp",
+      "branch": "master",
+      "sha": "f5df5f8b84f139f1e80496902da90798a0d92896",
+      "license": "MIT",
+      "pull_requests": 230,
+      "issues": 171,
+      "commits": 211,
+      "source_documents": 9,
+      "error": null
+    },
+    {
+      "repository": "mirek190/ggml",
+      "branch": "master",
+      "sha": "a05c9922613c6a2230dbb1d0de679519ecafb4f0",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 457,
+      "source_documents": 11,
+      "error": null
+    },
+    {
+      "repository": "morphious1986/gfx803-pytorch-rocm-community",
+      "branch": "main",
+      "sha": "b4b3ad56c6c3cb7885cd47d884ae28df6d44f914",
+      "license": null,
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 3,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "nihui/realsr-ncnn-vulkan",
+      "branch": "master",
+      "sha": "b7f890ee2704ccea76c73d9fd4d5b3298dd1beca",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 0,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "niveku/upscale-amd-vulkan",
+      "branch": "master",
+      "sha": "475f3337d8150f8a51608de316c29aac0078a8d2",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 0,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "overdoingism/llama-cpp-overdoing",
+      "branch": "main",
+      "sha": "edef8758a082266f914eae4245a168e51bb240f9",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 58,
+      "source_documents": 15,
+      "error": null
+    },
+    {
+      "repository": "pauldmartinphd/llm-performance-engineering-notebook",
+      "branch": "main",
+      "sha": "4d4905f3c5fe312a3388b2d02d5444e3188c32cd",
+      "license": "MIT",
+      "pull_requests": 1,
+      "issues": 0,
+      "commits": 32,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "PrismML-Eng/llama.cpp",
+      "branch": "prism",
+      "sha": "62c418ccd7aefee37997e94c2d9fac1eed7fc89b",
+      "license": "MIT",
+      "pull_requests": 238,
+      "issues": 55,
+      "commits": 1259,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "rxzsu/polarisrs",
+      "branch": "main",
+      "sha": "47a8a200306c534d03e110b004d88fdf5992da0b",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 3,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "Schaka/rocm-gfx803",
+      "branch": "main",
+      "sha": "8fdcf7b1305d0cfc6fc8c1fc7b1bfb5f73494e78",
+      "license": null,
+      "pull_requests": 1,
+      "issues": 3,
+      "commits": 31,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "SegmentationFish/sdvk",
+      "branch": "main",
+      "sha": "b3cb53af33b5bda557cf431c0250be20fef67aed",
+      "license": "GPL-3.0",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 22,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "ServeurpersoCom/omnivoice.cpp",
+      "branch": "master",
+      "sha": "dbfc792d6fbe0cc3a776817f56de35a3744d7594",
+      "license": "MIT",
+      "pull_requests": 3,
+      "issues": 2,
+      "commits": 25,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "ServeurpersoCom/qwentts.cpp",
+      "branch": "master",
+      "sha": "de2ad833e9bd5c06082231d1da637789f7562816",
+      "license": "MIT",
+      "pull_requests": 11,
+      "issues": 17,
+      "commits": 30,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "ServeurpersoCom/yue2.cpp",
+      "branch": "master",
+      "sha": "5a9500fd2979ab99fc82895877aadf8583acbabb",
+      "license": "MIT",
+      "pull_requests": 6,
+      "issues": 17,
+      "commits": 91,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "sirfyyn/FastLocalExperts",
+      "branch": "main",
+      "sha": "e6909b7550c9917194cd351998f3770717b34ce2",
+      "license": "MIT",
+      "pull_requests": 25,
+      "issues": 0,
+      "commits": 213,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "spy1134/rocm-gfx803",
+      "branch": "main",
+      "sha": "0b4e82eb502db012dcf9c2f6dffeeda52faa6a48",
+      "license": null,
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 153,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "stew675/llama-cpp-rdna-boosts",
+      "branch": "main",
+      "sha": "87693010e6700933ca65719bfcc0be873168478e",
+      "license": "MIT",
+      "pull_requests": 120,
+      "issues": 123,
+      "commits": 2001,
+      "source_documents": 25,
+      "error": null
+    },
+    {
+      "repository": "Tencent/ncnn",
+      "branch": "master",
+      "sha": "2c6176ecee79ac0a1d2969e4c8e7e89b8a859e44",
+      "license": "NOASSERTION",
+      "pull_requests": 300,
+      "issues": 88,
+      "commits": 135,
+      "source_documents": 15,
+      "error": null
+    },
+    {
+      "repository": "thiensubs/llama-cpp-rx580-egpu",
+      "branch": "main",
+      "sha": "9783b75d4b94eb2dd40c3352736750ba46e04758",
+      "license": null,
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 27,
+      "source_documents": 5,
+      "error": null
+    },
+    {
+      "repository": "trickymind1324/axon-infer",
+      "branch": "main",
+      "sha": "54c645f02797e4ccc4e31a72bfc059c076bb3e8e",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 8,
+      "commits": 145,
+      "source_documents": 1,
+      "error": null
+    },
+    {
+      "repository": "wlejon/brodiffusion",
+      "branch": "main",
+      "sha": "636812a6734d4978274da36aa31fb293c1b2277e",
+      "license": "MIT",
+      "pull_requests": 0,
+      "issues": 0,
+      "commits": 93,
+      "source_documents": 2,
+      "error": null
+    },
+    {
+      "repository": "xinntao/Real-ESRGAN-ncnn-vulkan",
+      "branch": "master",
+      "sha": "37026f49824c5cf84062e7c6a5dd71445dcf610f",
+      "license": "NOASSERTION",
+      "pull_requests": 0,
+      "issues": 1,
+      "commits": 0,
+      "source_documents": 1,
+      "error": null
+    }
+  ],
+  "detailed_records": [
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1152",
+      "title": "Use Flash Attention for RoFormer separation on Vulkan",
+      "updated": "2026-10-31T16:37:24Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 3,
+      "merged_at": "2026-10-31T16:36:59Z"
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1168",
+      "title": "perf(irodori_tts): read the RF context K/V cache in place",
+      "updated": "2026-11-02T07:31:48Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": "2026-11-02T04:59:27Z"
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1183",
+      "title": "Correct Vulkan pipeline selection for oversized buffer bindings",
+      "updated": "2026-11-03T05:32:08Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 8,
+      "merged_at": "2026-11-03T05:32:03Z"
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1215",
+      "title": "Reduce Nemotron Transcribe transfers and unused prefill work",
+      "updated": "2026-11-06T01:39:37Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 7,
+      "merged_at": "2026-11-06T01:39:32Z"
+    },
+    {
+      "url": "https://github.com/AvilaCarlosDev/polaris-local-ai/pull/8",
+      "title": "docs: README and guides up to date with the Oct 25–26 models and benchmarks",
+      "updated": "2026-10-29T22:31:24Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 7,
+      "merged_at": "2026-10-29T22:31:23Z"
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/17",
+      "title": "fix SSBO hack",
+      "updated": "2026-11-02T11:14:59Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/18",
+      "title": "qwen 4 support",
+      "updated": "2026-11-03T09:52:58Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/21",
+      "title": "kv.paged: finish forward PagedAttention (page pool + seam wiring)",
+      "updated": "2026-11-05T20:25:23Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/3",
+      "title": "Gate dp4a on the Accelerated flags; try SDWA int8-dot emulation",
+      "updated": "2026-11-01T11:46:34Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/11",
+      "title": "feat(vulkan): split the first forward on slow discrete GPUs",
+      "updated": "2026-11-01T10:57:21Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 5,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/12",
+      "title": "feat(vulkan): fp32 K-quant prefill GEMM for GPUs without fast int8 dot",
+      "updated": "2026-11-01T12:15:47Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 14,
+      "merged_at": "2026-11-01T12:15:47Z"
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/14",
+      "title": "feat(exl3): scalar trellis decode oracle + parity (Phase 0, CPU-only)",
+      "updated": "2026-11-02T14:13:24Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 7,
+      "merged_at": "2026-11-02T14:13:24Z"
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/16",
+      "title": "feat(vulkan): route wide MTP-verify Linears to the fp32 kq_fma mrow",
+      "updated": "2026-11-06T10:31:17Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": 3,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2450",
+      "title": "Adaptive-P causes 26-37% reduction in generation speed (Windows, Vulkan, Gemma)",
+      "updated": "2026-09-09T20:07:15Z",
+      "state": "open",
+      "comments": 2,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2522",
+      "title": "RX 580 not working via vulkan+windows",
+      "updated": "2026-10-12T14:06:32Z",
+      "state": "open",
+      "comments": 11,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2574",
+      "title": "Corrupted Gemma 4 generation on legacy AMD GCN under Windows Vulkan",
+      "updated": "2026-10-31T05:07:35Z",
+      "state": "open",
+      "comments": 2,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2585",
+      "title": "Flux3 problem .",
+      "updated": "2026-11-06T11:38:00Z",
+      "state": "open",
+      "comments": 9,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2586",
+      "title": "Can't run Bonsai-2-27B-PQ2_0-MTP.gguf",
+      "updated": "2026-11-06T02:35:33Z",
+      "state": "open",
+      "comments": 5,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2564",
+      "title": "AZ-000 - fix: support legacy AMD hardware in CPU and Vulkan paths",
+      "updated": "2026-11-03T09:14:39Z",
+      "state": "closed",
+      "comments": 14,
+      "changed_files": 2,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2575",
+      "title": "sd: sync with master-1004-a85db96",
+      "updated": "2026-11-04T13:50:54Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 91,
+      "merged_at": "2026-11-04T13:50:53Z"
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2576",
+      "title": "sd: sync with master-1028-37bc88b",
+      "updated": "2026-11-05T11:04:51Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": 81,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2577",
+      "title": "sd: switch CMakeLists.txt to build-time source file discovery",
+      "updated": "2026-11-04T15:43:52Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2580",
+      "title": "build: automatically select ISA libraries on Linux",
+      "updated": "2026-11-05T11:38:53Z",
+      "state": "open",
+      "comments": 5,
+      "changed_files": 7,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2583",
+      "title": "Add new config option for the soft-limit percent",
+      "updated": "2026-11-06T02:55:41Z",
+      "state": "open",
+      "comments": 3,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/250",
+      "title": "ggml-cpu : AVX-512 VNNI and AVX2 vec_dot for PTQ1_0 on x86 (4x token generation)",
+      "updated": "2026-10-24T19:45:56Z",
+      "state": "closed",
+      "comments": 7,
+      "changed_files": 2,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/252",
+      "title": "vulkan: dedicated mul_mat_vec shader for PTQ1_0 (~3x on the dequant path)",
+      "updated": "2026-10-08T20:08:57Z",
+      "state": "closed",
+      "comments": 6,
+      "changed_files": 2,
+      "merged_at": "2026-10-08T20:08:56Z"
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/392",
+      "title": "ggml-cpu : AVX-512 VNNI and AVX2 vec_dot for PTQ1_0 x Q8_0 on x86 (rebased #250, about 2x CPU)",
+      "updated": "2026-10-24T19:45:55Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": "2026-10-24T19:45:49Z"
+    },
+    {
+      "url": "https://github.com/Schaka/rocm-gfx803/pull/7",
+      "title": "Add containerized ROCm/HIP setup for gfx803 (an installer script)",
+      "updated": "2026-10-26T08:58:07Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 2,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7136",
+      "title": "vulkan: stabilize InstanceNorm subgroup reduction",
+      "updated": "2026-10-18T15:29:04Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 7,
+      "merged_at": "2026-10-18T13:31:56Z"
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7140",
+      "title": "vulkan: fix two validation errors on subgroup size and weight buffer usage",
+      "updated": "2026-10-20T09:59:52Z",
+      "state": "closed",
+      "comments": 5,
+      "changed_files": 2,
+      "merged_at": "2026-10-19T13:14:50Z"
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7170",
+      "title": "vulkan: use StorageBuffer for int8 storage shaders",
+      "updated": "2026-10-25T02:50:07Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 1,
+      "merged_at": "2026-10-25T02:50:07Z"
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7239",
+      "title": "vulkan: avoid exp overflow in mish",
+      "updated": "2026-11-05T04:32:51Z",
+      "state": "closed",
+      "comments": 5,
+      "changed_files": 5,
+      "merged_at": "2026-11-05T04:27:17Z"
+    },
+    {
+      "url": "https://github.com/chboishabba/gfx803_compat_graph/pull/5",
+      "title": "Build source-pinned Schaka gfx803 Nix binary factory and fail-closed admission",
+      "updated": "2026-11-06T15:08:56Z",
+      "state": "open",
+      "comments": 1,
+      "changed_files": 42,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/24066",
+      "title": "Eval bug: Vulkan: performance drop in recent builds",
+      "updated": "2026-11-01T07:08:54Z",
+      "state": "open",
+      "comments": 49,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29596",
+      "title": "Vulkan: Abysmal performance on FirePro D700 (Gentoo Linux 7.2.7, Mesa 26.2.3)",
+      "updated": "2026-10-21T20:16:19Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/30554",
+      "title": "Eval bug: Vulkan] Poor Flash Attention performance on AMD RDNA2 (RX 6600 XT) under Windows",
+      "updated": "2026-10-14T22:04:32Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/30644",
+      "title": "Misc. bug: Vulkan: generation 2-4x slower with two GPUs since #29741 (GCN 1.0 / Tahiti, no ReBAR)",
+      "updated": "2026-10-16T14:55:04Z",
+      "state": "closed",
+      "comments": 3,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/30688",
+      "title": "Eval bug: Vulkan draft-mtp decode ~4x slower and prefill ~6x slower since #30020 (target compute buffer re-allocated into GTT)",
+      "updated": "2026-10-19T01:44:57Z",
+      "state": "open",
+      "comments": 1,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/16650",
+      "title": "ggml-cpu: optimise rms_norm op",
+      "updated": "2026-09-21T18:38:00Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": 2,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/19706",
+      "title": "Q6_K - Block Interleaving Implementation for x86 SIMD (AVX512/AVX2)",
+      "updated": "2026-10-29T14:23:24Z",
+      "state": "open",
+      "comments": 1,
+      "changed_files": 3,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/19707",
+      "title": "Q5_K - Block Interleaving Implementation for x86 SIMD (AVX512/AVX2)",
+      "updated": "2026-10-22T13:35:08Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": 3,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/22250",
+      "title": "Q5_0 - Block Interleaving Implementation for x86 SIMD (AVX512/AVX2)",
+      "updated": "2026-10-22T13:35:04Z",
+      "state": "open",
+      "comments": 2,
+      "changed_files": 4,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/22970",
+      "title": "vulkan : transpose A-matrix data layout for K-quant mul_mat performance",
+      "updated": "2026-11-03T09:51:44Z",
+      "state": "open",
+      "comments": 39,
+      "changed_files": 10,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/23762",
+      "title": "vulkan: fix UMA performance by preferring cached host memory and handling non…",
+      "updated": "2026-09-07T06:07:16Z",
+      "state": "open",
+      "comments": 9,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28422",
+      "title": "vulkan: use add_alloc_dep to enable topk_moe fusion for prefill",
+      "updated": "2026-09-10T17:21:30Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": "2026-09-10T17:21:29Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28427",
+      "title": "vulkan: optimize iq3_xxs mat-vec shader",
+      "updated": "2026-10-20T20:36:23Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28440",
+      "title": "vulkan: optimize IQ4_XS matmul kernels",
+      "updated": "2026-09-16T09:23:38Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 4,
+      "merged_at": "2026-09-16T09:23:38Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28457",
+      "title": "vulkan: small M matrix optimizations for qwen",
+      "updated": "2026-09-10T17:20:19Z",
+      "state": "closed",
+      "comments": 3,
+      "changed_files": 2,
+      "merged_at": "2026-09-10T17:20:18Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28658",
+      "title": "vulkan: reduce stack usage in ggml_vk_load_shaders",
+      "updated": "2026-09-09T17:52:26Z",
+      "state": "closed",
+      "comments": 3,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29476",
+      "title": "vulkan: Tune GDN kernel, fix Intel performance",
+      "updated": "2026-09-29T17:44:25Z",
+      "state": "closed",
+      "comments": 7,
+      "changed_files": 1,
+      "merged_at": "2026-09-29T17:44:21Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29882",
+      "title": "vulkan: rms norm optimization using subgroup reductions",
+      "updated": "2026-10-26T14:14:32Z",
+      "state": "closed",
+      "comments": 13,
+      "changed_files": 5,
+      "merged_at": "2026-10-26T14:14:32Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30119",
+      "title": "vulkan: Optimize pool_2d when the pooling window is large",
+      "updated": "2026-10-13T15:18:00Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 5,
+      "merged_at": "2026-10-13T15:18:00Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30280",
+      "title": "RDNA3/4 Vulkan Large-Tile Split-K Optimization",
+      "updated": "2026-11-05T12:11:08Z",
+      "state": "closed",
+      "comments": 19,
+      "changed_files": 1,
+      "merged_at": "2026-11-05T12:11:08Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30487",
+      "title": "vulkan : check combined K+V f16 scratch size in FA dequant path",
+      "updated": "2026-11-05T10:02:41Z",
+      "state": "closed",
+      "comments": 3,
+      "changed_files": 1,
+      "merged_at": "2026-11-05T10:02:40Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30526",
+      "title": "ggml-cpu : optimize pad_f32",
+      "updated": "2026-10-15T07:13:19Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": "2026-10-15T07:13:19Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30666",
+      "title": "server : fix swa checkpoint invalidation logic",
+      "updated": "2026-10-19T14:11:43Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 2,
+      "merged_at": "2026-10-19T13:58:15Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30904",
+      "title": "vulkan: optimize mul_mat_vec kernel for iq3_xxs",
+      "updated": "2026-11-02T14:53:53Z",
+      "state": "open",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31058",
+      "title": "improve gemm4xN Q8_0 on AVX2",
+      "updated": "2026-10-23T19:30:47Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31061",
+      "title": "ggml-cpu: unroll x86 quantized vec_dot accumulator chains (Q4_0, Q4_K, Q5_K, IQ3_S, IQ3_XXS)",
+      "updated": "2026-10-30T01:15:01Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31149",
+      "title": "vulkan: optimize RMS_NORM_MUL_ROPE loop control",
+      "updated": "2026-10-29T15:34:58Z",
+      "state": "open",
+      "comments": 2,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31323",
+      "title": "vulkan: optimize prompt processing Flash Attention for RDNA3 and RDNA4",
+      "updated": "2026-10-29T07:03:49Z",
+      "state": "open",
+      "comments": 2,
+      "changed_files": 9,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31420",
+      "title": "ggml-cpu : fully unroll the AVX2 iq1_s, iq1_m, iq2_xxs, iq2_s block loops with clang",
+      "updated": "2026-10-31T22:13:58Z",
+      "state": "open",
+      "comments": 3,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31587",
+      "title": "vulkan: Re-enable large coopmat matmul configuration on fixed AMD proprietary drivers",
+      "updated": "2026-11-05T06:40:40Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": "2026-11-05T06:40:40Z"
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31804",
+      "title": "vulkan: improve RDNA4 MMVQ performance for Q3_K, Q5_K and IQ4_XS",
+      "updated": "2026-11-06T13:30:27Z",
+      "state": "open",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2664",
+      "title": "Fix AVX2 GEMM for IQ4_XS, IQ4_KSS, IQ5_KS",
+      "updated": "2026-10-13T17:06:31Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 2,
+      "merged_at": "2026-10-13T17:06:30Z"
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2752",
+      "title": "ggml: optimize rms_norm in Qwen Flash Next",
+      "updated": "2026-10-25T17:01:59Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": "2026-10-25T16:49:02Z"
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2757",
+      "title": "pp512 Qwen FN optimizations",
+      "updated": "2026-10-26T20:48:50Z",
+      "state": "closed",
+      "comments": 8,
+      "changed_files": 2,
+      "merged_at": "2026-10-26T15:40:51Z"
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2777",
+      "title": "pp512 Qwen FN optimizations round 2",
+      "updated": "2026-10-28T06:07:38Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 2,
+      "merged_at": "2026-10-28T06:07:38Z"
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2829",
+      "title": "ggml: small threading improvements",
+      "updated": "2026-11-05T17:42:18Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 3,
+      "merged_at": "2026-11-04T05:42:12Z"
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/23",
+      "title": "perf(vulkan): fuse weighted RMSNorm with rotary positioning and F16 output",
+      "updated": "2026-11-04T18:54:24Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 5,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/24",
+      "title": "perf(vulkan): fuse 3072-wide RMSNorm modulation",
+      "updated": "2026-11-04T18:54:41Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 4,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/25",
+      "title": "perf(vulkan): stage SiTU output directly as F16 for Q8 matmul",
+      "updated": "2026-11-04T18:34:24Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 4,
+      "merged_at": "2026-11-04T18:34:24Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/2118",
+      "title": "auto-fit produces worse plans than --offload-to-cpu on mid-range GPUs: resident weights are non-evictable and starve VAE decode",
+      "updated": "2026-10-10T15:15:18Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/2127",
+      "title": "master-956: post-graph-cut weight re-load pathologically slow (MB/s) - 11.5x wall-time regression on Qwen-Image vs master-945 (Vulkan, 16 GB)",
+      "updated": "2026-10-11T12:56:02Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/2137",
+      "title": "master-964: automatic direct convolution selection (#2134) is ~7x slower end-to-end on RDNA2 (RX 6950 XT, Vulkan)",
+      "updated": "2026-10-15T23:24:33Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/2173",
+      "title": "Vulkan conv-direct auto: probe says 'output check failed' on RX 7900 XTX (gfx1100), forced on gives bit-identical images (master-975)",
+      "updated": "2026-10-21T15:47:38Z",
+      "state": "closed",
+      "comments": 3,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/2218",
+      "title": "[Bug] GGUF reader seeks once per skipped metadata string: ~1 s per start, 36 s on uncached storage",
+      "updated": "2026-10-26T16:24:45Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/2275",
+      "title": "[Bug] MiniMax-H3 on Vulkan: SIGSEGV in ggml_vk_tensor_subbuffer (ggml_vk_mul) at 1024x1024x192 frames, after #2257",
+      "updated": "2026-11-05T04:22:15Z",
+      "state": "open",
+      "comments": 0,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/1891",
+      "title": "Optimize Krea2 Vulkan (target: Strix Halo)",
+      "updated": "2026-10-08T19:31:39Z",
+      "state": "open",
+      "comments": 5,
+      "changed_files": 15,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2102",
+      "title": "perf: avoid redundant permute+cont in non-interleaved RoPE",
+      "updated": "2026-10-06T08:55:21Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": "2026-10-06T08:54:56Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2113",
+      "title": "perf: use ggml rope apply op on supported backends",
+      "updated": "2026-10-08T20:33:34Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 7,
+      "merged_at": "2026-10-08T20:32:37Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2132",
+      "title": "feat: add per-module automatic flash attention selection",
+      "updated": "2026-10-13T15:00:34Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 53,
+      "merged_at": "2026-10-13T14:58:46Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2140",
+      "title": "fix: prevent core dump in CPU backend if using FP8 (e4m3) tensors",
+      "updated": "2026-10-18T07:38:20Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": "2026-10-15T14:26:28Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2141",
+      "title": "fix: benchmark Vulkan direct convolution in auto mode",
+      "updated": "2026-10-15T18:42:53Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 4,
+      "merged_at": "2026-10-15T15:08:31Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2181",
+      "title": "fix: update ggml to avoid small BAR heaps on Vulkan",
+      "updated": "2026-10-22T18:20:11Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 1,
+      "merged_at": "2026-10-22T14:58:25Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2201",
+      "title": "perf(moss): reduce CUDA Q8 inference overhead while preserving output pixels",
+      "updated": "2026-10-24T20:58:00Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 4,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2208",
+      "title": "perf(moss): reuse shared modulation slices",
+      "updated": "2026-10-25T08:00:27Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": "2026-10-25T08:00:27Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2209",
+      "title": "perf(moss): avoid redundant CUDA projection copies",
+      "updated": "2026-10-25T08:57:19Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 2,
+      "merged_at": "2026-10-25T08:54:52Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2210",
+      "title": "perf(moss): use optional fused SiTU activation",
+      "updated": "2026-11-03T15:41:22Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 4,
+      "merged_at": "2026-11-03T15:41:09Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2232",
+      "title": "moss-image : view qkv slices instead of slice+reshape",
+      "updated": "2026-11-03T15:47:48Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 1,
+      "merged_at": "2026-11-03T15:46:36Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2251",
+      "title": "perf: optimize Vulkan kernels, graph fusion, and workspace reuse",
+      "updated": "2026-11-02T16:49:09Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 6,
+      "merged_at": "2026-10-31T06:55:59Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2252",
+      "title": "perf(vulkan): update ggml for H3 inference optimizations",
+      "updated": "2026-11-02T16:49:08Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 2,
+      "merged_at": "2026-10-31T16:26:59Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2256",
+      "title": "fix: retry Vulkan capacity checks after memory reclamation",
+      "updated": "2026-11-02T16:49:02Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": "2026-11-01T14:55:56Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2258",
+      "title": "feat: add custom modulate operator and ConvRot fusion",
+      "updated": "2026-11-02T16:48:59Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 36,
+      "merged_at": "2026-11-01T17:19:29Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2269",
+      "title": "perf(cuda): fuse MOSS modulation and direct RoPE F16 output",
+      "updated": "2026-11-03T18:22:13Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 3,
+      "merged_at": "2026-11-03T18:01:42Z"
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2273",
+      "title": "perf(vulkan): accelerate MOSS normalization and SiTU staging",
+      "updated": "2026-11-05T18:00:35Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 11,
+      "merged_at": "2026-11-04T19:01:32Z"
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39028",
+      "title": "[CPU] Fix INT8 convolution saturation on AVX2 without VNNI",
+      "updated": "2026-10-28T01:28:17Z",
+      "state": "open",
+      "comments": 3,
+      "changed_files": 7,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/sirfyyn/FastLocalExperts/pull/14",
+      "title": "Fix: shutdown hang with FLE_MOE_WILLNEED_NOW",
+      "updated": "2026-11-02T19:25:43Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 1,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/sirfyyn/FastLocalExperts/pull/25",
+      "title": "README: Rin repo name",
+      "updated": "2026-11-06T06:56:47Z",
+      "state": "closed",
+      "comments": 0,
+      "changed_files": 1,
+      "merged_at": "2026-11-06T06:56:45Z"
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/issues/273",
+      "title": "gfx1201 decode step: two small grids hit the dispatch stall, seq_rm scans the whole cache when an idle slot is parked, and two per-step host costs",
+      "updated": "2026-11-05T15:31:44Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": null,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/125",
+      "title": "wip/decode-host-overhead: async graph-input uploads (opt-in), seq_rm used range, AVX2 S2 top-k prefilter (bit-identical, r37)",
+      "updated": "2026-10-30T05:34:58Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 4,
+      "merged_at": "2026-10-11T12:34:43Z"
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/235",
+      "title": "`llama: state get: copy the staged bytes with streaming stores on two threads (x86)`",
+      "updated": "2026-10-27T17:09:41Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 2,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/245",
+      "title": " Backend sampling: reserve the compute buffers once per sequence, not on every set_sampler() (a llama.cpp defect; upstream/ copy included)",
+      "updated": "2026-10-29T00:24:38Z",
+      "state": "closed",
+      "comments": 2,
+      "changed_files": 4,
+      "merged_at": null
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/84",
+      "title": "wip/x86-q2_0-avx2: AVX2 Q2_0 x Q8_0 dot product for x86 (bit-exact)",
+      "updated": "2026-10-30T05:36:10Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 2,
+      "merged_at": "2026-10-02T12:12:02Z"
+    },
+    {
+      "url": "https://github.com/turboderp-org/exllamav3/pull/577",
+      "title": "Optimize AVX2 fractional MoE execution and optional packed weights",
+      "updated": "2026-10-30T20:04:12Z",
+      "state": "closed",
+      "comments": 1,
+      "changed_files": 11,
+      "merged_at": "2026-10-30T20:04:12Z"
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/13694",
+      "title": "Studio installer (AMD, Linux): Vulkan llama.cpp for RDNA 1 and Polaris when ROCm is installed",
+      "updated": "2026-10-14T15:22:29Z",
+      "state": "closed",
+      "comments": 4,
+      "changed_files": 2,
+      "merged_at": "2026-10-14T15:22:25Z"
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/13697",
+      "title": "Studio: run native image generation on Vulkan when torch is CPU-only on an AMD or Arc GPU",
+      "updated": "2026-10-14T16:33:30Z",
+      "state": "closed",
+      "comments": 8,
+      "changed_files": 8,
+      "merged_at": "2026-10-14T16:33:26Z"
+    }
+  ],
+  "review_limits": [
+    "GitHub search caps some broad queries. Direct REST pagination covers the listed repository inventories.",
+    "The old whisper.cpp repository alias returned 422. Queried the canonical ggml-org/whisper.cpp.",
+    "A Real-ESRGAN owner alias returned 422. Inspected xinntao/Real-ESRGAN-ncnn-vulkan and nihui/realsr-ncnn-vulkan directly.",
+    "wbruna/koboldcpp was unavailable. Source inventory and targeted diffs do not imply review of every unrelated hit."
+  ]
+}

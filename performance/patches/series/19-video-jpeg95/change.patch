@@ -1,0 +1,13 @@
+diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
+index 2950a07..13bc283 100644
+--- a/otherarch/sdcpp/sdtype_adapter.cpp
++++ b/otherarch/sdcpp/sdtype_adapter.cpp
+@@ -2538,7 +2538,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+             }
+             if(output_avi)
+             {
+-                status2 = create_mjpg_avi_membuf_from_sd_images(vid_result->frames, generated_num_results, vid_fps, 40, &out_data2,&out_len2, generated_audio);
++                status2 = create_mjpg_avi_membuf_from_sd_images(vid_result->frames, generated_num_results, vid_fps, 95, &out_data2,&out_len2, generated_audio);
+             }
+ 
+             if(generated_num_results>1)

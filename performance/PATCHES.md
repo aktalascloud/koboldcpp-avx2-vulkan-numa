@@ -1,5 +1,9 @@
 # Retained patches and sources
 
+## November 6, 2026
+
+The [ordered series](patches/series/) contains 37 individual diffs and descriptions. Applying them to the recorded upstream commit reproduces the tree from the combined runtime snapshot. [Source review](review-2026-11-06.md) · [Search index](review-2026-11-06.json) · [Manual measurements](../results/performance-2026-11-06.json).
+
 ## Maintenance4November2026
 
 Official1.125 / ab00ee52 is merged with history. [PR2581](https://github.com/LostRuins/koboldcpp/pull/2581) supplies the new Vulkan comm implementation include. Batched submits preserve upstream small-graph0/clamped FLOP handling; HybridMoE context fields and synchronization are adapted to new KV/embedding metadata, still opt-in. [Fresh review](daily-review.json). Build/startup/GET acceptance only; the manual photo results below belong to cb260832 from2November.

@@ -1,0 +1,60 @@
+diff --git a/koboldcpp.py b/koboldcpp.py
+index b5e602a..6df1f74 100644
+--- a/koboldcpp.py
++++ b/koboldcpp.py
+@@ -1006,6 +1006,8 @@ def init_library():
+         if mode not in ('auto','disabled','distribute','isolate'):
+             raise ValueError('--numa must be auto, disabled, distribute or isolate')
+         _kcpp_set_native_environment('KCPP_WIN_NUMA_POLICY',str({'disabled':0,'auto':1,'distribute':2,'isolate':3}[mode]))
++    if args:
++        _kcpp_set_native_environment('KCPP_MOE_PREFILL_COPY_ALL','1' if getattr(args,'moe_prefill_copy_all',False) else '0')
+     libname = lib_default
+ 
+     if not args: # debug helper: koboldcpp.py loaded by external script
+@@ -14632,6 +14634,7 @@ if __name__ == '__main__':
+     advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
+     advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
+     advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
++    advparser.add_argument("--moe-prefill-copy-all", action="store_true", help="Experimental: upload full CPU expert tensors for large prefill batches, avoiding routing readback. Requires local speed validation.")
+     advparser.add_argument("--moe-hybrid", dest="moe_hybrid_threads", type=check_range(int,0,512), default=0, help="Experimental CPU threads for expert cache misses; requires --moe-cache-mib.0 disables hybrid.")
+     advparser.add_argument("--moe-hybrid-uploads", type=check_range(int,0,1024), default=0, help="Expert replacements per layer step in hybrid mode; default0 avoids decode uploads.")
+     advparser.add_argument("--moe-cache-mib", "--moecache", dest="moe_cache_mib", type=check_range(int, 0, 2147483647), default=0, metavar="MiB", help="Experimental GPU cache size in MiB for CPU-resident MoE experts. Split among GPUs like layers. Uses additional VRAM; combine with --moecpu or --autofit (default=0, disabled).")
+diff --git a/src/llama-context.cpp b/src/llama-context.cpp
+index 41d1801..573a9e7 100644
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -1,3 +1,4 @@
++#include <atomic> // KCPP_MOE_PREFILL_COPY_ALL diagnostic guard
+ #include "llama-context.h"
+ 
+ #include "ggml.h"
+@@ -3014,10 +3015,26 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
+         return false;
+     }
+ 
+-    // the scheduler calls this before the previous splits are done, and dst may still be in use
+-    ggml_backend_synchronize(backend);
+-
+     const ggml_tensor * ids = node->src[2];
++    // KCPP_MOE_PREFILL_COPY_ALL: copy immutable host experts without a routing readback.
++    // Unlike the old scheduler patch, modern expert copies live in this context callback.
++    // Copying extra experts changes traffic only; selected experts and arithmetic are unchanged.
++    static const bool copy_all_prefill = []() {
++        const char * option = getenv("KCPP_MOE_PREFILL_COPY_ALL");
++        return option != nullptr && atoi(option) != 0;
++    }();
++    if (copy_all_prefill && !lctx->moe_cache && src->ne[2] > 0 &&
++        ggml_nelements(ids) >= 8 * src->ne[2]) {
++        static std::atomic<bool> announced{false};
++        if (!announced.exchange(true)) {
++            LLAMA_LOG_INFO("KCPP_MOE_PREFILL_COPY_ALL: routing readback bypass active\n");
++        }
++        ggml_backend_tensor_set_async(backend, dst, src->data, 0, ggml_nbytes(src));
++        return true;
++    }
++
++    // Other callbacks still require the original synchronization before overwriting dst.
++    ggml_backend_synchronize(backend);
+     if (ggml_nelements(ids) == 0) {
+         return true;
+     }

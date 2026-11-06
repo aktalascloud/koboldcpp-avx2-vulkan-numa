@@ -5,20 +5,19 @@ Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **
 
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
-O3/Haswell + LTO, no PGO/fast-math. **Current1.125 / ab00ee52,2026-11-04: build/source/hash, cold startup, visible window and GET acceptance only; no new generation/speed tests.** Official KV/FA, Vulkan safety, model/SDCPP and YuE2 fixes included; [PR2581 Vulkan build fix](https://github.com/LostRuins/koboldcpp/pull/2581), [review/limits](performance/daily-review.json). Retained [ports and attribution](performance/PATCHES.md), monolithic `KCPP_COMMONIZE=0` and explicit C ABI.
+**1.125 · 2026-11-06 · upstream `6ae75742` · Native `dc51f393`.** O3/Haswell + LTO with monolithic `KCPP_COMMONIZE=0`. [Patch series and descriptions](performance/patches/series/) · [Source review and limits](performance/review-2026-11-06.md).
 
-## Manual photo comparison · 2026-11-02
+## Manual Normal and 4× · 2026-11-06
 
-Current Ray Q8 + Afterlight0.25/RealismEnhancer1, unchanged encoder/VAE/settings: Normal736×1104,8 Euler/simple, Cache-DiT0.08. Official rolling1.124.2 (`c66550f4`) versus the last measured fork (`cb260832`). Warm model-ready medians,2 repeats per final arm:
+Same current models, settings, prompt and seed, previous installed fork `2df2c89f` → `dc51f393`. Warm Normal medians use two repeats per arm. Separate 4× medians use two repeats per arm.
 
-| Time | Official stock | Measured cb260832 | Less time |
-|---|---:|---:|---:|
-| Native photo |176.670s|146.815s|16.90%|
-| Native + faces/Gater |184.423s|154.698s|16.12%|
+| Measure | Before → after |
+|---|---:|
+| Normal, Native | 146.905 s → 146.391 s |
+| Normal, public API | 155.512 s → 155.473 s |
+| 4×, public API | 5.715 s → 5.482 s |
 
-The new Polaris row-SCALE/MOSS FFN-view patch adds **0.47% Native /0.37% pipeline** versus the previous fork, separately from the whole-fork gains. It removes504 materializations in this workload;184 CPU/Vulkan cases and17 unprofiled real generations retained identical RGB. [All repeats, SHA, models, profiler data and limits](results/photo-latest.json) · [Patch](performance/PATCHES.md#manual-photo-optimization--2-november-2026).
-
-The matched table uses common PNG6. The [media backend](https://github.com/aktalascloud/koboldcpp-media-pipeline) separately adds lossless PNG3:4x encoding1.566→1.052s, payload+1.4%, exact RGB/text. Whole SR HTTP ranges overlap; this is not a whole-request gain claim. First calls and return controls are retained, including the trial's slower first Native151.229s versus149.658/149.732s. Model loading/return, public HTTP queue and diagnostic runs are excluded from the table. One prompt/seed and this hardware/model set; no new LLM/video benchmark.
+All raw, finished and upscaled RGB samples matched exactly. On operation tests, Haswell Q8_0 GEMM took 8–13.5% less time, Vulkan F16 value packing 26.7–28.1% less on the three large shapes, and aligned Polaris Q4_K matmul 1.5–3.2% less. [All repeats, CPU quant, KV/UMT5 checks and rejected trials](results/performance-2026-11-06.json) · [Historical official stock comparison](results/photo-latest.json).
 
 ## Last LLM token comparison · 2026-10-25
 Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, CPU 4 / Vulkan 2 repeats per arm. Tokens/s means:
@@ -30,7 +29,7 @@ Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, 
 | Vulkan prompt | 411.010 | 712.810 | +73.4% |
 | Vulkan output | 17.035 | 23.655 | +38.9% |
 
-Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **The current1.125 / ab00ee52 build has no new token benchmark; these historical speeds are not its benchmark.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
+Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **The current1.125 / 6ae75742 build has no new token benchmark; these historical speeds are not its benchmark.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
 
 Vulkan starting point: threads 6 / BLAS 4, batch/ubatch 1024, GPU layers 99, NUMA auto. CPU-only 16/20; media encoder 20 separately. Graphics queue 1, batched submits 1, node 100 and gated Polaris controls are described in [RUN.txt](performance/RUN.txt).
 

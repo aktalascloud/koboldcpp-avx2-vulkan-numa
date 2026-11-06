@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index c76ed6e..b686ad2 100644
+index 15a4307..f63b799 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -767,7 +767,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel
@@ -32,7 +32,7 @@ index c76ed6e..b686ad2 100644
  	@echo 'Vulkan shaders need to be regenerated. This can only be done on Windows or Linux. Please stand by...'
  	$(CXX) $(CXXFLAGS) $(VKGEN_NOEXT_ADD) $(filter-out %.h,$^) -o $@ $(LDFLAGS)
 diff --git a/common/arg.cpp b/common/arg.cpp
-index 15ae6bd..8178308 100644
+index 8c4154f..ba42b13 100644
 --- a/common/arg.cpp
 +++ b/common/arg.cpp
 @@ -2735,6 +2735,27 @@ common_params_context common_params_parser_init(common_params & params, llama_ex
@@ -64,10 +64,10 @@ index 15ae6bd..8178308 100644
          {"-ncffn", "--n-cpu-ffn"}, "N",
          "keep the dense FFN weights of the first N layers in the CPU\n"
 diff --git a/common/common.cpp b/common/common.cpp
-index 6e53b3f..c013386 100644
+index 4107c65..d12977f 100644
 --- a/common/common.cpp
 +++ b/common/common.cpp
-@@ -1791,6 +1791,8 @@ struct llama_context_params common_context_params_to_llama(const common_params &
+@@ -1780,6 +1780,8 @@ struct llama_context_params common_context_params_to_llama(const common_params &
      cparams.type_v = params.cache_type_v;
  
      cparams.moe_cache_size = params.moe_cache_size;
@@ -77,7 +77,7 @@ index 6e53b3f..c013386 100644
      return cparams;
  }
 diff --git a/common/common.h b/common/common.h
-index b0630a7..64d18eb 100644
+index f73df2a..e9e305a 100644
 --- a/common/common.h
 +++ b/common/common.h
 @@ -599,6 +599,8 @@ struct common_params {
@@ -90,10 +90,10 @@ index b0630a7..64d18eb 100644
      common_conversation_mode conversation_mode = COMMON_CONVERSATION_MODE_AUTO;
  
 diff --git a/common/speculative.cpp b/common/speculative.cpp
-index 0250541..984a4ec 100644
+index 9ea0937..c6152b0 100644
 --- a/common/speculative.cpp
 +++ b/common/speculative.cpp
-@@ -2710,6 +2710,7 @@ common_params common_base_params_to_speculative(const common_params & params) {
+@@ -2745,6 +2745,7 @@ common_params common_base_params_to_speculative(const common_params & params) {
  
      // the MoE cache is only used by the target context
      result.moe_cache_size = 0;
@@ -217,8 +217,403 @@ index 2987013..39e651b 100644
              if (ec != GGML_STATUS_SUCCESS) {
                  return ec;
              }
+diff --git a/ggml/src/ggml-cpu/arch/x86/quants.c b/ggml/src/ggml-cpu/arch/x86/quants.c
+index 6b86dae..ea18d6c 100644
+--- a/ggml/src/ggml-cpu/arch/x86/quants.c
++++ b/ggml/src/ggml-cpu/arch/x86/quants.c
+@@ -2298,10 +2298,17 @@ void ggml_vec_dot_q5_K_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const voi
+     uint32_t utmp[4];
+ 
+ #if defined __AVX2__
++    UNUSED(kmask1);
++    UNUSED(kmask2);
++    UNUSED(kmask3);
++    UNUSED(utmp);
+ 
+     const __m256i m4 = _mm256_set1_epi8(0xF);
+     const __m128i mzero = _mm_setzero_si128();
+-    const __m256i mone  = _mm256_set1_epi8(1);
++    const __m256i m10 = _mm256_set1_epi8(0x10);
++    const __m128i m3f = _mm_set1_epi8(0x3F);
++    const __m128i m0f = _mm_set1_epi8(0x0F);
++    const __m128i m30 = _mm_set1_epi8(0x30);
+ 
+     __m256 acc = _mm256_setzero_ps();
+ 
+@@ -2314,14 +2321,16 @@ void ggml_vec_dot_q5_K_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const voi
+         const float d = y[i].d * GGML_CPU_FP16_TO_FP32(x[i].d);
+         const float dmin = -y[i].d * GGML_CPU_FP16_TO_FP32(x[i].dmin);
+ 
+-        memcpy(utmp, x[i].scales, 12);
+-        utmp[3] = ((utmp[2] >> 4) & kmask2) | (((utmp[1] >> 6) & kmask3) << 4);
+-        const uint32_t uaux = utmp[1] & kmask1;
+-        utmp[1] = (utmp[2] & kmask2) | (((utmp[0] >> 6) & kmask3) << 4);
+-        utmp[2] = uaux;
+-        utmp[0] &= kmask1;
++        const __m128i s01 = _mm_loadl_epi64((const __m128i *)x[i].scales);
++        int32_t s2_i32;
++        memcpy(&s2_i32, x[i].scales + 8, sizeof(int32_t));
++        const __m128i s2 = _mm_cvtsi32_si128(s2_i32);
++        const __m128i u02 = _mm_and_si128(s01, m3f);
++        const __m128i hi01 = _mm_and_si128(_mm_srli_epi16(s01, 2), m30);
++        const __m128i lo23 = _mm_and_si128(_mm_unpacklo_epi32(s2, _mm_srli_epi16(s2, 4)), m0f);
++        const __m128i utmps = _mm_unpacklo_epi32(u02, _mm_or_si128(lo23, hi01));
+ 
+-        const __m256i mins_and_scales = _mm256_cvtepu8_epi16(_mm_set_epi32(utmp[3], utmp[2], utmp[1], utmp[0]));
++        const __m256i mins_and_scales = _mm256_cvtepu8_epi16(utmps);
+ 
+         const __m256i q8sums = _mm256_loadu_si256((const __m256i*)y[i].bsums);
+         const __m128i q8s = _mm_hadd_epi16(_mm256_extracti128_si256(q8sums, 0), _mm256_extracti128_si256(q8sums, 1));
+@@ -2329,45 +2338,45 @@ void ggml_vec_dot_q5_K_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const voi
+         const __m128i hsum = _mm_hadd_epi32(_mm_hadd_epi32(prod, mzero), mzero);
+         summs += dmin * _mm_extract_epi32(hsum, 0);
+ 
+-        const __m128i sc128  = _mm256_extracti128_si256(mins_and_scales, 0);
+-        const __m256i scales = MM256_SET_M128I(sc128, sc128);
+-
+-        const __m256i hbits = _mm256_loadu_si256((const __m256i*)x[i].qh);
+-        __m256i hmask = mone;
+-
+-        __m256i sumi = _mm256_setzero_si256();
+-
+-        int bit = 0;
+-
+-        for (int j = 0; j < QK_K/64; ++j) {
+-
+-            const __m256i scale_0 = _mm256_shuffle_epi8(scales, get_scale_shuffle_k4(2*j+0));
+-            const __m256i scale_1 = _mm256_shuffle_epi8(scales, get_scale_shuffle_k4(2*j+1));
+-
+-            const __m256i q5bits = _mm256_loadu_si256((const __m256i*)q5); q5 += 32;
+-
+-            const __m256i q5l_0 = _mm256_and_si256(q5bits, m4);
+-            const __m256i q5h_0 = _mm256_slli_epi16(_mm256_srli_epi16(_mm256_and_si256(hbits, hmask), bit++), 4);
+-            const __m256i q5_0  = _mm256_add_epi8(q5l_0, q5h_0);
+-            hmask = _mm256_slli_epi16(hmask, 1);
+-
+-            const __m256i q5l_1 = _mm256_and_si256(_mm256_srli_epi16(q5bits, 4), m4);
+-            const __m256i q5h_1 = _mm256_slli_epi16(_mm256_srli_epi16(_mm256_and_si256(hbits, hmask), bit++), 4);
+-            const __m256i q5_1  = _mm256_add_epi8(q5l_1, q5h_1);
+-            hmask = _mm256_slli_epi16(hmask, 1);
+-
+-            const __m256i q8_0 = _mm256_loadu_si256((const __m256i*)q8); q8 += 32;
+-            const __m256i q8_1 = _mm256_loadu_si256((const __m256i*)q8); q8 += 32;
+-
+-            __m256i p16_0 = _mm256_maddubs_epi16(q5_0, q8_0);
+-            __m256i p16_1 = _mm256_maddubs_epi16(q5_1, q8_1);
+-
+-            p16_0 = _mm256_madd_epi16(scale_0, p16_0);
+-            p16_1 = _mm256_madd_epi16(scale_1, p16_1);
+-
+-            sumi = _mm256_add_epi32(sumi, _mm256_add_epi32(p16_0, p16_1));
+-
+-        }
++        const __m128i sc128  = _mm256_castsi256_si128(mins_and_scales);
++        const __m256i sc256  = MM256_SET_M128I(sc128, sc128);
++        const __m256i sc_lo  = _mm256_unpacklo_epi16(sc256, sc256);
++        const __m256i sc_hi  = _mm256_unpackhi_epi16(sc256, sc256);
++        const __m256i hbits  = _mm256_loadu_si256((const __m256i*)x[i].qh);
++
++        const __m256i q5b0 = _mm256_loadu_si256((const __m256i*)(q5 +  0));
++        const __m256i q5_0 = _mm256_or_si256(_mm256_and_si256(q5b0, m4), _mm256_and_si256(_mm256_slli_epi16(hbits, 4), m10));
++        const __m256i q5_1 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q5b0, 4), m4), _mm256_and_si256(_mm256_slli_epi16(hbits, 3), m10));
++        __m256i sumi0 = _mm256_add_epi32(
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_lo, 0x00), _mm256_maddubs_epi16(q5_0, _mm256_loadu_si256((const __m256i*)(q8 +  0)))),
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_lo, 0x55), _mm256_maddubs_epi16(q5_1, _mm256_loadu_si256((const __m256i*)(q8 + 32))))
++        );
++
++        const __m256i q5b1 = _mm256_loadu_si256((const __m256i*)(q5 + 32));
++        const __m256i q5_2 = _mm256_or_si256(_mm256_and_si256(q5b1, m4), _mm256_and_si256(_mm256_slli_epi16(hbits, 2), m10));
++        const __m256i q5_3 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q5b1, 4), m4), _mm256_and_si256(_mm256_slli_epi16(hbits, 1), m10));
++        __m256i sumi1 = _mm256_add_epi32(
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_lo, 0xaa), _mm256_maddubs_epi16(q5_2, _mm256_loadu_si256((const __m256i*)(q8 + 64)))),
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_lo, 0xff), _mm256_maddubs_epi16(q5_3, _mm256_loadu_si256((const __m256i*)(q8 + 96))))
++        );
++
++        const __m256i q5b2 = _mm256_loadu_si256((const __m256i*)(q5 + 64));
++        const __m256i q5_4 = _mm256_or_si256(_mm256_and_si256(q5b2, m4), _mm256_and_si256(hbits, m10));
++        const __m256i q5_5 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q5b2, 4), m4), _mm256_and_si256(_mm256_srli_epi16(hbits, 1), m10));
++        sumi0 = _mm256_add_epi32(sumi0, _mm256_add_epi32(
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_hi, 0x00), _mm256_maddubs_epi16(q5_4, _mm256_loadu_si256((const __m256i*)(q8 + 128)))),
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_hi, 0x55), _mm256_maddubs_epi16(q5_5, _mm256_loadu_si256((const __m256i*)(q8 + 160))))
++        ));
++
++        const __m256i q5b3 = _mm256_loadu_si256((const __m256i*)(q5 + 96));
++        const __m256i q5_6 = _mm256_or_si256(_mm256_and_si256(q5b3, m4), _mm256_and_si256(_mm256_srli_epi16(hbits, 2), m10));
++        const __m256i q5_7 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q5b3, 4), m4), _mm256_and_si256(_mm256_srli_epi16(hbits, 3), m10));
++        sumi1 = _mm256_add_epi32(sumi1, _mm256_add_epi32(
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_hi, 0xaa), _mm256_maddubs_epi16(q5_6, _mm256_loadu_si256((const __m256i*)(q8 + 192)))),
++            _mm256_madd_epi16(_mm256_shuffle_epi32(sc_hi, 0xff), _mm256_maddubs_epi16(q5_7, _mm256_loadu_si256((const __m256i*)(q8 + 224))))
++        ));
++
++        const __m256i sumi = _mm256_add_epi32(sumi0, sumi1);
+ 
+         __m256 vd = _mm256_set1_ps(d);
+         acc = _mm256_fmadd_ps(vd, _mm256_cvtepi32_ps(sumi), acc);
+@@ -2503,8 +2512,15 @@ void ggml_vec_dot_q6_K_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const voi
+ 
+ #if defined __AVX2__
+ 
+-    const __m256i m3 = _mm256_set1_epi8(3);
++    const __m256i m3  = _mm256_set1_epi8(3);
++    const __m256i m12 = _mm256_set1_epi8(12);
++    const __m256i m48 = _mm256_set1_epi8(48);
++    const __m256i m64 = _mm256_set1_epi8(-64);
+     const __m256i m15 = _mm256_set1_epi8(15);
++    const __m256i sh0 = get_scale_shuffle_q3k(0);
++    const __m256i sh1 = get_scale_shuffle_q3k(1);
++    const __m256i sh2 = get_scale_shuffle_q3k(2);
++    const __m256i sh3 = get_scale_shuffle_q3k(3);
+ 
+     __m256 acc = _mm256_setzero_ps();
+ 
+@@ -2521,50 +2537,38 @@ void ggml_vec_dot_q6_K_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const voi
+         const __m256i scales_16 = _mm256_cvtepi8_epi16(scales);
+         const __m256i q8sclsub = _mm256_slli_epi32(_mm256_madd_epi16(q8sums, scales_16), 5);
+ 
+-        __m256i sumi = _mm256_setzero_si256();
+-
+-        int is = 0;
+-
+-        for (int j = 0; j < QK_K/128; ++j) {
+-            const __m256i q4bits1 = _mm256_loadu_si256((const __m256i*)q4); q4 += 32;
+-            const __m256i q4bits2 = _mm256_loadu_si256((const __m256i*)q4); q4 += 32;
+-            const __m256i q4bitsH = _mm256_loadu_si256((const __m256i*)qh); qh += 32;
+-
+-            const __m256i q4h_0 = _mm256_slli_epi16(_mm256_and_si256(q4bitsH, m3), 4);
+-            const __m256i q4h_1 = _mm256_slli_epi16(_mm256_and_si256(q4bitsH, _mm256_set1_epi8(12)), 2);
+-            const __m256i q4h_2 = _mm256_and_si256(q4bitsH, _mm256_set1_epi8(48));
+-            const __m256i q4h_3 = _mm256_srli_epi16(_mm256_and_si256(q4bitsH, _mm256_set1_epi8(-64)), 2);
+-
+-            const __m256i q4_0 = _mm256_or_si256(_mm256_and_si256(q4bits1, m15), q4h_0);
+-            const __m256i q4_1 = _mm256_or_si256(_mm256_and_si256(q4bits2, m15), q4h_1);
+-            const __m256i q4_2 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q4bits1, 4), m15), q4h_2);
+-            const __m256i q4_3 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q4bits2, 4), m15), q4h_3);
++        const __m256i sc_lo = _mm256_permute2x128_si256(scales_16, scales_16, 0x00);
++        const __m256i sc_hi = _mm256_permute2x128_si256(scales_16, scales_16, 0x11);
+ 
+-            const __m256i q8_0 = _mm256_loadu_si256((const __m256i*)q8); q8 += 32;
+-            const __m256i q8_1 = _mm256_loadu_si256((const __m256i*)q8); q8 += 32;
+-            const __m256i q8_2 = _mm256_loadu_si256((const __m256i*)q8); q8 += 32;
+-            const __m256i q8_3 = _mm256_loadu_si256((const __m256i*)q8); q8 += 32;
++        const __m256i q4bits1_0 = _mm256_loadu_si256((const __m256i*)(q4 +  0));
++        const __m256i q4bits2_0 = _mm256_loadu_si256((const __m256i*)(q4 + 32));
++        const __m256i q4bitsH_0 = _mm256_loadu_si256((const __m256i*)(qh +  0));
+ 
+-            __m256i p16_0 = _mm256_maddubs_epi16(q4_0, q8_0);
+-            __m256i p16_1 = _mm256_maddubs_epi16(q4_1, q8_1);
+-            __m256i p16_2 = _mm256_maddubs_epi16(q4_2, q8_2);
+-            __m256i p16_3 = _mm256_maddubs_epi16(q4_3, q8_3);
++        const __m256i q4_0 = _mm256_or_si256(_mm256_and_si256(q4bits1_0, m15), _mm256_slli_epi16(_mm256_and_si256(q4bitsH_0, m3), 4));
++        const __m256i q4_1 = _mm256_or_si256(_mm256_and_si256(q4bits2_0, m15), _mm256_slli_epi16(_mm256_and_si256(q4bitsH_0, m12), 2));
++        const __m256i q4_2 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q4bits1_0, 4), m15), _mm256_and_si256(q4bitsH_0, m48));
++        const __m256i q4_3 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q4bits2_0, 4), m15), _mm256_srli_epi16(_mm256_and_si256(q4bitsH_0, m64), 2));
+ 
+-            const __m128i scale_0 = _mm_shuffle_epi8(scales, get_scale_shuffle(is + 0));
+-            const __m128i scale_1 = _mm_shuffle_epi8(scales, get_scale_shuffle(is + 1));
+-            const __m128i scale_2 = _mm_shuffle_epi8(scales, get_scale_shuffle(is + 2));
+-            const __m128i scale_3 = _mm_shuffle_epi8(scales, get_scale_shuffle(is + 3));
+-            is += 4;
++        __m256i p16_0 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_lo, sh0), _mm256_maddubs_epi16(q4_0, _mm256_loadu_si256((const __m256i*)(q8 +  0))));
++        __m256i p16_1 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_lo, sh1), _mm256_maddubs_epi16(q4_1, _mm256_loadu_si256((const __m256i*)(q8 + 32))));
++        __m256i p16_2 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_lo, sh2), _mm256_maddubs_epi16(q4_2, _mm256_loadu_si256((const __m256i*)(q8 + 64))));
++        __m256i p16_3 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_lo, sh3), _mm256_maddubs_epi16(q4_3, _mm256_loadu_si256((const __m256i*)(q8 + 96))));
++        __m256i sumi = _mm256_add_epi32(_mm256_add_epi32(p16_0, p16_1), _mm256_add_epi32(p16_2, p16_3));
+ 
+-            p16_0 = _mm256_madd_epi16(_mm256_cvtepi8_epi16(scale_0), p16_0);
+-            p16_1 = _mm256_madd_epi16(_mm256_cvtepi8_epi16(scale_1), p16_1);
+-            p16_2 = _mm256_madd_epi16(_mm256_cvtepi8_epi16(scale_2), p16_2);
+-            p16_3 = _mm256_madd_epi16(_mm256_cvtepi8_epi16(scale_3), p16_3);
++        const __m256i q4bits1_1 = _mm256_loadu_si256((const __m256i*)(q4 + 64));
++        const __m256i q4bits2_1 = _mm256_loadu_si256((const __m256i*)(q4 + 96));
++        const __m256i q4bitsH_1 = _mm256_loadu_si256((const __m256i*)(qh + 32));
+ 
+-            sumi = _mm256_add_epi32(sumi, _mm256_add_epi32(p16_0, p16_1));
+-            sumi = _mm256_add_epi32(sumi, _mm256_add_epi32(p16_2, p16_3));
++        const __m256i q4_4 = _mm256_or_si256(_mm256_and_si256(q4bits1_1, m15), _mm256_slli_epi16(_mm256_and_si256(q4bitsH_1, m3), 4));
++        const __m256i q4_5 = _mm256_or_si256(_mm256_and_si256(q4bits2_1, m15), _mm256_slli_epi16(_mm256_and_si256(q4bitsH_1, m12), 2));
++        const __m256i q4_6 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q4bits1_1, 4), m15), _mm256_and_si256(q4bitsH_1, m48));
++        const __m256i q4_7 = _mm256_or_si256(_mm256_and_si256(_mm256_srli_epi16(q4bits2_1, 4), m15), _mm256_srli_epi16(_mm256_and_si256(q4bitsH_1, m64), 2));
+ 
+-        }
++        p16_0 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_hi, sh0), _mm256_maddubs_epi16(q4_4, _mm256_loadu_si256((const __m256i*)(q8 + 128))));
++        p16_1 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_hi, sh1), _mm256_maddubs_epi16(q4_5, _mm256_loadu_si256((const __m256i*)(q8 + 160))));
++        p16_2 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_hi, sh2), _mm256_maddubs_epi16(q4_6, _mm256_loadu_si256((const __m256i*)(q8 + 192))));
++        p16_3 = _mm256_madd_epi16(_mm256_shuffle_epi8(sc_hi, sh3), _mm256_maddubs_epi16(q4_7, _mm256_loadu_si256((const __m256i*)(q8 + 224))));
++        sumi = _mm256_add_epi32(sumi, _mm256_add_epi32(_mm256_add_epi32(p16_0, p16_1), _mm256_add_epi32(p16_2, p16_3)));
+ 
+         sumi = _mm256_sub_epi32(sumi, q8sclsub);
+         acc = _mm256_fmadd_ps(_mm256_broadcast_ss(&d), _mm256_cvtepi32_ps(sumi), acc);
+@@ -3339,43 +3343,31 @@ void ggml_vec_dot_iq3_xxs_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const
+ 
+     const uint64_t * signs64 = (const uint64_t *)keven_signs_q2xs;
+ 
+-    uint32_t aux32[2];
+-
+     __m256 accumf = _mm256_setzero_ps();
+     for (int i = 0; i < nb; ++i) {
+         const float d = GGML_CPU_FP16_TO_FP32(x[i].d) * y[i].d;
+         const uint8_t * GGML_RESTRICT q3 = x[i].qs;
+         const uint8_t * GGML_RESTRICT gas = x[i].qs + QK_K/4;
+         const int8_t  * GGML_RESTRICT q8 = y[i].qs;
+-        __m256i sumi1 = _mm256_setzero_si256();
+-        __m256i sumi2 = _mm256_setzero_si256();
+-        for (int ib32 = 0; ib32 < QK_K/32; ib32 += 2) {
+-            const __m256i q8_1 = _mm256_loadu_si256((const __m256i *)q8); q8 += 32;
+-            const __m256i q8_2 = _mm256_loadu_si256((const __m256i *)q8); q8 += 32;
++        __m256i sumi = _mm256_setzero_si256();
++        for (int ib32 = 0; ib32 < QK_K/32; ++ib32) {
++            uint32_t aux0;
++            memcpy(&aux0, gas, sizeof(uint32_t));
++            gas += 4;
++            const __m256i q8_1 = _mm256_loadu_si256((const __m256i *)q8);
++            q8 += 32;
+             const __m256i q2_1 = _mm256_set_epi32(iq3xxs_grid[q3[7]], iq3xxs_grid[q3[6]], iq3xxs_grid[q3[5]], iq3xxs_grid[q3[4]],
+                                                   iq3xxs_grid[q3[3]], iq3xxs_grid[q3[2]], iq3xxs_grid[q3[1]], iq3xxs_grid[q3[0]]);
+             q3 += 8;
+-            const __m256i q2_2 = _mm256_set_epi32(iq3xxs_grid[q3[7]], iq3xxs_grid[q3[6]], iq3xxs_grid[q3[5]], iq3xxs_grid[q3[4]],
+-                                                  iq3xxs_grid[q3[3]], iq3xxs_grid[q3[2]], iq3xxs_grid[q3[1]], iq3xxs_grid[q3[0]]);
+-            q3 += 8;
+-            memcpy(aux32, gas, 8); gas += 8;
+-            const __m256i s2_1 = _mm256_set_epi64x(signs64[(aux32[0] >> 21) & 127], signs64[(aux32[0] >> 14) & 127],
+-                                                   signs64[(aux32[0] >>  7) & 127], signs64[(aux32[0] >>  0) & 127]);
+-            const __m256i s2_2 = _mm256_set_epi64x(signs64[(aux32[1] >> 21) & 127], signs64[(aux32[1] >> 14) & 127],
+-                                                   signs64[(aux32[1] >>  7) & 127], signs64[(aux32[1] >>  0) & 127]);
++            const __m256i s2_1 = _mm256_set_epi64x(signs64[(aux0 >> 21) & 127], signs64[(aux0 >> 14) & 127],
++                                                   signs64[(aux0 >>  7) & 127], signs64[(aux0 >>  0) & 127]);
+             const __m256i q8s_1 = _mm256_sign_epi8(q8_1, s2_1);
+-            const __m256i q8s_2 = _mm256_sign_epi8(q8_2, s2_2);
+             const __m256i dot1  = _mm256_maddubs_epi16(q2_1, q8s_1);
+-            const __m256i dot2  = _mm256_maddubs_epi16(q2_2, q8s_2);
+-            const uint16_t ls1 = aux32[0] >> 28;
+-            const uint16_t ls2 = aux32[1] >> 28;
+-            const __m256i p1 = _mm256_madd_epi16(dot1, _mm256_set1_epi16(2*ls1+1));
+-            const __m256i p2 = _mm256_madd_epi16(dot2, _mm256_set1_epi16(2*ls2+1));
+-            sumi1 = _mm256_add_epi32(sumi1, p1);
+-            sumi2 = _mm256_add_epi32(sumi2, p2);
++            const uint16_t ls1  = aux0 >> 28;
++            sumi = _mm256_add_epi32(sumi, _mm256_madd_epi16(dot1, _mm256_set1_epi16(2*ls1+1)));
+         }
+ 
+-        accumf = _mm256_fmadd_ps(_mm256_set1_ps(d), _mm256_cvtepi32_ps(_mm256_add_epi32(sumi1, sumi2)), accumf);
++        accumf = _mm256_fmadd_ps(_mm256_set1_ps(d), _mm256_cvtepi32_ps(sumi), accumf);
+ 
+     }
+ 
+@@ -3471,72 +3463,57 @@ void ggml_vec_dot_iq3_s_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const vo
+ 
+     const __m256i mask1 = _mm256_loadu_si256((const __m256i*)k_mask1);
+     const __m256i mask2 = _mm256_loadu_si256((const __m256i*)k_mask2);
+-
+-    const __m256i idx_shift = _mm256_set_epi32(1, 2, 3, 4, 5, 6, 7, 8);
+-    const __m256i idx_mask  = _mm256_set1_epi32(256);
+-
+-    typedef union {
+-        __m256i  vec[2];
+-        uint32_t index[16];
+-    } index_t;
+-
+-    index_t idx;
++    const __m256i one_i8 = _mm256_set1_epi8(1);
+ 
+     __m256 accumf = _mm256_setzero_ps();
+     for (int i = 0; i < nb; ++i) {
+         const float d = GGML_CPU_FP16_TO_FP32(x[i].d) * y[i].d;
+         const uint8_t * GGML_RESTRICT qs = x[i].qs;
+         const uint8_t * GGML_RESTRICT qh = x[i].qh;
+-        const uint16_t * GGML_RESTRICT signs = (const uint16_t *)x[i].signs;
++        const uint8_t * GGML_RESTRICT signs = x[i].signs;
+         const int8_t  * GGML_RESTRICT q8 = y[i].qs;
+-        __m256i sumi1 = _mm256_setzero_si256();
+-        __m256i sumi2 = _mm256_setzero_si256();
+-        for (int ib32 = 0; ib32 < QK_K/32; ib32 += 2) {
+-            const __m256i q8_1 = _mm256_loadu_si256((const __m256i *)q8); q8 += 32;
+-            const __m256i q8_2 = _mm256_loadu_si256((const __m256i *)q8); q8 += 32;
+-            const __m256i idx_l = _mm256_cvtepu8_epi16(_mm_loadu_si128((const __m128i *)qs)); qs += 16;
+-            idx.vec[0] = _mm256_set1_epi32(qh[ib32+0]);
+-            idx.vec[1] = _mm256_set1_epi32(qh[ib32+1]);
+-            idx.vec[0] = _mm256_and_si256(_mm256_sllv_epi32(idx.vec[0], idx_shift), idx_mask);
+-            idx.vec[1] = _mm256_and_si256(_mm256_sllv_epi32(idx.vec[1], idx_shift), idx_mask);
+-            idx.vec[0] = _mm256_or_si256(idx.vec[0], _mm256_cvtepi16_epi32(_mm256_castsi256_si128(idx_l)));
+-            idx.vec[1] = _mm256_or_si256(idx.vec[1], _mm256_cvtepi16_epi32(_mm256_extractf128_si256(idx_l, 1)));
+-
+-            // At leat on my CPU (Ryzen 7950X), using _mm256_i32gather_epi32 is slower than _mm256_set_epi32. Strange.
+-            //const __m256i q2_1 = _mm256_i32gather_epi32((const int *)iq3s_grid, idx.vec[0], 4);
+-            //const __m256i q2_2 = _mm256_i32gather_epi32((const int *)iq3s_grid, idx.vec[1], 4);
+-            const __m256i q2_1 = _mm256_set_epi32(
+-                    iq3s_grid[idx.index[7]], iq3s_grid[idx.index[6]], iq3s_grid[idx.index[5]], iq3s_grid[idx.index[4]],
+-                    iq3s_grid[idx.index[3]], iq3s_grid[idx.index[2]], iq3s_grid[idx.index[1]], iq3s_grid[idx.index[0]]
+-            );
+-            const __m256i q2_2 = _mm256_set_epi32(
+-                    iq3s_grid[idx.index[15]], iq3s_grid[idx.index[14]], iq3s_grid[idx.index[13]], iq3s_grid[idx.index[12]],
+-                    iq3s_grid[idx.index[11]], iq3s_grid[idx.index[10]], iq3s_grid[idx.index[ 9]], iq3s_grid[idx.index[ 8]]
+-            );
+-
+-            __m256i aux256 = _mm256_set1_epi32(signs[0] | (signs[1] << 16));
+-            aux256 = _mm256_and_si256(_mm256_shuffle_epi8(aux256,mask1), mask2);
+-            const __m256i s2_1 = _mm256_cmpeq_epi8(aux256, mask2);
+-            const __m256i q8s_1 = _mm256_sub_epi8(_mm256_xor_si256(s2_1, q8_1), s2_1);
+-
+-            aux256 = _mm256_set1_epi32(signs[2] | (signs[3] << 16));
+-            aux256 = _mm256_and_si256(_mm256_shuffle_epi8(aux256,mask1), mask2);
+-            const __m256i s2_2 = _mm256_cmpeq_epi8(aux256, mask2);
+-            const __m256i q8s_2 = _mm256_sub_epi8(_mm256_xor_si256(s2_2, q8_2), s2_2);
+-
+-            signs += 4;
+-
++        uint32_t scales32;
++        memcpy(&scales32, x[i].scales, sizeof(uint32_t));
++        uint32_t scales_lo_odd = ((scales32 & 0x0f0f0f0fU) << 1) | 0x01010101U;
++        uint32_t scales_hi_odd = (((scales32 >> 4) & 0x0f0f0f0fU) << 1) | 0x01010101U;
++        __m256i sumi = _mm256_setzero_si256();
++        for (int ib32 = 0; ib32 < (QK_K >> 6); ++ib32) {
++            uint32_t s01, s23;
++            memcpy(&s01, signs, sizeof(uint32_t));
++            memcpy(&s23, signs + 4, sizeof(uint32_t));
++            signs += 8;
++
++            const uint32_t qh0 = qh[0];
++            const uint64_t g0 = (uint64_t)iq3s_grid[qs[0] | ((qh0 << 8) & 0x100)] | ((uint64_t)iq3s_grid[qs[1] | ((qh0 << 7) & 0x100)] << 32);
++            const uint64_t g1 = (uint64_t)iq3s_grid[qs[2] | ((qh0 << 6) & 0x100)] | ((uint64_t)iq3s_grid[qs[3] | ((qh0 << 5) & 0x100)] << 32);
++            const uint64_t g2 = (uint64_t)iq3s_grid[qs[4] | ((qh0 << 4) & 0x100)] | ((uint64_t)iq3s_grid[qs[5] | ((qh0 << 3) & 0x100)] << 32);
++            const uint64_t g3 = (uint64_t)iq3s_grid[qs[6] | ((qh0 << 2) & 0x100)] | ((uint64_t)iq3s_grid[qs[7] | ((qh0 << 1) & 0x100)] << 32);
++            const __m256i q2_1 = _mm256_set_epi64x((int64_t)g3, (int64_t)g2, (int64_t)g1, (int64_t)g0);
++
++            __m256i aux1 = _mm256_and_si256(_mm256_shuffle_epi8(_mm256_set1_epi32((int32_t)s01), mask1), mask2);
++            const __m256i q8s_1 = _mm256_sign_epi8(_mm256_loadu_si256((const __m256i *)q8), _mm256_or_si256(_mm256_cmpeq_epi8(aux1, mask2), one_i8));
+             const __m256i dot1  = _mm256_maddubs_epi16(q2_1, q8s_1);
++            sumi = _mm256_add_epi32(sumi, _mm256_madd_epi16(dot1, _mm256_set1_epi16((int16_t)(scales_lo_odd & 0xffU))));
++            scales_lo_odd >>= 8;
++
++            const uint32_t qh1 = qh[1];
++            qh += 2;
++            const uint64_t g4 = (uint64_t)iq3s_grid[qs[ 8] | ((qh1 << 8) & 0x100)] | ((uint64_t)iq3s_grid[qs[ 9] | ((qh1 << 7) & 0x100)] << 32);
++            const uint64_t g5 = (uint64_t)iq3s_grid[qs[10] | ((qh1 << 6) & 0x100)] | ((uint64_t)iq3s_grid[qs[11] | ((qh1 << 5) & 0x100)] << 32);
++            const uint64_t g6 = (uint64_t)iq3s_grid[qs[12] | ((qh1 << 4) & 0x100)] | ((uint64_t)iq3s_grid[qs[13] | ((qh1 << 3) & 0x100)] << 32);
++            const uint64_t g7 = (uint64_t)iq3s_grid[qs[14] | ((qh1 << 2) & 0x100)] | ((uint64_t)iq3s_grid[qs[15] | ((qh1 << 1) & 0x100)] << 32);
++            const __m256i q2_2 = _mm256_set_epi64x((int64_t)g7, (int64_t)g6, (int64_t)g5, (int64_t)g4);
++            qs += 16;
++
++            __m256i aux2 = _mm256_and_si256(_mm256_shuffle_epi8(_mm256_set1_epi32((int32_t)s23), mask1), mask2);
++            const __m256i q8s_2 = _mm256_sign_epi8(_mm256_loadu_si256((const __m256i *)(q8 + 32)), _mm256_or_si256(_mm256_cmpeq_epi8(aux2, mask2), one_i8));
++            q8 += 64;
+             const __m256i dot2  = _mm256_maddubs_epi16(q2_2, q8s_2);
+-            const uint16_t ls1 = x[i].scales[ib32/2] & 0xf;
+-            const uint16_t ls2 = x[i].scales[ib32/2] >>  4;
+-            const __m256i p1 = _mm256_madd_epi16(dot1, _mm256_set1_epi16(2*ls1+1));
+-            const __m256i p2 = _mm256_madd_epi16(dot2, _mm256_set1_epi16(2*ls2+1));
+-            sumi1 = _mm256_add_epi32(sumi1, p1);
+-            sumi2 = _mm256_add_epi32(sumi2, p2);
++            sumi = _mm256_add_epi32(sumi, _mm256_madd_epi16(dot2, _mm256_set1_epi16((int16_t)(scales_hi_odd & 0xffU))));
++            scales_hi_odd >>= 8;
+         }
+ 
+-        accumf = _mm256_fmadd_ps(_mm256_set1_ps(d), _mm256_cvtepi32_ps(_mm256_add_epi32(sumi1, sumi2)), accumf);
++        accumf = _mm256_fmadd_ps(_mm256_set1_ps(d), _mm256_cvtepi32_ps(sumi), accumf);
+ 
+     }
+ 
 diff --git a/ggml/src/ggml-cpu/ggml-cpu-impl.h b/ggml/src/ggml-cpu/ggml-cpu-impl.h
-index 865847a..19d9624 100644
+index f8b3637..88c5d8a 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu-impl.h
 +++ b/ggml/src/ggml-cpu/ggml-cpu-impl.h
 @@ -529,6 +529,15 @@ static __m256 __lasx_xvreplfr2vr_s(const float val) {
@@ -238,7 +633,7 @@ index 865847a..19d9624 100644
  void ggml_barrier(struct ggml_threadpool * tp);
  
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index 5277910..259109c 100644
+index 3c25909..f276f0e 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
 @@ -1542,6 +1542,20 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
@@ -474,8 +869,126 @@ index 5277910..259109c 100644
      set_numa_thread_affinity(state->ith);
  #endif
  
+diff --git a/ggml/src/ggml-cpu/llamafile/sgemm.cpp b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
+index b406f37..fc49df1 100644
+--- a/ggml/src/ggml-cpu/llamafile/sgemm.cpp
++++ b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
+@@ -1625,42 +1625,80 @@ class tinyBLAS_Q0_AVX {
+             int64_t ii = m0 + job / xtiles * 4;
+             int64_t jj = n0 + job % xtiles * RN;
+             __m256 Cv[RN][4] = {};
+-            for (int64_t l = 0; l < k; ++l) {
+-                uint64_t a_delta = ((uint64_t)A[lda * (ii + 3) + l].d << 48) | ((uint64_t)A[lda * (ii + 2) + l].d << 32) | ((uint64_t)A[lda * (ii + 1) + l].d << 16) | (A[lda * (ii + 0) + l].d);
+-                // Convert delta values for four blocks to float values
+-                __m128 da = _mm_cvtph_ps(_mm_set_epi64x(0, a_delta));
+-                __m256i avec0 = load(A + lda * (ii + 0) + l);
+-                __m256i avec1 = load(A + lda * (ii + 1) + l);
+-                __m256i avec2 = load(A + lda * (ii + 2) + l);
+-                __m256i avec3 = load(A + lda * (ii + 3) + l);
++            if constexpr (std::is_same_v<TA, block_q8_0>) {
++                for (int64_t l = 0; l < k; ++l) {
++                    uint64_t a_delta = ((uint64_t)A[lda * (ii + 3) + l].d << 48) | ((uint64_t)A[lda * (ii + 2) + l].d << 32) | ((uint64_t)A[lda * (ii + 1) + l].d << 16) | (A[lda * (ii + 0) + l].d);
++                    // Convert the four scales and duplicate them across both lanes.
++                    const __m256 da = _mm256_cvtph_ps(_mm_set1_epi64x(a_delta));
++                    __m256 dab[RN];
++                    for (int64_t j = 0; j < RN; ++j) {
++                        dab[j] = _mm256_mul_ps(da, _mm256_set1_ps(unhalf(B[ldb * (jj + j) + l].d)));
++                    }
++
++                    for (int64_t i = 0; i < 4; ++i) {
++                        const __m256i a = load(A + lda * (ii + i) + l);
++                        const __m256i magnitude = _mm256_sign_epi8(a, a);
++                        __m256 dot[RN];
++                        for (int64_t j = 0; j < RN; ++j) {
++                            dot[j] = updot(magnitude, _mm256_sign_epi8(load(B + ldb * (jj + j) + l), a));
++                        }
++                        for (int64_t j = 0; j < RN; ++j) {
++                            const __m256 d = i == 0 ? _mm256_shuffle_ps(dab[j], dab[j], 0x00) :
++                                             i == 1 ? _mm256_shuffle_ps(dab[j], dab[j], 0x55) :
++                                             i == 2 ? _mm256_shuffle_ps(dab[j], dab[j], 0xaa) :
++                                                      _mm256_shuffle_ps(dab[j], dab[j], 0xff);
++                            Cv[j][i] = madd(d, dot[j], Cv[j][i]);
++                        }
++                    }
++                }
++
+                 for (int64_t j = 0; j < RN; ++j) {
+-                        __m128 db = _mm_set1_ps(unhalf(B[ldb * (jj + j) + l].d));
+-                        // Computation of product of delta values for four blocks and replicate it across 256 bit lane
+-                        __m256 dvec =  _mm256_castps128_ps256(_mm_mul_ps(da, db));
+-                        dvec = _mm256_permute2f128_ps(dvec ,dvec, 0);
+-                        // Computation of dot product and multiplication with appropriate delta value products
+-                        Cv[j][0] = madd(_mm256_shuffle_ps(dvec, dvec, 0),
+-                                    updot(_mm256_sign_epi8(avec0, avec0),
+-                                          _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec0)),
+-                                    Cv[j][0]);
+-                        Cv[j][1] = madd(_mm256_shuffle_ps(dvec, dvec, 85),
+-                                    updot(_mm256_sign_epi8(avec1, avec1),
+-                                            _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec1)),
+-                                    Cv[j][1]);
+-                        Cv[j][2] = madd(_mm256_shuffle_ps(dvec, dvec, 170),
+-                                    updot(_mm256_sign_epi8(avec2, avec2),
+-                                            _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec2)),
+-                                    Cv[j][2]);
+-                        Cv[j][3] = madd(_mm256_shuffle_ps(dvec, dvec, 255),
+-                                    updot(_mm256_sign_epi8(avec3, avec3),
+-                                            _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec3)),
+-                                    Cv[j][3]);
++                    __m128 rows[4];
++                    for (int i = 0; i < 4; ++i) {
++                        rows[i] = _mm_add_ps(_mm256_extractf128_ps(Cv[j][i], 1), _mm256_castps256_ps128(Cv[j][i]));
++                    }
++                    _MM_TRANSPOSE4_PS(rows[0], rows[1], rows[2], rows[3]);
++                    const __m128 sum = _mm_add_ps(_mm_add_ps(rows[0], rows[2]), _mm_add_ps(rows[1], rows[3]));
++                    _mm_storeu_ps(C + ldc * (jj + j) + ii, sum);
++                }
++            } else {
++                for (int64_t l = 0; l < k; ++l) {
++                    uint64_t a_delta = ((uint64_t)A[lda * (ii + 3) + l].d << 48) | ((uint64_t)A[lda * (ii + 2) + l].d << 32) | ((uint64_t)A[lda * (ii + 1) + l].d << 16) | (A[lda * (ii + 0) + l].d);
++                    // Convert delta values for four blocks to float values
++                    __m128 da = _mm_cvtph_ps(_mm_set_epi64x(0, a_delta));
++                    __m256i avec0 = load(A + lda * (ii + 0) + l);
++                    __m256i avec1 = load(A + lda * (ii + 1) + l);
++                    __m256i avec2 = load(A + lda * (ii + 2) + l);
++                    __m256i avec3 = load(A + lda * (ii + 3) + l);
++                    for (int64_t j = 0; j < RN; ++j) {
++                            __m128 db = _mm_set1_ps(unhalf(B[ldb * (jj + j) + l].d));
++                            // Computation of product of delta values for four blocks and replicate it across 256 bit lane
++                            __m256 dvec =  _mm256_castps128_ps256(_mm_mul_ps(da, db));
++                            dvec = _mm256_permute2f128_ps(dvec ,dvec, 0);
++                            // Computation of dot product and multiplication with appropriate delta value products
++                            Cv[j][0] = madd(_mm256_shuffle_ps(dvec, dvec, 0),
++                                        updot(_mm256_sign_epi8(avec0, avec0),
++                                              _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec0)),
++                                        Cv[j][0]);
++                            Cv[j][1] = madd(_mm256_shuffle_ps(dvec, dvec, 85),
++                                        updot(_mm256_sign_epi8(avec1, avec1),
++                                                _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec1)),
++                                        Cv[j][1]);
++                            Cv[j][2] = madd(_mm256_shuffle_ps(dvec, dvec, 170),
++                                        updot(_mm256_sign_epi8(avec2, avec2),
++                                                _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec2)),
++                                        Cv[j][2]);
++                            Cv[j][3] = madd(_mm256_shuffle_ps(dvec, dvec, 255),
++                                        updot(_mm256_sign_epi8(avec3, avec3),
++                                                _mm256_sign_epi8(load(B + ldb * (jj + j) + l), avec3)),
++                                        Cv[j][3]);
++                    }
+                 }
+-            }
+ 
+-            for (int64_t j = 0; j < RN; ++j)
+-                for (int64_t i = 0; i < 4; ++i)
+-                    C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
++                for (int64_t j = 0; j < RN; ++j)
++                    for (int64_t i = 0; i < 4; ++i)
++                        C[ldc * (jj + j) + (ii + i)] = hsum(Cv[j][i]);
++            }
+         }
+     }
+ 
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index dbdde69..9783813 100644
+index 55f6255..082445c 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
 @@ -1731,12 +1731,31 @@ static void ggml_compute_forward_repeat_f32(
@@ -513,7 +1026,7 @@ index dbdde69..9783813 100644
  
      // guaranteed to be an integer due to the check in ggml_can_repeat
 diff --git a/ggml/src/ggml-cpu/vec.h b/ggml/src/ggml-cpu/vec.h
-index f24fa00..355f9c0 100644
+index aa9b5c8..05caae0 100644
 --- a/ggml/src/ggml-cpu/vec.h
 +++ b/ggml/src/ggml-cpu/vec.h
 @@ -1240,14 +1240,14 @@ inline static __m512 ggml_v_gelu_quick(__m512 x) {
@@ -548,10 +1061,10 @@ index f24fa00..355f9c0 100644
      const __m256 zero = _mm256_setzero_ps();
      const __m256 neg_x = _mm256_sub_ps(zero, x);
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index c9990b5..b0802e4 100644
+index 7714bc3..30903fd 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -825,6 +825,7 @@ struct vk_device_struct {
+@@ -834,6 +834,7 @@ struct vk_device_struct {
      vk_pipeline pipeline_add_id_f32;
  
      vk_pipeline pipeline_concat_i8, pipeline_concat_i16, pipeline_concat_i32, pipeline_concat_i64;
@@ -560,18 +1073,10 @@ index c9990b5..b0802e4 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 459deea..ce37692 100644
+index e5c2812..5894799 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -13,6 +13,7 @@
- #include "ggml-vulkan-common.h"
- #include "ggml-vulkan-buffers.cpp" //kcpp: dirty include
- #include "ggml-vulkan-debug.cpp" //kcpp: dirty include
-+#include "ggml-vulkan-comm.cpp" //kcpp: dirty include; PR2581
- 
- static vk_device_architecture get_device_architecture(const vk::PhysicalDevice& device) {
-     vk::PhysicalDeviceProperties props = device.getProperties();
-@@ -1277,7 +1278,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
+@@ -1278,7 +1278,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
      // On AMD RDNA, for small head sizes and big batch size the shader uses few registers, so too many subgroups get scheduled
      // at once and end up thrashing the cache. Fix this by setting a large (unused) shmem buffer that reduces occupancy.
      // This targets an occupancy of 4 subgroups per SIMD.
@@ -580,7 +1085,7 @@ index 459deea..ce37692 100644
          if (device->architecture != AMD_GCN && n_rows >= 64 && hsk <= 128) {
              // 30kb target for hsk > 64, 26kb for <= 64 due to smaller workgroup size
              // Values are guessed, tested on RDNA2
-@@ -1861,7 +1862,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -1873,7 +1873,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          s_warptile_mmqid_int_k = { mul_mat_subgroup_size_32, 32,  32, 32, mul_mat_s_warptile_wm_16, 32, 1, 2, 1, 1, mul_mat_subgroup_size_16 };
  
          // chip specific tuning
@@ -589,8 +1094,8 @@ index 459deea..ce37692 100644
 +        if (device->architecture == AMD_GCN) {
              m_warptile_mmq = m_warptile_mmq_int = { 256, 64, 64, 32, 16, 16, 2, 2, 2, 1, 16 };
              m_warptile_mmqid = m_warptile_mmqid_int = { 256, 64, 64, 32, 16, 16, 2, 2, 2, 1, 16 };
-         } else if (device->vendor_id == VK_VENDOR_ID_AMD && device->coopmat_support && device->driver_id != vk::DriverId::eAmdProprietary) {
-@@ -1895,6 +1897,28 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+         } else if (device->vendor_id == VK_VENDOR_ID_AMD && device->coopmat_support && ggml_vk_amd_large_tile_supported(device)) {
+@@ -1907,6 +1908,28 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              }
          }
  
@@ -619,7 +1124,48 @@ index 459deea..ce37692 100644
          const bool use_cm1_int = device->coopmat_int_support &&
                                   (device->architecture == AMD_RDNA3 || device->architecture == AMD_RDNA4);
  
-@@ -2911,6 +2935,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2615,6 +2638,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+                                    const std::string& name, size_t len, const void* data, uint32_t pc_size, uint32_t pc,
+                                    uint32_t rsgs = 0) {
+             auto tc = filter_tc(tc_base, key.type_a, key.mul_mat_id);
++            const char* wide_prefill = getenv("GGML_VK_GCN_K_PREFILL");
++            if (device->architecture == AMD_GCN && device->subgroup_size == 64 &&
++                (device->properties.deviceID == 0x67df || device->properties.deviceID == 0x6fdf) &&
++                !device->fp16 && !device->integer_dot_product && !device->coopmat_support &&
++                !key.mul_mat_id && key.type_b == GGML_TYPE_F32 &&
++                key.type_a == GGML_TYPE_Q4_K &&
++                tc.size() == 2 && device->shader_core_count > 0 &&
++                (!wide_prefill || strcmp(wide_prefill, "0") != 0)) {
++                vk_tile_config wide{{256, 128, 64, 32, 32, 64, 1, 4, 8, 1, 64}, {128, 64, 1}, 128};
++                if (ggml_vk_matmul_shmem_support(device, wide.warptile, false, key.type_a)) {
++                    tc.push_back(std::move(wide));
++                }
++            }
+             if (!tc.empty()) {
+                 spec_fn_t qs = [&, type_a=key.type_a](const std::vector<uint32_t>& wt, bool a) { return ggml_vk_mul_mm_spec_quant(wt, a, (uint32_t)type_a); };
+                 create_mm_pipelines(key, tc, name, len, data, pc_size, pc, qs, false, rsgs > 0, rsgs);
+@@ -2882,12 +2918,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+             return 0;
+         };
+     } else {
+-        device->matmul_tile_selector = [](uint32_t m, uint32_t n, uint32_t /*k*/, uint32_t /*shader_core_count*/,
++        const bool gcn = device->architecture == AMD_GCN;
++        device->matmul_tile_selector = [gcn](uint32_t m, uint32_t n, uint32_t /*k*/, uint32_t shader_core_count,
+                                           const std::vector<vk_matmul_pipeline_pair>& configs) -> uint32_t {
+             if (configs.size() <= 1) return 0;
+             if (m <= 32 || n <= 32) return 0;
+             if (configs.size() == 2) return 1;
+             if (m <= 64 || n <= 64) return 1;
++            const auto& tile = configs.back().unaligned->wg_denoms;
++            if (gcn && tile[0] == 128 && tile[1] == 64) {
++                // No padded edges or occupancy loss on the new prefill tile.
++                return m % 128 == 0 && n % 64 == 0 &&
++                    uint64_t(m / 128) * (n / 64) >= shader_core_count ? 2 : 1;
++            }
+             return (uint32_t)configs.size() - 1;
+         };
+         device->matmul_id_tile_selector = device->matmul_tile_selector;
+@@ -2923,6 +2966,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          return is_rdna3_or_4 ? 4u : rows;
      };
      uint32_t rm_iq = 2 * rm_kq;
@@ -637,7 +1183,7 @@ index 459deea..ce37692 100644
  
      const bool use_subgroups = device->subgroup_arithmetic;
      // The Imagination proprietary compiler rejects the subgroup-only dequant mul_mat_vec
-@@ -2973,7 +3008,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2985,7 +3039,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ2_S][i],   "mul_mat_vec_iq2_s_f32_f32",   arr_dmmv_iq2_s_f32_f32_len[reduc16],   arr_dmmv_iq2_s_f32_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ3_XXS][i], "mul_mat_vec_iq3_xxs_f32_f32", arr_dmmv_iq3_xxs_f32_f32_len[reduc16], arr_dmmv_iq3_xxs_f32_f32_data[reduc16], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ3_S][i],   "mul_mat_vec_iq3_s_f32_f32",   arr_dmmv_iq3_s_f32_f32_len[reduc16],   arr_dmmv_iq3_s_f32_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -646,7 +1192,7 @@ index 459deea..ce37692 100644
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_IQ4_NL][i],  "mul_mat_vec_iq4_nl_f32_f32",  arr_dmmv_iq4_nl_f32_f32_len[reduc16],  arr_dmmv_iq4_nl_f32_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_MXFP4][i],   "mul_mat_vec_mxfp4_f32_f32",   OCP_DMMV_LEN(arr_dmmv_mxfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_mxfp4_f32_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f32_f32[w][GGML_TYPE_NVFP4][i],   "mul_mat_vec_nvfp4_f32_f32",   OCP_DMMV_LEN(arr_dmmv_nvfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_nvfp4_f32_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
-@@ -3002,7 +3037,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3014,7 +3068,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ2_S][i],   "mul_mat_vec_iq2_s_f16_f32",   arr_dmmv_iq2_s_f16_f32_len[reduc16],   arr_dmmv_iq2_s_f16_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ3_XXS][i], "mul_mat_vec_iq3_xxs_f16_f32", arr_dmmv_iq3_xxs_f16_f32_len[reduc16], arr_dmmv_iq3_xxs_f16_f32_data[reduc16], "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ3_S][i],   "mul_mat_vec_iq3_s_f16_f32",   arr_dmmv_iq3_s_f16_f32_len[reduc16],   arr_dmmv_iq3_s_f16_f32_data[reduc16],   "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -655,7 +1201,7 @@ index 459deea..ce37692 100644
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_IQ4_NL][i],  "mul_mat_vec_iq4_nl_f16_f32",  arr_dmmv_iq4_nl_f16_f32_len[reduc16],  arr_dmmv_iq4_nl_f16_f32_data[reduc16],  "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_MXFP4][i],   "mul_mat_vec_mxfp4_f16_f32",   OCP_DMMV_LEN(arr_dmmv_mxfp4_f16_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_mxfp4_f16_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
              ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_f16_f32[w][GGML_TYPE_NVFP4][i],   "mul_mat_vec_nvfp4_f16_f32",   OCP_DMMV_LEN(arr_dmmv_nvfp4_f16_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_nvfp4_f16_f32, reduc16), "main", mul_mat_vec_num_bindings, sizeof(vk_mat_vec_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq, i+1}, 1, true, use_subgroups16, force_subgroup_size16);
-@@ -3059,7 +3094,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3071,7 +3125,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ2_S],   "mul_mat_vec_id_iq2_s_f32",   arr_dmmv_id_iq2_s_f32_f32_len[reduc16],   arr_dmmv_id_iq2_s_f32_f32_data[reduc16],   "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ3_XXS], "mul_mat_vec_id_iq3_xxs_f32", arr_dmmv_id_iq3_xxs_f32_f32_len[reduc16], arr_dmmv_id_iq3_xxs_f32_f32_data[reduc16], "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ3_S],   "mul_mat_vec_id_iq3_s_f32",   arr_dmmv_id_iq3_s_f32_f32_len[reduc16],   arr_dmmv_id_iq3_s_f32_f32_data[reduc16],   "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
@@ -664,7 +1210,7 @@ index 459deea..ce37692 100644
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_IQ4_NL],  "mul_mat_vec_id_iq4_nl_f32",  arr_dmmv_id_iq4_nl_f32_f32_len[reduc16],  arr_dmmv_id_iq4_nl_f32_f32_data[reduc16],  "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_MXFP4],   "mul_mat_vec_id_mxfp4_f32",   OCP_DMMV_LEN(arr_dmmv_id_mxfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_id_mxfp4_f32_f32, reduc16), "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
          ggml_vk_create_pipeline(device, device->pipeline_dequant_mul_mat_vec_id_f32[w][GGML_TYPE_NVFP4],   "mul_mat_vec_id_nvfp4_f32",   OCP_DMMV_LEN(arr_dmmv_id_nvfp4_f32_f32, reduc16), OCP_DMMV_DATA(arr_dmmv_id_nvfp4_f32_f32, reduc16), "main", mul_mat_vec_id_num_bindings, sizeof(vk_mat_vec_id_push_constants), {rm_iq, 1, 1}, {wg_size_subgroup16, rm_iq}, 1, true, use_subgroups16, force_subgroup_size16);
-@@ -3413,6 +3448,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3425,6 +3479,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      ggml_vk_create_pipeline(device, device->pipeline_concat_i8, "concat_i8", concat_i8_len, concat_i8_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
      ggml_vk_create_pipeline(device, device->pipeline_concat_i16, "concat_i16", concat_i16_len, concat_i16_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
      ggml_vk_create_pipeline(device, device->pipeline_concat_i32, "concat_i32", concat_i32_len, concat_i32_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
@@ -672,7 +1218,7 @@ index 459deea..ce37692 100644
      ggml_vk_create_pipeline(device, device->pipeline_concat_i64, "concat_i64", concat_i64_len, concat_i64_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
  
      ggml_vk_create_pipeline(device, device->pipeline_upscale_nearest_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_NEAREST}, 1);
-@@ -3789,6 +3825,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3811,6 +3866,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      for (uint32_t s = 0; s < CONV_SHAPE_COUNT; ++s) {
          // smaller WG for the small-tile fallback gives more concurrent WGs per SM
          uint32_t conv2d_WG_SIZE  = (s == CONV_SHAPE_64x32) ? 128 : 256;
@@ -690,7 +1236,7 @@ index 459deea..ce37692 100644
          uint32_t use_collectives = 0;  // Enables subgroup ops for preventing the re-calculation of indices.
          uint32_t conv2d_TS_K     = (s == CONV_SHAPE_64x32) ? 4 : 8;
          uint32_t conv2d_SHMEM_PAD = 4;
-@@ -4351,11 +4398,23 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4373,11 +4439,23 @@ vk_device ggml_vk_get_device(size_t idx) {
          // Allow overriding avoiding the graphics queue because it can increase performance on RADV
          const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
          const vk::QueueFlagBits graphics_flag = allow_graphics_queue ? (vk::QueueFlagBits)0 : vk::QueueFlagBits::eGraphics;
@@ -717,7 +1263,7 @@ index 459deea..ce37692 100644
  
          std::vector<vk::DeviceQueueCreateInfo> device_queue_create_infos;
          vk::DeviceCreateInfo device_create_info{};
-@@ -4367,12 +4426,12 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4389,12 +4467,12 @@ vk_device ggml_vk_get_device(size_t idx) {
          device_features2.pNext = nullptr;
          device_features2.features = (VkPhysicalDeviceFeatures)device_features;
  
@@ -732,7 +1278,7 @@ index 459deea..ce37692 100644
          vk12_features.pNext = nullptr;
          vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
          vk11_features.pNext = &vk12_features;
-@@ -4831,7 +4890,19 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4853,7 +4931,19 @@ vk_device ggml_vk_get_device(size_t idx) {
              .setQueueCreateInfos(device_queue_create_infos)
              .setPEnabledExtensionNames(device_extensions);
          device_create_info.setPNext(&device_features2);
@@ -753,7 +1299,7 @@ index 459deea..ce37692 100644
  
          if (device->device_fault) {
              device->pfn_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT)
-@@ -5097,12 +5168,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+@@ -5118,12 +5208,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
      device_features2.pNext = nullptr;
  
@@ -768,7 +1314,7 @@ index 459deea..ce37692 100644
      vk12_features.pNext = nullptr;
      vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
      vk11_features.pNext = &vk12_features;
-@@ -5690,6 +5761,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
+@@ -5711,6 +5801,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
          }
      }
  
@@ -786,7 +1332,7 @@ index 459deea..ce37692 100644
      if (b_type == GGML_TYPE_Q8_1) {
          if (ctx->device->vendor_id == VK_VENDOR_ID_INTEL) {
              dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
-@@ -8820,6 +8902,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
+@@ -8861,6 +8962,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
      return pipelines[2];
  }
  
@@ -804,7 +1350,7 @@ index 459deea..ce37692 100644
  static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * dst, ggml_op op) {
      switch (op) {
      case GGML_OP_GET_ROWS:
-@@ -8912,6 +9005,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -8953,6 +9065,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
          if (!ggml_vk_concat_supported(src0, src1, dst)) {
              return nullptr;
          }
@@ -814,7 +1360,7 @@ index 459deea..ce37692 100644
          switch (ggml_vk_concat_unit_size(src0->type)) {
          case 1:
              return ctx->device->pipeline_concat_i8;
-@@ -9844,6 +9940,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -9885,6 +10000,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
      case GGML_OP_GLU:
      case GGML_OP_CONV_2D_DW:
          {
@@ -825,7 +1371,7 @@ index 459deea..ce37692 100644
              uint32_t ne = ggml_nelements(dst);
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
-@@ -10691,6 +10791,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -10732,6 +10851,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
@@ -834,7 +1380,7 @@ index 459deea..ce37692 100644
  
      ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
  }
-@@ -13723,7 +13825,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+@@ -13765,7 +13886,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
      const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
  
      // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
@@ -845,7 +1391,7 @@ index 459deea..ce37692 100644
             ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
             ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
             scale_in->src[0]->type == GGML_TYPE_F32 &&
-@@ -14517,6 +14621,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14559,6 +14682,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
      uint64_t flops_per_submit = ctx->last_total_flops < 1'000'000'000ULL ? 0 :
          std::clamp(ctx->last_total_flops / 40u, std::min<uint64_t>(100'000'000ULL, flops_cap), flops_cap);
  
@@ -858,7 +1404,7 @@ index 459deea..ce37692 100644
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -14541,7 +14651,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14583,7 +14712,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -867,7 +1413,7 @@ index 459deea..ce37692 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -14828,7 +14938,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14870,7 +14999,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -876,7 +1422,7 @@ index 459deea..ce37692 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -15403,7 +15513,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -15455,7 +15584,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  
@@ -886,7 +1432,7 @@ index 459deea..ce37692 100644
          vk_backend->iface.get_tensor_async = nullptr;
      }
  
-@@ -15994,8 +16105,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16050,8 +16180,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32;
          case GGML_OP_FILL:
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
@@ -905,7 +1451,7 @@ index 459deea..ce37692 100644
          case GGML_OP_PAD:
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
-@@ -16503,7 +16622,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -16572,7 +16710,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  
@@ -1107,7 +1653,7 @@ index 35ec726..0dc989d 100644
      }
  }
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 1801645..9f07613 100644
+index aaa0a61..f5d3940 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 @@ -354,7 +354,8 @@ using compile_count_guard = std::unique_ptr<uint32_t, decltype(&decrement_compil
@@ -1158,10 +1704,10 @@ index 07d4a3d..ca10e81 100644
  struct generation_inputs
  {
 diff --git a/kcpp_src/gpttype_adapter.cpp b/kcpp_src/gpttype_adapter.cpp
-index 99d1944..7efdc3c 100644
+index e2d5db6..dff87c5 100644
 --- a/kcpp_src/gpttype_adapter.cpp
 +++ b/kcpp_src/gpttype_adapter.cpp
-@@ -990,6 +990,7 @@ static void mtp_decoding_setup(llama_model * main_model, llama_context * main_ct
+@@ -992,6 +992,7 @@ static void mtp_decoding_setup(llama_model * main_model, llama_context * main_ct
      llama_context_params mtp_ctx_params = base_ctx_params;
      // Match upstream: only the target context owns an expert cache.
      mtp_ctx_params.moe_cache_size = 0;
@@ -1169,7 +1715,7 @@ index 99d1944..7efdc3c 100644
      mtp_ctx_params.ctx_type = LLAMA_CONTEXT_TYPE_MTP;
      mtp_ctx_params.ctx_other = main_ctx;
      mtp_ctx_params.n_rs_seq = 0;
-@@ -3456,6 +3457,8 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
+@@ -3458,6 +3459,8 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
          llama_context_params llama_ctx_params = llama_context_default_params();
          model_params.lazy_mode = static_cast<llama_lazy_mode>(inputs.lazy_mode);
          llama_ctx_params.moe_cache_size = static_cast<size_t>(inputs.moe_cache_mib) * 1024 * 1024;
@@ -1178,7 +1724,7 @@ index 99d1944..7efdc3c 100644
          const bool configure_batch_cache = continuous_batching_slots > 1 &&
              !inputs.use_mtp && draftmodel_filename.empty() && !load_guidance &&
              !kcpp_data->use_smartcontext && !kcpp_data->use_contextshift;
-@@ -3905,6 +3908,7 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
+@@ -3907,6 +3910,7 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
              // accounts for the target context.
              llama_context_params guidance_ctx_params = llama_ctx_params;
              guidance_ctx_params.moe_cache_size = 0;
@@ -1187,7 +1733,7 @@ index 99d1944..7efdc3c 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 7a723ab..4aae3f5 100644
+index d876a64..32ac95b 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -1287,7 +1833,7 @@ index 7a723ab..4aae3f5 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -8918,6 +8974,9 @@ Change Mode<br>
+@@ -8919,6 +8975,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -1297,7 +1843,7 @@ index 7a723ab..4aae3f5 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9473,7 +9532,27 @@ def show_gui():
+@@ -9474,7 +9533,27 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -1326,7 +1872,7 @@ index 7a723ab..4aae3f5 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9558,6 +9637,7 @@ def show_gui():
+@@ -9559,6 +9638,7 @@ def show_gui():
  
      # trigger empty tooltip then remove it
      def show_tooltip(event, tooltip_text=None):
@@ -1334,7 +1880,7 @@ index 7a723ab..4aae3f5 100644
          nonlocal gtooltip_box, gtooltip_label
          if not gtooltip_box and not gtooltip_label:
              gtooltip_box = ctk.CTkToplevel(root)
-@@ -9585,7 +9665,7 @@ def show_gui():
+@@ -9586,7 +9666,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
@@ -1343,7 +1889,7 @@ index 7a723ab..4aae3f5 100644
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9802,7 +9882,7 @@ def show_gui():
+@@ -9803,7 +9883,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
@@ -1352,7 +1898,7 @@ index 7a723ab..4aae3f5 100644
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
  
-@@ -10717,6 +10797,8 @@ def show_gui():
+@@ -10718,6 +10798,8 @@ def show_gui():
      # Image Gen Tab
  
      images_tab = tabcontent["Image Gen"]
@@ -1361,7 +1907,7 @@ index 7a723ab..4aae3f5 100644
      makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
  
      def togglesdlora(a,b,c):
-@@ -10757,7 +10839,7 @@ def show_gui():
+@@ -10758,7 +10840,7 @@ def show_gui():
      makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
      makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
      makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
@@ -1370,7 +1916,7 @@ index 7a723ab..4aae3f5 100644
  
  
      sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
-@@ -10785,6 +10867,8 @@ def show_gui():
+@@ -10786,6 +10868,8 @@ def show_gui():
  
      # audio tab
      audio_tab = tabcontent["Audio"]
@@ -1379,7 +1925,7 @@ index 7a723ab..4aae3f5 100644
      makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or SheetSage2 Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
      whisper_model_var.trace_add("write", gui_changed_modelfile)
      makefileentry(audio_tab, "TTS Model (Text-To-Speech):", "Select TTS GGUF Model File", tts_model_var, 3, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a TTS GGUF model file on disk to be loaded for Narration.")
-@@ -10870,6 +10954,8 @@ def show_gui():
+@@ -10871,6 +10955,8 @@ def show_gui():
  
      # extra tab
      extra_tab = tabcontent["Extra"]
@@ -1388,7 +1934,7 @@ index 7a723ab..4aae3f5 100644
      makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
      ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
      makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
-@@ -10935,6 +11021,8 @@ def show_gui():
+@@ -10936,6 +11022,8 @@ def show_gui():
  
      # launch
      def guilaunch():
@@ -1397,7 +1943,7 @@ index 7a723ab..4aae3f5 100644
          if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
              # prevent launch without at least one valid model
              givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
-@@ -11526,6 +11614,8 @@ def show_gui():
+@@ -11527,6 +11615,8 @@ def show_gui():
              auto_set_backend_gui(True)
  
      def save_config_gui():
@@ -1406,7 +1952,7 @@ index 7a723ab..4aae3f5 100644
          nonlocal kcpp_exporting_template
          kcpp_exporting_template = False
          export_vars()
-@@ -11541,6 +11631,8 @@ def show_gui():
+@@ -11542,6 +11632,8 @@ def show_gui():
          pass
  
      def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
@@ -1415,7 +1961,7 @@ index 7a723ab..4aae3f5 100644
          file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
          global runmode_untouched, zenity_permitted
          filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
-@@ -11661,6 +11753,22 @@ def show_gui():
+@@ -11662,6 +11754,22 @@ def show_gui():
              mydict = vars(args)
              import_vars(mydict)
  
@@ -1438,7 +1984,7 @@ index 7a723ab..4aae3f5 100644
      # runs main loop until closed or launch clicked
      try:
          root.mainloop()
-@@ -12997,7 +13105,7 @@ def main(launch_args, default_args):
+@@ -13014,7 +13122,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -1447,7 +1993,7 @@ index 7a723ab..4aae3f5 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14492,8 +14600,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14510,8 +14618,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  
@@ -1490,7 +2036,7 @@ index 7a723ab..4aae3f5 100644
  
      def check_range(value_type, min_value, max_value):
          def range_checker(arg: str):
-@@ -14537,6 +14679,7 @@ if __name__ == '__main__':
+@@ -14555,6 +14697,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -1498,7 +2044,7 @@ index 7a723ab..4aae3f5 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14571,6 +14714,9 @@ if __name__ == '__main__':
+@@ -14589,6 +14732,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -1624,7 +2170,7 @@ index 56e1e5a..33293a1 100644
 +OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 +SOFTWARE.
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index f4c30d3..761a701 100644
+index 2950a07..2515b24 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
 @@ -951,6 +951,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
@@ -1655,7 +2201,7 @@ index f4c30d3..761a701 100644
          vid_gen_params.loras = params.loras;
          vid_gen_params.lora_count = params.lora_count;
          if (!info.is_minimaxh3 && ref_audio_data.size()>0) {
-@@ -2334,12 +2348,41 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2334,6 +2348,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
  
          fflush(stdout);
  
@@ -1666,11 +2212,12 @@ index f4c30d3..761a701 100644
 +        if (latent_only && (!latent_path_env || !*latent_path_env || std::filesystem::exists(std::filesystem::u8path(latent_path_env)))) {
 +            return sd_generation.error("KCPP: latent-only video requires a fresh owned capture path");
 +        }
-         results = nullptr;
+         vid_result = nullptr;
+         generated_audio = nullptr;
          int output_fps = vid_fps;
-         if (!generate_video(sd_ctx, &vid_gen_params, &results, &generated_num_results, &generated_audio, &output_fps)) {
-             results = nullptr;
-             generated_audio = nullptr;
+@@ -2345,6 +2366,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+             generated_audio = vid_result->audio;
+             output_fps = vid_result->fps;
          }
 +        if (latent_only) {
 +            std::ifstream snapshot(std::filesystem::u8path(latent_path_env),std::ios::binary|std::ios::ate);
@@ -1683,11 +2230,10 @@ index f4c30d3..761a701 100644
 +                shape[2]>0 && shape[2]<=31 && shape[3]==48 && shape[4]==1 &&
 +                count==static_cast<uint64_t>(shape[0]*shape[1]*shape[2]*48) &&
 +                shape[0]*16==params.width && shape[1]*16==params.height && (shape[2]-1)*4+1==vid_req_frames;
++            free_sd_video_generation_result(vid_result);
++            vid_result=nullptr;
++            generated_audio=nullptr;
 +            if (!valid) return sd_generation.error("KCPP: incomplete or incompatible Wan latent export");
-+            if (results) {
-+                for (int i=0;i<generated_num_results;i++) free(results[i].data);
-+                free(results);results=nullptr;
-+            }
 +            sd_generation.reset();
 +            sd_generation.info=nlohmann::json({{"operation","wan_latents"},{"kcpp_wan_latents_ready",true},{"seed",params.seed},
 +                {"frames",vid_req_frames},{"width",params.width},{"height",params.height}}).dump();
@@ -1697,15 +2243,55 @@ index f4c30d3..761a701 100644
          if(!sd_is_quiet && sddebugmode==1)
          {
              printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",vid_req_frames, generated_num_results);
-@@ -2531,7 +2574,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2538,7 +2580,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              }
              if(output_avi)
              {
--                status2 = create_mjpg_avi_membuf_from_sd_images(results, generated_num_results, vid_fps, 40, &out_data2,&out_len2, generated_audio);
-+                status2 = create_mjpg_avi_membuf_from_sd_images(results, generated_num_results, vid_fps, 95, &out_data2,&out_len2, generated_audio);
+-                status2 = create_mjpg_avi_membuf_from_sd_images(vid_result->frames, generated_num_results, vid_fps, 40, &out_data2,&out_len2, generated_audio);
++                status2 = create_mjpg_avi_membuf_from_sd_images(vid_result->frames, generated_num_results, vid_fps, 95, &out_data2,&out_len2, generated_audio);
              }
  
              if(generated_num_results>1)
+diff --git a/otherarch/sdcpp/src/core/ggml_extend.cpp b/otherarch/sdcpp/src/core/ggml_extend.cpp
+index 1099f4b..2ce4836 100644
+--- a/otherarch/sdcpp/src/core/ggml_extend.cpp
++++ b/otherarch/sdcpp/src/core/ggml_extend.cpp
+@@ -684,15 +684,28 @@ ggml_tensor* ggml_ext_attention_ext(ggml_context* ctx,
+         }
+         k_in = ggml_cast(ctx, k_in, GGML_TYPE_F16);
+ 
+-        v_in = ggml_ext_cont(ctx, ggml_permute(ctx, v_in, 0, 2, 1, 3));
+-        v_in = ggml_reshape_3d(ctx, v_in, d_head, L_k, n_kv_head * N);
+-        if (pad_head) {
+-            v_in = ggml_pad(ctx, v_in, static_cast<int>(64 - d_head), 0, 0, 0);
++        v_in = ggml_permute(ctx, v_in, 0, 2, 1, 3);
++        ggml_tensor* packed_v = nullptr;
++        if (!pad_head && kv_scale == 1.0f && v_in->type == GGML_TYPE_F32 &&
++            !ggml_is_contiguous(v_in) && sd_backend_is(backend, "Vulkan")) {
++            // A strided copy converts to F16 and materializes the layout in one pass.
++            auto* candidate = ggml_cast(ctx, v_in, GGML_TYPE_F16);
++            if (ggml_backend_supports_op(backend, candidate)) {
++                packed_v = candidate;
++            }
+         }
+-        if (kv_scale != 1.0f) {
+-            v_in = ggml_ext_scale(ctx, v_in, kv_scale);
++        if (packed_v) {
++            v_in = ggml_reshape_3d(ctx, packed_v, d_head, L_k, n_kv_head * N);
++        } else {
++            v_in = ggml_reshape_3d(ctx, ggml_ext_cont(ctx, v_in), d_head, L_k, n_kv_head * N);
++            if (pad_head) {
++                v_in = ggml_pad(ctx, v_in, static_cast<int>(64 - d_head), 0, 0, 0);
++            }
++            if (kv_scale != 1.0f) {
++                v_in = ggml_ext_scale(ctx, v_in, kv_scale);
++            }
++            v_in = ggml_cast(ctx, v_in, GGML_TYPE_F16);
+         }
+-        v_in = ggml_cast(ctx, v_in, GGML_TYPE_F16);
+ 
+         if (mask_in != nullptr) {
+             // ggml_flash_attn_ext expects the mask as a contiguous F16 tensor shaped
 diff --git a/otherarch/sdcpp/src/core/pe_cache.cpp b/otherarch/sdcpp/src/core/pe_cache.cpp
 new file mode 100644
 index 0000000..df4aa62
@@ -2099,8 +2685,26 @@ index 84dd4d1..05c7d67 100644
                                                     : ggml_new_graph(compute_ctx);
          ggml_tensor* z   = make_input(z_tensor);
          auto runner_ctx  = get_context();
+diff --git a/otherarch/sdcpp/src/model_io/gguf_reader_ext.h b/otherarch/sdcpp/src/model_io/gguf_reader_ext.h
+index f02fe3c..7ddd390 100644
+--- a/otherarch/sdcpp/src/model_io/gguf_reader_ext.h
++++ b/otherarch/sdcpp/src/model_io/gguf_reader_ext.h
+@@ -60,7 +60,12 @@ private:
+         if (count > remaining_bytes_ / element_size)
+             return false;
+         uint64_t size = count * element_size;
+-        fin.seekg(static_cast<std::streamoff>(size), std::ios::cur);
++        // Keep small metadata skips inside the stream's read buffer.
++        if (size <= 65536) {
++            fin.ignore(static_cast<std::streamsize>(size));
++        } else {
++            fin.seekg(static_cast<std::streamoff>(size), std::ios::cur);
++        }
+         if (!fin.good())
+             return false;
+         remaining_bytes_ -= size;
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
-index 13265b0..f955fff 100644
+index 233a779..f8ba726 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 +++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 @@ -1,3 +1,6 @@
@@ -2110,7 +2714,7 @@ index 13265b0..f955fff 100644
  #include "diffusion_engine.h"
  
  #include <algorithm>
-@@ -2967,24 +2970,74 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
+@@ -3013,24 +3016,74 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
      if (sd_version_is_pid(version) || sd_version_is_minit2i(version) || version == VERSION_IRIS) {
          return sd::ops::clamp((x + 1.f) * 0.5f, 0.0f, 1.0f);
      }
@@ -2193,7 +2797,7 @@ index 13265b0..f955fff 100644
          }
      }
 diff --git a/otherarch/sdcpp/src/runtime/cache_dit.hpp b/otherarch/sdcpp/src/runtime/cache_dit.hpp
-index 273aa0e..a2364cc 100644
+index 666e61c..d833a46 100644
 --- a/otherarch/sdcpp/src/runtime/cache_dit.hpp
 +++ b/otherarch/sdcpp/src/runtime/cache_dit.hpp
 @@ -13,6 +13,8 @@
@@ -2259,7 +2863,7 @@ index 0b92c73..4ff4e5e 100644
          dbcfg.Fn_compute_blocks           = cache_params.Fn_compute_blocks;
          dbcfg.Bn_compute_blocks           = cache_params.Bn_compute_blocks;
 diff --git a/src/llama-context.cpp b/src/llama-context.cpp
-index 9ebe1ae..3b2e4ef 100644
+index 5c1f2b7..573a9e7 100644
 --- a/src/llama-context.cpp
 +++ b/src/llama-context.cpp
 @@ -1,3 +1,4 @@
@@ -2267,7 +2871,7 @@ index 9ebe1ae..3b2e4ef 100644
  #include "llama-context.h"
  
  #include "ggml.h"
-@@ -383,6 +384,8 @@ llama_context::llama_context(
+@@ -396,6 +397,8 @@ llama_context::llama_context(
      cparams.op_offload     = params.op_offload;
      cparams.kv_unified     = params.kv_unified;
      cparams.moe_cache_size = params.moe_cache_size;
@@ -2276,7 +2880,7 @@ index 9ebe1ae..3b2e4ef 100644
  
      // resolved after flash attention, see resolve_fused_ops()
      {
-@@ -592,7 +595,7 @@ llama_context::llama_context(
+@@ -621,7 +624,7 @@ llama_context::llama_context(
          }
  
          if (cparams.moe_cache_size > 0) {
@@ -2285,7 +2889,7 @@ index 9ebe1ae..3b2e4ef 100644
          }
  
          sched_reserve();
-@@ -2983,6 +2986,25 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
+@@ -3013,6 +3016,25 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
      }
  
      const ggml_tensor * ids = node->src[2];
@@ -2311,7 +2915,7 @@ index 9ebe1ae..3b2e4ef 100644
      if (ggml_nelements(ids) == 0) {
          return true;
      }
-@@ -4251,6 +4273,8 @@ llama_context_params llama_context_default_params() {
+@@ -4283,6 +4305,8 @@ llama_context_params llama_context_default_params() {
          /*.type_k                      =*/ GGML_TYPE_F16,
          /*.type_v                      =*/ GGML_TYPE_F16,
          /*.moe_cache_size              =*/ 0,
@@ -2334,7 +2938,7 @@ index 9141cba..015501c 100644
      std::vector<bool> embeddings_layer_inp; // [n_layer()] extract input embeddings for layer
      bool embeddings_layer_inp_dev; // write enabled layer inputs to a device buffer instead of host
 diff --git a/src/llama-graph.cpp b/src/llama-graph.cpp
-index 30af1bc..77abfd4 100644
+index c055934..89bfd61 100644
 --- a/src/llama-graph.cpp
 +++ b/src/llama-graph.cpp
 @@ -17,6 +17,7 @@
@@ -2345,7 +2949,7 @@ index 30af1bc..77abfd4 100644
  #include <cassert>
  #include <cmath>
  #include <cstring>
-@@ -2396,8 +2397,24 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
+@@ -2377,8 +2378,24 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
      //call early so that topk-moe can be used
      ggml_build_forward_expand(gf, weights);
  
@@ -2372,7 +2976,7 @@ index 30af1bc..77abfd4 100644
  
      cur = ggml_reshape_3d(ctx0, cur, n_embd, 1, n_tokens);
  
-@@ -2567,6 +2584,12 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
+@@ -2548,6 +2565,12 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
          }
      }
  
@@ -2385,6 +2989,42 @@ index 30af1bc..77abfd4 100644
      if (down_exps_s) {
          cb(experts, "ffn_moe_down_scaled", il);
      }
+diff --git a/src/llama-kv-cache.cpp b/src/llama-kv-cache.cpp
+index 6a1a3dc..27a385b 100644
+--- a/src/llama-kv-cache.cpp
++++ b/src/llama-kv-cache.cpp
+@@ -459,15 +459,12 @@ bool llama_kv_cache::seq_rm(llama_seq_id seq_id, llama_pos p0, llama_pos p1) {
+ 
+         uint32_t new_head = cells.size();
+ 
+-        for (uint32_t i = 0; i < cells.size(); ++i) {
+-            if (!cells.pos_in(i, p0, p1)) {
+-                continue;
+-            }
+-
+-            if (cells.seq_has(i, seq_id) && cells.seq_rm(i, seq_id)) {
+-                if (new_head == cells.size()) {
+-                    new_head = i;
+-                }
++        const auto & positions = cells.seq_pos_get(seq_id);
++        auto it = positions.lower_bound({p0, 0});
++        while (it != positions.end() && it->first < p1) {
++            const uint32_t i = (it++)->second; // seq_rm erases the current entry only
++            if (cells.seq_rm(i, seq_id)) {
++                new_head = std::min(new_head, i);
+             }
+         }
+ 
+@@ -483,7 +480,8 @@ bool llama_kv_cache::seq_rm(llama_seq_id seq_id, llama_pos p0, llama_pos p1) {
+ 
+             uint32_t new_head = cells.size();
+ 
+-            for (uint32_t i = 0; i < cells.size(); ++i) {
++            const uint32_t used_end = cells.used_max_p1();
++            for (uint32_t i = cells.used_min(); i < used_end; ++i) {
+                 if (!cells.pos_in(i, p0, p1)) {
+                     continue;
+                 }
 diff --git a/src/llama-moe-cache.cpp b/src/llama-moe-cache.cpp
 index 6a343a7..bcd11a6 100644
 --- a/src/llama-moe-cache.cpp

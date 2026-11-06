@@ -1,0 +1,130 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+index 7714bc3..30903fd 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+@@ -834,6 +834,7 @@ struct vk_device_struct {
+     vk_pipeline pipeline_add_id_f32;
+ 
+     vk_pipeline pipeline_concat_i8, pipeline_concat_i16, pipeline_concat_i32, pipeline_concat_i64;
++    vk_pipeline pipeline_concat_transpose_i32; // KCPP_TRANSPOSE_CONCAT32
+     vk_pipeline pipeline_upscale_nearest_f32, pipeline_upscale_bilinear_f32, pipeline_upscale_bicubic_f32, pipeline_upscale_bilinear_antialias_f32;
+     vk_pipeline pipeline_scale_f32;
+     vk_pipeline pipeline_log[2];
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 7bd1a69..6ff6110 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -3459,6 +3459,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     ggml_vk_create_pipeline(device, device->pipeline_concat_i8, "concat_i8", concat_i8_len, concat_i8_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
+     ggml_vk_create_pipeline(device, device->pipeline_concat_i16, "concat_i16", concat_i16_len, concat_i16_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
+     ggml_vk_create_pipeline(device, device->pipeline_concat_i32, "concat_i32", concat_i32_len, concat_i32_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
++    ggml_vk_create_pipeline(device, device->pipeline_concat_transpose_i32, "concat_transpose_i32", concat_transpose_i32_len, concat_transpose_i32_data, "main", 3, sizeof(vk_op_binary_push_constants), {32, 32, 1}, {}, 1);
+     ggml_vk_create_pipeline(device, device->pipeline_concat_i64, "concat_i64", concat_i64_len, concat_i64_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
+ 
+     ggml_vk_create_pipeline(device, device->pipeline_upscale_nearest_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_NEAREST}, 1);
+@@ -8930,6 +8931,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
+     return pipelines[2];
+ }
+ 
++// KCPP_TRANSPOSE_CONCAT32: adapted from ggml-org/llama.cpp PR30591.
++// 32x33 shared tile uses4224 bytes; no matrix-core or FP16 capability required.
++static bool ggml_vk_concat_transpose32(const ggml_tensor * a, const ggml_tensor * b, const ggml_tensor * d) {
++    return !ggml_is_quantized(a->type) && ggml_type_size(a->type) == 4 &&
++        ggml_get_op_params_i32(d, 0) == 0 &&
++        a->ne[2] == 1 && a->ne[3] == 1 && b->ne[2] == 1 && b->ne[3] == 1 &&
++        a->nb[0] == 4 && d->nb[0] == 4 && b->nb[0] > b->nb[1] &&
++        a->ne[1] == b->ne[1] && d->ne[1] == b->ne[1] &&
++        b->ne[1] >= 128 && d->ne[0] >= 128 && ggml_nelements(d) >= 65536;
++}
++
+ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * dst, ggml_op op) {
+     switch (op) {
+     case GGML_OP_GET_ROWS:
+@@ -9022,6 +9034,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+         if (!ggml_vk_concat_supported(src0, src1, dst)) {
+             return nullptr;
+         }
++        if (ggml_vk_concat_transpose32(src0, src1, dst)) {
++            return ctx->device->pipeline_concat_transpose_i32;
++        }
+         switch (ggml_vk_concat_unit_size(src0->type)) {
+         case 1:
+             return ctx->device->pipeline_concat_i8;
+@@ -9954,6 +9969,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+     case GGML_OP_GLU:
+     case GGML_OP_CONV_2D_DW:
+         {
++            if (op == GGML_OP_CONCAT && pipeline == ctx->device->pipeline_concat_transpose_i32) {
++                elements = { (uint32_t)src1->ne[1], (uint32_t)dst->ne[0], 1 };
++                break;
++            }
+             uint32_t ne = ggml_nelements(dst);
+             if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
+                 // Convert from number of logical elements to 2- or 4-byte units.
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp b/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp
+index e404698..e3ab1c1 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp
+@@ -3,6 +3,44 @@
+ #include "types.glsl"
+ #include "generic_binary_head.glsl"
+ 
++#ifdef KCPP_TRANSPOSE_CONCAT32
++// Adapted from ggml-org/llama.cpp PR30591 (MIT).
++#define TILE_DIM 32
++layout(local_size_x = TILE_DIM, local_size_y = 8, local_size_z = 1) in;
++
++// 33 columns (not 32) pads away shared-memory bank conflicts.
++shared A_TYPE tile[TILE_DIM][TILE_DIM + 1];
++
++void main() {
++    const uint tid_x = gl_LocalInvocationID.x;
++    const uint tid_y = gl_LocalInvocationID.y;
++
++    // workgroup x walks rows (src1's contiguous dim1) so consecutive workgroups stream src1, y walks dst columns
++    const uint row0 = gl_WorkGroupID.x * TILE_DIM;
++    const uint col0 = gl_WorkGroupID.y * TILE_DIM;
++
++    const uint i1 = row0 + tid_x;
++    [[unroll]] for (uint j = 0; j < TILE_DIM; j += gl_WorkGroupSize.y) {
++        const uint i0 = col0 + tid_y + j;
++        if (i0 >= p.ne00 && i0 - p.ne00 < p.ne10 && i1 < p.ne11) {
++            tile[tid_y + j][tid_x] = A_TYPE(data_b[get_boffset() + (i0 - p.ne00)*p.nb10 + i1*p.nb11]);
++        }
++    }
++
++    barrier();
++
++    const uint d0 = col0 + tid_x;
++    [[unroll]] for (uint j = 0; j < TILE_DIM; j += gl_WorkGroupSize.y) {
++        const uint d1 = row0 + tid_y + j;
++        if (d0 < p.ne20 && d1 < p.ne21) {
++            data_d[get_doffset() + d1*p.nb21 + d0*p.nb20] = d0 < p.ne00
++                ? D_TYPE(data_a[get_aoffset() + d1*p.nb01 + d0*p.nb00])
++                : D_TYPE(tile[tid_x][tid_y + j]);
++        }
++    }
++}
++
++#else
+ layout(local_size_x = 512, local_size_y = 1, local_size_z = 1) in;
+ 
+ void main() {
+@@ -39,3 +77,5 @@ void main() {
+     }
+ #endif
+ }
++
++#endif
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index 81b7314..f5d3940 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -995,6 +995,7 @@ void process_shaders() {
+     string_to_spv("concat_i8", "concat.comp", {{"A_TYPE", "uint8_t"}, {"B_TYPE", "uint8_t"}, {"D_TYPE", "uint8_t"}});
+     string_to_spv("concat_i16", "concat.comp", {{"A_TYPE", "uint16_t"}, {"B_TYPE", "uint16_t"}, {"D_TYPE", "uint16_t"}});
+     string_to_spv("concat_i32", "concat.comp", {{"A_TYPE", "uint"}, {"B_TYPE", "uint"}, {"D_TYPE", "uint"}});
++    string_to_spv("concat_transpose_i32", "concat.comp", {{"A_TYPE", "uint"}, {"B_TYPE", "uint"}, {"D_TYPE", "uint"}, {"KCPP_TRANSPOSE_CONCAT32", "1"}});
+     string_to_spv("concat_i64", "concat.comp", {{"A_TYPE", "uvec2"}, {"B_TYPE", "uvec2"}, {"D_TYPE", "uvec2"}});
+ 
+     string_to_spv("upscale_f32", "upscale.comp", {{"A_TYPE", "float"}, {"B_TYPE", "float"}, {"D_TYPE", "float"}});

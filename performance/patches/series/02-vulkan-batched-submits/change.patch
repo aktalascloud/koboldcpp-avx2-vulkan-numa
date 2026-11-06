@@ -1,0 +1,35 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index c8fbc44..9a81743 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -14583,6 +14583,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+     uint64_t flops_per_submit = ctx->last_total_flops < 1'000'000'000ULL ? 0 :
+         std::clamp(ctx->last_total_flops / 40u, std::min<uint64_t>(100'000'000ULL, flops_cap), flops_cap);
+ 
++    // KCPP_BATCHED_SUBMITS_PORT: reduce host submit overhead, retain watchdog cap.
++    static const bool batched_submits = getenv("GGML_VK_BATCHED_SUBMITS") != nullptr;
++    if (batched_submits && flops_per_submit != 0) {
++        flops_per_submit = flops_cap;
++    }
++
+     auto const submit_after = [&](int start, int end) {
+         if (ctx->device->serialize_submissions) {
+             try {
+@@ -14607,7 +14613,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+         first_node_in_batch = true;
+         submitted_nodes = 0;
+         batch_flops = 0;
+-        if (submit_count < 3) {
++        if (!batched_submits && submit_count < 3) {
+             flops_per_submit *= 2;
+         }
+         submit_count++;
+@@ -14894,7 +14900,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+         }
+ 
+         // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
+-        bool almost_ready = (cgraph->n_nodes - i) < cgraph->n_nodes / 5;
++        bool almost_ready = !batched_submits && (cgraph->n_nodes - i) < cgraph->n_nodes / 5;
+         bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
+                       (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
+                       (i + ctx->num_additional_fused_ops >= last_node) ||

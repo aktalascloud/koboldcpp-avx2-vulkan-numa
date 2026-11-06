@@ -1,0 +1,81 @@
+diff --git a/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h b/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h
+index 3b12bf8..464b8d6 100644
+--- a/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h
++++ b/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h
+@@ -26,6 +26,8 @@ class OmniVoiceSession final
+     , public runtime::IOfflineVoiceTaskSession
+     , public runtime::IStreamingVoiceTaskSession {
+ public:
++    ~OmniVoiceSession() override;
++
+     OmniVoiceSession(
+         runtime::TaskSpec task,
+         runtime::SessionOptions options,
+diff --git a/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h b/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h
+index f1afbd1..109276a 100644
+--- a/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h
++++ b/otherarch/audiocpp/upstream/include/engine/models/qwen3_tts/session.h
+@@ -25,6 +25,8 @@ class Qwen3TTSSession final
+     , public runtime::IOfflineVoiceTaskSession
+     , public runtime::StreamingTtsSessionBase {
+ public:
++    ~Qwen3TTSSession() override;
++
+     Qwen3TTSSession(
+         runtime::TaskSpec task,
+         runtime::SessionOptions options,
+diff --git a/otherarch/audiocpp/upstream/include/engine/models/vibevoice/session.h b/otherarch/audiocpp/upstream/include/engine/models/vibevoice/session.h
+index 0f484c5..c140ac0 100644
+--- a/otherarch/audiocpp/upstream/include/engine/models/vibevoice/session.h
++++ b/otherarch/audiocpp/upstream/include/engine/models/vibevoice/session.h
+@@ -21,6 +21,8 @@ class VibeVoiceSession final
+     , public runtime::IOfflineVoiceTaskSession
+     , public runtime::StreamingTtsSessionBase {
+ public:
++    ~VibeVoiceSession() override;
++
+     VibeVoiceSession(
+         runtime::TaskSpec task,
+         runtime::SessionOptions options,
+diff --git a/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp b/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp
+index 6434e72..349c61b 100644
+--- a/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp
++++ b/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp
+@@ -14,6 +14,9 @@
+ #include <vector>
+ 
+ namespace engine::models::omnivoice {
++
++// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
++OmniVoiceSession::~OmniVoiceSession() = default;
+ namespace {
+ 
+ constexpr size_t kDefaultAudioTokenizerGraphArenaBytes = 128ull * 1024ull * 1024ull;
+diff --git a/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp b/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp
+index dc916fa..bc8c377 100644
+--- a/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp
++++ b/otherarch/audiocpp/upstream/src/models/qwen3_tts/session.cpp
+@@ -16,6 +16,9 @@
+ #include <utility>
+ 
+ namespace engine::models::qwen3_tts {
++
++// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
++Qwen3TTSSession::~Qwen3TTSSession() = default;
+ namespace {
+ 
+ using Clock = std::chrono::steady_clock;
+diff --git a/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp b/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp
+index 9c218ca..96f0eb4 100644
+--- a/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp
++++ b/otherarch/audiocpp/upstream/src/models/vibevoice/session.cpp
+@@ -18,6 +18,9 @@
+ #include <vector>
+ 
+ namespace engine::models::vibevoice {
++
++// KCPP_AUDIO_LTO_DESTRUCTOR: one definition, unchanged virtual ABI.
++VibeVoiceSession::~VibeVoiceSession() = default;
+ namespace {
+ 
+ using Clock = std::chrono::steady_clock;

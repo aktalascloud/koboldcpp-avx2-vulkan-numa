@@ -1,0 +1,67 @@
+diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
+index 13bc283..6110d73 100644
+--- a/otherarch/sdcpp/sdtype_adapter.cpp
++++ b/otherarch/sdcpp/sdtype_adapter.cpp
+@@ -951,6 +951,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
+         params.photo_maker_path = "";
+     }
+ 
++    // KCPP_WAN_SPLIT_VAE: worker validates the independent decoder path/hash.
++    const char* kcpp_wan_tae_decoder = std::getenv("KCPP_WAN_TAE_DECODER");
++    const bool kcpp_wan_split_vae = tempver == VERSION_WAN2_2_TI2V && kcpp_wan_tae_decoder && *kcpp_wan_tae_decoder;
++    if (kcpp_wan_split_vae) {
++        if (!file_exists(kcpp_wan_tae_decoder) || path_empty(params.vae_path)) {
++            printf("KCPP: split Wan VAE requires a full VAE and the reviewed external Tiny decoder.\n");
++            GGML_ABORT("Reviewed split Wan decoder unavailable");
++        }
++        kcpp_taesd_path = kcpp_wan_tae_decoder;
++        params.tae_preview_only = true;
++        printf("KCPP: Wan5B full image encoder / independent Tiny video decoder enabled.\n");
++    }
+     //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
+     if(kcpp_taesd_path=="" && !path_empty(params.vae_path) && toLowerCase(params.vae_path).rfind("tae")!=std::string::npos)
+     {
+diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
+index 233a779..650ae58 100644
+--- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
++++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
+@@ -3013,24 +3013,32 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
+     if (sd_version_is_pid(version) || sd_version_is_minit2i(version) || version == VERSION_IRIS) {
+         return sd::ops::clamp((x + 1.f) * 0.5f, 0.0f, 1.0f);
+     }
+-    auto latents                      = first_stage_model->diffusion_to_vae_latents(x);
+-    auto tiling_params                = first_stage_model->resolve_tiling_params(vae_tiling_params);
++    // KCPP_WAN_SPLIT_DECODE: preserve the full encoder/latent normalization.
++    // Only final video decoding uses the already-loaded independent TAE runner.
++    auto decode_model = first_stage_model;
++    const char* decoder_override = std::getenv("KCPP_WAN_TAE_DECODER");
++    if (decode_video && version == VERSION_WAN2_2_TI2V && decoder_override && *decoder_override && preview_vae) {
++        decode_model = preview_vae;
++        LOG_INFO("KCPP split VAE: final video decoder=%s", decode_model->get_desc().c_str());
++    }
++    auto latents                      = decode_model->diffusion_to_vae_latents(x);
++    auto tiling_params                = decode_model->resolve_tiling_params(vae_tiling_params);
+     const bool prefer_temporal_tiling = decode_video && latents.dim() == 5 && latents.shape()[2] > 1 &&
+-                                        first_stage_model->can_temporal_tile_decode();
++                                        decode_model->can_temporal_tile_decode();
+     for (;;) {
+         int tile_size_w = static_cast<int>(latents.shape()[0]);
+         int tile_size_h = static_cast<int>(latents.shape()[1]);
+         float tile_overlap;
+         if (tiling_params.enabled &&
+-            !first_stage_model->get_tile_sizes(tile_size_w, tile_size_h, tile_overlap, tiling_params,
++            !decode_model->get_tile_sizes(tile_size_w, tile_size_h, tile_overlap, tiling_params,
+                                                latents.shape()[0], latents.shape()[1])) {
+             return {};
+         }
+-        auto decoded = first_stage_model->decode(n_threads, latents, tiling_params, decode_video, circular_x, circular_y);
++        auto decoded = decode_model->decode(n_threads, latents, tiling_params, decode_video, circular_x, circular_y);
+         if (!decoded.empty() ||
+             !sd::backend_fit::prepare_vae_decode_retry_tiling(tiling_params, prefer_temporal_tiling,
+-                                                              first_stage_model->last_compute_status(),
+-                                                              tile_size_w, tile_size_h, first_stage_model->get_scale_factor())) {
++                                                              decode_model->last_compute_status(),
++                                                              tile_size_w, tile_size_h, decode_model->get_scale_factor())) {
+             return decoded;
+         }
+     }
