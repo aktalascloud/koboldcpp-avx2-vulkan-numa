@@ -2502,7 +2502,8 @@ def generate(genparams, stream_flag=False):
     if args.genlimit > 0 and max_length > args.genlimit:
         max_length = args.genlimit
     if max_length >= (max_context_length-min_remain_softlimit):
-        print(f"\n!!! ====== !!!\nWarning: You are trying to generate text with max_length ({max_length}) near or exceeding max_context_length limit ({max_context_length}).\nMost of the context will be removed, and your outputs will not be very coherent.\nConsider launching with increased --contextsize to avoid issues.\n!!! ====== !!!")
+        if not args.quiet:
+            print(f"\n!!! ====== !!!\nWarning: You are trying to generate text with max_length ({max_length}) near or exceeding max_context_length limit ({max_context_length}).\nMost of the context will be removed, and your outputs will not be very coherent.\nConsider launching with increased --contextsize to avoid issues.\n!!! ====== !!!")
         if max_length >= (max_context_length-min_remain_hardlimit):
             max_length = max_context_length-min_remain_hardlimit
 
@@ -11916,7 +11917,8 @@ def run_horde_worker(args, api_key, worker_name, worker_id, parallel_batching_th
         return headers
 
     def make_url_request_horde(url, data, method='POST',addmykey=False,error_info=None):
-        ret = make_url_request(url, data, method, horde_headers(addmykey), error_info=error_info)
+        ret = make_url_request(url, data, method, horde_headers(addmykey),
+            timeout=args.reqtimeout, error_info=error_info)
         if not ret:
             print(f"Worker {worker_id} - Make sure your Horde API key and worker name is valid!")
         return ret
@@ -11973,7 +11975,7 @@ def run_horde_worker(args, api_key, worker_name, worker_id, parallel_batching_th
                     try:
                         request = urllib.request.Request(genurl, data=json.dumps(payload).encode('utf-8'), headers=horde_headers(True))
                         request.add_header('Content-Type', 'application/json')
-                        with urllib.request.urlopen(request, timeout=600) as response:
+                        with urllib.request.urlopen(request, timeout=args.reqtimeout) as response:
                             if 'text/event-stream' not in response.headers.get('Content-Type', ''):
                                 generation = json.loads(response.read())
                                 return
@@ -12763,7 +12765,7 @@ def get_kobold_agent_path():
     return os.path.join(base_path, "kcpp_agent.py")
 
 
-def run_bundled_kobold_agent(base_url=None, api_key=None, load_session=None):
+def run_bundled_kobold_agent(base_url=None, api_key=None, load_session=None, request_timeout=None):
     """Run the bundled agent script inside a frozen KoboldCpp process."""
     agent_path = get_kobold_agent_path()
     if not os.path.isfile(agent_path):
@@ -12780,12 +12782,15 @@ def run_bundled_kobold_agent(base_url=None, api_key=None, load_session=None):
             sys.argv.extend(["--api-key", api_key])
         if load_session:
             sys.argv.extend(["--load-session", load_session])
+        if request_timeout is not None:
+            sys.argv.extend(["--request-timeout", str(request_timeout)])
         kcpp_agent.main()
     finally:
         sys.argv = old_argv
 
 
-def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=False, load_session=None):
+def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=False,
+                                 load_session=None, request_timeout=None):
     """Run the agent in a new or existing terminal, using the bundled runner when frozen."""
     agent_path = get_kobold_agent_path()
     if not os.path.isfile(agent_path):
@@ -12801,6 +12806,8 @@ def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=Fals
         command.extend(["--agent-api-key" if is_frozen else "--api-key", api_key])
     if load_session:
         command.extend(["--agentload" if is_frozen else "--load-session", load_session])
+    if request_timeout is not None:
+        command.extend(["--reqtimeout" if is_frozen else "--request-timeout", str(request_timeout)])
 
     try:
         if same_terminal:
@@ -12897,6 +12904,9 @@ def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=Fals
                 print("Cannot launch Kobold Agent: no supported terminal emulator was found.")
             manual_command = ([sys.executable, "--run-bundled-agent"] if is_frozen
                               else [sys.executable, agent_path])
+            if request_timeout is not None:
+                manual_command.extend(["--reqtimeout" if is_frozen else "--request-timeout",
+                                       str(request_timeout)])
             print(f"Try running this in an existing terminal: {shlex.join(manual_command)}")
             return False
         return True
@@ -12906,7 +12916,8 @@ def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=Fals
 
 
 def launch_kobold_agent_after_mcp_load(
-    mcp_load_thread, base_url=None, api_key=None, same_terminal=False, load_session=None
+    mcp_load_thread, base_url=None, api_key=None, same_terminal=False, load_session=None,
+    request_timeout=None
 ):
     """Briefly wait for a complete MCP tool list, then launch regardless."""
     if mcp_load_thread is not None:
@@ -12919,7 +12930,9 @@ def launch_kobold_agent_after_mcp_load(
                 "launching KoboldCpp Agent anyway. Use /clear after loading finishes "
                 "to refresh MCP tools."
             )
-    return launch_kobold_agent_terminal(base_url, api_key, same_terminal, load_session)
+    return launch_kobold_agent_terminal(
+        base_url, api_key, same_terminal, load_session, request_timeout
+    )
 
 
 def register_koboldcpp():
@@ -13068,12 +13081,16 @@ def main(launch_args, default_args):
     args = launch_args #note: these are NOT shared with the child processes!
 
     if args.run_bundled_agent:
-        run_bundled_kobold_agent(args.agent_base_url, args.agent_api_key, args.agentload)
+        run_bundled_kobold_agent(
+            args.agent_base_url, args.agent_api_key, args.agentload, args.reqtimeout
+        )
         return
 
-    standalone_agent_args = cli_arg_overrides and cli_arg_overrides <= {"agent", "agentload"}
+    standalone_agent_args = cli_arg_overrides and cli_arg_overrides <= {
+        "agent", "agentload", "reqtimeout"
+    }
     if args.agent and (len(sys.argv) == 2 or standalone_agent_args):
-        launch_kobold_agent_terminal(load_session=args.agentload)
+        launch_kobold_agent_terminal(load_session=args.agentload, request_timeout=args.reqtimeout)
         return
 
     if (args.version) and len(sys.argv) <= 2:
@@ -14590,6 +14607,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
                     args.password,
                     same_terminal=args.cli,
                     load_session=args.agentload,
+                    request_timeout=args.reqtimeout,
                 )
                 if args.cli:
                     raise SystemExit(0 if success else 1)
