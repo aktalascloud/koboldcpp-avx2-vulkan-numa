@@ -239,7 +239,7 @@ KoboldCpp maps its existing `instruction` field to Ming's `freeform` template
 unless `template_name` is supplied explicitly. Ming produces 44.1 kHz mono
 audio in Chinese, English, Japanese, Korean, German, French, or Spanish.
 
-Pass `sheetsage2-orig.gguf` through the existing `--whispermodel` slot to use
+Pass `sheetsage2-orig.gguf` through the existing `--transcribemodel` slot to use
 music-to-ABC transcription instead of Whisper speech-to-text. Both
 `/api/extra/transcribe` and `/v1/audio/transcriptions` return the generated ABC
 in their normal `text` field. The convenience `/api/extra/music/transcribe`
@@ -252,7 +252,7 @@ bridge occupies the transcription slot, so Whisper and SheetSage2 cannot both be
 resident there at once.
 
 Qwen3-ASR, Audio8-ASR, and SenseVoice GGUF packages use that same
-`--whispermodel` slot and the existing `/api/extra/transcribe` and
+`--transcribemodel` slot and the existing `/api/extra/transcribe` and
 `/v1/audio/transcriptions` endpoints. Qwen's existing `prompt` field is passed
 as transcription context, while `langcode`/`language` selects a language for
 Qwen3-ASR and SenseVoice; omit it or use `auto` for detection. Requests default
@@ -264,6 +264,18 @@ them. In particular, `keep_tags=true` retains SenseVoice's language, emotion,
 and audio-event tags. Only one Whisper, SheetSage2, or Audio.cpp ASR model can
 occupy the transcription slot at a time.
 
+Qwen3-ASR word timestamps require a separate Qwen3 Forced Aligner package. Pass
+its GGUF with `--transcribealigner`; the recommended upstream package is
+`qwen3-forced-aligner-0.6b-q8_0.gguf`. Set `return_timestamps=true` on the
+KoboldCpp transcription endpoint to add an OpenAI-compatible `words` array to
+its normal JSON response. Each entry contains `word`, `start`, and `end` in
+seconds. Timestamp requests default to clamped word spans and
+punctuation-preserving transcript text. The aligner does not provide diarization.
+The supported alignment languages are English, Chinese, Cantonese, French,
+German, Italian, Japanese, Korean, Portuguese, Russian, and Spanish.
+Supplying `transcript` together with an explicit `language` aligns that known
+text directly against the uploaded audio and bypasses the ASR generation pass.
+
 ## Intentional compatibility changes
 
 - `otherarch/tts_adapter.cpp`: Kitten TTS 2 sessions fall back to CPU when the
@@ -273,6 +285,9 @@ occupy the transcription slot at a time.
 - `src/framework/modules/attention/attention_internal.h`: KoboldCpp lowers
   Audio.cpp's optional private CUDA `ggml_mul_mat_pack4` projection to the
   standard portable linear operation. This keeps upstream GGML unchanged.
+- `src/models/qwen3_asr/session.cpp`: KoboldCpp accepts an
+  `alignment_transcript` request option and routes it directly through the
+  already-loaded forced aligner session.
 
 CosyVoice3's RKNN source files are present only because its loader references
 the optional execution-plan plumbing. `ENGINE_HAVE_RKNN` is not defined and
