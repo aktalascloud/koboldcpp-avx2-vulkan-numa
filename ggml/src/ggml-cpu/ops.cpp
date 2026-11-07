@@ -12438,12 +12438,101 @@ void ggml_compute_forward_opt_step_sgd(const ggml_compute_params * params, ggml_
     }
 }
 
+#if defined(__AVX2__) && !defined(__AVX512F__)
+#include <immintrin.h>
+static inline bool fwht_low8(float* row,int64_t n) {
+    const __m256 limit=_mm256_set1_ps(4.2535293329816107e37f); // FLT_MAX/8, exact safety for three stages
+    const __m256 sign=_mm256_set1_ps(-0.f);
+    for(int64_t i=0;i<n;i+=8)if(_mm256_movemask_ps(_mm256_cmp_ps(_mm256_andnot_ps(sign,_mm256_loadu_ps(row+i)),limit,_CMP_LE_OQ))!=255)return false;
+    for(int64_t i=0;i<n;i+=8) {
+        __m256 a=_mm256_loadu_ps(row+i);
+        __m256 b=_mm256_permute_ps(a,0xb1);
+        a=_mm256_blend_ps(_mm256_add_ps(a,b),_mm256_sub_ps(b,a),0xaa);
+        b=_mm256_permute_ps(a,0x4e);
+        a=_mm256_blend_ps(_mm256_add_ps(a,b),_mm256_sub_ps(b,a),0xcc);
+        b=_mm256_permute2f128_ps(a,a,1);
+        a=_mm256_blend_ps(_mm256_add_ps(a,b),_mm256_sub_ps(b,a),0xf0);
+        _mm256_storeu_ps(row+i,a);
+    }
+    return true;
+}
+
+#endif
+
 static inline float ggml_fwht_load(const float value) {
     return value;
 }
 
 static inline float ggml_fwht_load(const ggml_fp16_t value) {
     return ggml_fp16_to_fp32(value);
+}
+
+#define P 1.0f
+#define N -1.0f
+
+// constant Hadamard matrix via Paley I construction
+static constexpr float H12[12][12] = {
+    { P, P, P, P, P, P, P, P, P, P, P, P },
+    { P, N, P, N, P, P, P, N, N, N, P, N },
+    { P, N, N, P, N, P, P, P, N, N, N, P },
+    { P, P, N, N, P, N, P, P, P, N, N, N },
+    { P, N, P, N, N, P, N, P, P, P, N, N },
+    { P, N, N, P, N, N, P, N, P, P, P, N },
+    { P, N, N, N, P, N, N, P, N, P, P, P },
+    { P, P, N, N, N, P, N, N, P, N, P, P },
+    { P, P, P, N, N, N, P, N, N, P, N, P },
+    { P, P, P, P, N, N, N, P, N, N, P, N },
+    { P, N, P, P, P, N, N, N, P, N, N, P },
+    { P, P, N, P, P, P, N, N, N, P, N, N }
+};
+
+static constexpr float H20[20][20] = {
+    { P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P, P },
+    { P, N, P, N, N, P, P, P, P, N, P, N, P, N, N, N, N, P, P, N },
+    { P, N, N, P, N, N, P, P, P, P, N, P, N, P, N, N, N, N, P, P },
+    { P, P, N, N, P, N, N, P, P, P, P, N, P, N, P, N, N, N, N, P },
+    { P, P, P, N, N, P, N, N, P, P, P, P, N, P, N, P, N, N, N, N },
+    { P, N, P, P, N, N, P, N, N, P, P, P, P, N, P, N, P, N, N, N },
+    { P, N, N, P, P, N, N, P, N, N, P, P, P, P, N, P, N, P, N, N },
+    { P, N, N, N, P, P, N, N, P, N, N, P, P, P, P, N, P, N, P, N },
+    { P, N, N, N, N, P, P, N, N, P, N, N, P, P, P, P, N, P, N, P },
+    { P, P, N, N, N, N, P, P, N, N, P, N, N, P, P, P, P, N, P, N },
+    { P, N, P, N, N, N, N, P, P, N, N, P, N, N, P, P, P, P, N, P },
+    { P, P, N, P, N, N, N, N, P, P, N, N, P, N, N, P, P, P, P, N },
+    { P, N, P, N, P, N, N, N, N, P, P, N, N, P, N, N, P, P, P, P },
+    { P, P, N, P, N, P, N, N, N, N, P, P, N, N, P, N, N, P, P, P },
+    { P, P, P, N, P, N, P, N, N, N, N, P, P, N, N, P, N, N, P, P },
+    { P, P, P, P, N, P, N, P, N, N, N, N, P, P, N, N, P, N, N, P },
+    { P, P, P, P, P, N, P, N, P, N, N, N, N, P, P, N, N, P, N, N },
+    { P, N, P, P, P, P, N, P, N, P, N, N, N, N, P, P, N, N, P, N },
+    { P, N, N, P, P, P, P, N, P, N, P, N, N, N, N, P, P, N, N, P },
+    { P, P, N, N, P, P, P, P, N, P, N, P, N, N, N, N, P, P, N, N }
+};
+
+#undef P
+#undef N
+
+
+template<typename src_t>
+static void kcpp_fwht_kronecker(const ggml_compute_params * params, ggml_tensor * dst) {
+    const ggml_tensor * src0=dst->src[0], *src1=dst->src[1];
+    GGML_TENSOR_BINARY_OP_LOCALS
+    int64_t factor=0,groups=0;
+    for(int64_t f:{12,20})if(ne10%f==0){auto q=ne10/f;if(q>0&&(q&(q-1))==0){factor=f;groups=q;break;}}
+    GGML_ASSERT(factor==12||factor==20);
+    const float scale=1.f/sqrtf(float(ne10));
+    const int64_t nr=ne11*ne12*ne13,dr=(nr+params->nth-1)/params->nth;
+    for(int64_t r=params->ith*dr;r<MIN(nr,(params->ith+1)*dr);++r){
+        auto i3=r/(ne11*ne12),i2=(r-i3*ne11*ne12)/ne11,i1=r-i3*ne11*ne12-i2*ne11;
+        const auto * x=(const src_t*)((const char*)src1->data+i1*nb11+i2*nb12+i3*nb13);
+        auto * out=(float*)((char*)dst->data+i1*nb1+i2*nb2+i3*nb3);
+        for(int64_t block=0;block<groups;++block){
+            float z[20];
+            for(int64_t i=0;i<factor;++i){float sum=0;for(int64_t j=0;j<factor;++j)sum+=ggml_fwht_load(x[block*factor+j])*(factor==12?H12[j][i]:H20[j][i]);z[i]=sum*scale;}
+            for(int64_t i=0;i<factor;++i)out[block*factor+i]=z[i];
+        }
+        for(int64_t h=1;h<groups;h*=2)for(int64_t i=0;i<groups;i+=2*h)for(int64_t block=i;block<i+h;++block)for(int64_t k=0;k<factor;++k){float u=out[block*factor+k],v=out[(block+h)*factor+k];out[block*factor+k]=u+v;out[(block+h)*factor+k]=u-v;}
+    }
 }
 
 template<typename src_t>
@@ -12460,7 +12549,10 @@ static void ggml_compute_forward_fwht_impl(const ggml_compute_params * params, g
     const int nth = params->nth;
 
     const int64_t n = ne10;
-    GGML_ASSERT((n & (n - 1)) == 0); // must be power of 2
+    if ((n & (n - 1)) != 0) {
+        kcpp_fwht_kronecker<src_t>(params, dst);
+        return;
+    }
 
     const int64_t nr = ne11 * ne12 * ne13;
     const int64_t rows_per_thread = (nr + nth - 1) / nth;
@@ -12494,6 +12586,11 @@ static void ggml_compute_forward_fwht_impl(const ggml_compute_params * params, g
 #endif
 #else
         const int step = n;
+#endif
+#if defined(__AVX2__) && !defined(__AVX512F__)
+        if (n >= 8 && fwht_low8(dst_row, n)) {
+            // Three independent low stages are already complete;large SIMD stages remain below.
+        } else
 #endif
         for (int64_t len = 1; len < step && len < n; len <<= 1) {
             for (int64_t i = 0; i < n; i += 2 * len) {

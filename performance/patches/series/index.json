@@ -1,7 +1,7 @@
 {
   "upstream": "2d469743d30d09737633607071fe83dc2283bfec",
-  "tree": "cabaaf3f8c77f3d799ebd602509df3dd20ebff69",
-  "snapshot_sha256": "7bd8728c5d77449c2165c693fd9fd3099fdb0736f53446e85779dc20cd6813e4",
+  "tree": "990df61c1f0573da01208952a68f5ab01e0bf04f",
+  "snapshot_sha256": "af2cc7d11aa67c8ef5fe945f4bc49de141e33780a21897a795f0fe758aa7448c",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -392,6 +392,36 @@
       "title": "Polaris F32 RMS weight and vector modulation fusion",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2273",
       "sha256": "a1031cfe06fbbd1da7ce6d863118d84ffa5ebfcb0c78f17cef6d95cf12f57947"
+    },
+    {
+      "path": "66-vulkan-yarn-truncate/change.patch",
+      "title": "Respect model-selected YaRN truncation on Vulkan",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/30802",
+      "sha256": "594c6dfcfc7b0375a015f1b5cb22cfcb8cab81455260840a8fa5de29c2cdc104"
+    },
+    {
+      "path": "67-vulkan-topk-mask-bitset/change.patch",
+      "title": "Duplicate-safe Vulkan TopK masks without half arithmetic",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31544",
+      "sha256": "59cb5052a65ba0fd8cb4af344a3eeb9947490df94a23af5948518b0d6c01db7f"
+    },
+    {
+      "path": "68-cpu-fwht-12-20/change.patch",
+      "title": "CPU Hadamard12/20 with typed strided input",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/28490",
+      "sha256": "6959b0c9041e9eba3040af8d57b635241c2ac1cf20183a01c6c1a30f9d0d1b17"
+    },
+    {
+      "path": "69-haswell-fwht-low-stages/change.patch",
+      "title": "Fuse the first three Haswell FWHT stages",
+      "source": null,
+      "sha256": "2cde07f91c4f1ebec22c392af627a221bc7ffc5197639919d5124decf8ce133b"
+    },
+    {
+      "path": "70-polaris-rms-wide-cache8/change.patch",
+      "title": "Retain wide fused RMS row inputs in registers",
+      "source": null,
+      "sha256": "2f0eb86fbc0569c83fcc4faae2bb82822c273e5a99c3643aae4b4353dcd47d99"
     }
   ],
   "empty_ports": [
@@ -399,5 +429,7 @@
     "soprano-amalgamation",
     "startup-redaction",
     "vulkan-comm-amalgamation"
-  ]
+  ],
+  "accepted_executable_sha256": "ebe56a513028935093bb2390d233975fcb71a8fd702e880e4b9f9419f57792b4",
+  "build_date": "2026-11-07"
 }

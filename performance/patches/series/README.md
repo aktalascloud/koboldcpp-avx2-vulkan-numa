@@ -67,3 +67,8 @@ Apply in numeric order to `2d469743d30d09737633607071fe83dc2283bfec`. [Index and
 - [Check CPU expert indices in release builds](63-cpu-release-expert-bounds/README.md)
 - [Preserve external consumers in segmented graph fusion checks](64-sdcpp-segment-use-counts/README.md)
 - [Polaris F32 RMS weight and vector modulation fusion](65-polaris-rms-vector-modulate/README.md)
+- [Respect model-selected YaRN truncation on Vulkan](66-vulkan-yarn-truncate/README.md)
+- [Duplicate-safe Vulkan TopK masks without half arithmetic](67-vulkan-topk-mask-bitset/README.md)
+- [CPU Hadamard12/20 with typed strided input](68-cpu-fwht-12-20/README.md)
+- [Fuse the first three Haswell FWHT stages](69-haswell-fwht-low-stages/README.md)
+- [Retain wide fused RMS row inputs in registers](70-polaris-rms-wide-cache8/README.md)

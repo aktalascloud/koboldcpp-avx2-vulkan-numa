@@ -1,9 +1,7 @@
 # Retained Native patches
 
-[65 individually described patches](patches/series/README.md) apply in order to official `2d469743d30d09737633607071fe83dc2283bfec`. [Index/SHA256](patches/series/index.json),[combined exact snapshot](patches/runtime.patch). Native `efddce0e7f8518d735c809cbf925e3718786dddd6221da30eb9bc96107eaaca7`.
+[70 individually described patches](patches/series/README.md) apply in numeric order to `2d469743d30d09737633607071fe83dc2283bfec`. [Index and hashes](patches/series/index.json) · [Exact combined snapshot](patches/runtime.patch). Accepted Native `ebe56a513028935093bb2390d233975fcb71a8fd702e880e4b9f9419f57792b4`.
 
-Seven new adaptations:GLU,automatic discrete-device choice,shared-node owner,precise SiTU,release CPU expert bounds,external segment use counts,and Polaris RMS-vector modulation. [Review/depth/deferrals](review-2026-11-07-r5.md) · [Operator evidence and rejected experiments](../results/operations-2026-11-07-r5.json) · [Current three-arm image evidence](../results/performance-2026-11-07-r4.json).
+Five new changes:qualified F32 YaRN,duplicate-safe TopK,typed Hadamard12/20,own Haswell low-stage butterflies,and own Polaris wide RMS cache. [Review/depth/deferrals](review-2026-11-07-r6.md) · [Operator controls and negative results](../results/operations-2026-11-07-r6.json) · [Current stock/previous/latest image cohort](../results/performance-2026-11-07-r5.json).
 
-Historical evidence keeps its own source/binary cohort:[IQ4_NL/quant/GGUF/RPC0bbe1cf2](patches/source-0bbe1cf2.json),[workspace planning](../results/operations-2026-11-07-r4.json),[previous image cohort0519dcbf](../results/performance-2026-11-07-r3.json),[earlier remaining-source screen](review-2026-11-07-r2.md). No old timing is assigned to the current EXE.
-
-[Source/license notices](NOTICE.md). The separate [Pillow13 media patch](https://github.com/aktalascloud/koboldcpp-media-pipeline/tree/main/patches/pillow13-security) is not a Native kernel patch.
+Historical cohorts keep their original SHAs:[preceding65-patch efddce0e](../results/performance-2026-11-07-r4.json),[its operators](../results/operations-2026-11-07-r5.json),[earlier scoped review](review-2026-11-07-r5.md). [Source/license notices](NOTICE.md). The separate [Pillow13 media patch](https://github.com/aktalascloud/koboldcpp-media-pipeline/tree/main/patches/pillow13-security) is not a Native kernel patch.

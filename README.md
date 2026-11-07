@@ -5,20 +5,20 @@ Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **
 
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
-**1.125 · 2026-11-07 · Native `efddce0e`.** Official `2d46974`,O3/Haswell+LTO,no PGO. [65 separate patches](performance/patches/series/) · [332 PR decisions and review depth](performance/review-2026-11-07-r5.md).
+**1.125 · 2026-11-07 · Native `ebe56a51`.** Official `2d46974`,O3/Haswell+LTO,no PGO. [70 separate patches](performance/patches/series/) · [12 deferred-PR follow-ups](performance/review-2026-11-07-r6.md).
 
 ## Manual Normal+4× · 2026-11-07
 
-Latest available official rolling1.125 `db00fc38`,updated November3 → `efddce0e`. Three arms:stock,previous0519dcbf,new EXE;the same current models,settings,prompt and seed424242,no High.3 Normal/arm,first separate,warm median of two;2 separate4×/arm with photo resident before every call.
+Official rolling1.125 `db00fc38`,updated November3 → `ebe56a51`. Three arms:stock,preceding efddce0e,new EXE. Current models,settings,prompt and seed424242 preserved;no High.3 Normal/arm,first separate,warm median of two;2 separate4×/arm,photo resident before every call.
 
-| Stage | Official1.125 | Fork efddce0e | Less time |
+| Stage | Official1.125 | New fork | Less time |
 |---|---:|---:|---:|
-| Native | 176.810 s | 143.500 s | 33.310 s / 18.84% |
-| Normal ready | 185.187 s | 152.333 s | 32.854 s / 17.74% |
-| Separate4× | 2.838 s | 2.772 s | 0.066 s / 2.33% |
-| Normal+4×* | 188.025 s | 155.105 s | 32.920 s / 17.51% |
+| Native | 176.000 s | 142.968 s | 33.032 s / 18.77% |
+| Normal ready | 182.848 s | 150.999 s | 31.849 s / 17.42% |
+| Separate4× | 2.809 s | 2.744 s | 0.065 s / 2.33% |
+| Normal+4×* | 185.657 s | 153.743 s | 31.914 s / 17.19% |
 
-*Sum of independently measured phase medians,not one joint API request. Production Pipeline/private Native HTTP includes PNG/base64/JSON;public5001 queue/transport,model loading and photo return are excluded. All9 raw/finished RGB and6 SR outputs match. Against previous0519dcbf,the sum saves **2.745s / 1.74%**;separate4× takes **33.5ms longer**. SR shares identical media code;this is not an upscaler-kernel gain. [Every repeat,range,load,hash and limit](results/performance-2026-11-07-r4.json). Arm order is fixed,sample size small.
+*Sum of separately measured phase medians,not one API request. Production Pipeline/private Native HTTP includes PNG/base64/JSON;public5001 queue/transport,model loading and photo return are excluded. All9 raw/finished RGB and6 SR outputs match. Against preceding efddce0e,no additional photo speedup is demonstrated:phase ranges overlap and Native is essentially unchanged. Observed phase-sum change **-0.119s / -0.08%**;4× changes by **-17.5ms**. SR code is shared,this is not an upscaler-kernel gain. [Every repeat,range,load,hash and limit](results/performance-2026-11-07-r5.json). Arm order is fixed.
 
 ## Last LLM token comparison · 2026-10-25
 Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, CPU 4 / Vulkan 2 repeats per arm. Tokens/s means:

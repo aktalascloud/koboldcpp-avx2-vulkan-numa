@@ -1,0 +1,250 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-common.h b/ggml/src/ggml-vulkan/ggml-vulkan-common.h
+index 71ba045fe..74beef505 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-common.h
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-common.h
+@@ -103,6 +103,7 @@ void ggml_vk_quantize_q8_1(ggml_backend_vk_context * ctx, vk_context& subctx, co
+ void ggml_vk_dsv4_hc_comb(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * mixes, const ggml_tensor * scale, const ggml_tensor * base, ggml_tensor * dst);
+ void ggml_vk_dsv4_hc_pre(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * x, const ggml_tensor * weights, ggml_tensor * dst);
+ void ggml_vk_dsv4_hc_post(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * x, const ggml_tensor * residual, const ggml_tensor * post, const ggml_tensor * comb, ggml_tensor * dst, const ggml_tensor * gate_scale_in = nullptr);
++void ggml_vk_top_k_mask(ggml_backend_vk_context * ctx, vk_context& subctx, ggml_tensor * dst);
+ void ggml_vk_mul_mat(ggml_backend_vk_context * ctx, vk_context& subctx, const struct ggml_cgraph * cgraph, int node_idx);
+ bool ggml_vk_use_mul_mat_vec_id(const struct ggml_cgraph * cgraph, int node_idx);
+ void ggml_vk_mul_mat_id(ggml_backend_vk_context * ctx, vk_context& subctx, const struct ggml_cgraph * cgraph, int node_idx);
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-push-constants.h b/ggml/src/ggml-vulkan/ggml-vulkan-push-constants.h
+index 219c477c6..944da1edf 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-push-constants.h
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-push-constants.h
+@@ -211,6 +211,29 @@ struct vk_op_dsv4_hc_post_push_constants {
+     float    gate_scale_out;
+ };
+ 
++struct vk_op_top_k_mask_push_constants {
++    uint32_t n_kv;
++    uint32_t n_top;
++    uint32_t n_pick;
++    uint32_t n_blk;
++    uint32_t n_extra;
++    uint32_t has_score;
++    uint32_t ninf;
++
++    uint32_t ne1; uint32_t ne2;
++
++    uint32_t m1; uint32_t m2; uint32_t m3;
++    uint32_t nbm1; uint32_t nbm2; uint32_t nbm3;
++    uint32_t nbd1; uint32_t nbd2; uint32_t nbd3;
++
++    uint32_t m_offset;
++    uint32_t k_offset;
++    uint32_t s_offset;
++    uint32_t b_offset;
++    uint32_t e_offset;
++    uint32_t d_offset;
++};
++
+ struct vk_op_count_experts_push_constants {
+     uint32_t ne00;
+     uint32_t ne01;
+@@ -969,6 +992,18 @@ template <> inline void init_pushconst_tensor_offsets(ggml_backend_vk_context *
+     p.d_offset = get_misalign_bytes(ctx, dst)  / ggml_type_size(dst->type);
+ }
+ 
++// the fifth source, extra, comes from dst
++template <> inline void init_pushconst_tensor_offsets(ggml_backend_vk_context * ctx, vk_op_top_k_mask_push_constants &p, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * src3, ggml_tensor * dst) {
++    const ggml_tensor * extra = dst->src[4];
++
++    p.m_offset = get_misalign_bytes(ctx, src0) / ggml_type_size(src0->type);
++    p.k_offset = get_misalign_bytes(ctx, src1) / ggml_type_size(src1->type);
++    p.s_offset = src2  ? get_misalign_bytes(ctx, src2)  / ggml_type_size(src2->type)  : 0;
++    p.b_offset = src3  ? get_misalign_bytes(ctx, src3)  / ggml_type_size(src3->type)  : 0;
++    p.e_offset = extra ? get_misalign_bytes(ctx, extra) / ggml_type_size(extra->type) : 0;
++    p.d_offset = get_misalign_bytes(ctx, dst) / ggml_type_size(dst->type);
++}
++
+ template <typename T> size_t push_constant_size(const T &t) {
+     static_assert(std::is_class<T>::value, "T must be a struct/class");
+     GGML_UNUSED(t);
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+index c0a63a852..9044b0b84 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+@@ -965,6 +965,8 @@ struct vk_device_struct {
+     vk_pipeline pipeline_dsv4_hc_pre_gated_f32;
+     vk_pipeline pipeline_dsv4_hc_post_f32;
+     vk_pipeline pipeline_dsv4_hc_post_nocomb_f32;
++    vk_pipeline pipeline_top_k_mask_f16;
++    vk_pipeline pipeline_top_k_mask_f32;
+     std::map<vk_solve_tri_pipeline_state, vk_pipeline> pipeline_solve_tri_f32;
+     vk_pipeline pipeline_im2col_f32, pipeline_im2col_f32_f16;
+     vk_pipeline pipeline_im2col_3d_f32, pipeline_im2col_3d_f32_f16;
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 177cdee13..406eb5fc9 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -3725,6 +3725,10 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     ggml_vk_create_pipeline(device, device->pipeline_dsv4_hc_post_f32,       "dsv4_hc_post_f32",       dsv4_hc_post_f32_len, dsv4_hc_post_f32_data, "main", 5, sizeof(vk_op_dsv4_hc_post_push_constants), {256, 1, 1}, { 256, 1 }, 1);
+     ggml_vk_create_pipeline(device, device->pipeline_dsv4_hc_post_nocomb_f32,"dsv4_hc_post_nocomb_f32",dsv4_hc_post_f32_len, dsv4_hc_post_f32_data, "main", 5, sizeof(vk_op_dsv4_hc_post_push_constants), {256, 1, 1}, { 256, 0 }, 1);
+ 
++    const uint32_t top_k_mask_wg = std::min({256u, device->properties.limits.maxComputeWorkGroupInvocations, device->properties.limits.maxComputeWorkGroupSize[0]});
++    ggml_vk_create_pipeline(device, device->pipeline_top_k_mask_f16, "top_k_mask_f16", top_k_mask_f16_len, top_k_mask_f16_data, "main", 6, sizeof(vk_op_top_k_mask_push_constants), {1, 1, 1}, {top_k_mask_wg}, 1);
++    ggml_vk_create_pipeline(device, device->pipeline_top_k_mask_f32, "top_k_mask_f32", top_k_mask_f32_len, top_k_mask_f32_data, "main", 6, sizeof(vk_op_top_k_mask_push_constants), {1, 1, 1}, {top_k_mask_wg}, 1);
++
+     for (auto &s : device->pipeline_solve_tri_f32) {
+         const vk_solve_tri_pipeline_state &state = s.first;
+ 
+@@ -7562,6 +7566,46 @@ void ggml_vk_dsv4_hc_post(ggml_backend_vk_context * ctx, vk_context& subctx, con
+     ggml_vk_dispatch_pipeline(ctx, subctx, pipeline, { x_buf, r_buf, p_buf, c_buf, d_buf }, pc, { n_embd, n_tokens, 1 });
+ }
+ 
++void ggml_vk_top_k_mask(ggml_backend_vk_context * ctx, vk_context& subctx, ggml_tensor * dst) {
++    const ggml_tensor * mask   = dst->src[0];
++    const ggml_tensor * top_k  = dst->src[1];
++    const ggml_tensor * score  = dst->src[2];
++    const ggml_tensor * blocks = dst->src[3];
++    const ggml_tensor * extra  = dst->src[4];
++    VK_LOG_DEBUG("ggml_vk_top_k_mask(" << mask << ", " << top_k << ", " << score << ", " << blocks << ", " << extra << ", " << dst << ")");
++
++    vk_pipeline pipeline = dst->type == GGML_TYPE_F16 ? ctx->device->pipeline_top_k_mask_f16 : ctx->device->pipeline_top_k_mask_f32;
++    GGML_ASSERT(pipeline != nullptr);
++
++    ggml_pipeline_request_descriptor_sets(ctx, pipeline, 1);
++
++    const vk_subbuffer m_buf = ggml_vk_tensor_subbuffer(ctx, mask,  true);
++    const vk_subbuffer k_buf = ggml_vk_tensor_subbuffer(ctx, top_k, true);
++    const vk_subbuffer s_buf = score  ? ggml_vk_tensor_subbuffer(ctx, score,  true) : k_buf;
++    const vk_subbuffer b_buf = blocks ? ggml_vk_tensor_subbuffer(ctx, blocks, true) : k_buf;
++    const vk_subbuffer e_buf = extra  ? ggml_vk_tensor_subbuffer(ctx, extra,  true) : k_buf;
++    const vk_subbuffer d_buf = ggml_vk_tensor_subbuffer(ctx, dst,   true);
++
++    vk_op_top_k_mask_push_constants pc = {
++        (uint32_t)mask->ne[0],
++        (uint32_t)top_k->ne[0],
++        (uint32_t)(blocks ? blocks->ne[1] : score ? score->ne[0] : mask->ne[0]),
++        blocks ? (uint32_t)blocks->ne[0] : 0,
++        extra  ? (uint32_t)extra->ne[0]  : 0,
++        score  ? 1u : 0u,
++        dst->type == GGML_TYPE_F16 ? 0xFC00u : 0xFF800000u,
++        (uint32_t)dst->ne[1], (uint32_t)dst->ne[2],
++        (uint32_t)mask->ne[1], (uint32_t)mask->ne[2], (uint32_t)mask->ne[3],
++        ggml_vk_nb_elem(mask, 1), ggml_vk_nb_elem(mask, 2), ggml_vk_nb_elem(mask, 3),
++        ggml_vk_nb_elem(dst,  1), ggml_vk_nb_elem(dst,  2), ggml_vk_nb_elem(dst,  3),
++        0, 0, 0, 0, 0, 0,
++    };
++    init_pushconst_tensor_offsets(ctx, pc, mask, top_k, score, blocks, dst);
++
++    ggml_vk_dispatch_pipeline(ctx, subctx, pipeline, { m_buf, k_buf, s_buf, b_buf, e_buf, d_buf }, pc,
++        { (uint32_t)dst->ne[1], (uint32_t)dst->ne[2], (uint32_t)dst->ne[3] });
++}
++
+ void ggml_vk_mul_mat(ggml_backend_vk_context * ctx, vk_context& subctx, const struct ggml_cgraph * cgraph, int node_idx) {
+     ggml_tensor * dst = cgraph->nodes[node_idx];
+     ggml_tensor * src0 = dst->src[0];
+@@ -13148,6 +13192,11 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
+ 
+         break;
+ 
++    case GGML_OP_TOP_K_MASK:
++        ggml_vk_top_k_mask(ctx, compute_ctx, node);
++
++        break;
++
+     case GGML_OP_GATED_DELTA_NET:
+         ggml_vk_gated_delta_net(ctx, compute_ctx, node);
+ 
+@@ -16429,6 +16478,42 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+                 }
+                 return true;
+             }
++        case GGML_OP_TOP_K_MASK:
++            {
++                const ggml_tensor * mask = op->src[0];
++                // Shared bitset bounds and packed F16 words are conservative capability gates.
++                if (mask->ne[0] > 65536 || device->properties.limits.maxComputeSharedMemorySize < 8192) { return false; }
++                for (const ggml_tensor * t : std::initializer_list<const ggml_tensor *>{op,mask,op->src[1],op->src[2],op->src[3],op->src[4]}) {
++                    if (!t) { continue; }
++                    if (ggml_is_empty(t) || ggml_nbytes(t) > device->properties.limits.maxStorageBufferRange || ggml_nelements(t) > UINT32_MAX || ggml_nbytes(t)/ggml_type_size(t->type) > UINT32_MAX) { return false; }
++                }
++                if (op->type == GGML_TYPE_F16) {
++                    for (const ggml_tensor * t : {op,mask}) {
++                        if ((t->ne[0]&1) || (vk_tensor_offset(t)+t->view_offs)%4) { return false; }
++                        for (int axis=1;axis<GGML_MAX_DIMS;++axis) { if (t->nb[axis]%4) { return false; } }
++                    }
++                }
++                if ((op->type != GGML_TYPE_F16 && op->type != GGML_TYPE_F32) || mask->type != op->type) {
++                    return false;
++                }
++
++                // one workgroup per row
++                const auto & max_wg = device->properties.limits.maxComputeWorkGroupCount;
++                if (op->ne[1] > max_wg[0] || op->ne[2] > max_wg[1] || op->ne[3] > max_wg[2]) {
++                    return false;
++                }
++
++                // the shader expects contiguous rows in mask and dst, and contiguous tensors in the other inputs
++                if (!ggml_is_contiguous_rows(op) || !ggml_is_contiguous_rows(mask)) {
++                    return false;
++                }
++                for (int i = 1; i <= 4; ++i) {
++                    if (op->src[i] && !ggml_is_contiguous(op->src[i])) {
++                        return false;
++                    }
++                }
++                return true;
++            }
+         case GGML_OP_GATED_DELTA_NET:
+             {
+                 const uint32_t S_v = op->src[2]->ne[0];
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/top_k_mask.comp b/ggml/src/ggml-vulkan/vulkan-shaders/top_k_mask.comp
+new file mode 100644
+index 000000000..94803a30e
+--- /dev/null
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/top_k_mask.comp
+@@ -0,0 +1,36 @@
++#version 450
++layout(constant_id=0)const uint BLOCK_SIZE=256;
++layout(local_size_x_id=0,local_size_y=1,local_size_z=1)in;
++layout(push_constant)uniform parameter{
++    uint n_kv,n_top,n_pick,n_blk,n_extra,has_score,ninf;
++    uint ne1,ne2,m1,m2,m3,nbm1,nbm2,nbm3,nbd1,nbd2,nbd3;
++    uint m_offset,k_offset,s_offset,b_offset,e_offset,d_offset;
++};
++layout(binding=0,std430)readonly buffer M{uint data_m[];};
++layout(binding=1,std430)readonly buffer K{int data_k[];};
++layout(binding=2,std430)readonly buffer S{uint data_s[];};
++layout(binding=3,std430)readonly buffer B{int data_b[];};
++layout(binding=4,std430)readonly buffer E{int data_e[];};
++layout(binding=5,std430)writeonly buffer D{uint data_d[];};
++shared uint kept[2048];
++void mark(int c){if(c>=0&&uint(c)<n_kv)atomicOr(kept[uint(c)>>5],1u<<(uint(c)&31));}
++bool live(uint c){return(kept[c>>5]&(1u<<(c&31)))!=0;}
++void main(){
++    uint tid=gl_LocalInvocationIndex,i1=gl_WorkGroupID.x,i2=gl_WorkGroupID.y,i3=gl_WorkGroupID.z;
++    uint row=i1+ne1*(i2+ne2*i3),mr=m_offset+(i1%m1)*nbm1+(i2%m2)*nbm2+(i3%m3)*nbm3,dr=d_offset+i1*nbd1+i2*nbd2+i3*nbd3;
++    for(uint i=tid;i<(n_kv+31)/32;i+=BLOCK_SIZE)kept[i]=0;
++    barrier();
++    for(uint i=tid;i<n_top+n_extra;i+=BLOCK_SIZE){
++        if(i>=n_top){mark(data_e[e_offset+row*n_extra+i-n_top]);continue;}
++        int p=data_k[k_offset+row*n_top+i];if(p<0||uint(p)>=n_pick)continue;
++        if(has_score!=0){uint s=data_s[s_offset+row*n_pick+uint(p)];if(s==0xff800000u||(s&0x7fffffffu)>0x7f800000u)continue;}
++        if(n_blk==0)mark(p);else for(uint k=0;k<n_blk;++k)mark(data_b[b_offset+uint(p)*n_blk+k]);
++    }
++    barrier();
++#if MASK_F16
++    // One invocation owns the whole32-bit store;duplicates and adjacent halfwords cannot race.
++    for(uint word=tid;word<n_kv/2;word+=BLOCK_SIZE){uint c=word*2,v=data_m[(mr+c)/2];uint lo=live(c)?v&65535u:ninf,hi=live(c+1)?v>>16:ninf;data_d[dr/2+word]=lo|(hi<<16);}
++#else
++    for(uint c=tid;c<n_kv;c+=BLOCK_SIZE)data_d[dr+c]=live(c)?data_m[mr+c]:ninf;
++#endif
++}
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index 7aa5afd64..83ad70b7c 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -1149,6 +1149,8 @@ void process_shaders() {
+     string_to_spv("dsv4_hc_comb_f32", "dsv4_hc_comb.comp", {});
+     string_to_spv("dsv4_hc_pre_f32",  "dsv4_hc_pre.comp",  {});
+     string_to_spv("dsv4_hc_post_f32", "dsv4_hc_post.comp", {});
++    string_to_spv("top_k_mask_f16", "top_k_mask.comp", {{"MASK_F16", "1"}});
++    string_to_spv("top_k_mask_f32", "top_k_mask.comp", {{"MASK_F16", "0"}});
+     string_to_spv("cumsum_f32", "cumsum.comp", merge_maps(base_dict, {{"A_TYPE", "float"}, {"D_TYPE", "float"}}));
+     string_to_spv("cumsum_multipass1_f32", "cumsum_multipass1.comp", merge_maps(base_dict, {{"A_TYPE", "float"}, {"D_TYPE", "float"}}));
+     string_to_spv("cumsum_multipass2_f32", "cumsum_multipass2.comp", merge_maps(base_dict, {{"A_TYPE", "float"}, {"D_TYPE", "float"}}));
