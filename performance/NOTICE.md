@@ -19,3 +19,5 @@ Compute ports28October2026: CPU row-copy parallelism is an independent GGML adap
 ## Super-TinyVAE reference
 
 Native architecture adaptation follows madebyollin/taehv at commit 011dfc2112197741c540e0bdd5b7b67bcc930771 (MIT). Full copyright/license is retained in otherarch/sdcpp/SDCPP_LICENSE. Checkpoint downloads remain with the original distributor. The advanced-lvl-up VAE workflow supplies a configuration idea; no HIP/Tensile binary or code is redistributed.
+
+Exact IQ4_NL decoder idea from Strata, adapted to AVX2: Copyright(c)2026 Niko1221 and the Strata contributors; [MIT notice](licenses/strata/LICENSE.txt), [pinned source](https://github.com/aktalascloud/strata-legacy-gpu/tree/157f5810bf0458b940521baf59f32fd2f71345c2/p40/patches/avx1-ple-iq4nl-shuffle). No P40 model timing is transferred to RX580.

@@ -376,6 +376,7 @@ private:
     std::vector<swap_info> output_swaps;
 
     ggml_backend_sched_ptr sched;
+    size_t sched_max_nodes = 0;
 
     bool sched_need_reserve = true;
 

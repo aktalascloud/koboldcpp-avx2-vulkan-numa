@@ -1,5 +1,9 @@
 # Retained patches and sources
 
+## November7 PR,security and SDCPP follow-up
+
+[58 ordered patches](patches/series/),official `9958bb2`,Native `0519dcbf`. Twelve Native additions since the previous published build plus a separate media Pillow13 security update. [Review and scope](review-2026-11-07-r4.md) · [All new planning checks/repeats](../results/operations-2026-11-07-r4.json).
+
 ## November 7 completed remaining-source review
 
 [46 ordered and described patches](patches/series/), official `0041730`, installed Native `5e7c8de5`. Added x64 greedy selection, few-row CPU RMSNorm scheduling and Windows copied-weight page release. [29736 remaining diffs read, 76 unavailable, zero pending](review-2026-11-07-r2.md). [Every operation/image repeat and scope](../results/performance-2026-11-07-r2.json).

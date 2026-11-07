@@ -1,0 +1,5 @@
+# Focused fixtures,2026-11-07
+
+GGUF uses the real writer/reader. Quant fixtures compile the actual x86 kernels against generic kernels. RPC traversal/predicates are extracted production code with a stub deserializer and wide-integer span reference. IQ4 contains the exact old/new decoder bodies; its timings keep the0bbe1cf2 cohort. The SDCPP tests compile the actual ComputeWorkspace and extracted scalar/capacity functions; real GGML CPU backends exercise memory planning, while discovery/logging and capacity queries are stubbed. No models or GPU inference are used.
+
+Production flags: O3,Haswell tuning,stack realignment,LTO,static runtime; sampler/SDCPP host code keeps baseline x64 ISA, selected compute objects use Haswell AVX2/FMA/F16C. SDCPP needs SD_USE_UPSTREAM_GGML and its include/src/thirdparty paths. Link real GGML backend/allocator/CPU objects plus kcpp-quantmapper.o,kcpp-repackmapper.o,sgemm.o and OpenMP for the workspace fixture. All repeats,first-miss costs,fixture hashes and limits are in results/operations-2026-11-07-r3.json and r4.json.

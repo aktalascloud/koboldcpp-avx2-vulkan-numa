@@ -1691,13 +1691,13 @@ ggml_tensor * rpc_server::deserialize_tensor(struct ggml_context * ctx, const rp
         result->buffer = nullptr;
     }
 
-    if (result->buffer && ggml_nelements(result) > 0) {
+    if (result->buffer) {
         // require that the tensor data does not go beyond the buffer end
         uint64_t tensor_size = (uint64_t) ggml_nbytes(result);
         uint64_t buffer_start = (uint64_t) ggml_backend_buffer_get_base(result->buffer);
         uint64_t buffer_size = (uint64_t) ggml_backend_buffer_get_size(result->buffer);
-        if (tensor->data + tensor_size < tensor->data ||
-            tensor->data < buffer_start || tensor->data + tensor_size > buffer_start + buffer_size) {
+        if (tensor->data < buffer_start || tensor->data - buffer_start > buffer_size ||
+            tensor_size > buffer_size - (tensor->data - buffer_start)) {
             LOG_ERROR("[%s] tensor '%s' (op %s, type %s, ne [%" PRId64 ", %" PRId64 ", %" PRId64 ", %" PRId64 "]) "
                       "data [0x%" PRIx64 ", 0x%" PRIx64 ") out of buffer bounds [0x%" PRIx64 ", 0x%" PRIx64 ")\n",
                       __func__, tensor->name, ggml_op_name((ggml_op) tensor->op), ggml_type_name(result->type),
@@ -1754,7 +1754,8 @@ bool rpc_server::set_tensor(const std::vector<uint8_t> & input) {
         const size_t p0 = (size_t) ggml_backend_buffer_get_base(tensor->buffer);
         const size_t p1 = p0 + ggml_backend_buffer_get_size(tensor->buffer);
 
-        if (in_tensor->data + offset < p0 || in_tensor->data + offset >= p1 || size > (p1 - in_tensor->data - offset)) {
+        if (in_tensor->data < p0 || in_tensor->data > p1 || offset > (p1 - in_tensor->data) ||
+            size > (p1 - in_tensor->data - offset)) {
             LOG_ERROR("[%s] tensor data region (data=0x%" PRIx64 ", offset=%" PRIu64 ", size=%zu) out of buffer bounds [0x%zx, 0x%zx)\n",
                            __func__, in_tensor->data, offset, size, p0, p1);
             return false;
@@ -1892,8 +1893,8 @@ bool rpc_server::set_tensor_hash(const rpc_msg_set_tensor_hash_req & request, rp
         const size_t p0 = (size_t) ggml_backend_buffer_get_base(tensor->buffer);
         const size_t p1 = p0 + ggml_backend_buffer_get_size(tensor->buffer);
 
-        if (request.tensor.data + request.offset < p0
-         || request.tensor.data + request.offset >= p1
+        if (request.tensor.data < p0 || request.tensor.data > p1
+         || request.offset > (p1 - request.tensor.data)
          || size > (p1 - request.tensor.data - request.offset)) {
             LOG_ERROR("[%s] tensor data region (data=0x%" PRIx64 ", offset=%" PRIu64 ", size=%zu, hash=0x%" PRIx64 ") out of buffer bounds [0x%zx, 0x%zx)\n",
                            __func__, request.tensor.data, request.offset, size, request.hash, p0, p1);
@@ -1966,8 +1967,8 @@ bool rpc_server::get_tensor(const rpc_msg_get_tensor_req & request, std::vector<
         const size_t p0 = (size_t) ggml_backend_buffer_get_base(tensor->buffer);
         const size_t p1 = p0 + ggml_backend_buffer_get_size(tensor->buffer);
 
-        if (request.tensor.data + request.offset < p0 ||
-            request.tensor.data + request.offset >= p1 ||
+        if (request.tensor.data < p0 || request.tensor.data > p1 ||
+            request.offset > (p1 - request.tensor.data) ||
             request.size > (p1 - request.tensor.data - request.offset)) {
                 LOG_ERROR("[%s] requested tensor region (data=0x%" PRIx64 ", offset=%" PRIu64 ", size=%" PRIu64 ") out of buffer bounds [0x%zx, 0x%zx)\n",
                                __func__, request.tensor.data, request.offset, request.size, p0, p1);
@@ -2052,7 +2053,8 @@ bool rpc_server::copy_tensor(const rpc_msg_copy_tensor_req & request, rpc_msg_co
     uint64_t dst_base   = (uint64_t) ggml_backend_buffer_get_base(dst->buffer);
     uint64_t dst_buf_sz = (uint64_t) ggml_backend_buffer_get_size(dst->buffer);
 
-    if (dst_data + src_size > dst_base + dst_buf_sz) {
+    if (dst_data < dst_base || dst_data - dst_base > dst_buf_sz ||
+        src_size > dst_buf_sz - (dst_data - dst_base)) {
         LOG_ERROR("[%s] out-of-bounds write in rpc_server::copy_tensor:\n"
                          "    write range : [0x%" PRIx64 ", 0x%" PRIx64 "]\n"
                          "    buffer base: [0x%" PRIx64 ", 0x%" PRIx64 "]\n",
@@ -2074,56 +2076,52 @@ ggml_tensor * rpc_server::create_node(uint64_t id,
                                       struct ggml_context * ctx,
                                       const std::unordered_map<uint64_t, const rpc_tensor*> & tensor_ptrs,
                                       std::unordered_map<uint64_t, struct ggml_tensor*> & tensor_map) {
-    if (tensor_map.find(id) != tensor_map.end()) {
-        return tensor_map[id];
+    const auto cached = tensor_map.find(id);
+    if (cached != tensor_map.end()) {
+        return cached->second;
     }
-    // Safely find the tensor pointer
-    auto it_ptr = tensor_ptrs.find(id);
-    if (it_ptr == tensor_ptrs.end()) {
-        return nullptr;
-    }
-    const rpc_tensor * tensor = it_ptr->second;
-
-    struct ggml_tensor * result = deserialize_tensor(ctx, tensor);
-    if (result == nullptr) {
-        return nullptr;
-    }
-    if (result->buffer == nullptr && result->data != nullptr) {
-        LOG_ERROR("[%s] invalid data ptr\n", __func__);
-        return nullptr;
-    }
-    tensor_map[id] = result;
-    for (int i = 0; i < GGML_MAX_SRC; i++) {
-        // Check if the source ID is 0 before calling create_node recursively
-        if (tensor->src[i] == 0) {
-            result->src[i] = nullptr;
-        } else {
-            result->src[i] = create_node(tensor->src[i], ctx, tensor_ptrs, tensor_map);
-            // If the recursive call failed for a non-zero ID, propagate the error
-            if (result->src[i] == nullptr) {
-                LOG_ERROR("[%s] failed to create source node %d (src_id=%" PRIu64 ") for node id %" PRIu64 "\n",
-                               __func__, i, tensor->src[i], id);
-                // Must return nullptr to signal failure up the call stack
-                return nullptr;
-            }
+    // First materialize reachable descriptors without C++ recursion. Inserting
+    // before visiting edges also handles shared nodes and cycles as before.
+    std::vector<uint64_t> pending { id };
+    std::vector<uint64_t> created;
+    while (!pending.empty()) {
+        const uint64_t current = pending.back();
+        pending.pop_back();
+        if (tensor_map.find(current) != tensor_map.end()) {
+            continue;
         }
-    }
-
-    // Handle view_src similarly
-    if (tensor->view_src == 0) {
-        result->view_src = nullptr;
-    } else {
-        result->view_src = create_node(tensor->view_src, ctx, tensor_ptrs, tensor_map);
-        // If the recursive call failed for a non-zero ID, propagate the error
-        if (result->view_src == nullptr) {
-            LOG_ERROR("[%s] failed to create view_src node (view_src_id=%" PRIu64 ") for node id %" PRIu64 "\n",
-                           __func__, tensor->view_src, id);
-            // Must return nullptr to signal failure up the call stack
+        const auto descriptor = tensor_ptrs.find(current);
+        if (descriptor == tensor_ptrs.end()) {
             return nullptr;
         }
+        const rpc_tensor * tensor = descriptor->second;
+        ggml_tensor * result = deserialize_tensor(ctx, tensor);
+        if (result == nullptr || (result->buffer == nullptr && result->data != nullptr)) {
+            LOG_ERROR("[%s] invalid tensor for node id %" PRIu64 "\n", __func__, current);
+            return nullptr;
+        }
+        tensor_map.emplace(current, result);
+        created.push_back(current);
+        for (int i = 0; i < GGML_MAX_SRC; ++i) {
+            if (tensor->src[i] != 0) {
+                pending.push_back(tensor->src[i]);
+            }
+        }
+        if (tensor->view_src != 0) {
+            pending.push_back(tensor->view_src);
+        }
     }
-    result->view_offs = tensor->view_offs;
-    return result;
+    // Then wire edges. Previously memoized tensors are left untouched.
+    for (uint64_t current : created) {
+        const rpc_tensor * tensor = tensor_ptrs.at(current);
+        ggml_tensor * result = tensor_map.at(current);
+        for (int i = 0; i < GGML_MAX_SRC; ++i) {
+            result->src[i] = tensor->src[i] == 0 ? nullptr : tensor_map.at(tensor->src[i]);
+        }
+        result->view_src = tensor->view_src == 0 ? nullptr : tensor_map.at(tensor->view_src);
+        result->view_offs = tensor->view_offs;
+    }
+    return tensor_map.at(id);
 }
 
 bool rpc_server::graph_compute(const std::vector<uint8_t> & input) {

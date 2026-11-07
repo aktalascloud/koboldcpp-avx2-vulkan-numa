@@ -201,7 +201,7 @@ index 0b56701..52d890e 100644
          // if it returns true, execution of llama_decode() will be aborted
          // currently works only with CPU execution
 diff --git a/kcpp_src/expose.h b/kcpp_src/expose.h
-index b029d32..e5518f6 100644
+index 35ce4d5..ede4c41 100644
 --- a/kcpp_src/expose.h
 +++ b/kcpp_src/expose.h
 @@ -96,6 +96,8 @@ struct load_model_inputs
@@ -243,10 +243,10 @@ index e2d5db6..dff87c5 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 612264c..2c5e732 100644
+index 9836363..4579a11 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -386,7 +386,9 @@ class load_model_inputs(ctypes.Structure):
+@@ -387,7 +387,9 @@ class load_model_inputs(ctypes.Structure):
                  ("rpc_targets", ctypes.c_char_p),
                  ("lazy_mode", ctypes.c_int),
                  ("moe_cache_mib", ctypes.c_int),
@@ -257,7 +257,7 @@ index 612264c..2c5e732 100644
  
  class generation_inputs(ctypes.Structure):
      _fields_ = [("seed", ctypes.c_int),
-@@ -2188,6 +2190,14 @@ def load_model(model_filename):
+@@ -2193,6 +2195,14 @@ def load_model(model_filename):
      inputs = load_model_inputs()
      inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
      inputs.moe_cache_mib = args.moe_cache_mib
@@ -272,7 +272,7 @@ index 612264c..2c5e732 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -14600,6 +14610,8 @@ if __name__ == '__main__':
+@@ -14741,6 +14751,8 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")

@@ -1,7 +1,7 @@
 {
-  "upstream": "004173000d5384a5d9c953d97d45475b5efbb395",
-  "tree": "44f92fa2e106fcd79dfb8146c763926cfed907e5",
-  "snapshot_sha256": "a45b0a6c8809510897d6319a1330f5eaa62202768cf4f62fa0b89a91a6494410",
+  "upstream": "9958bb20b97595a9b19238aa4750c9498668e4c3",
+  "tree": "03059f84b50e64fc3251dd1666f36aad72d8860a",
+  "snapshot_sha256": "b85178a8b60e947d2c4ba2fa92b9a712e9ce8e1d0bf67f52140fbb27de239c48",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -43,19 +43,19 @@
       "path": "07-hybrid-moe/change.patch",
       "title": "HybridMoE and SLRU expert cache",
       "source": "https://github.com/MohammadR3za/HybridMoE",
-      "sha256": "c83ff9956c077d4cfdd1c64a0ac7cd8c5a6920abbc73955b258a9e6d77f54d2c"
+      "sha256": "69e553ec5ae809b7fd60a9e3f61b8a7b35dfb55a994eb00b073db93de4f19433"
     },
     {
       "path": "08-windows-numa/change.patch",
       "title": "Windows NUMA affinity",
       "source": "https://github.com/ggml-org/llama.cpp/pull/6832",
-      "sha256": "ec296332108a7ac8a2151108813136a2da0ec1fcfee9149ab2b5ac0179061287"
+      "sha256": "066d7778edb9d6f05a29d9806dcebf4a811e91f988a1072243e2e7c408823267"
     },
     {
       "path": "09-moe-prefill/change.patch",
       "title": "MoE prefill routing readback bypass",
       "source": "https://github.com/pauldmartinphd/llm-performance-engineering-notebook",
-      "sha256": "6c8c65e72dc10e235c2c947dfff13f7cbbfabd9ff3645d9d8fb982a5fc9fd1fb"
+      "sha256": "3aea8077e034715d9c70ad6d6ce2ce6dd70490e2382d08023df33a9aff2d3615"
     },
     {
       "path": "10-shader-dependencies/change.patch",
@@ -79,7 +79,7 @@
       "path": "13-native-build-date/change.patch",
       "title": "Native build date in the UI",
       "source": null,
-      "sha256": "8e20b0847d0fb24c890f4c9dc168015601970abdd9e3dbe13eed502d25ad2ad5"
+      "sha256": "a7084d06f34defdf2e5d3790ad2c49d42b7a9099513bf5d4ec2e1000603accdb"
     },
     {
       "path": "14-gcn-lds/change.patch",
@@ -145,7 +145,7 @@
       "path": "24-wan-latent-export/change.patch",
       "title": "Wan latent-only operation",
       "source": null,
-      "sha256": "afa38f52fe41d73e17d1582f0a88404c55f6424b682429ceab51ae65d6bc2f80"
+      "sha256": "18b03404ddd7da5c61d2b62fff3a3f3f0b1090fe86361925d46a62aaee8eb0a9"
     },
     {
       "path": "25-video-cache-forwarding/change.patch",
@@ -169,7 +169,7 @@
       "path": "28-native-media-launcher/change.patch",
       "title": "Native media launcher integration",
       "source": null,
-      "sha256": "68daaa1d107b2c5f477a4f5d9bbaeb454b8f73838f18cdd6c388060a184eb32b"
+      "sha256": "59ea788d87e640df6845a22a884c9508a65c89cfb11457ce90782c65c83345fd"
     },
     {
       "path": "29-legacy-vulkan-readback/change.patch",
@@ -278,6 +278,78 @@
       "title": "Spread short CPU RMSNorm rows across heads and batches",
       "source": "https://github.com/ikawrakow/ik_llama.cpp/pull/2457",
       "sha256": "e357920ec918ceb4dc011f27d5d366c142ccb7ed85c02cc97b1291dc51b6ca24"
+    },
+    {
+      "path": "47-gguf-zero-axes/change.patch",
+      "title": "Preserve zero-sized GGUF tensor axes",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31845",
+      "sha256": "920c169512384ca73e1c7fa0bbd3a2846ff8331df085abe7b3efb065e5b5e26f"
+    },
+    {
+      "path": "48-gguf-shape-bound/change.patch",
+      "title": "Reject GGUF shapes before constructor overflow asserts",
+      "source": "https://github.com/ggml-org/ggml/pull/1673",
+      "sha256": "3e06b635343cd98dd20fd57109f25104571f5c6ca171d0c69cc4a8b18c6fc22b"
+    },
+    {
+      "path": "49-rpc-transfer-bounds/change.patch",
+      "title": "Check RPC transfers without unsigned wrap",
+      "source": "https://github.com/ggml-org/ggml/pull/1671",
+      "sha256": "907f5231568c1aa71ed6aa4a83a4b74855464dd8a52527ecc37c2aa1d0996563"
+    },
+    {
+      "path": "50-rpc-iterative-graph/change.patch",
+      "title": "Materialize deep RPC graphs iteratively",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31843",
+      "sha256": "620bbc463e4dc66bdd337740c8307ad09dca84643bb9c8b96f6544bfd5e7003d"
+    },
+    {
+      "path": "51-scheduler-retain-buffers/change.patch",
+      "title": "Retain scheduler buffers across graph reservations",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31841",
+      "sha256": "d872622862cf6023b8e4343815b2ddd0b195a511918b2eefd5688c8a0bfc8780"
+    },
+    {
+      "path": "52-x86-exact-neg128/change.patch",
+      "title": "Exact x86 int8 dot products at minus 128",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/29359",
+      "sha256": "670fdb7775a94455524a96b8f98cff7fdffac0ae89cc7357e6faaec9c9898939"
+    },
+    {
+      "path": "53-vulkan-queue-padding/change.patch",
+      "title": "Deterministic Vulkan queue descriptors",
+      "source": "https://github.com/ggml-org/ggml/pull/1672",
+      "sha256": "880d6a353238ab528ee701e5fbed78f318e8272d8dabe6035659fdcfdbc879d7"
+    },
+    {
+      "path": "54-native-repeat-window-bound/change.patch",
+      "title": "Bound the native repetition window",
+      "source": "https://github.com/LostRuins/koboldcpp/security/advisories/GHSA-h59g-8cq4-cqjj",
+      "sha256": "eab5154ed78d24519003647f8acd7c46921640748cacb63c24899a585d5e8c49"
+    },
+    {
+      "path": "55-haswell-iq4nl-decode/change.patch",
+      "title": "Exact AVX2 IQ4_NL row decoding",
+      "source": "https://github.com/aktalascloud/strata-legacy-gpu/tree/157f5810bf0458b940521baf59f32fd2f71345c2/p40/patches/avx1-ple-iq4nl-shuffle",
+      "sha256": "d4ebb159153e471c5d57d3c93e9d97d920cbb7333ff7a41d85d936f099e7de7d"
+    },
+    {
+      "path": "56-sdcpp-i32-lora-scalar/change.patch",
+      "title": "Read integer LoRA scalars as FP32",
+      "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2263",
+      "sha256": "f61ee1d0e3bb488c1ef68ad86684b7c8b8e28260d11cbaae4fb2c26e1233fe86"
+    },
+    {
+      "path": "57-sdcpp-workspace-measure-cache/change.patch",
+      "title": "Cache matching fallback workspace measurements",
+      "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2251",
+      "sha256": "cc41799d2cd0409a5db982e52f44ed6adbfe60b0d9a60585a0c1602540f017c5"
+    },
+    {
+      "path": "58-sdcpp-reclaimed-capacity/change.patch",
+      "title": "Honor the final reclaimed-memory capacity check",
+      "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2256",
+      "sha256": "6c8cf2f5d426aa6dd5f0570f49357d6bde397c17e25cbbab1832ebae09996912"
     }
   ],
   "empty_ports": [

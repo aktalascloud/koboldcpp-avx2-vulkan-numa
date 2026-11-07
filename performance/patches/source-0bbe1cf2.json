@@ -1,0 +1,9 @@
+{
+  "upstream": "8192a34451989f938bdd2b7d92a26517dadd30a1",
+  "tree": "2c832acca1c2782d0d6b31e8b56591adba3ba624",
+  "snapshot_sha256": "bebc3cce213c249ba85f39a4f9de60395d1cacfd4b7bb56d864b683a54e7aacd",
+  "path": "source-0bbe1cf2.patch",
+  "patches": 55,
+  "native_executable_sha256": "0bbe1cf2a1af12ee07e7add158a1a281ce483c92c86a08f616b25f66386bde9d",
+  "scope": "Historical combined source snapshot for the0bbe1cf2 fixture cohort; current58 separate patches use the newer official base."
+}

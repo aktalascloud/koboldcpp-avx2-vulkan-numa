@@ -1,6 +1,6 @@
 # Native patch stack
 
-Apply in numeric order to `004173000d5384a5d9c953d97d45475b5efbb395`. [Index and SHA-256](index.json).
+Apply in numeric order to `9958bb20b97595a9b19238aa4750c9498668e4c3`. [Index and SHA-256](index.json).
 
 - [Polaris Vulkan queue initialization](01-polaris-queue/README.md)
 - [Vulkan batched submissions](02-vulkan-batched-submits/README.md)
@@ -48,3 +48,15 @@ Apply in numeric order to `004173000d5384a5d9c953d97d45475b5efbb395`. [Index and
 - [Haswell greedy selection and candidate-copy bypass](44-haswell-greedy-reduction/README.md)
 - [Release copied Windows weight pages from the working set](45-windows-mmap-release/README.md)
 - [Spread short CPU RMSNorm rows across heads and batches](46-cpu-rms-head-rows/README.md)
+- [Preserve zero-sized GGUF tensor axes](47-gguf-zero-axes/README.md)
+- [Reject GGUF shapes before constructor overflow asserts](48-gguf-shape-bound/README.md)
+- [Check RPC transfers without unsigned wrap](49-rpc-transfer-bounds/README.md)
+- [Materialize deep RPC graphs iteratively](50-rpc-iterative-graph/README.md)
+- [Retain scheduler buffers across graph reservations](51-scheduler-retain-buffers/README.md)
+- [Exact x86 int8 dot products at minus 128](52-x86-exact-neg128/README.md)
+- [Deterministic Vulkan queue descriptors](53-vulkan-queue-padding/README.md)
+- [Bound the native repetition window](54-native-repeat-window-bound/README.md)
+- [Exact AVX2 IQ4_NL row decoding](55-haswell-iq4nl-decode/README.md)
+- [Read integer LoRA scalars as FP32](56-sdcpp-i32-lora-scalar/README.md)
+- [Cache matching fallback workspace measurements](57-sdcpp-workspace-measure-cache/README.md)
+- [Honor the final reclaimed-memory capacity check](58-sdcpp-reclaimed-capacity/README.md)

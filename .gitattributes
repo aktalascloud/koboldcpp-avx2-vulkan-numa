@@ -1,0 +1,2 @@
+# SHA-bound patch artifacts include significant context-space lines.
+*.patch -text -whitespace
