@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 15a4307..f63b799 100644
+index c33ec3e..14b0ceb 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -767,7 +767,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel
@@ -1023,7 +1023,7 @@ index b406f37..fc49df1 100644
      }
  
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 55f6255..d0bf517 100644
+index 55f6255..db16158 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
 @@ -1731,12 +1731,31 @@ static void ggml_compute_forward_repeat_f32(
@@ -1060,7 +1060,20 @@ index 55f6255..d0bf517 100644
      GGML_TENSOR_UNARY_OP_LOCALS
  
      // guaranteed to be an integer due to the check in ggml_can_repeat
-@@ -5840,7 +5859,9 @@ static void ggml_compute_forward_soft_max_f32(
+@@ -4109,7 +4128,11 @@ static void ggml_compute_forward_rms_norm_f32(
+     // TODO: optimize
+     for (int64_t i03 = 0; i03 < ne03; i03++) {
+         for (int64_t i02 = 0; i02 < ne02; i02++) {
+-            for (int64_t i01 = ith; i01 < ne01; i01 += nth) {
++            // Spread short leading rows over heads/batches, preserving every
++            // row's double-precision sum and the ordinary full-worker path.
++            const int64_t row_base = (i03*ne02 + i02)*ne01;
++            const int64_t first_row = ne01 < nth ? (ith + nth - row_base % nth) % nth : ith;
++            for (int64_t i01 = first_row; i01 < ne01; i01 += nth) {
+                 const float * x = (float *) ((char *) src0->data + i01*nb01 + i02*nb02 + i03*nb03);
+ 
+                 ggml_float sum = 0.0;
+@@ -5840,7 +5863,9 @@ static void ggml_compute_forward_soft_max_f32(
  
      for (int64_t i03 = 0; i03 < ne03; i03++) {
          for (int64_t i02 = 0; i02 < ne02; i02++) {
@@ -1979,7 +1992,7 @@ index 0b56701..52d890e 100644
          // if it returns true, execution of llama_decode() will be aborted
          // currently works only with CPU execution
 diff --git a/kcpp_src/expose.h b/kcpp_src/expose.h
-index 07d4a3d..ca10e81 100644
+index b029d32..e5518f6 100644
 --- a/kcpp_src/expose.h
 +++ b/kcpp_src/expose.h
 @@ -96,6 +96,8 @@ struct load_model_inputs
@@ -2021,7 +2034,7 @@ index e2d5db6..dff87c5 100644
          }
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index d876a64..32ac95b 100644
+index 612264c..8e8d22b 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -2043,7 +2056,7 @@ index d876a64..32ac95b 100644
  showdebug = True
  kcpp_instance = None #global running instance
  global_memory = {"tunnel_url": "", "restart_target":"", "input_to_exit":False, "load_complete":False, "restart_override_base_config":"", "last_active_timestamp":datetime.now(), "triggered_sleeping":False, "current_model":"initial_model", "base_config":"", "swapReqType": None, "loadedReqTypes": [], "autoswapmode": False}
-@@ -385,7 +397,9 @@ class load_model_inputs(ctypes.Structure):
+@@ -386,7 +398,9 @@ class load_model_inputs(ctypes.Structure):
                  ("rpc_targets", ctypes.c_char_p),
                  ("lazy_mode", ctypes.c_int),
                  ("moe_cache_mib", ctypes.c_int),
@@ -2054,7 +2067,7 @@ index d876a64..32ac95b 100644
  
  class generation_inputs(ctypes.Structure):
      _fields_ = [("seed", ctypes.c_int),
-@@ -915,6 +929,18 @@ def restore_stdout():
+@@ -917,6 +931,18 @@ def restore_stdout():
          saved_stdout = saved_stderr = saved_stdout_py = saved_stderr_py = stdout_nullfile = stdout_nullfile_py = None
  
  def get_default_threads():
@@ -2073,7 +2086,7 @@ index d876a64..32ac95b 100644
      physical_core_limit = 1
      if os.cpu_count() is not None and os.cpu_count()>1:
          physical_core_limit = os.cpu_count() // 2
-@@ -968,10 +994,32 @@ lib_option_pairs = [
+@@ -970,10 +996,32 @@ lib_option_pairs = [
  default_option, cublas_option, hipblas_option, vulkan_option, noavx2_option, vulkan_noavx2_option, vulkan_failsafe_option, failsafe_option = (opt if file_exists(lib) or (os.name == 'nt' and file_exists(opt + ".dll")) else None for lib, opt in lib_option_pairs)
  runopts = [opt for lib, opt in lib_option_pairs if file_exists(lib)]
  
@@ -2106,7 +2119,7 @@ index d876a64..32ac95b 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -2186,6 +2234,14 @@ def load_model(model_filename):
+@@ -2188,6 +2236,14 @@ def load_model(model_filename):
      inputs = load_model_inputs()
      inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
      inputs.moe_cache_mib = args.moe_cache_mib
@@ -2121,7 +2134,7 @@ index d876a64..32ac95b 100644
      inputs.model_filename = model_filename.encode("UTF-8")
      inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
      inputs.threads = args.threads
-@@ -8919,6 +8975,9 @@ Change Mode<br>
+@@ -8928,6 +8984,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -2131,7 +2144,7 @@ index d876a64..32ac95b 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9474,7 +9533,27 @@ def show_gui():
+@@ -9483,7 +9542,27 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -2160,7 +2173,7 @@ index d876a64..32ac95b 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9559,6 +9638,7 @@ def show_gui():
+@@ -9568,6 +9647,7 @@ def show_gui():
  
      # trigger empty tooltip then remove it
      def show_tooltip(event, tooltip_text=None):
@@ -2168,7 +2181,7 @@ index d876a64..32ac95b 100644
          nonlocal gtooltip_box, gtooltip_label
          if not gtooltip_box and not gtooltip_label:
              gtooltip_box = ctk.CTkToplevel(root)
-@@ -9586,7 +9666,7 @@ def show_gui():
+@@ -9595,7 +9675,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
@@ -2177,7 +2190,7 @@ index d876a64..32ac95b 100644
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9803,7 +9883,7 @@ def show_gui():
+@@ -9812,7 +9892,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
@@ -2186,7 +2199,7 @@ index d876a64..32ac95b 100644
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
  
-@@ -10718,6 +10798,8 @@ def show_gui():
+@@ -10727,6 +10807,8 @@ def show_gui():
      # Image Gen Tab
  
      images_tab = tabcontent["Image Gen"]
@@ -2195,7 +2208,7 @@ index d876a64..32ac95b 100644
      makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
  
      def togglesdlora(a,b,c):
-@@ -10758,7 +10840,7 @@ def show_gui():
+@@ -10767,7 +10849,7 @@ def show_gui():
      makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
      makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
      makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
@@ -2204,16 +2217,16 @@ index d876a64..32ac95b 100644
  
  
      sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
-@@ -10786,6 +10868,8 @@ def show_gui():
+@@ -10795,6 +10877,8 @@ def show_gui():
  
      # audio tab
      audio_tab = tabcontent["Audio"]
 +    audio_tab = ctk.CTkScrollableFrame(audio_tab,width=440,height=440)
 +    audio_tab.grid(row=1,padx=3,pady=2,sticky="nsew")
-     makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or SheetSage2 Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
+     makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or Audio.cpp Transcription Model", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin or Audio.cpp ASR .gguf for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
      whisper_model_var.trace_add("write", gui_changed_modelfile)
      makefileentry(audio_tab, "TTS Model (Text-To-Speech):", "Select TTS GGUF Model File", tts_model_var, 3, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a TTS GGUF model file on disk to be loaded for Narration.")
-@@ -10871,6 +10955,8 @@ def show_gui():
+@@ -10880,6 +10964,8 @@ def show_gui():
  
      # extra tab
      extra_tab = tabcontent["Extra"]
@@ -2222,7 +2235,7 @@ index d876a64..32ac95b 100644
      makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
      ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
      makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
-@@ -10936,6 +11022,8 @@ def show_gui():
+@@ -10945,6 +11031,8 @@ def show_gui():
  
      # launch
      def guilaunch():
@@ -2231,7 +2244,7 @@ index d876a64..32ac95b 100644
          if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
              # prevent launch without at least one valid model
              givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
-@@ -11527,6 +11615,8 @@ def show_gui():
+@@ -11536,6 +11624,8 @@ def show_gui():
              auto_set_backend_gui(True)
  
      def save_config_gui():
@@ -2240,7 +2253,7 @@ index d876a64..32ac95b 100644
          nonlocal kcpp_exporting_template
          kcpp_exporting_template = False
          export_vars()
-@@ -11542,6 +11632,8 @@ def show_gui():
+@@ -11551,6 +11641,8 @@ def show_gui():
          pass
  
      def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
@@ -2249,7 +2262,7 @@ index d876a64..32ac95b 100644
          file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
          global runmode_untouched, zenity_permitted
          filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
-@@ -11662,6 +11754,22 @@ def show_gui():
+@@ -11671,6 +11763,22 @@ def show_gui():
              mydict = vars(args)
              import_vars(mydict)
  
@@ -2272,7 +2285,7 @@ index d876a64..32ac95b 100644
      # runs main loop until closed or launch clicked
      try:
          root.mainloop()
-@@ -13014,7 +13122,7 @@ def main(launch_args, default_args):
+@@ -13025,7 +13133,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -2281,7 +2294,7 @@ index d876a64..32ac95b 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14510,8 +14618,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14521,8 +14629,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  
@@ -2324,7 +2337,7 @@ index d876a64..32ac95b 100644
  
      def check_range(value_type, min_value, max_value):
          def range_checker(arg: str):
-@@ -14555,6 +14697,7 @@ if __name__ == '__main__':
+@@ -14566,6 +14708,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -2332,7 +2345,7 @@ index d876a64..32ac95b 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14589,6 +14732,9 @@ if __name__ == '__main__':
+@@ -14600,6 +14743,9 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -3313,6 +3326,47 @@ index 6a1a3dc..27a385b 100644
                  if (!cells.pos_in(i, p0, p1)) {
                      continue;
                  }
+diff --git a/src/llama-mmap.cpp b/src/llama-mmap.cpp
+index 880591f..28ead51 100644
+--- a/src/llama-mmap.cpp
++++ b/src/llama-mmap.cpp
+@@ -644,8 +644,34 @@ printf("\nPrefetchVirtualMemory skipped in compatibility mode.\n");
+     }
+ 
+     void unmap_fragment(size_t first, size_t last) {
+-        GGML_UNUSED(first);
+-        GGML_UNUSED(last);
++        // Windows cannot unmap part of a view. Release only complete pages of
++        // weights already copied elsewhere; mapped CPU tensors remain readable.
++        last = std::min(last, size);
++        if (first >= last) {
++            return;
++        }
++        static const size_t page_size = [] {
++            SYSTEM_INFO info;
++            GetSystemInfo(&info);
++            return static_cast<size_t>(info.dwPageSize);
++        }();
++        const size_t padding = (page_size - first % page_size) % page_size;
++        if (last - first <= padding) {
++            return;
++        }
++        first += padding;
++        last -= last % page_size;
++        if (last <= first) {
++            return;
++        }
++        // ERROR_NOT_LOCKED is expected: VirtualUnlock removes unlocked pages
++        // from the working set while preserving the file mapping and its bytes.
++        if (!VirtualUnlock(static_cast<char *>(addr) + first, last - first)) {
++            const DWORD error = GetLastError();
++            if (error != ERROR_NOT_LOCKED) {
++                LLAMA_LOG_WARN("warning: VirtualUnlock failed: %s\n", llama_format_win_err(error).c_str());
++            }
++        }
+     }
+ 
+     ~impl() {
 diff --git a/src/llama-moe-cache.cpp b/src/llama-moe-cache.cpp
 index 6a343a7..bcd11a6 100644
 --- a/src/llama-moe-cache.cpp
@@ -4246,7 +4300,7 @@ index 6c8e365..6666f5f 100644
      bool copy(ggml_backend_t backend, const ggml_tensor * src, ggml_tensor * dst, ggml_cgraph * graph);
  
 diff --git a/src/llama-sampler.cpp b/src/llama-sampler.cpp
-index 9004efa..dc76b03 100644
+index 9004efa..c2ffee8 100644
 --- a/src/llama-sampler.cpp
 +++ b/src/llama-sampler.cpp
 @@ -1,3 +1,4 @@
@@ -4310,3 +4364,93 @@ index 9004efa..dc76b03 100644
  /*
  static void llama_log_softmax(float * array, size_t size) {
      float max_l = *std::max_element(array, array + size);
+@@ -893,6 +882,48 @@ uint32_t llama_sampler_backend_n_nodes(const llama_sampler * sampler) {
+     return chain->n_nodes;
+ }
+ 
++#if defined(__AVX2__)
++template<typename GetLogit>
++static size_t llama_sampler_greedy_select(size_t size, GetLogit get_logit) {
++    if (size == 0) {
++        return 0;
++    }
++    // Start every accumulator at the first candidate, preserving the original
++    // first-NaN and lowest-index tie rules.
++    constexpr size_t width = 4;
++    std::array<float, width> maxima;
++    maxima.fill(get_logit(0));
++    std::array<size_t, width> indices = {};
++    size_t i = 1;
++    for (; size - i >= width; i += width) {
++        for (size_t lane = 0; lane < width; ++lane) {
++            const float logit = get_logit(i + lane);
++            if (logit > maxima[lane]) {
++                maxima[lane] = logit;
++                indices[lane] = i + lane;
++            }
++        }
++    }
++    size_t selected = indices[0];
++    float maximum = maxima[0];
++    for (size_t lane = 1; lane < width; ++lane) {
++        if (maxima[lane] > maximum || (maxima[lane] == maximum && indices[lane] < selected)) {
++            maximum = maxima[lane];
++            selected = indices[lane];
++        }
++    }
++    for (; i < size; ++i) {
++        if (get_logit(i) > maximum) {
++            maximum = get_logit(i);
++            selected = i;
++        }
++    }
++    return selected;
++}
++
++static void llama_sampler_greedy_apply(struct llama_sampler * smpl, llama_token_data_array * cur_p);
++#endif
++
+ llama_token llama_sampler_sample(struct llama_sampler * smpl, struct llama_context * ctx, int32_t idx) {
+     const llama_token   sampled_token  = llama_get_sampled_token_ith     (ctx, idx);
+     const float *       sampled_probs  = llama_get_sampled_probs_ith     (ctx, idx);
+@@ -911,6 +942,23 @@ llama_token llama_sampler_sample(struct llama_sampler * smpl, struct llama_conte
+ 
+     const int n_vocab = llama_vocab_n_tokens(vocab);
+ 
++#if defined(__AVX2__)
++    // A bare greedy sampler consumes only logits. Keep compact backend IDs and
++    // the single accept callback while avoiding a vocabulary-sized candidate copy.
++    if (smpl->iface->apply == llama_sampler_greedy_apply) {
++        const float * logits = sampled_logits ? sampled_logits : llama_get_logits_ith(ctx, idx);
++        const size_t count = sampled_probs ? llama_get_sampled_probs_count_ith(ctx, idx) :
++                             sampled_logits ? llama_get_sampled_logits_count_ith(ctx, idx) : n_vocab;
++        GGML_ASSERT(logits != nullptr && count > 0);
++        GGML_ASSERT(!sampled_probs || sampled_logits);
++        GGML_ASSERT(!sampled_logits || sampled_ids);
++        const size_t selected = llama_sampler_greedy_select(count, [&](size_t i) { return logits[i]; });
++        const llama_token token = sampled_logits ? sampled_ids[selected] : static_cast<llama_token>(selected);
++        llama_sampler_accept(smpl, token);
++        return token;
++    }
++#endif
++
+     // use pre-allocated buffer from chain if available, otherwise allocate locally
+     std::vector<llama_token_data> * cur_ptr;
+     std::vector<llama_token_data> cur_local;
+@@ -1052,12 +1100,16 @@ static void llama_sampler_greedy_free(struct llama_sampler * smpl) {
+ }
+ 
+ static void llama_sampler_greedy_apply(struct llama_sampler * /*smpl*/, llama_token_data_array * cur_p) {
++#if defined(__AVX2__)
++    cur_p->selected = llama_sampler_greedy_select(cur_p->size, [&](size_t i) { return cur_p->data[i].logit; });
++#else
+     cur_p->selected = 0;
+     for (size_t i = 1; i < cur_p->size; ++i) {
+         if (cur_p->data[i].logit > cur_p->data[cur_p->selected].logit) {
+             cur_p->selected = i;
+         }
+     }
++#endif
+ }
+ 
+ static bool llama_sampler_greedy_backend_init(

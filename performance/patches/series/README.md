@@ -1,6 +1,6 @@
 # Native patch stack
 
-Apply in numeric order to `6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d`. [Index and SHA-256](index.json).
+Apply in numeric order to `004173000d5384a5d9c953d97d45475b5efbb395`. [Index and SHA-256](index.json).
 
 - [Polaris Vulkan queue initialization](01-polaris-queue/README.md)
 - [Vulkan batched submissions](02-vulkan-batched-submits/README.md)
@@ -45,3 +45,6 @@ Apply in numeric order to `6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d`. [Index and
 - [AVX2 GELU and GEGLU table lookup](41-haswell-gelu-table/README.md)
 - [Vulkan RMSNorm beyond the X workgroup limit](42-vulkan-rms-row-stride/README.md)
 - [Keep view-only tails in the allocation plan](43-buffer-split-view-tail/README.md)
+- [Haswell greedy selection and candidate-copy bypass](44-haswell-greedy-reduction/README.md)
+- [Release copied Windows weight pages from the working set](45-windows-mmap-release/README.md)
+- [Spread short CPU RMSNorm rows across heads and batches](46-cpu-rms-head-rows/README.md)

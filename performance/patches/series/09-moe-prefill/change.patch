@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index b5e602a..6df1f74 100644
+index fbf7d27..baf82b9 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -1006,6 +1006,8 @@ def init_library():
+@@ -1008,6 +1008,8 @@ def init_library():
          if mode not in ('auto','disabled','distribute','isolate'):
              raise ValueError('--numa must be auto, disabled, distribute or isolate')
          _kcpp_set_native_environment('KCPP_WIN_NUMA_POLICY',str({'disabled':0,'auto':1,'distribute':2,'isolate':3}[mode]))
@@ -11,7 +11,7 @@ index b5e602a..6df1f74 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -14632,6 +14634,7 @@ if __name__ == '__main__':
+@@ -14643,6 +14645,7 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")

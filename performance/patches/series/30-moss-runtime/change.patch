@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 87c7b94..f63b799 100644
+index 8e10116..14b0ceb 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -767,7 +767,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel

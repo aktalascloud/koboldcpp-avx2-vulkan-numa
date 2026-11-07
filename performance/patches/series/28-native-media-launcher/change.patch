@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index bb0a234..32ac95b 100644
+index 4518cf5..8e8d22b 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -9534,6 +9534,26 @@ def show_gui():
+@@ -9543,6 +9543,26 @@ def show_gui():
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
      root.title(f"KoboldCpp v{KcppWindowVersion}")
@@ -29,7 +29,7 @@ index bb0a234..32ac95b 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9618,6 +9638,7 @@ def show_gui():
+@@ -9627,6 +9647,7 @@ def show_gui():
  
      # trigger empty tooltip then remove it
      def show_tooltip(event, tooltip_text=None):
@@ -37,7 +37,7 @@ index bb0a234..32ac95b 100644
          nonlocal gtooltip_box, gtooltip_label
          if not gtooltip_box and not gtooltip_label:
              gtooltip_box = ctk.CTkToplevel(root)
-@@ -9645,7 +9666,7 @@ def show_gui():
+@@ -9654,7 +9675,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
@@ -46,7 +46,7 @@ index bb0a234..32ac95b 100644
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9862,7 +9883,7 @@ def show_gui():
+@@ -9871,7 +9892,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
@@ -55,7 +55,7 @@ index bb0a234..32ac95b 100644
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
  
-@@ -10777,6 +10798,8 @@ def show_gui():
+@@ -10786,6 +10807,8 @@ def show_gui():
      # Image Gen Tab
  
      images_tab = tabcontent["Image Gen"]
@@ -64,7 +64,7 @@ index bb0a234..32ac95b 100644
      makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
  
      def togglesdlora(a,b,c):
-@@ -10817,7 +10840,7 @@ def show_gui():
+@@ -10826,7 +10849,7 @@ def show_gui():
      makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
      makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
      makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
@@ -73,16 +73,16 @@ index bb0a234..32ac95b 100644
  
  
      sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
-@@ -10845,6 +10868,8 @@ def show_gui():
+@@ -10854,6 +10877,8 @@ def show_gui():
  
      # audio tab
      audio_tab = tabcontent["Audio"]
 +    audio_tab = ctk.CTkScrollableFrame(audio_tab,width=440,height=440)
 +    audio_tab.grid(row=1,padx=3,pady=2,sticky="nsew")
-     makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or SheetSage2 Model File", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
+     makefileentry(audio_tab, "Audio Transcription:", "Select Whisper or Audio.cpp Transcription Model", whisper_model_var, 1, width=280, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin or Audio.cpp ASR .gguf for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
      whisper_model_var.trace_add("write", gui_changed_modelfile)
      makefileentry(audio_tab, "TTS Model (Text-To-Speech):", "Select TTS GGUF Model File", tts_model_var, 3, width=280, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Select a TTS GGUF model file on disk to be loaded for Narration.")
-@@ -10930,6 +10955,8 @@ def show_gui():
+@@ -10939,6 +10964,8 @@ def show_gui():
  
      # extra tab
      extra_tab = tabcontent["Extra"]
@@ -91,7 +91,7 @@ index bb0a234..32ac95b 100644
      makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
      ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
      makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
-@@ -10995,6 +11022,8 @@ def show_gui():
+@@ -11004,6 +11031,8 @@ def show_gui():
  
      # launch
      def guilaunch():
@@ -100,7 +100,7 @@ index bb0a234..32ac95b 100644
          if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
              # prevent launch without at least one valid model
              givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
-@@ -11586,6 +11615,8 @@ def show_gui():
+@@ -11595,6 +11624,8 @@ def show_gui():
              auto_set_backend_gui(True)
  
      def save_config_gui():
@@ -109,7 +109,7 @@ index bb0a234..32ac95b 100644
          nonlocal kcpp_exporting_template
          kcpp_exporting_template = False
          export_vars()
-@@ -11601,6 +11632,8 @@ def show_gui():
+@@ -11610,6 +11641,8 @@ def show_gui():
          pass
  
      def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
@@ -118,7 +118,7 @@ index bb0a234..32ac95b 100644
          file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
          global runmode_untouched, zenity_permitted
          filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
-@@ -11721,6 +11754,22 @@ def show_gui():
+@@ -11730,6 +11763,22 @@ def show_gui():
              mydict = vars(args)
              import_vars(mydict)
  
@@ -141,7 +141,7 @@ index bb0a234..32ac95b 100644
      # runs main loop until closed or launch clicked
      try:
          root.mainloop()
-@@ -14569,8 +14618,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14580,8 +14629,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  

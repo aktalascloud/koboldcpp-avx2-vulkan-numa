@@ -1,7 +1,7 @@
 {
-  "upstream": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
-  "tree": "cf604155f2ab45d22cf4e3083abc037a120241de",
-  "snapshot_sha256": "0306bea833766b221ed24fcefb01eb49543490eb16027d9151fa09d816068505",
+  "upstream": "004173000d5384a5d9c953d97d45475b5efbb395",
+  "tree": "5798619e5af495d14370f62d5d67a9bee1bd952f",
+  "snapshot_sha256": "4a4eac70d6524857cc344c9cee7f41b2d912e0ad7217339fb3fe2d73297e855b",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -43,25 +43,25 @@
       "path": "07-hybrid-moe/change.patch",
       "title": "HybridMoE and SLRU expert cache",
       "source": "https://github.com/MohammadR3za/HybridMoE",
-      "sha256": "f38779df2d4ff252b3bed1e02eeafd32c55aa8e615cd0b0ab7279450aae3f681"
+      "sha256": "c83ff9956c077d4cfdd1c64a0ac7cd8c5a6920abbc73955b258a9e6d77f54d2c"
     },
     {
       "path": "08-windows-numa/change.patch",
       "title": "Windows NUMA affinity",
       "source": "https://github.com/ggml-org/llama.cpp/pull/6832",
-      "sha256": "ae8ce207bba4afb4ac8584f83d2029abc105718cc344e7a57c1c4573e2bc8dbb"
+      "sha256": "ec296332108a7ac8a2151108813136a2da0ec1fcfee9149ab2b5ac0179061287"
     },
     {
       "path": "09-moe-prefill/change.patch",
       "title": "MoE prefill routing readback bypass",
       "source": "https://github.com/pauldmartinphd/llm-performance-engineering-notebook",
-      "sha256": "45da1bc8072a59476cbd0ca0aefa658856d9939427f2fde1d7b7110fb762cc84"
+      "sha256": "6c8c65e72dc10e235c2c947dfff13f7cbbfabd9ff3645d9d8fb982a5fc9fd1fb"
     },
     {
       "path": "10-shader-dependencies/change.patch",
       "title": "Invalidate shader artifacts on source changes",
       "source": null,
-      "sha256": "984a16b588ee7b1346a4f6791b2a3d0375f85937af3367ef8849734df6a467c0"
+      "sha256": "21256d644222a4a0f796a14f93517afd15e4ddf7971e6abed6df1a65ef279ce4"
     },
     {
       "path": "11-polaris-tile-variants/change.patch",
@@ -79,7 +79,7 @@
       "path": "13-native-build-date/change.patch",
       "title": "Native build date in the UI",
       "source": null,
-      "sha256": "35f23413ccb40f6d1c8e35f5133dd5f01d4c43d3faaaf0929bf68c579e7bd4ae"
+      "sha256": "8e20b0847d0fb24c890f4c9dc168015601970abdd9e3dbe13eed502d25ad2ad5"
     },
     {
       "path": "14-gcn-lds/change.patch",
@@ -145,7 +145,7 @@
       "path": "24-wan-latent-export/change.patch",
       "title": "Wan latent-only operation",
       "source": null,
-      "sha256": "2f76ac3e675c2b1cff970e92c12eccf9498b5f2339252bdff1cf0ca4a0ad9c02"
+      "sha256": "afa38f52fe41d73e17d1582f0a88404c55f6424b682429ceab51ae65d6bc2f80"
     },
     {
       "path": "25-video-cache-forwarding/change.patch",
@@ -169,7 +169,7 @@
       "path": "28-native-media-launcher/change.patch",
       "title": "Native media launcher integration",
       "source": null,
-      "sha256": "68671f5595283d7e6f5beb2d1901c492d4dc5793904c55e9a9a73571fa40c2ba"
+      "sha256": "68daaa1d107b2c5f477a4f5d9bbaeb454b8f73838f18cdd6c388060a184eb32b"
     },
     {
       "path": "29-legacy-vulkan-readback/change.patch",
@@ -181,7 +181,7 @@
       "path": "30-moss-runtime/change.patch",
       "title": "MOSS QKV, modulation and position cache",
       "source": "https://github.com/LostRuins/koboldcpp/pull/2576",
-      "sha256": "88ac61fd6eb45407658deff17e2722b212640a72601a1222c19b97faa57eef6c"
+      "sha256": "7b94979cad7aa433ddc19e5e0e0cd4a4e3698f8d8783215082893ee3975d5385"
     },
     {
       "path": "31-moss-ffn-views/change.patch",
@@ -260,6 +260,24 @@
       "title": "Keep view-only tails in the allocation plan",
       "source": "https://github.com/ggml-org/llama.cpp/pull/25584",
       "sha256": "38cf3daa10545d578a0f8b23eef16916bc40801d2a11db9e8779fc06bf1a15a5"
+    },
+    {
+      "path": "44-haswell-greedy-reduction/change.patch",
+      "title": "Haswell greedy selection and candidate-copy bypass",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/30659",
+      "sha256": "58314d100e6edcf7dee61132379819cb8de8be2c13c09a10c614fe3ffbc8d4e6"
+    },
+    {
+      "path": "45-windows-mmap-release/change.patch",
+      "title": "Release copied Windows weight pages from the working set",
+      "source": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/269",
+      "sha256": "be318c09679c49fb470dd7aa7876c5eb9b0fac64e2facb081ce8772ac43c9e0f"
+    },
+    {
+      "path": "46-cpu-rms-head-rows/change.patch",
+      "title": "Spread short CPU RMSNorm rows across heads and batches",
+      "source": "https://github.com/ikawrakow/ik_llama.cpp/pull/2457",
+      "sha256": "e357920ec918ceb4dc011f27d5d366c142ccb7ed85c02cc97b1291dc51b6ca24"
     }
   ],
   "empty_ports": [

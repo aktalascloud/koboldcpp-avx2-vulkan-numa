@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 15a4307..87c7b94 100644
+index c33ec3e..8e10116 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -925,15 +925,17 @@ llamaserver: $(LLAMASERVER_SRCS) $(LLAMASERVER_COMMON_SRCS) build-info.h ggml.o
