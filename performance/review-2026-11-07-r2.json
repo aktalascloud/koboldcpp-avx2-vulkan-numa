@@ -1,0 +1,123 @@
+{
+  "date": "2026-11-07",
+  "window_local": [
+    "2026-09-07",
+    "2026-11-07"
+  ],
+  "updated_since_utc": "2026-09-06T18:00:00Z",
+  "upstream": "004173000d5384a5d9c953d97d45475b5efbb395",
+  "scope": "All remaining entries from the fixed prior metadata-only queue. Complete diff bytes screened; semantic dispositions are limited to documented candidate reviews, not every line of unrelated code.",
+  "configured_and_previous_sources": 90,
+  "accessible_sources": 89,
+  "unavailable_source": "wbruna/koboldcpp: HTTP404",
+  "initial_inventory_prs": 33853,
+  "initial_inventory_issues": 10787,
+  "previous_selected_prs": 572,
+  "previous_followup_diffs": 3469,
+  "remaining_queue": 29812,
+  "read": 29736,
+  "unavailable": 76,
+  "pending": 0,
+  "methods": {
+    "public_diff": 98,
+    "git_three_dot": 26037,
+    "github_rest_files_counted": 3268,
+    "github_files_verified_blob_recovery": 317,
+    "git_three_dot_blob_cdn": 10,
+    "git_root_snapshot": 4,
+    "git_merge_commit": 1,
+    "github_rest_diff": 1
+  },
+  "screening": {
+    "unavailable": 76,
+    "transferable_code_candidate": 845,
+    "read": 29736,
+    "other_platform_or_nonproduction": 9404,
+    "other_runtime": 19134,
+    "native_runtime_overlap": 352,
+    "generated_data_only": 1
+  },
+  "sources": {
+    "0xShug0/audio.cpp": {
+      "read": 211
+    },
+    "AvilaCarlosDev/polaris-local-ai": {
+      "read": 4
+    },
+    "Comfy-Org/ComfyUI": {
+      "read": 1129
+    },
+    "JonPark0/krafla": {
+      "read": 67
+    },
+    "PrismML-Eng/llama.cpp": {
+      "read": 158,
+      "unavailable": 1
+    },
+    "ROCm/AMDMIGraphX": {
+      "read": 347
+    },
+    "ROCm/rocm-libraries": {
+      "read": 3660
+    },
+    "ServeurpersoCom/qwentts.cpp": {
+      "read": 8
+    },
+    "ServeurpersoCom/yue2.cpp": {
+      "read": 3
+    },
+    "Tencent/ncnn": {
+      "read": 260
+    },
+    "christopherthompson81/inference.rs": {
+      "read": 621
+    },
+    "esolithe/esobold": {
+      "read": 2
+    },
+    "ggml-org/llama.cpp": {
+      "unavailable": 75,
+      "read": 828
+    },
+    "ggml-org/whisper.cpp": {
+      "read": 183
+    },
+    "ikawrakow/ik_llama.cpp": {
+      "read": 151
+    },
+    "lakitu12/rocm-gfx803": {
+      "read": 27
+    },
+    "leejet/stable-diffusion.cpp": {
+      "read": 58
+    },
+    "ollama/ollama": {
+      "read": 1058
+    },
+    "openvinotoolkit/openvino": {
+      "read": 1720
+    },
+    "sirfyyn/FastLocalExperts": {
+      "read": 20
+    },
+    "stew675/llama-cpp-rdna-boosts": {
+      "read": 46
+    },
+    "turboderp-org/exllamav3": {
+      "read": 150
+    },
+    "unslothai/unsloth": {
+      "read": 6054
+    },
+    "vllm-project/vllm": {
+      "read": 12971
+    }
+  },
+  "evidence_index": "review-2026-11-07-r2-index.json.gz",
+  "limits": [
+    "The earlier detail/available-hunk passes retain their original limits.",
+    "Four orphan-history PRs use complete root snapshots with provider-matched file counts and separate base/head evidence.",
+    "Records marked unavailable have no retrievable source diff. One other PR404 was recovered from its exact recorded merge commit and provider-matched file count.",
+    "No new model tokens/s or physical dual-socket claim follows from isolated operation tests."
+  ]
+}

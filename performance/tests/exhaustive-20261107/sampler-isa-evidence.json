@@ -1,0 +1,14 @@
+{
+  "translation_unit": "src/llama.cpp includes llama-sampler.cpp",
+  "production_isa_flags": [
+    "-mtune=haswell",
+    "-mstackrealign"
+  ],
+  "compiler_defines": {
+    "__x86_64__": "1"
+  },
+  "guard": "defined(__x86_64__) || defined(_M_X64)",
+  "guard_enabled": true,
+  "production_command_sha256": "d4ffd0c48257e87f70480f978a730f506e6f16bceba964dbb980f4ea9f10e077",
+  "single_candidate_no_read": true
+}
