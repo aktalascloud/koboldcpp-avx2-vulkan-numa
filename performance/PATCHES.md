@@ -2,7 +2,7 @@
 
 ## November 7 continued source review
 
-The [ordered series](patches/series/) now contains **46 individual patches**, each with a description, source link and SHA-256. It reproduces official `004173000d5384a5d9c953d97d45475b5efbb395` plus the accepted local changes; installed Native SHA-256 is `9d261c9884c715e89e0c10f537d53a72f66fec47938b4b1ba1c7be400f9cf4fd`.
+The [ordered series](patches/series/) now contains **46 individual patches**, each with a description, source link and SHA-256. It reproduces official `004173000d5384a5d9c953d97d45475b5efbb395` plus the accepted local changes; installed Native SHA-256 is `5e7c8de54808cef1173cb4f0fef25ad6024b42ecefdee7e51ed2339732f69736`.
 
 New carries cover x64 greedy selection (the baseline-ISA sampler build is explicitly supported), short CPU RMSNorm row distribution with unchanged double accumulation, and release of copied Windows weight pages from the working set. Source review and controlled performance measurements are still in progress; no new whole-model speed claim is made here.
 

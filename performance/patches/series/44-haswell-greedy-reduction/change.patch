@@ -1,5 +1,5 @@
 diff --git a/src/llama-sampler.cpp b/src/llama-sampler.cpp
-index dc76b03..d65d23e 100644
+index dc76b03..0fbb0f9 100644
 --- a/src/llama-sampler.cpp
 +++ b/src/llama-sampler.cpp
 @@ -882,6 +882,48 @@ uint32_t llama_sampler_backend_n_nodes(const llama_sampler * sampler) {
@@ -9,7 +9,7 @@ index dc76b03..d65d23e 100644
 +#if defined(__x86_64__) || defined(_M_X64)
 +template<typename GetLogit>
 +static size_t llama_sampler_greedy_select(size_t size, GetLogit get_logit) {
-+    if (size == 0) {
++    if (size <= 1) {
 +        return 0;
 +    }
 +    // Start every accumulator at the first candidate, preserving the original

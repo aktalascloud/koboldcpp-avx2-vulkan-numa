@@ -885,7 +885,7 @@ uint32_t llama_sampler_backend_n_nodes(const llama_sampler * sampler) {
 #if defined(__x86_64__) || defined(_M_X64)
 template<typename GetLogit>
 static size_t llama_sampler_greedy_select(size_t size, GetLogit get_logit) {
-    if (size == 0) {
+    if (size <= 1) {
         return 0;
     }
     // Start every accumulator at the first candidate, preserving the original

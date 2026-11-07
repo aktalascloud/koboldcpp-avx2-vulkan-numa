@@ -1,7 +1,7 @@
 {
   "upstream": "004173000d5384a5d9c953d97d45475b5efbb395",
-  "tree": "c70c7ab4a3f56c81ec81cb5b99dc10432fdd8a9e",
-  "snapshot_sha256": "d66538e7781d5d5ebe4f615f20c85832632fb28b57ae47fa1fb4cb7dd18ae605",
+  "tree": "44f92fa2e106fcd79dfb8146c763926cfed907e5",
+  "snapshot_sha256": "a45b0a6c8809510897d6319a1330f5eaa62202768cf4f62fa0b89a91a6494410",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -265,7 +265,7 @@
       "path": "44-haswell-greedy-reduction/change.patch",
       "title": "Haswell greedy selection and candidate-copy bypass",
       "source": "https://github.com/ggml-org/llama.cpp/pull/30659",
-      "sha256": "43db279c9539ebc7af38c4f8f8cbf59c91f6ae4fe7e8ecaf24f2f020bcdf3817"
+      "sha256": "171be052a72f3c63fb1a46ac418ff927e6fa7120751a1c75b52281d42e058c67"
     },
     {
       "path": "45-windows-mmap-release/change.patch",
