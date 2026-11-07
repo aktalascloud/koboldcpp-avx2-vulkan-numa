@@ -4122,6 +4122,29 @@ static bool ggml_vk_host_buffer_import_usable(uint32_t vendor_id) {
     return vendor_id != VK_VENDOR_ID_AMD;
 }
 
+// A separately mapped small BAR is not the main host-visible VRAM heap.
+static bool ggml_vk_has_rebar(const vk::PhysicalDevice & physical_device) {
+    const auto props = physical_device.getMemoryProperties();
+    uint32_t vram = UINT32_MAX;
+    for (uint32_t i = 0; i < props.memoryHeapCount; ++i) {
+        const auto & heap = props.memoryHeaps[i];
+        if ((heap.flags & vk::MemoryHeapFlagBits::eDeviceLocal) &&
+            (vram == UINT32_MAX || heap.size > props.memoryHeaps[vram].size)) {
+            vram = i;
+        }
+    }
+    const auto visible_vram = vk::MemoryPropertyFlagBits::eDeviceLocal |
+                              vk::MemoryPropertyFlagBits::eHostVisible |
+                              vk::MemoryPropertyFlagBits::eHostCoherent;
+    for (uint32_t i = 0; i < props.memoryTypeCount; ++i) {
+        const auto & type = props.memoryTypes[i];
+        if (type.heapIndex == vram && (type.propertyFlags & visible_vram) == visible_vram) {
+            return true;
+        }
+    }
+    return false;
+}
+
 vk_device ggml_vk_get_device(size_t idx) {
     VK_LOG_DEBUG("ggml_vk_get_device(" << idx << ")");
 
@@ -4368,6 +4391,7 @@ vk_device ggml_vk_get_device(size_t idx) {
         device->subgroup_size = subgroup_props.subgroupSize;
         device->subgroup_size_log2 = uint32_t(log2f(float(device->subgroup_size)));
         device->uma = device->properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu;
+        device->rebar = ggml_vk_has_rebar(device->physical_device);
         if (sm_builtins) {
             device->shader_core_count = sm_props.shaderSMCount;
         } else if (amd_shader_core_properties2) {
@@ -5346,8 +5370,8 @@ static void ggml_vk_print_gpu_info(size_t idx) {
 #endif
 
     std::string device_name = props2.properties.deviceName.data();
-    GGML_LOG_DEBUG("ggml_vulkan: %zu = %s (%s) | uma: %d | fp16: %s | bf16: %d | fp4: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s\n",
-              idx, device_name.c_str(), driver_props.driverName.data(), uma, fp16_str, bf16, fp4, subgroup_size,
+    GGML_LOG_DEBUG("ggml_vulkan: %zu = %s (%s) | uma: %d | rebar: %d | fp16: %s | bf16: %d | fp4: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s\n",
+              idx, device_name.c_str(), driver_props.driverName.data(), uma, ggml_vk_has_rebar(physical_device), fp16_str, bf16, fp4, subgroup_size,
               props2.properties.limits.maxComputeSharedMemorySize, integer_dot_product, matrix_cores.c_str());
 
     if (props2.properties.deviceType == vk::PhysicalDeviceType::eCpu) {

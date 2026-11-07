@@ -39,3 +39,6 @@ Apply in numeric order to `6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d`. [Index and
 - [Vulkan FA value staging](35-vulkan-fa-v-pack/README.md)
 - [AVX2 Q5_K, Q6_K and IQ3 dot products](36-haswell-avx2-quant-dot/README.md)
 - [Polaris wide scalar Q4_K prefill](37-polaris-wide-k-prefill/README.md)
+- [Reserve the small Vulkan BAR for transfers](38-vulkan-small-bar/README.md)
+- [Spread CPU Softmax rows across heads and batches](39-haswell-softmax-rows/README.md)
+- [Check tensor allocator size before padding](40-tallocr-size-bounds/README.md)

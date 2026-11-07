@@ -1,8 +1,12 @@
 # Retained patches and sources
 
+## November 7, 2026
+
+The [ordered series](patches/series/) contains 40 diffs, each with its own description and SHA-256. The latest changes reserve the small Vulkan BAR for transfers, distribute CPU Softmax rows over available workers and guard tensor allocation arithmetic. [Source decisions](review-2026-11-07.md) · [Isolated tests](../results/operations-2026-11-07.json).
+
 ## November 6, 2026
 
-The [ordered series](patches/series/) contains 37 individual diffs and descriptions. Applying them to the recorded upstream commit reproduces the tree from the combined runtime snapshot. [Source review](review-2026-11-06.md) · [Search index](review-2026-11-06.json) · [Manual measurements](../results/performance-2026-11-06.json).
+The [November 6 series](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/v1.125-20261106-dc51f393/performance/patches/series) contains 37 individual diffs and descriptions. Applying them to the recorded upstream commit reproduces the tree from the combined runtime snapshot. [Source review](review-2026-11-06.md) · [Search index](review-2026-11-06.json) · [Manual measurements](../results/performance-2026-11-06.json).
 
 ## Maintenance4November2026
 

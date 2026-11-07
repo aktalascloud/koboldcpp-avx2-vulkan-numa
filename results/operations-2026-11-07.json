@@ -1,0 +1,529 @@
+{
+  "date": "2026-11-07",
+  "official_commit": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
+  "installed_native_sha256": "05e9dc7a50a8dcfb0c07e37b8d38e92a483b2f0896dacd9e2aff288f09cacf7e",
+  "patch_sha256": "d93b804d433035c1ab2ca226a8ab5e0182740149e529b0bca9e482b0b6376945",
+  "cpu": "Xeon E5-2696 v3",
+  "gpu": "AMD Radeon RX 580 2048SP",
+  "scope": "Isolated kernel A/B and startup evidence",
+  "softmax": {
+    "source": "https://github.com/ggml-org/llama.cpp/pull/30923",
+    "unit": "microseconds per operation, including worker barriers",
+    "methodology": "Same Haswell kernel sources and input; balanced ABBA twice, 32 operations per sample, 6 or 20 persistent workers, real GGML vector path; outputs compared byte for byte.",
+    "end_to_end_model_timing": false,
+    "rows": [
+      {
+        "width": 12288,
+        "rows": 1,
+        "heads": 24,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          900.7281,
+          901.9688,
+          898.4188,
+          898.5531
+        ],
+        "candidate_us": [
+          169.325,
+          168.1188,
+          169.0125,
+          172.0875
+        ],
+        "baseline_median_us": 899.6406,
+        "candidate_median_us": 169.16875,
+        "speed_ratio": 5.318007019617985,
+        "spread_across_heads": true
+      },
+      {
+        "width": 12288,
+        "rows": 1,
+        "heads": 24,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          1069.175,
+          1073.1312,
+          1071.3531,
+          1074.6906
+        ],
+        "candidate_us": [
+          207.4281,
+          206.2312,
+          201.3688,
+          200.6312
+        ],
+        "baseline_median_us": 1072.24215,
+        "candidate_median_us": 203.8,
+        "speed_ratio": 5.2612470559371936,
+        "spread_across_heads": true
+      },
+      {
+        "width": 32768,
+        "rows": 1,
+        "heads": 16,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          1661.775,
+          1660.9688,
+          1657.1781,
+          1662.7938
+        ],
+        "candidate_us": [
+          336.5562,
+          337.8406,
+          348.0344,
+          335.925
+        ],
+        "baseline_median_us": 1661.3719,
+        "candidate_median_us": 337.1984,
+        "speed_ratio": 4.9269863083573355,
+        "spread_across_heads": true
+      },
+      {
+        "width": 32768,
+        "rows": 1,
+        "heads": 16,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          1954.0906,
+          1954.4562,
+          1952.3406,
+          1955.6531
+        ],
+        "candidate_us": [
+          388.6344,
+          389.9219,
+          385.925,
+          384.075
+        ],
+        "baseline_median_us": 1954.2734,
+        "candidate_median_us": 387.27970000000005,
+        "speed_ratio": 5.046155014063479,
+        "spread_across_heads": true
+      },
+      {
+        "width": 4096,
+        "rows": 2,
+        "heads": 12,
+        "batch": 2,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          320.4969,
+          318.2656,
+          317.8344,
+          319.8375
+        ],
+        "candidate_us": [
+          119.9031,
+          119.3312,
+          120.5062,
+          119.5531
+        ],
+        "baseline_median_us": 319.05155,
+        "candidate_median_us": 119.7281,
+        "speed_ratio": 2.6648009113984106,
+        "spread_across_heads": true
+      },
+      {
+        "width": 4096,
+        "rows": 2,
+        "heads": 12,
+        "batch": 2,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          370.3125,
+          367.2937,
+          373.7844,
+          369.8375
+        ],
+        "candidate_us": [
+          140.3562,
+          136.2188,
+          142.4812,
+          140.7094
+        ],
+        "baseline_median_us": 370.075,
+        "candidate_median_us": 140.5328,
+        "speed_ratio": 2.633370999510434,
+        "spread_across_heads": true
+      },
+      {
+        "width": 4096,
+        "rows": 3,
+        "heads": 8,
+        "batch": 2,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          227.3781,
+          223.2594,
+          221.5125,
+          224.6969
+        ],
+        "candidate_us": [
+          119.7281,
+          117.8656,
+          120.9844,
+          118.7531
+        ],
+        "baseline_median_us": 223.97815,
+        "candidate_median_us": 119.2406,
+        "speed_ratio": 1.8783715445913556,
+        "spread_across_heads": true
+      },
+      {
+        "width": 4096,
+        "rows": 3,
+        "heads": 8,
+        "batch": 2,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          259.7781,
+          260.75,
+          254.9344,
+          261.0844
+        ],
+        "candidate_us": [
+          149.9469,
+          143.7219,
+          143.0563,
+          140.1312
+        ],
+        "baseline_median_us": 260.26405,
+        "candidate_median_us": 143.38909999999998,
+        "speed_ratio": 1.8150895012242914,
+        "spread_across_heads": true
+      },
+      {
+        "width": 1024,
+        "rows": 8,
+        "heads": 12,
+        "batch": 2,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          178.2469,
+          174.025,
+          175.1438,
+          174.7656
+        ],
+        "candidate_us": [
+          169.2156,
+          166.6656,
+          169.45,
+          167.8688
+        ],
+        "baseline_median_us": 174.9547,
+        "candidate_median_us": 168.54219999999998,
+        "speed_ratio": 1.0380468511743648,
+        "spread_across_heads": false
+      },
+      {
+        "width": 1024,
+        "rows": 8,
+        "heads": 12,
+        "batch": 2,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          215.3125,
+          212.6531,
+          214.1,
+          214.6188
+        ],
+        "candidate_us": [
+          204.1781,
+          205.7469,
+          205.4094,
+          207.6813
+        ],
+        "baseline_median_us": 214.3594,
+        "candidate_median_us": 205.57815,
+        "speed_ratio": 1.0427148994190287,
+        "spread_across_heads": false
+      },
+      {
+        "width": 1024,
+        "rows": 16,
+        "heads": 8,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          108.2844,
+          105.1094,
+          105.5031,
+          104.5875
+        ],
+        "candidate_us": [
+          98.8812,
+          96.8406,
+          97.05,
+          97.6094
+        ],
+        "baseline_median_us": 105.30625,
+        "candidate_median_us": 97.3297,
+        "speed_ratio": 1.0819539154030064,
+        "spread_across_heads": false
+      },
+      {
+        "width": 1024,
+        "rows": 16,
+        "heads": 8,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          120.2406,
+          118.9031,
+          120.9938,
+          121.7687
+        ],
+        "candidate_us": [
+          117.2375,
+          115.6063,
+          114.9688,
+          116.4625
+        ],
+        "baseline_median_us": 120.6172,
+        "candidate_median_us": 116.0344,
+        "speed_ratio": 1.0394951841867583,
+        "spread_across_heads": false
+      },
+      {
+        "width": 512,
+        "rows": 1,
+        "heads": 24,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          59.6406,
+          58.9594,
+          55.7125,
+          57.5688
+        ],
+        "candidate_us": [
+          28.6875,
+          26.4531,
+          28.3281,
+          27.5906
+        ],
+        "baseline_median_us": 58.2641,
+        "candidate_median_us": 27.95935,
+        "speed_ratio": 2.0838860703127935,
+        "spread_across_heads": true
+      },
+      {
+        "width": 512,
+        "rows": 1,
+        "heads": 24,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          65.775,
+          66.6031,
+          64.6875,
+          68.9719
+        ],
+        "candidate_us": [
+          30.1031,
+          28.8875,
+          29.7188,
+          28.175
+        ],
+        "baseline_median_us": 66.18905000000001,
+        "candidate_median_us": 29.303150000000002,
+        "speed_ratio": 2.25876910844056,
+        "spread_across_heads": true
+      },
+      {
+        "width": 256,
+        "rows": 1,
+        "heads": 6,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          24.5719,
+          25.0969,
+          24.0344,
+          24.1281
+        ],
+        "candidate_us": [
+          21.9594,
+          21.4,
+          22.35,
+          21.8469
+        ],
+        "baseline_median_us": 24.35,
+        "candidate_median_us": 21.90315,
+        "speed_ratio": 1.1117122423030479,
+        "spread_across_heads": true
+      },
+      {
+        "width": 256,
+        "rows": 1,
+        "heads": 6,
+        "batch": 1,
+        "threads": 6,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          29.1594,
+          26.2906,
+          25.6875,
+          24.7906
+        ],
+        "candidate_us": [
+          24.15,
+          20.8062,
+          21.3188,
+          20.8125
+        ],
+        "baseline_median_us": 25.98905,
+        "candidate_median_us": 21.065649999999998,
+        "speed_ratio": 1.2337169752654202,
+        "spread_across_heads": true
+      },
+      {
+        "width": 16384,
+        "rows": 1,
+        "heads": 32,
+        "batch": 1,
+        "threads": 20,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          1638.6594,
+          1662.6437,
+          1654.3156,
+          1642.2562
+        ],
+        "candidate_us": [
+          242.3063,
+          238.9906,
+          249.2188,
+          235.1406
+        ],
+        "baseline_median_us": 1648.2858999999999,
+        "candidate_median_us": 240.64845,
+        "speed_ratio": 6.849351824206638,
+        "spread_across_heads": true
+      },
+      {
+        "width": 16384,
+        "rows": 1,
+        "heads": 32,
+        "batch": 1,
+        "threads": 20,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          1927.5219,
+          1921.6594,
+          1924.3594,
+          1946.5844
+        ],
+        "candidate_us": [
+          282.1344,
+          282.0406,
+          280.5312,
+          282.05
+        ],
+        "baseline_median_us": 1925.94065,
+        "candidate_median_us": 282.0453,
+        "speed_ratio": 6.828479857668254,
+        "spread_across_heads": true
+      },
+      {
+        "width": 2539,
+        "rows": 1,
+        "heads": 24,
+        "batch": 1,
+        "threads": 20,
+        "fp16_mask": false,
+        "bit_exact": true,
+        "baseline_us": [
+          255.6937,
+          257.6094,
+          258.2469,
+          256.2063
+        ],
+        "candidate_us": [
+          88.2625,
+          86.6688,
+          87.5906,
+          82.3344
+        ],
+        "baseline_median_us": 256.90785,
+        "candidate_median_us": 87.1297,
+        "speed_ratio": 2.9485680542914756,
+        "spread_across_heads": true
+      },
+      {
+        "width": 2539,
+        "rows": 1,
+        "heads": 24,
+        "batch": 1,
+        "threads": 20,
+        "fp16_mask": true,
+        "bit_exact": true,
+        "baseline_us": [
+          294.3062,
+          298.4187,
+          289.6344,
+          296.2406
+        ],
+        "candidate_us": [
+          91.5594,
+          93.8563,
+          91.3406,
+          90.4125
+        ],
+        "baseline_median_us": 295.2734,
+        "candidate_median_us": 91.44999999999999,
+        "speed_ratio": 3.2287960634226356,
+        "spread_across_heads": true
+      }
+    ]
+  },
+  "vulkan": {
+    "source": "https://github.com/ggml-org/llama.cpp/pull/31658",
+    "physical_main_vram_mib": 7936,
+    "physical_bar_mib": 256,
+    "native_reports_rebar": false,
+    "measured_speedup": false
+  },
+  "allocator": {
+    "source": "https://github.com/ggml-org/llama.cpp/pull/26318",
+    "cases": 10,
+    "scope": "Actual allocator function with a bounded fake buffer; no model load required."
+  }
+}

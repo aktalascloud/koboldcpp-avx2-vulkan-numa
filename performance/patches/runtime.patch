@@ -114,6 +114,32 @@ index afb8633..039f4f0 100644
      // `src` is the tensor in the previous split
      // `dst` is the copy of `src` in the split
      // `graph` is the compute graph of the split
+diff --git a/ggml/src/ggml-alloc.c b/ggml/src/ggml-alloc.c
+index b0c067b..e7a10b2 100644
+--- a/ggml/src/ggml-alloc.c
++++ b/ggml/src/ggml-alloc.c
+@@ -75,11 +75,18 @@ struct ggml_tallocr ggml_tallocr_new(ggml_backend_buffer_t buffer) {
+ 
+ enum ggml_status ggml_tallocr_alloc(struct ggml_tallocr * talloc, struct ggml_tensor * tensor) {
+     size_t size = ggml_backend_buffer_get_alloc_size(talloc->buffer, tensor);
+-    size = GGML_PAD(size, talloc->alignment);
++    const size_t alignment = talloc->alignment;
++    GGML_ASSERT(alignment && !(alignment & (alignment - 1)));
++    if (size > SIZE_MAX - (alignment - 1)) {
++        GGML_ABORT("tensor allocation size overflow");
++    }
++    size = GGML_PAD(size, alignment);
+ 
+-    if (talloc->offset + size > ggml_backend_buffer_get_size(talloc->buffer)) {
++    const size_t capacity = ggml_backend_buffer_get_size(talloc->buffer);
++    if (talloc->offset > capacity || size > capacity - talloc->offset) {
++        const size_t available = talloc->offset <= capacity ? capacity - talloc->offset : 0;
+         GGML_LOG_ERROR("%s: not enough space in the buffer to allocate %s (needed %zu, available %zu)\n",
+-                __func__, tensor->name, size, ggml_backend_buffer_get_size(talloc->buffer) - talloc->offset);
++                __func__, tensor->name, size, available);
+         GGML_ABORT("not enough space in the buffer");
+     }
+ 
 diff --git a/ggml/src/ggml-backend.cpp b/ggml/src/ggml-backend.cpp
 index 2987013..39e651b 100644
 --- a/ggml/src/ggml-backend.cpp
@@ -988,7 +1014,7 @@ index b406f37..fc49df1 100644
      }
  
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 55f6255..082445c 100644
+index 55f6255..d0bf517 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
 @@ -1731,12 +1731,31 @@ static void ggml_compute_forward_repeat_f32(
@@ -1025,6 +1051,17 @@ index 55f6255..082445c 100644
      GGML_TENSOR_UNARY_OP_LOCALS
  
      // guaranteed to be an integer due to the check in ggml_can_repeat
+@@ -5840,7 +5859,9 @@ static void ggml_compute_forward_soft_max_f32(
+ 
+     for (int64_t i03 = 0; i03 < ne03; i03++) {
+         for (int64_t i02 = 0; i02 < ne02; i02++) {
+-            for (int64_t i01 = ith; i01 < ne01; i01 += nth) {
++            const int64_t row_base = (i03*ne02 + i02)*ne01;
++            const int64_t first_row = ne01 < nth ? (ith + nth - row_base % nth) % nth : ith;
++            for (int64_t i01 = first_row; i01 < ne01; i01 += nth) {
+                 const int64_t i11 = i01;
+                 const int64_t i12 = i02%ne12;
+                 const int64_t i13 = i03%ne13;
 diff --git a/ggml/src/ggml-cpu/vec.h b/ggml/src/ggml-cpu/vec.h
 index aa9b5c8..05caae0 100644
 --- a/ggml/src/ggml-cpu/vec.h
@@ -1060,11 +1097,32 @@ index aa9b5c8..05caae0 100644
      const __m256 one = _mm256_set1_ps(1);
      const __m256 zero = _mm256_setzero_ps();
      const __m256 neg_x = _mm256_sub_ps(zero, x);
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-buffers.cpp b/ggml/src/ggml-vulkan/ggml-vulkan-buffers.cpp
+index 4076519..6b91952 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-buffers.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-buffers.cpp
+@@ -229,7 +229,7 @@ vk_buffer ggml_vk_create_buffer_device(vk_device& device, size_t size) {
+             buf = ggml_vk_create_buffer(device, size, {vk::MemoryPropertyFlagBits::eDeviceLocal | vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent,
+                                                        vk::MemoryPropertyFlagBits::eDeviceLocal,
+                                                        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent});
+-        } else if (device->disable_host_visible_vidmem) {
++        } else if (!device->rebar || device->disable_host_visible_vidmem) {
+             if (device->allow_sysmem_fallback) {
+                 buf = ggml_vk_create_buffer(device, size, {vk::MemoryPropertyFlagBits::eDeviceLocal,
+                                                            vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent});
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 7714bc3..30903fd 100644
+index 7714bc3..fce5a20 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -834,6 +834,7 @@ struct vk_device_struct {
+@@ -705,6 +705,7 @@ struct vk_device_struct {
+     uint32_t subgroup_size_log2;
+     uint32_t shader_core_count;
+     bool uma;
++    bool rebar;
+     bool prefer_host_memory;
+     bool float_controls_rte_fp16;
+     bool float_controls_denorm_preserve_fp16;
+@@ -834,6 +835,7 @@ struct vk_device_struct {
      vk_pipeline pipeline_add_id_f32;
  
      vk_pipeline pipeline_concat_i8, pipeline_concat_i16, pipeline_concat_i32, pipeline_concat_i64;
@@ -1073,7 +1131,7 @@ index 7714bc3..30903fd 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index e5c2812..5894799 100644
+index e5c2812..5fa1fed 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1278,7 +1278,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
@@ -1236,7 +1294,45 @@ index e5c2812..5894799 100644
          uint32_t use_collectives = 0;  // Enables subgroup ops for preventing the re-calculation of indices.
          uint32_t conv2d_TS_K     = (s == CONV_SHAPE_64x32) ? 4 : 8;
          uint32_t conv2d_SHMEM_PAD = 4;
-@@ -4373,11 +4439,23 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4056,6 +4122,29 @@ static bool ggml_vk_host_buffer_import_usable(uint32_t vendor_id) {
+     return vendor_id != VK_VENDOR_ID_AMD;
+ }
+ 
++// A separately mapped small BAR is not the main host-visible VRAM heap.
++static bool ggml_vk_has_rebar(const vk::PhysicalDevice & physical_device) {
++    const auto props = physical_device.getMemoryProperties();
++    uint32_t vram = UINT32_MAX;
++    for (uint32_t i = 0; i < props.memoryHeapCount; ++i) {
++        const auto & heap = props.memoryHeaps[i];
++        if ((heap.flags & vk::MemoryHeapFlagBits::eDeviceLocal) &&
++            (vram == UINT32_MAX || heap.size > props.memoryHeaps[vram].size)) {
++            vram = i;
++        }
++    }
++    const auto visible_vram = vk::MemoryPropertyFlagBits::eDeviceLocal |
++                              vk::MemoryPropertyFlagBits::eHostVisible |
++                              vk::MemoryPropertyFlagBits::eHostCoherent;
++    for (uint32_t i = 0; i < props.memoryTypeCount; ++i) {
++        const auto & type = props.memoryTypes[i];
++        if (type.heapIndex == vram && (type.propertyFlags & visible_vram) == visible_vram) {
++            return true;
++        }
++    }
++    return false;
++}
++
+ vk_device ggml_vk_get_device(size_t idx) {
+     VK_LOG_DEBUG("ggml_vk_get_device(" << idx << ")");
+ 
+@@ -4302,6 +4391,7 @@ vk_device ggml_vk_get_device(size_t idx) {
+         device->subgroup_size = subgroup_props.subgroupSize;
+         device->subgroup_size_log2 = uint32_t(log2f(float(device->subgroup_size)));
+         device->uma = device->properties.deviceType == vk::PhysicalDeviceType::eIntegratedGpu;
++        device->rebar = ggml_vk_has_rebar(device->physical_device);
+         if (sm_builtins) {
+             device->shader_core_count = sm_props.shaderSMCount;
+         } else if (amd_shader_core_properties2) {
+@@ -4373,11 +4463,23 @@ vk_device ggml_vk_get_device(size_t idx) {
          // Allow overriding avoiding the graphics queue because it can increase performance on RADV
          const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
          const vk::QueueFlagBits graphics_flag = allow_graphics_queue ? (vk::QueueFlagBits)0 : vk::QueueFlagBits::eGraphics;
@@ -1263,7 +1359,7 @@ index e5c2812..5894799 100644
  
          std::vector<vk::DeviceQueueCreateInfo> device_queue_create_infos;
          vk::DeviceCreateInfo device_create_info{};
-@@ -4389,12 +4467,12 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4389,12 +4491,12 @@ vk_device ggml_vk_get_device(size_t idx) {
          device_features2.pNext = nullptr;
          device_features2.features = (VkPhysicalDeviceFeatures)device_features;
  
@@ -1278,7 +1374,7 @@ index e5c2812..5894799 100644
          vk12_features.pNext = nullptr;
          vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
          vk11_features.pNext = &vk12_features;
-@@ -4853,7 +4931,19 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4853,7 +4955,19 @@ vk_device ggml_vk_get_device(size_t idx) {
              .setQueueCreateInfos(device_queue_create_infos)
              .setPEnabledExtensionNames(device_extensions);
          device_create_info.setPNext(&device_features2);
@@ -1299,7 +1395,7 @@ index e5c2812..5894799 100644
  
          if (device->device_fault) {
              device->pfn_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT)
-@@ -5118,12 +5208,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+@@ -5118,12 +5232,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
      device_features2.pNext = nullptr;
  
@@ -1314,7 +1410,18 @@ index e5c2812..5894799 100644
      vk12_features.pNext = nullptr;
      vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
      vk11_features.pNext = &vk12_features;
-@@ -5711,6 +5801,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
+@@ -5256,8 +5370,8 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+ #endif
+ 
+     std::string device_name = props2.properties.deviceName.data();
+-    GGML_LOG_DEBUG("ggml_vulkan: %zu = %s (%s) | uma: %d | fp16: %s | bf16: %d | fp4: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s\n",
+-              idx, device_name.c_str(), driver_props.driverName.data(), uma, fp16_str, bf16, fp4, subgroup_size,
++    GGML_LOG_DEBUG("ggml_vulkan: %zu = %s (%s) | uma: %d | rebar: %d | fp16: %s | bf16: %d | fp4: %d | warp size: %zu | shared memory: %d | int dot: %d | matrix cores: %s\n",
++              idx, device_name.c_str(), driver_props.driverName.data(), uma, ggml_vk_has_rebar(physical_device), fp16_str, bf16, fp4, subgroup_size,
+               props2.properties.limits.maxComputeSharedMemorySize, integer_dot_product, matrix_cores.c_str());
+ 
+     if (props2.properties.deviceType == vk::PhysicalDeviceType::eCpu) {
+@@ -5711,6 +5825,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
          }
      }
  
@@ -1332,7 +1439,7 @@ index e5c2812..5894799 100644
      if (b_type == GGML_TYPE_Q8_1) {
          if (ctx->device->vendor_id == VK_VENDOR_ID_INTEL) {
              dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
-@@ -8861,6 +8962,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
+@@ -8861,6 +8986,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
      return pipelines[2];
  }
  
@@ -1350,7 +1457,7 @@ index e5c2812..5894799 100644
  static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * dst, ggml_op op) {
      switch (op) {
      case GGML_OP_GET_ROWS:
-@@ -8953,6 +9065,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -8953,6 +9089,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
          if (!ggml_vk_concat_supported(src0, src1, dst)) {
              return nullptr;
          }
@@ -1360,7 +1467,7 @@ index e5c2812..5894799 100644
          switch (ggml_vk_concat_unit_size(src0->type)) {
          case 1:
              return ctx->device->pipeline_concat_i8;
-@@ -9885,6 +10000,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -9885,6 +10024,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
      case GGML_OP_GLU:
      case GGML_OP_CONV_2D_DW:
          {
@@ -1371,7 +1478,7 @@ index e5c2812..5894799 100644
              uint32_t ne = ggml_nelements(dst);
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
-@@ -10732,6 +10851,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -10732,6 +10875,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
@@ -1380,7 +1487,7 @@ index e5c2812..5894799 100644
  
      ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
  }
-@@ -13765,7 +13886,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+@@ -13765,7 +13910,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
      const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
  
      // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
@@ -1391,7 +1498,7 @@ index e5c2812..5894799 100644
             ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
             ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
             scale_in->src[0]->type == GGML_TYPE_F32 &&
-@@ -14559,6 +14682,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14559,6 +14706,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
      uint64_t flops_per_submit = ctx->last_total_flops < 1'000'000'000ULL ? 0 :
          std::clamp(ctx->last_total_flops / 40u, std::min<uint64_t>(100'000'000ULL, flops_cap), flops_cap);
  
@@ -1404,7 +1511,7 @@ index e5c2812..5894799 100644
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -14583,7 +14712,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14583,7 +14736,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -1413,7 +1520,7 @@ index e5c2812..5894799 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -14870,7 +14999,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14870,7 +15023,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -1422,7 +1529,7 @@ index e5c2812..5894799 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -15455,7 +15584,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -15455,7 +15608,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  
@@ -1432,7 +1539,7 @@ index e5c2812..5894799 100644
          vk_backend->iface.get_tensor_async = nullptr;
      }
  
-@@ -16050,8 +16180,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16050,8 +16204,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32;
          case GGML_OP_FILL:
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
@@ -1451,7 +1558,7 @@ index e5c2812..5894799 100644
          case GGML_OP_PAD:
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
-@@ -16572,7 +16710,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -16572,7 +16734,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  

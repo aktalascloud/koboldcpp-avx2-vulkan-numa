@@ -1,0 +1,6181 @@
+{
+  "date": "2026-11-07",
+  "window_local": [
+    "2026-09-07",
+    "2026-11-07"
+  ],
+  "updated_since_utc": "2026-09-06T18:00:00Z",
+  "baseline": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
+  "official_head": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
+  "unique_sources": 90,
+  "unavailable_sources": 1,
+  "prs": 33853,
+  "issues": 10787,
+  "screening": {
+    "metadata_outside_focus": 33281,
+    "detail_available": 572
+  },
+  "official_prs": 57,
+  "official_missing_detailed_evidence": [],
+  "full_detail_fetched_this_pass": 515,
+  "previous_detail_records": 107,
+  "detail_retrieval_errors": [],
+  "source_inventory": [
+    {
+      "name": "LostRuins/koboldcpp",
+      "groups": [
+        "configured",
+        "canonical_direct"
+      ],
+      "pages": 2,
+      "prs": 57,
+      "issues": 99,
+      "pr_screening": {
+        "detail_available": 57
+      }
+    },
+    {
+      "name": "andrewdhannah/vulkan-polaris-llama",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ponyol/llama.cpp.patch.speed",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "AvilaCarlosDev/polaris-local-ai",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 8,
+      "issues": 0,
+      "pr_screening": {
+        "detail_available": 1,
+        "metadata_outside_focus": 7
+      }
+    },
+    {
+      "name": "castlen3/rx580-llamacpp-vulkan-guide",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 1,
+      "pr_screening": {}
+    },
+    {
+      "name": "doteyeso-ops/rx580-vulkan-agents",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "cubetitled-ui/llama.cpp",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "robertrosenbusch/gfx803_rocm",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 2,
+      "pr_screening": {}
+    },
+    {
+      "name": "MohammadR3za/HybridMoE",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "lakitu12/vkblas",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "Schaka/rocm-gfx803",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 1,
+      "issues": 3,
+      "pr_screening": {
+        "detail_available": 1
+      }
+    },
+    {
+      "name": "lakitu12/rocm-gfx803-torch",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "dhaern/VelociQ8",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "chboishabba/gfx803_compat_graph",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 2,
+      "issues": 1,
+      "pr_screening": {
+        "detail_available": 2
+      }
+    },
+    {
+      "name": "lakitu12/rocm-gfx803",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 30,
+      "issues": 0,
+      "pr_screening": {
+        "metadata_outside_focus": 30
+      }
+    },
+    {
+      "name": "superexp1/llama2c-avx2-tuning",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ikawrakow/ik_llama.cpp",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 6,
+      "prs": 414,
+      "issues": 94,
+      "pr_screening": {
+        "metadata_outside_focus": 395,
+        "detail_available": 19
+      }
+    },
+    {
+      "name": "cjml555/llama-native",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "layfhaker/llama.cpp-x86-neon",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "pauldmartinphd/llm-performance-engineering-notebook",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 1,
+      "issues": 0,
+      "pr_screening": {
+        "metadata_outside_focus": 1
+      }
+    },
+    {
+      "name": "nandyalu/rocm-llamacpp-cpu-fix",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "sirfyyn/FastLocalExperts",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 25,
+      "issues": 0,
+      "pr_screening": {
+        "detail_available": 2,
+        "metadata_outside_focus": 23
+      }
+    },
+    {
+      "name": "HarshaVardhan3002/ROCmFPX",
+      "groups": [
+        "configured",
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 2,
+      "pr_screening": {}
+    },
+    {
+      "name": "advanced-lvl-up/Rx470-Vega10-Rx580-gfx803-gfx900-fix-AMD-GPU",
+      "groups": [
+        "configured"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "0xShug0/audio.cpp",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 8,
+      "prs": 595,
+      "issues": 156,
+      "pr_screening": {
+        "metadata_outside_focus": 567,
+        "detail_available": 28
+      }
+    },
+    {
+      "name": "aivisionslab-studios/rx580-local-ai-guide",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "aryan-nikzad/4x-rx580-sdserver-launcher",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "aryan-nikzad/qwen-image-rx580-launcher",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "aryan-nikzad/rx580-llamacpp-launcher",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ayanoby/vega-igpu-diffusion",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "dmalves/local-ai",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "doteyeso-ops/rx580-vulkan-fa-lds",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "engival/yue2-eagle3-train",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "engival/yue2.cpp",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 1,
+      "issues": 2,
+      "pr_screening": {
+        "metadata_outside_focus": 1
+      }
+    },
+    {
+      "name": "FFmpeg/FFmpeg",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "gaigher/Polaris-multi-GPU-llama",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ggml-org/whisper.cpp",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 7,
+      "prs": 248,
+      "issues": 443,
+      "pr_screening": {
+        "metadata_outside_focus": 240,
+        "detail_available": 8
+      }
+    },
+    {
+      "name": "JonPark0/krafla",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 72,
+      "issues": 0,
+      "pr_screening": {
+        "metadata_outside_focus": 72
+      }
+    },
+    {
+      "name": "KessokuNet/infr",
+      "groups": [
+        "previous_branches",
+        "previous_branches",
+        "previous_search_repos"
+      ],
+      "pages": 1,
+      "prs": 7,
+      "issues": 15,
+      "pr_screening": {
+        "detail_available": 7
+      }
+    },
+    {
+      "name": "leejet/stable-diffusion.cpp",
+      "groups": [
+        "previous_branches",
+        "canonical_direct"
+      ],
+      "pages": 4,
+      "prs": 226,
+      "issues": 171,
+      "pr_screening": {
+        "detail_available": 32,
+        "metadata_outside_focus": 194
+      }
+    },
+    {
+      "name": "mirek190/ggml",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "morphious1986/gfx803-pytorch-rocm-community",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "nihui/realsr-ncnn-vulkan",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "niveku/upscale-amd-vulkan",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "overdoingism/llama-cpp-overdoing",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "PrismML-Eng/llama.cpp",
+      "groups": [
+        "previous_branches",
+        "canonical_direct"
+      ],
+      "pages": 3,
+      "prs": 236,
+      "issues": 55,
+      "pr_screening": {
+        "metadata_outside_focus": 221,
+        "detail_available": 15
+      }
+    },
+    {
+      "name": "rxzsu/polarisrs",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "SegmentationFish/sdvk",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ServeurpersoCom/omnivoice.cpp",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 3,
+      "issues": 2,
+      "pr_screening": {
+        "metadata_outside_focus": 3
+      }
+    },
+    {
+      "name": "ServeurpersoCom/qwentts.cpp",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 11,
+      "issues": 17,
+      "pr_screening": {
+        "metadata_outside_focus": 11
+      }
+    },
+    {
+      "name": "ServeurpersoCom/yue2.cpp",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 6,
+      "issues": 17,
+      "pr_screening": {
+        "metadata_outside_focus": 6
+      }
+    },
+    {
+      "name": "spy1134/rocm-gfx803",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "stew675/llama-cpp-rdna-boosts",
+      "groups": [
+        "previous_branches",
+        "canonical_direct"
+      ],
+      "pages": 3,
+      "prs": 120,
+      "issues": 125,
+      "pr_screening": {
+        "detail_available": 6,
+        "metadata_outside_focus": 114
+      }
+    },
+    {
+      "name": "Tencent/ncnn",
+      "groups": [
+        "previous_branches",
+        "canonical_direct"
+      ],
+      "pages": 4,
+      "prs": 299,
+      "issues": 88,
+      "pr_screening": {
+        "metadata_outside_focus": 273,
+        "detail_available": 26
+      }
+    },
+    {
+      "name": "thiensubs/llama-cpp-rx580-egpu",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "trickymind1324/axon-infer",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 8,
+      "pr_screening": {}
+    },
+    {
+      "name": "wlejon/brodiffusion",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "xinntao/Real-ESRGAN-ncnn-vulkan",
+      "groups": [
+        "previous_branches"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 1,
+      "pr_screening": {}
+    },
+    {
+      "name": "lieselstand-stack/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "Solenopsisbot/friend.cpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 3,
+      "issues": 0,
+      "pr_screening": {
+        "metadata_outside_focus": 3
+      }
+    },
+    {
+      "name": "kallewoof/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "esolithe/esobold",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 5,
+      "issues": 1,
+      "pr_screening": {
+        "metadata_outside_focus": 5
+      }
+    },
+    {
+      "name": "stanley-fork/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "yukawaii/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "swoldanski/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "alvinets/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "Computador33/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "InspectorCaracal/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "tandemura/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "yggdrasil75/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "Khania93/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ervanjaeger-ui/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "Zontomoka5934/koboldcpp_1.124.2",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "tk-shockwave/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "dr-pr-anand25/koboldcpp",
+      "groups": [
+        "previous_forks"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "ggml-org/llama.cpp",
+      "groups": [
+        "canonical_direct"
+      ],
+      "pages": 47,
+      "prs": 2933,
+      "issues": 1694,
+      "pr_screening": {
+        "metadata_outside_focus": 2791,
+        "detail_available": 142
+      }
+    },
+    {
+      "name": "ggml-org/ggml",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 1,
+      "prs": 45,
+      "issues": 25,
+      "pr_screening": {
+        "detail_available": 45
+      }
+    },
+    {
+      "name": "leejet/ggml",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 1,
+      "prs": 22,
+      "issues": 0,
+      "pr_screening": {
+        "detail_available": 22
+      }
+    },
+    {
+      "name": "ollama/ollama",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 18,
+      "prs": 1087,
+      "issues": 683,
+      "pr_screening": {
+        "metadata_outside_focus": 1080,
+        "detail_available": 7
+      }
+    },
+    {
+      "name": "ROCm/rocBLAS",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 1,
+      "prs": 1,
+      "issues": 0,
+      "pr_screening": {
+        "metadata_outside_focus": 1
+      }
+    },
+    {
+      "name": "ROCm/AMDMIGraphX",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 4,
+      "prs": 350,
+      "issues": 17,
+      "pr_screening": {
+        "metadata_outside_focus": 350
+      }
+    },
+    {
+      "name": "ROCm/rocm-libraries",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 43,
+      "prs": 3736,
+      "issues": 522,
+      "pr_screening": {
+        "metadata_outside_focus": 3717,
+        "detail_available": 19
+      }
+    },
+    {
+      "name": "Comfy-Org/ComfyUI",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 19,
+      "prs": 1141,
+      "issues": 684,
+      "pr_screening": {
+        "metadata_outside_focus": 1135,
+        "detail_available": 6
+      }
+    },
+    {
+      "name": "vllm-project/vllm",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 167,
+      "prs": 13161,
+      "issues": 3479,
+      "pr_screening": {
+        "metadata_outside_focus": 13121,
+        "detail_available": 40
+      }
+    },
+    {
+      "name": "nihui/rife-ncnn-vulkan",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 1,
+      "prs": 0,
+      "issues": 0,
+      "pr_screening": {}
+    },
+    {
+      "name": "turboderp-org/exllamav3",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 3,
+      "prs": 172,
+      "issues": 123,
+      "pr_screening": {
+        "metadata_outside_focus": 171,
+        "detail_available": 1
+      }
+    },
+    {
+      "name": "unslothai/unsloth",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 80,
+      "prs": 6306,
+      "issues": 1645,
+      "pr_screening": {
+        "metadata_outside_focus": 6269,
+        "detail_available": 37
+      }
+    },
+    {
+      "name": "openvinotoolkit/openvino",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 24,
+      "prs": 1816,
+      "issues": 489,
+      "pr_screening": {
+        "metadata_outside_focus": 1798,
+        "detail_available": 18
+      }
+    },
+    {
+      "name": "christopherthompson81/inference.rs",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "pages": 9,
+      "prs": 713,
+      "issues": 123,
+      "pr_screening": {
+        "metadata_outside_focus": 682,
+        "detail_available": 31
+      }
+    },
+    {
+      "name": "wbruna/koboldcpp",
+      "groups": [
+        "previous_search_repos"
+      ],
+      "error": "HTTP 404"
+    }
+  ],
+  "detailed_record_index": [
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/issues/1114",
+      "title": "Vulkan: VibeVoice voice_samples longer than ~2.73 s abort with GGML_ASSERT maxComputeWorkGroupCount (ggml-vulkan.cpp:6842) -- AMD RX 580",
+      "updated": "2026-10-27T23:51:28Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 2,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1036",
+      "title": "Fix MOSS-Nano CJK chunking for supplementary ideographs",
+      "updated": "2026-10-21T23:53:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1056",
+      "title": "Expose YuE2 performance controls and cuda_perf preset",
+      "updated": "2026-10-23T17:15:29Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 20,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1104",
+      "title": "🚨 Extend BreezeTTS performance controls to Vulkan and Metal",
+      "updated": "2026-10-26T18:57:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1109",
+      "title": "fix(ggml-cuda): prevent shared-memory aborts with Vulkan",
+      "updated": "2026-10-28T16:48:49Z",
+      "state": "open",
+      "pr": true,
+      "comments": 5,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/1120",
+      "title": "Fix Vulkan RMSNorm dispatch overflow for long voice references",
+      "updated": "2026-10-29T23:22:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/388",
+      "title": "fix(voxcpm1) GGUF-only tokenizer    ",
+      "updated": "2026-09-25T11:25:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 16,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/491",
+      "title": "perf(mira-tts): accelerate CPU and Vulkan inference",
+      "updated": "2026-09-08T23:39:43Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/496",
+      "title": "feat(kokoro): add multilingual GGUF synthesis and optimized CPU inference",
+      "updated": "2026-09-11T18:37:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 12,
+      "files": 35,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/508",
+      "title": "Apply upstream Vulkan FILL dispatch fix",
+      "updated": "2026-09-10T23:30:59Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/509",
+      "title": "Fix UI for YuE2",
+      "updated": "2026-09-11T03:16:57Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/540",
+      "title": "vulkan-shaders-gen: retry an empty shader compile instead of failing at link (potential fix for CI failures)",
+      "updated": "2026-09-20T21:09:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/542",
+      "title": "vulkan: fix COL2IM_1D dispatch for large tensors",
+      "updated": "2026-09-15T18:02:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/593",
+      "title": "fix(clap): materialize contiguous layout before the mel-projection matmul",
+      "updated": "2026-09-20T10:53:21Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/596",
+      "title": "Add deterministic YuE2 plan inputs and fix injected-ABC prefix assembly",
+      "updated": "2026-09-17T21:11:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 8,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/624",
+      "title": "fix(voxcpm1): use the stateful streaming decode on Vulkan too",
+      "updated": "2026-09-20T21:02:36Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/649",
+      "title": "gguf: quantize a tensor's rows in parallel",
+      "updated": "2026-09-22T18:57:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/667",
+      "title": "yue2: global fix opt-in context sizing",
+      "updated": "2026-09-24T19:02:46Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 16,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/674",
+      "title": "Reduce MOSS-TTS v1.5 GPU memory usage",
+      "updated": "2026-09-24T19:50:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/705",
+      "title": "higgs_audio_tts: reuse prefill storage on Vulkan",
+      "updated": "2026-09-26T18:50:12Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/706",
+      "title": "models: add validated CUDA and Vulkan parallel-slot adapters",
+      "updated": "2026-10-09T23:39:37Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 21,
+      "files": 121,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/737",
+      "title": "ACE-Step family : reduce memory usage 63% and speedup for vulkan 16% and cuda 6%",
+      "updated": "2026-09-29T22:04:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 11,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/869",
+      "title": "parakeet_tdt: reduce Vulkan decoder transfers and encoder allocation peaks",
+      "updated": "2026-10-12T15:46:17Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/905",
+      "title": "Fix Vulkan ceiling division overflow",
+      "updated": "2026-10-14T17:02:27Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/0xShug0/audio.cpp/pull/929",
+      "title": "Fix Drama 3 Vulkan voice conditioning with opt-in F32 encoder accumulation",
+      "updated": "2026-10-16T05:24:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Comfy-Org/ComfyUI/pull/15474",
+      "title": "fix(xpu): VAE no_grad + execution-layer VRAM prep, H3 first-forward synchronize, .gguf extension support",
+      "updated": "2026-09-29T21:56:45Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Comfy-Org/ComfyUI/pull/16185",
+      "title": "Fix quantized text encoder matmul gating and Gemma4 prefill cache",
+      "updated": "2026-09-08T18:57:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Comfy-Org/ComfyUI/pull/16293",
+      "title": "Fix yue2 AMD issues and add more controls to the generate ABC node.",
+      "updated": "2026-09-12T23:36:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Comfy-Org/ComfyUI/pull/16409",
+      "title": "feat(yue2): 18x throughput speedup & VRAM residency fix on entry-level GPUs (RTX 3050 4GB)",
+      "updated": "2026-10-25T19:40:46Z",
+      "state": "open",
+      "pr": true,
+      "comments": 6,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Comfy-Org/ComfyUI/pull/16453",
+      "title": "Fix Qwen flash attention CUDA gating",
+      "updated": "2026-09-21T17:09:52Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Comfy-Org/ComfyUI/pull/16567",
+      "title": "Fix Qwen-Image 2.1 text encoder fallback for vision-stripped / GGUF Qwen3-8B weights",
+      "updated": "2026-10-10T04:01:51Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/2",
+      "title": "Pick the faster decode GEMV variant on wave64",
+      "updated": "2026-11-01T10:04:07Z",
+      "state": "open",
+      "pr": false,
+      "comments": 1,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/4",
+      "title": "GCN4 prefill GEMM tier for Q4_K/Q6_K (beat llama.cpp)",
+      "updated": "2026-11-01T10:57:24Z",
+      "state": "open",
+      "pr": false,
+      "comments": 3,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/5",
+      "title": "GCN4 decode GEMV tier (beat llama.cpp, approach bandwidth ceiling)",
+      "updated": "2026-11-01T10:25:32Z",
+      "state": "open",
+      "pr": false,
+      "comments": 2,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/6",
+      "title": "EXL3 trellis-decode GEMV experiment on RX 580",
+      "updated": "2026-11-02T19:59:36Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 2,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/issues/9",
+      "title": "Propose the wave64 port upstream",
+      "updated": "2026-11-01T10:00:40Z",
+      "state": "open",
+      "pr": false,
+      "comments": 0,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/13",
+      "title": "Wave64-native subgroup decode GEMV (EXL3 #6)",
+      "updated": "2026-11-01T20:24:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/15",
+      "title": "feat(vulkan): multi-row fp32 kq_fma verify GEMV for the emulated-dot tier",
+      "updated": "2026-11-02T08:52:49Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 13,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/KessokuNet/infr/pull/20",
+      "title": "Gemma 4 image input + faster Q4_K/Q6_K mmq prefill on RDNA2",
+      "updated": "2026-11-05T11:20:18Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 31,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2252",
+      "title": "[Vulkan] dGPU + iGPU is slower in LLMs than 8GB dGPU with CPU overflow?",
+      "updated": "2026-10-16T05:41:39Z",
+      "state": "open",
+      "pr": false,
+      "comments": 11,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2456",
+      "title": "[ Feature Request ] Add Dual CLIP (OpenCLIP‑ViT/G + OpenAI CLIP‑ViT/L) Support for SDXL GGUF",
+      "updated": "2026-09-14T02:45:45Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 15,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2540",
+      "title": "Video generation regression in KoboldCpp 1.122 and 1.123 on AMD RX 9070 XT (Vulkan, Windows 11)",
+      "updated": "2026-10-16T06:09:48Z",
+      "state": "open",
+      "pr": false,
+      "comments": 2,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2541",
+      "title": "[Minor bug] `--sdmodel` goes not recognize Linux symbolic link unless link name has same extension as model file (gguf)",
+      "updated": "2026-10-24T01:33:51Z",
+      "state": "open",
+      "pr": false,
+      "comments": 8,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2555",
+      "title": "CUDA error \"invalid configuration argument\" at warm-up with Gemma 4 12B (Vulkan works)",
+      "updated": "2026-10-23T12:07:55Z",
+      "state": "open",
+      "pr": false,
+      "comments": 0,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2586",
+      "title": "Can't run Bonsai-2-27B-PQ2_0-MTP.gguf",
+      "updated": "2026-11-07T01:02:00Z",
+      "state": "open",
+      "pr": false,
+      "comments": 7,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/issues/2587",
+      "title": "extra flags using the launcher ?",
+      "updated": "2026-11-07T01:05:21Z",
+      "state": "open",
+      "pr": false,
+      "comments": 1,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2345",
+      "title": "feat: add native continuous batching benchmark",
+      "updated": "2026-10-13T14:28:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2359",
+      "title": "Add video input support for VLM inference",
+      "updated": "2026-10-14T16:12:59Z",
+      "state": "open",
+      "pr": true,
+      "comments": 11,
+      "files": 7,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2434",
+      "title": "fix grammar rejection cache: store reject indices, not candidate pointers",
+      "updated": "2026-10-14T16:12:59Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2444",
+      "title": "Optimize koboldcpp.sh for local users",
+      "updated": "2026-09-18T02:49:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2445",
+      "title": "fix `--port` argument when launching the gui",
+      "updated": "2026-09-07T16:00:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2452",
+      "title": "sd: merge upstream int8 convrot and fp8 scaled at master-841-6b3edaa",
+      "updated": "2026-09-14T14:11:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 9,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2453",
+      "title": "sd: sync with master-849-d04e895",
+      "updated": "2026-09-16T15:13:57Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 115,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2457",
+      "title": "sd: sync with master-852-14eddb3",
+      "updated": "2026-09-19T09:20:15Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 47,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2458",
+      "title": "sd: sync with master-866-42d6c0a",
+      "updated": "2026-09-24T08:21:21Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 75,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2460",
+      "title": "sd: fix video LoRAs",
+      "updated": "2026-09-14T14:21:12Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2462",
+      "title": "Updated websearch handling.",
+      "updated": "2026-09-14T03:50:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2477",
+      "title": "sd: sync with master-872-cc515a0",
+      "updated": "2026-09-27T10:03:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 81,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2483",
+      "title": "sd: fix: inhibit ggml log changes from sdcpp code",
+      "updated": "2026-09-21T12:56:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2484",
+      "title": "sd: round `info` floating point parameters",
+      "updated": "2026-09-21T13:31:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2491",
+      "title": "sd: sync with master-885-b8248a8",
+      "updated": "2026-09-29T15:41:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 44,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2496",
+      "title": "sd: sync with master-917-4c3cf75",
+      "updated": "2026-10-03T15:52:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 69,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2502",
+      "title": "fix: keep an integer minimum from accepting a shorter number",
+      "updated": "2026-09-28T15:48:45Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2504",
+      "title": "sd: sync with master-929-3f8527a",
+      "updated": "2026-10-11T16:06:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 36,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2508",
+      "title": "fix(build): apply Vulkan LDFLAGS on FreeBSD as well as OpenBSD",
+      "updated": "2026-09-28T14:57:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2514",
+      "title": "sd: support for custom sigma lists",
+      "updated": "2026-10-04T03:09:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2518",
+      "title": "sd: move the model swapping patch to sdtype_adapter",
+      "updated": "2026-10-11T09:51:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 16,
+      "files": 7,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2519",
+      "title": "sd: minor code cleanups",
+      "updated": "2026-10-06T09:35:32Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2524",
+      "title": "sd: sync with master-956-1b0ba10",
+      "updated": "2026-10-16T05:57:17Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 38,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2527",
+      "title": "sd: move model path fixups from sdcpp to sdtype_adapter",
+      "updated": "2026-10-11T09:40:32Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2529",
+      "title": "sd: add support for Z-Image L2P and Iris-3B",
+      "updated": "2026-10-16T15:39:06Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 35,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2530",
+      "title": "sd: model loading refactors",
+      "updated": "2026-10-12T10:42:43Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2531",
+      "title": "sd: fix VAE tiling adjustment to never reduce tile size",
+      "updated": "2026-10-12T10:10:48Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2532",
+      "title": "Skip unsupported tools without a name in compress_tools_array",
+      "updated": "2026-10-23T08:14:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2534",
+      "title": "sd: add a non-default target for a Vulkan sdmain binary",
+      "updated": "2026-10-13T12:16:10Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2535",
+      "title": "sd: fix h3 incoherence with flash attention",
+      "updated": "2026-10-14T05:25:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2538",
+      "title": "build: refactor the Makefile to use static libraries for ggml",
+      "updated": "2026-10-31T02:03:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2542",
+      "title": "sd: sync with master-975-95b3090",
+      "updated": "2026-10-20T09:35:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 9,
+      "files": 58,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2543",
+      "title": "Enable CUDA graphs with explicit architectures and add opt-in ADD capture",
+      "updated": "2026-10-18T03:15:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2544",
+      "title": "Expose lazy tensor loading and the upstream MoE GPU cache",
+      "updated": "2026-10-18T03:51:26Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2546",
+      "title": "build: use -Ofast only for legacy ggml",
+      "updated": "2026-10-19T09:55:17Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2547",
+      "title": "lookahead sampler",
+      "updated": "2026-11-03T18:55:26Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 8,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2548",
+      "title": "sd: detect file type by content instead of extension",
+      "updated": "2026-10-19T13:00:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2550",
+      "title": "Respect configured SWA padding including zero",
+      "updated": "2026-10-19T07:26:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2553",
+      "title": "sd: sync with master-995-fd21ecf",
+      "updated": "2026-10-30T10:17:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 26,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2557",
+      "title": "Fix Soprano implementation include placement",
+      "updated": "2026-10-24T09:27:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2559",
+      "title": "add support for glm5next",
+      "updated": "2026-10-30T09:02:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2560",
+      "title": "add glm 5 & mimo chat templates",
+      "updated": "2026-10-30T10:15:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 25,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2562",
+      "title": "sd: sync with master-997-cd7f986",
+      "updated": "2026-11-03T14:11:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 52,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2564",
+      "title": "AZ-000 - fix: support legacy AMD hardware in CPU and Vulkan paths",
+      "updated": "2026-11-03T09:14:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 14,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2565",
+      "title": "README: add Runcrate to Cloud GPUs",
+      "updated": "2026-10-26T12:15:25Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2566",
+      "title": "Mask passwords and keys in the startup argument print.",
+      "updated": "2026-10-28T16:24:47Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2567",
+      "title": "Include content, stop_reason, stop_sequence in Anthropic message_start",
+      "updated": "2026-10-30T07:36:47Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2568",
+      "title": "Honor stop_sequences in Anthropic /v1/messages",
+      "updated": "2026-10-30T06:41:04Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2569",
+      "title": "Enable option for RPC server tensor cache in host mode",
+      "updated": "2026-10-30T11:38:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2571",
+      "title": "Honor Anthropic tool_choice auto and any in /v1/messages",
+      "updated": "2026-10-30T06:40:49Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2573",
+      "title": "Horde chat reasoning and limits",
+      "updated": "2026-10-30T22:02:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2575",
+      "title": "sd: sync with master-1004-a85db96",
+      "updated": "2026-11-04T13:50:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 91,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2576",
+      "title": "sd: sync with master-1028-37bc88b",
+      "updated": "2026-11-05T11:04:51Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 81,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2577",
+      "title": "sd: switch CMakeLists.txt to build-time source file discovery",
+      "updated": "2026-11-04T15:43:52Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2580",
+      "title": "build: automatically select ISA libraries on Linux",
+      "updated": "2026-11-05T11:38:53Z",
+      "state": "open",
+      "pr": true,
+      "comments": 5,
+      "files": 7,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2581",
+      "title": "fix Vulkan build",
+      "updated": "2026-11-04T04:13:09Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/LostRuins/koboldcpp/pull/2583",
+      "title": "Add new config option for the soft-limit percent",
+      "updated": "2026-11-06T16:44:52Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/190",
+      "title": "ggml-cpu: fix crash: avoid null repack-trait and read callbacks",
+      "updated": "2026-10-23T20:13:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/198",
+      "title": "build: fix Ubuntu ARM64 and Windows Vulkan release jobs",
+      "updated": "2026-09-23T23:04:23Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/206",
+      "title": "ggml-cpu: AVX2/AVX-VNNI kernels for PQ2_0 + Q8_K activations + tiled GEMM (x86 without AVX-512)",
+      "updated": "2026-09-25T15:51:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/233",
+      "title": "ggml-cpu: AVX2 / AVX-VNNI GEMV+GEMM kernels for Q1_0 (4x8 repack) + shared-scale Q8 activations",
+      "updated": "2026-09-22T04:19:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/255",
+      "title": "ggml-cpu: add NEON, AVX2, AVX and SSSE3 vec_dot for PQ1_0",
+      "updated": "2026-09-29T22:20:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/260",
+      "title": "ggml-cpu: fix unused type warnings in the mul_mat chunk helpers",
+      "updated": "2026-09-24T07:27:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/263",
+      "title": "ggml-cpu : fix PQ2_0 x86 vec_dot build on non-AVX2 CPU variants",
+      "updated": "2026-09-24T07:26:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/274",
+      "title": "vulkan: extend PTQ1_0 fast integer-dot path to INTEL_XE1 iGPUs (Arrow Lake-H)",
+      "updated": "2026-09-27T21:57:25Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/29",
+      "title": "Bit-interleaved Q1_0 8x32 repack kernels for x86 AVX2",
+      "updated": "2026-09-25T20:26:57Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 34,
+      "files": 39,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/349",
+      "title": "vulkan: fuse the sign multiply into the Hadamard FWHT",
+      "updated": "2026-10-16T03:26:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/366",
+      "title": "vulkan: fix signed FWHT fusion fallback from #349",
+      "updated": "2026-10-16T16:33:32Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/PrismML-Eng/llama.cpp/pull/421",
+      "title": "build: fix RPC, Vulkan and SYCL builds after the upstream merge",
+      "updated": "2026-10-30T19:42:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/11189",
+      "title": "fix(ck-tile): fix sink+blockscale softmax dilution",
+      "updated": "2026-11-05T00:31:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/11761",
+      "title": "fix(miopen): remove gfx803-tuned solvers and stale kernel sources",
+      "updated": "2026-09-21T20:49:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 33,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/12624",
+      "title": "composablekernel: optimize gfx12 FlashAttention backward for D=128",
+      "updated": "2026-11-04T19:04:21Z",
+      "state": "open",
+      "pr": true,
+      "comments": 10,
+      "files": 9,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/12954",
+      "title": "composablekernel: optimize gfx12 FlashAttention backward for D32/D64",
+      "updated": "2026-11-04T19:03:34Z",
+      "state": "open",
+      "pr": true,
+      "comments": 7,
+      "files": 10,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/13122",
+      "title": "fix(rocke): apply gfx950 dense softmax scale in fp32",
+      "updated": "2026-10-09T01:20:44Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/13138",
+      "title": "fix(rocke): apply gfx942 dense softmax scale in fp32",
+      "updated": "2026-10-09T01:20:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/13517",
+      "title": "fix(hipblaslt): sync the matmul test stream before destroying it",
+      "updated": "2026-10-12T23:33:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14021",
+      "title": "Revert \"fix(hipblaslt): sync the matmul test stream before destroying it\"",
+      "updated": "2026-10-26T08:13:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14260",
+      "title": "fix(hipblaslt): sync the matmul test stream before destroy only for placement tests",
+      "updated": "2026-10-26T08:14:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14276",
+      "title": "fix(rocke/attention): carry the running softmax max in 3D split-KV",
+      "updated": "2026-10-27T13:19:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 8,
+      "files": 9,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14525",
+      "title": "feat(hip-kernel-provider): port the rocKE gfx950 tiled-2D V double-buffer, D256 fast path and softmax interleave to C++",
+      "updated": "2026-10-30T16:39:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 19,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14610",
+      "title": "fix(hipblaslt): run the memory preflight for every matmul case and list memory skips",
+      "updated": "2026-11-06T06:10:46Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 9,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14613",
+      "title": "fix(rocke): emit the gfx1250 DPP softmax reduce with update.dpp, not inline asm",
+      "updated": "2026-10-30T17:15:12Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14700",
+      "title": "fix(hipblaslt): release matmul timing events on early exits",
+      "updated": "2026-11-06T12:54:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14714",
+      "title": "fix(hipblaslt): release matmul descriptors on early exits",
+      "updated": "2026-11-05T14:32:49Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/14768",
+      "title": "fix(hipblaslt): refuse HIPBLASLT_ORDER_ROW in matmul instead of computing column-major",
+      "updated": "2026-11-06T12:55:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/15091",
+      "title": "perf(hipblaslt): remove per-call locks from the matmul launch path",
+      "updated": "2026-11-07T01:11:30Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 12,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/15294",
+      "title": "fix(hipblaslt): check batched matmul norms per batch",
+      "updated": "2026-11-06T23:17:11Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ROCm/rocm-libraries/pull/5240",
+      "title": "perf(miopen): Softmax optimization",
+      "updated": "2026-09-08T04:31:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 14,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6754",
+      "title": "layernorm vulkan subgroup reduce optimization",
+      "updated": "2026-10-17T15:25:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6755",
+      "title": "rmsnorm vulkan subgroup reduce optimization",
+      "updated": "2026-10-17T15:32:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6756",
+      "title": "GroupNorm Vulkan subgroup reduce optimization",
+      "updated": "2026-10-18T09:28:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6758",
+      "title": "InstanceNorm Vulkan subgroup reduce optimization",
+      "updated": "2026-10-18T09:28:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6870",
+      "title": "Fix Vulkan fallback crash with empty optional inputs",
+      "updated": "2026-10-10T15:18:45Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6952",
+      "title": "fix(vulkan): omit zero-count descriptor pool sizes",
+      "updated": "2026-09-16T06:07:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6962",
+      "title": "fix vulkan bf16 packed without int16shader",
+      "updated": "2026-09-07T03:48:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/6964",
+      "title": "fix vulkan reduction shared accumulator type precision issue",
+      "updated": "2026-09-07T06:24:15Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7005",
+      "title": "fix vulkan tanh gelu overflow",
+      "updated": "2026-09-15T09:19:43Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7026",
+      "title": "vulkan: skip gpu instance teardown during windows process shutdown",
+      "updated": "2026-10-30T15:40:47Z",
+      "state": "open",
+      "pr": true,
+      "comments": 5,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7040",
+      "title": "fix(vulkan): include element packing in BinaryOp shape hints",
+      "updated": "2026-10-12T06:23:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7041",
+      "title": "vulkan: do not crash when recording a pipeline that failed to create",
+      "updated": "2026-11-01T20:50:31Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7043",
+      "title": "vulkan: make the fp16 inference path correct and fast",
+      "updated": "2026-10-15T08:05:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 22,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7055",
+      "title": "fix(reduction): stabilize LogSumExp on CPU and Vulkan",
+      "updated": "2026-11-05T02:18:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7058",
+      "title": "fix: reject mismatched MatMul inner dimensions",
+      "updated": "2026-10-09T13:23:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7121",
+      "title": "vulkan: fix sdpa_cross out-of-bounds load when M or N is not a multiple of 4",
+      "updated": "2026-10-16T16:00:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7133",
+      "title": "vulkan: skip unused RMSNorm fallback pipelines",
+      "updated": "2026-10-18T05:05:59Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7141",
+      "title": "softmax vulkan subgroup reduce optimization",
+      "updated": "2026-10-19T03:57:48Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 8,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7142",
+      "title": "vulkan: reduce the flash attention row statistics on subgroups",
+      "updated": "2026-10-19T04:02:16Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7144",
+      "title": "vulkan: fix Adreno fp16 packed and int8 convolution errors",
+      "updated": "2026-10-19T14:45:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7167",
+      "title": "Vulkan paged weight allocator",
+      "updated": "2026-11-04T13:53:13Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 23,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/Tencent/ncnn/pull/7174",
+      "title": "vulkan: avoid fp16 overflow in Normalize coefficients",
+      "updated": "2026-10-25T16:47:04Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/chboishabba/gfx803_compat_graph/pull/4",
+      "title": "Restore gfx803 on current TheRock and publish prebuilt artifacts",
+      "updated": "2026-09-14T02:43:02Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 19,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/chboishabba/gfx803_compat_graph/pull/5",
+      "title": "Build source-pinned Schaka gfx803 Nix binary factory and fail-closed admission",
+      "updated": "2026-11-07T00:31:40Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 42,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/244",
+      "title": "perf: mmq prefill kernels for ik_llama.cpp's trellis GGUF types",
+      "updated": "2026-10-03T03:39:29Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 12,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/245",
+      "title": "perf: mmq prefill kernels for ik_llama.cpp's IQK GGUF types",
+      "updated": "2026-10-03T12:05:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 21,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/267",
+      "title": "perf(build): drop the FlashAttention-2 instances no supported model uses",
+      "updated": "2026-10-04T16:47:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 17,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/361",
+      "title": "fix(quant): CPU MatMul multiplies in the operands' dtype instead of casting to F16",
+      "updated": "2026-10-08T14:14:27Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 7,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/362",
+      "title": "fix(quant): CPU MatMul multiplies in the operands' dtype instead of casting to F16",
+      "updated": "2026-10-08T14:18:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/372",
+      "title": "fix(gguf): size each GGUF layer from its own bytes for the auto device map",
+      "updated": "2026-10-08T19:22:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/374",
+      "title": "perf(gguf): grouped mmq for raw-type MoE experts, in prefill and decode",
+      "updated": "2026-10-08T19:40:41Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/379",
+      "title": "perf(gguf): expert-indexed mmvq for MoE decode over raw experts",
+      "updated": "2026-10-09T00:57:15Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 12,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/381",
+      "title": "fix(gguf): Gemma 3 with an mmproj sees its images and tokenizes like llama.cpp",
+      "updated": "2026-10-09T03:15:10Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/397",
+      "title": "fix(tensor): CPU batched matmul folds; faster CPU conv1d; bare-tensor .pt files",
+      "updated": "2026-10-09T16:24:26Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/435",
+      "title": "fix(gguf): skip a folder's projectors made for another base model",
+      "updated": "2026-10-12T18:31:23Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/455",
+      "title": "perf(attention): flash attention for SigLIP vision towers (head dim 72)",
+      "updated": "2026-10-14T00:16:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/461",
+      "title": "fix(gguf): bind SigLIP fc1/fc2 by shape, for mmproj files that swap ffn_up and ffn_down",
+      "updated": "2026-10-14T02:39:26Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/491",
+      "title": "perf(gguf): 4-8 row matmuls take MMQ where it beats MMVQ, per weight type",
+      "updated": "2026-10-18T03:47:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/493",
+      "title": "perf(gguf): the ik types take MMQ from 2-3 rows; the Qwen3.8 27B weight quant study",
+      "updated": "2026-10-18T05:30:51Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/494",
+      "title": "perf(gguf): tile-ordered IQ4_KS for speculative decoding, +15% DFlash 2 decode",
+      "updated": "2026-11-05T18:11:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 26,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/502",
+      "title": "perf(gdn): a GGUF's ssm_beta and ssm_alpha run as one matmul",
+      "updated": "2026-11-05T18:11:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/503",
+      "title": "perf(gguf): the tile-ordered IQ4_KS matvec's inner loop, 8% off the verify step",
+      "updated": "2026-11-05T18:11:04Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/522",
+      "title": "perf(moe): CPU experts run from their GGUF blocks",
+      "updated": "2026-10-20T22:53:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/524",
+      "title": "feat(moe): --moe-expert-cache keeps GGUF experts in host memory with a GPU cache",
+      "updated": "2026-10-20T23:51:47Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 32,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/60",
+      "title": "perf(gguf): device-map sizing reads tensor sizes through two helpers",
+      "updated": "2026-09-27T16:45:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/604",
+      "title": "perf(moe): offloaded GGUF experts stay pageable in the file mapping",
+      "updated": "2026-10-23T18:22:15Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/610",
+      "title": "perf(moe): AVX2 32-wide CPU expert dots, and pageable prompt staging through a pinned ring",
+      "updated": "2026-10-24T01:29:07Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/612",
+      "title": "perf(gguf): IQ3_S CPU dots gather their grid codes",
+      "updated": "2026-10-24T03:15:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/615",
+      "title": "fix(loading): an MTP head is sized from its GGUF bytes and offloads its experts",
+      "updated": "2026-10-24T04:48:59Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/617",
+      "title": "perf(gguf): 32-wide CPU dots convert block scales with F16C",
+      "updated": "2026-11-05T18:11:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/618",
+      "title": "perf(gguf): single-token CPU dots prefetch the weights ahead of each block",
+      "updated": "2026-10-24T13:38:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/646",
+      "title": "fix(gguf): Flash-Next GGUFs with merged same-input projections load as their halves",
+      "updated": "2026-11-05T18:11:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/662",
+      "title": "fix(gguf): one-label reranker heads written as bare vectors",
+      "updated": "2026-11-05T18:11:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/779",
+      "title": "Activations quantize to Q8 with AVX2",
+      "updated": "2026-11-05T18:11:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/christopherthompson81/inference.rs/pull/809",
+      "title": "Vulkan reads the quantized KV cache: Nemotron Lightning holds 262K of context on a 24 GB GPU without spilling",
+      "updated": "2026-11-05T18:11:01Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 21,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1518",
+      "title": "tests : add OLMoE-sized K-quant shapes to test_mul_mat_id (ref #1506)",
+      "updated": "2026-10-29T15:46:49Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1534",
+      "title": "sycl: fix soft_max_f32 max reduction",
+      "updated": "2026-10-17T13:34:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1571",
+      "title": "Gate RVV code on the target extension",
+      "updated": "2026-11-03T14:05:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 9,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1591",
+      "title": "Handle F32 x F16 src1 in CUDA binary broadcast ops",
+      "updated": "2026-09-24T09:35:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1620",
+      "title": "Fix builds on s390x",
+      "updated": "2026-10-08T09:44:37Z",
+      "state": "open",
+      "pr": true,
+      "comments": 9,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1622",
+      "title": "sync : llama.cpp",
+      "updated": "2026-09-09T12:31:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 74,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1623",
+      "title": "simple : temporary change to trigger Vulkan crash on macOS",
+      "updated": "2026-09-09T12:49:28Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1625",
+      "title": "fix(cuda): include <cuda/execution> and <cuda/stream_ref> for CUB top-k path (CCCL 3.2+)",
+      "updated": "2026-10-26T00:37:38Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1626",
+      "title": "sync : llama.cpp",
+      "updated": "2026-09-14T19:03:43Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 111,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1627",
+      "title": "ggml : bump version to 0.24.0",
+      "updated": "2026-09-14T13:34:24Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1631",
+      "title": "add getexecpath for get_executable_path() on OpenBSD",
+      "updated": "2026-09-18T21:41:54Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1632",
+      "title": "sync : llama.cpp",
+      "updated": "2026-10-28T10:25:17Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 190,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1633",
+      "title": "fix for two functions when top_k exceeds the vocabulary size.",
+      "updated": "2026-09-23T07:45:07Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1634",
+      "title": "sync : llama.cpp",
+      "updated": "2026-09-23T07:47:06Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 29,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1635",
+      "title": "ggml : bump version to 0.25.0",
+      "updated": "2026-09-23T08:25:45Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1636",
+      "title": "sync : llama.cpp",
+      "updated": "2026-09-23T17:11:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 18,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1637",
+      "title": "ggml : bump version to 0.25.1",
+      "updated": "2026-09-23T17:10:14Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1638",
+      "title": "scripts : make-release-desc - link previous release in changelog title",
+      "updated": "2026-09-23T17:56:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1639",
+      "title": "sync : llama.cpp",
+      "updated": "2026-09-24T12:58:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 12,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1640",
+      "title": "mnist : make mnist_model move-only",
+      "updated": "2026-09-24T08:58:46Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1641",
+      "title": "ci : move cuda to hf-jobs and add amd-vulkan",
+      "updated": "2026-09-24T17:31:52Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1642",
+      "title": "ggml : bump version to 0.25.2",
+      "updated": "2026-09-24T13:00:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1644",
+      "title": "ggml : fix ubsan error in `ggml_graph_nbytes`",
+      "updated": "2026-09-24T17:32:59Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1645",
+      "title": "ggml : bump version to 0.25.3",
+      "updated": "2026-09-24T18:01:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1646",
+      "title": "sycl: fix SYCL_DNNL flag report",
+      "updated": "2026-09-25T21:12:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1647",
+      "title": "cmake: avoid linking MATH_LIBRARY-NOTFOUND",
+      "updated": "2026-09-29T14:57:32Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1651",
+      "title": "sync : llama.cpp",
+      "updated": "2026-10-05T13:56:09Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 246,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1652",
+      "title": "ggml : bump version to 0.26.0",
+      "updated": "2026-10-05T14:26:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1653",
+      "title": "scripts : add apiabi release check",
+      "updated": "2026-10-12T09:33:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1654",
+      "title": "sam : remove redundant layout copies in the image encoder and mask head",
+      "updated": "2026-10-12T10:11:14Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1656",
+      "title": "ggml : fix argument order in ggml_rms_norm_back comment",
+      "updated": "2026-10-13T08:44:26Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1657",
+      "title": "sync : llama.cpp",
+      "updated": "2026-10-15T12:37:36Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 239,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1659",
+      "title": "ggml : bump version to 0.27.0",
+      "updated": "2026-10-15T12:50:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1665",
+      "title": "ci : fix --strict mode for API check",
+      "updated": "2026-10-20T11:20:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1666",
+      "title": "ci : upload API/ABI reports as artifacts",
+      "updated": "2026-10-20T11:20:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1671",
+      "title": "ggml-rpc : fix tensor bounds checks, recv_msg length_error, and destr…",
+      "updated": "2026-10-24T08:57:02Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1672",
+      "title": "vulkan: fix struct padding in VkDeviceQueueInfo2 for translation layers",
+      "updated": "2026-10-26T15:46:48Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1673",
+      "title": "gguf: fix tensor shape overflow check mismatch and add regression test (#1668)",
+      "updated": "2026-10-26T19:09:42Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1675",
+      "title": "sync : llama.cpp",
+      "updated": "2026-10-28T10:25:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 272,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1676",
+      "title": "ggml : bump version to v.28.0",
+      "updated": "2026-10-28T10:25:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1677",
+      "title": "CUDA/HIP: add J=128 tiles for Q4_K, Q6_K, Q4_0 and Q4_1 on gfx1030",
+      "updated": "2026-11-03T02:29:57Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1678",
+      "title": "examples: fix greedy sampling at --temp 0 for GPT-2/GPT-J",
+      "updated": "2026-11-02T12:30:03Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1679",
+      "title": "sync : llama.cpp",
+      "updated": "2026-11-04T09:16:35Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 197,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/1680",
+      "title": "ggml : bump version to 0.29.0",
+      "updated": "2026-11-04T09:27:51Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/ggml/pull/657",
+      "title": "Return an error when a tensor's name in gguf is long",
+      "updated": "2026-09-11T11:06:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/27097",
+      "title": "Misc. bug: Vulkan - slow token generation with AMD DGPU Resizable BAR disabled",
+      "updated": "2026-11-06T09:35:06Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 8,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/27334",
+      "title": "Eval bug: errors and poor performance on vulkan tensor split on quad rx580",
+      "updated": "2026-10-03T01:14:59Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 1,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/29623",
+      "title": "Vulkan ErrorDeviceLost (vk::Queue::submit) on AMD Radeon AI PRO R9700 when SAM/ReBAR enabled",
+      "updated": "2026-10-31T00:49:26Z",
+      "state": "open",
+      "pr": false,
+      "comments": 5,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/30342",
+      "title": "Misc. bug: ~7% slower CPU-side MoE decode on AVX2+F16C since #30270 (Clang vpinsrw merge on the accumulator)",
+      "updated": "2026-10-14T16:36:09Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 0,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/issues/30888",
+      "title": "Vulkan (AMD, Windows, no ReBAR): DEVICE_LOCAL|HOST_VISIBLE buffers are backed by system memory and exhaust the WDDM shared budget -> vkQueueSubmit returns ErrorOutOfDeviceMemory",
+      "updated": "2026-10-20T18:21:42Z",
+      "state": "open",
+      "pr": false,
+      "comments": 1,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/20017",
+      "title": "vulkan: add sparse OOM fallback for large UMA allocations and chunked staging fallback",
+      "updated": "2026-09-28T03:39:18Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/22892",
+      "title": "[ggml] Fix Vulkan-Hpp handle usage on 32-bit targets.",
+      "updated": "2026-09-08T07:34:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/23358",
+      "title": "ggml-cpu: Optimized Arm NEON cpu q1_0 dot (with plain/DP/I8MM)",
+      "updated": "2026-09-15T06:32:44Z",
+      "state": "open",
+      "pr": true,
+      "comments": 10,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/24305",
+      "title": "ggml-cpu : fix rms_norm_back wrong output under in-place aliasing",
+      "updated": "2026-10-14T00:53:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/24406",
+      "title": "vulkan: add Intel Xe flash attention optimization kernels (2/3, Xe-LPG Plus/Xe2/Xe3)",
+      "updated": "2026-09-24T15:56:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 52,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/24407",
+      "title": "vulkan: GEMM/Group GEMM optimizations on Intel Xe (3/3, Xe-LPG Plus/Xe2/Xe3)",
+      "updated": "2026-09-23T01:39:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/24408",
+      "title": "vulkan: Intel Xe flash attention, GEMM optimizations(Xe-LPG Plus/Xe2/Xe3) [MEGA PR]",
+      "updated": "2026-10-19T11:04:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 23,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/24759",
+      "title": "gguf: guard GGML_PAD inputs against integer overflow",
+      "updated": "2026-09-12T13:53:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/25051",
+      "title": "vulkan: add tensor-parallel allreduce function",
+      "updated": "2026-11-03T12:57:44Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 66,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/25483",
+      "title": "vulkan: skip unneeded MoE work in mul_mm coopmat1 path",
+      "updated": "2026-09-17T06:53:08Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 14,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/25940",
+      "title": "HIP: RDNA 4 MUL_MAT optimizations",
+      "updated": "2026-09-29T20:43:32Z",
+      "state": "open",
+      "pr": true,
+      "comments": 28,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/26103",
+      "title": "ggml-cpu: skip unsupported ARM ISA variants under GGML_CPU_ALL_VARIANTS",
+      "updated": "2026-09-11T22:08:29Z",
+      "state": "open",
+      "pr": true,
+      "comments": 8,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/26318",
+      "title": "ggml: fix size wrap in allocator and gguf alignment read",
+      "updated": "2026-10-05T07:25:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/26460",
+      "title": "llama: re-create the KV cache when flash attention resolves to disabled (performance and layout bug)",
+      "updated": "2026-10-30T00:11:38Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/26829",
+      "title": "vulkan: Intel vulkan kernel optimizations for LLM inference.",
+      "updated": "2026-10-19T11:04:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 18,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27096",
+      "title": "ggml-cpu : fix soft_max_back wrong output when dst aliases src1",
+      "updated": "2026-10-02T14:37:12Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27220",
+      "title": "vulkan : fuse UNARY(GELU|SIGMOID|SILU|SOFTPLUS) + MUL",
+      "updated": "2026-09-08T07:35:04Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 12,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27256",
+      "title": "ggml-cpu : fix dup_bytes row size for block-quantized types",
+      "updated": "2026-10-22T00:15:44Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27356",
+      "title": "convert: fix Nemotron-H LoRA GGUF conversion",
+      "updated": "2026-09-10T12:05:27Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27478",
+      "title": "ggml : speed up batch-1 CPU decode, align large allocations",
+      "updated": "2026-10-10T07:13:23Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27494",
+      "title": "Optimize Krea Vulkan - Flash Attention",
+      "updated": "2026-09-07T15:03:28Z",
+      "state": "open",
+      "pr": true,
+      "comments": 6,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27495",
+      "title": "Optimize Krea Vulkan - fusion and misc. changes",
+      "updated": "2026-09-28T08:58:53Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 8,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27841",
+      "title": "ggml-cuda: hip: add missing AMD GCN MMQ config",
+      "updated": "2026-09-12T09:26:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 9,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/27973",
+      "title": "vulkan: fuse GATED_DELTA_NET state write into recurrent cache",
+      "updated": "2026-10-26T13:41:24Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28024",
+      "title": "vulkan: rms_norm fusion opportunities",
+      "updated": "2026-09-07T06:08:29Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28450",
+      "title": "Performance tune for gemma4-26b-a4b flash attention shape.",
+      "updated": "2026-09-22T13:43:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28517",
+      "title": "mtmd : load a sharded mmproj GGUF, and fix string_format's trailing NUL",
+      "updated": "2026-09-06T21:30:49Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28523",
+      "title": "gguf-py : fix sign-loss on wide tensor quantization",
+      "updated": "2026-09-09T11:28:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 11,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28593",
+      "title": "vulkan: fix three null-pointer crashes on pre-1.2 devices reporting VK 1.2 features",
+      "updated": "2026-09-08T06:09:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28673",
+      "title": "ggml-cpu : optimize q4_K vec_dot for batch=1 on ARM I8MM",
+      "updated": "2026-09-10T08:09:09Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28705",
+      "title": "vulkan: fix data race and OOB access in argsort(large)",
+      "updated": "2026-09-11T05:44:14Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28727",
+      "title": "glm5next: avoid soft_max gridDim.y overflow in the indexer",
+      "updated": "2026-09-11T02:35:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 42,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28729",
+      "title": "glm5next: avoid soft_max gridDim.y overflow in the indexer",
+      "updated": "2026-09-11T03:37:12Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 42,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28730",
+      "title": "model : fix k-pool indexer softmax gridDim.y overflow",
+      "updated": "2026-09-11T03:37:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 31,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28785",
+      "title": "ggml-cpu : skip threadpool for graphs with no CPU work",
+      "updated": "2026-09-24T14:47:16Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28810",
+      "title": "gguf: guard GGML_PAD inputs against integer overflow",
+      "updated": "2026-10-07T19:14:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28861",
+      "title": "ggml-cpu : separate shared buffer per thread to improve speed",
+      "updated": "2026-09-13T23:45:14Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28880",
+      "title": "fix(gguf-py): bound array nesting depth to prevent unbounded recursion in GGUFReader",
+      "updated": "2026-09-14T07:05:13Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28882",
+      "title": "ggml-cpu : disable PCH and fix CACHE_LINE_SIZE ambiguity",
+      "updated": "2026-09-14T10:52:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28903",
+      "title": "Gguf index cache - Faster model info loading for llama.cpp",
+      "updated": "2026-09-14T16:54:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28943",
+      "title": "hip : skip fully masked KV tiles in WMMA Flash Attention",
+      "updated": "2026-09-22T17:52:35Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 9,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28951",
+      "title": "Fix SPIRV-Headers target to ggml-vulkan",
+      "updated": "2026-09-17T11:27:22Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28956",
+      "title": "vulkan: fix wrong results when a mul_mat reads a slice of a larger cache",
+      "updated": "2026-09-28T06:36:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/28996",
+      "title": " vulkan: fix buffer_reference alignment in im2col shaders",
+      "updated": "2026-09-17T05:14:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29034",
+      "title": "ggml-cpu: Fix Flash Attention softcap handling for padded KV tiles on CPU",
+      "updated": "2026-09-26T08:17:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29036",
+      "title": "gguf-py: fix Q8_1 block size in GGML_QUANT_SIZES (2+2+32)",
+      "updated": "2026-09-18T08:53:18Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29280",
+      "title": "vulkan : reuse descriptor sets when bindings are constant",
+      "updated": "2026-09-29T06:54:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 11,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29359",
+      "title": "ggml-cpu x86: exact -128 handling in int8 dot-product helpers (fix #29351; excludes q1_0, iq2_*, iq3_*, sgemm, repack)",
+      "updated": "2026-09-27T08:52:40Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29370",
+      "title": "ggml-alloc : re-plan when a tensor's input/output flag changes",
+      "updated": "2026-09-24T10:49:17Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29469",
+      "title": "vulkan: fix argsort kernel selection for Adreno",
+      "updated": "2026-09-27T10:06:07Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29520",
+      "title": "vulkan: fuse qwen4exp's SCALE -> SIGMOID -> SCALE -> hc_post chain",
+      "updated": "2026-09-28T12:20:15Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29534",
+      "title": "ggml-cuda: HIP: use wave64 for GCN Q8 flash attention",
+      "updated": "2026-10-18T13:28:56Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29575",
+      "title": "ggml-cpu : check row bounds in get_rows_back",
+      "updated": "2026-09-29T20:44:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29591",
+      "title": "vulkan: fix stale prealloc_y reuse across flash attention and soft_max",
+      "updated": "2026-10-05T08:38:27Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29671",
+      "title": "ggml : amx : fix batched mul_mat weight broadcast and byte offsets",
+      "updated": "2026-09-29T21:29:27Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29766",
+      "title": "vulkan : fix concurrent first device init",
+      "updated": "2026-10-15T08:37:36Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29853",
+      "title": "fix(gguf-py): use >= thresholds so exact 1M/1B/1T counts get the larger unit",
+      "updated": "2026-10-02T13:33:41Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29889",
+      "title": "[SYCL]: fix memory errors in mul_mat, split buffer, host pool",
+      "updated": "2026-10-16T07:58:26Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29934",
+      "title": "vulkan: fix rdna4 mat_vec tuning",
+      "updated": "2026-10-04T12:05:25Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/29988",
+      "title": "vulkan: fix Flash Attention shmem write out of bounds",
+      "updated": "2026-10-05T13:15:06Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30021",
+      "title": "ggml-cuda: hip: tune GCN MMQ configs",
+      "updated": "2026-10-25T13:39:41Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30022",
+      "title": "ggml-cuda: hip: Tune stream_k algo and mmq configs to use stream_k on AMD GCN",
+      "updated": "2026-10-05T21:45:58Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30049",
+      "title": "vulkan: fix amd iGPU slow checkpoint read",
+      "updated": "2026-10-07T06:20:09Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30066",
+      "title": "[Fix] Skip over -inf for CPU Flash Attention to prevent NaN during softmax",
+      "updated": "2026-10-15T02:46:21Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30107",
+      "title": "vulkan : fix TOP_K for +inf/NaN inputs and k = 1 on negative values",
+      "updated": "2026-10-08T10:14:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30145",
+      "title": "vulkan: fix rms_norm workgroup count overflow",
+      "updated": "2026-10-09T13:00:18Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30146",
+      "title": "vulkan: improve small-n split-K selection on RDNA3 and RDNA4",
+      "updated": "2026-11-02T11:54:10Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30150",
+      "title": "ggml-cpu : thread fixed-width concat over all rows, constant element …",
+      "updated": "2026-10-26T07:55:14Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30270",
+      "title": "cpu: fix AVX2 CPUs not using F16C when available",
+      "updated": "2026-10-15T06:34:40Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30296",
+      "title": "cpu : reduce AVX2 tiled accumulators together",
+      "updated": "2026-10-16T06:48:24Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30326",
+      "title": "vulkan: fix buffer logging on 32-bit platforms after source split",
+      "updated": "2026-10-12T04:51:25Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30344",
+      "title": "ggml-cuda: hip: Feature fattn tile GCN tune config",
+      "updated": "2026-10-11T17:43:43Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30468",
+      "title": "vulkan: fix gpu-visible host memory issues",
+      "updated": "2026-10-16T07:08:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30495",
+      "title": "vulkan: fix compile error",
+      "updated": "2026-10-14T07:13:09Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30544",
+      "title": "vulkan : keep F32-precision MUL_MAT_ID on the GPU for mat-vec, skip MMVQ",
+      "updated": "2026-10-24T13:38:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30641",
+      "title": "vulkan: Let q8/q4 KV use fa kernel optimized for Intel Xe",
+      "updated": "2026-10-19T21:05:16Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30643",
+      "title": "ggml-cpu: fix RVV IQ4_NL and MXFP4 odd-block dot products",
+      "updated": "2026-10-29T11:49:47Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30738",
+      "title": "vulkan: add dequant+transpose fast path for Q4_0 KV cache in flash attention",
+      "updated": "2026-11-04T19:59:55Z",
+      "state": "open",
+      "pr": true,
+      "comments": 9,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30769",
+      "title": "vulkan: Implement test-fusion interface",
+      "updated": "2026-11-05T12:31:45Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30828",
+      "title": "Fix termux vulkan builds",
+      "updated": "2026-10-22T12:40:14Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30836",
+      "title": "HIP/CUDA: Fix reduction in mmf getting tile widths not devisiable by 64 in mul_mat_id on wave64 devices",
+      "updated": "2026-10-20T11:32:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30867",
+      "title": "ggml-cpu: add SVE-optimized q5_0 and q5_1 dot-product kernels",
+      "updated": "2026-11-05T14:48:23Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30916",
+      "title": "Fixed flash attention SYCL graph call crash",
+      "updated": "2026-10-23T09:37:43Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/30923",
+      "title": "ggml: parallelize CPU softmax across heads and batches",
+      "updated": "2026-10-21T14:05:42Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31079",
+      "title": "vulkan : fix out-of-bounds NVFP4 UE4M3 scale lookup",
+      "updated": "2026-11-03T06:58:57Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31114",
+      "title": "vulkan: skip maxStorageBufferRange pre-check for non-compute tensors",
+      "updated": "2026-11-03T21:46:46Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31125",
+      "title": "[SYCL] add DPAS flash attention kernel for quantized KV cache",
+      "updated": "2026-11-03T02:49:10Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31180",
+      "title": "ggml-cpu : fix unused variables in arm arch",
+      "updated": "2026-10-26T10:38:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31196",
+      "title": "vulkan: reuse Q8_0 weights in MMVQ for 9-16 columns",
+      "updated": "2026-11-05T17:23:08Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31197",
+      "title": "vulkan: store CM1 attention P row-major and reuse its fragments",
+      "updated": "2026-11-02T13:33:05Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31211",
+      "title": "ggml-cpu x86: fix Q8_0 dot product sign error for -128 (issue #29351)",
+      "updated": "2026-10-26T18:26:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31223",
+      "title": "ggml: fix OOB write in ggml_pad_reflect_1d",
+      "updated": "2026-11-05T13:05:10Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31224",
+      "title": "ggml: fix OOB write in ggml_conv_3d with unchecked oc",
+      "updated": "2026-11-05T13:05:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31225",
+      "title": "ggml: fix OOB write in ggml_col2im_1d with unchecked oc",
+      "updated": "2026-11-05T13:05:15Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31226",
+      "title": "ggml: fix OOB write in ggml_add_rel_pos with unchecked src1 dims",
+      "updated": "2026-11-05T13:05:18Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31239",
+      "title": "vulkan: fix CI llvmpipe by allowing dim 3 broadcast in MUL_MAT",
+      "updated": "2026-10-27T12:39:07Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31310",
+      "title": "gguf-py: fix np_roundf dropping the sign",
+      "updated": "2026-10-28T13:04:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31343",
+      "title": "gguf-py : fix crash when extra_special_tokens is not a dict",
+      "updated": "2026-11-01T12:23:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31399",
+      "title": "ggml-cpu: let the tiled flash-attention kernel read a q8_0 KV cache",
+      "updated": "2026-10-30T01:21:27Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31501",
+      "title": "gguf-split: fix tensor data offset mismatch with non-default alignment",
+      "updated": "2026-11-01T11:05:47Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31526",
+      "title": "vulkan: allow dequantized KV optimization with CM2",
+      "updated": "2026-11-05T15:03:11Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31559",
+      "title": "ggml-vulkan: skip host buffer allocation on single iGPUs",
+      "updated": "2026-11-04T15:50:07Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31592",
+      "title": "ggml: fix OOB write in ggml_argmax with unchecked src0 rows",
+      "updated": "2026-11-05T13:05:20Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31594",
+      "title": "ggml: fix OOB read in ggml_get_rel_pos with unchecked dst dims",
+      "updated": "2026-11-05T13:05:23Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31595",
+      "title": "ggml: fix OOB read in ggml_rope mrope with unchecked dst ne2",
+      "updated": "2026-11-05T13:05:25Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31597",
+      "title": "ggml: fix OOB read in ggml_flash_attn_ext with narrow mask",
+      "updated": "2026-11-05T13:05:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31648",
+      "title": "ggml: fix OOB write in ggml_pool_2d with forged stride",
+      "updated": "2026-11-05T13:05:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31649",
+      "title": "ggml: fix OOB write in ggml_ssm_scan with forged src0 stride",
+      "updated": "2026-11-05T13:05:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31652",
+      "title": "ggml: fix OOB write in ggml_mul_mat_id with unguarded expert id",
+      "updated": "2026-11-05T13:05:35Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31658",
+      "title": "vulkan: detect ReBAR support, avoid BAR allocations if unavailable",
+      "updated": "2026-11-06T09:35:04Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31701",
+      "title": "ggml : fix FreeBSD Vulkan build by setting _XOPEN_SOURCE=700",
+      "updated": "2026-11-06T12:59:50Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31721",
+      "title": "ggml: fix OOB write in ggml_argsort with mismatched rows",
+      "updated": "2026-11-05T13:05:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31724",
+      "title": "ggml: fix OOB read/write in ggml_silu_back with mismatched rows",
+      "updated": "2026-11-05T13:05:40Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31725",
+      "title": "ggml: fix OOB write in ggml_pool_1d with mismatched rows",
+      "updated": "2026-11-05T13:07:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31727",
+      "title": "ggml: fix OOB write in ggml_leaky_relu with mismatched rows",
+      "updated": "2026-11-05T13:08:29Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/llama.cpp/pull/31729",
+      "title": "ggml: fix OOB read/write in ggml_top_k with top_k larger than src0",
+      "updated": "2026-11-05T13:21:48Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/3658",
+      "title": "build: reduce cpu and vulkan docker image size",
+      "updated": "2026-10-06T17:07:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/3704",
+      "title": "fix: allow flash attention in encoder when DTW is enabled",
+      "updated": "2026-10-29T14:35:42Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/3719",
+      "title": "Fix/vulkan adreno crashes",
+      "updated": "2026-10-29T14:35:42Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/3768",
+      "title": "ggml-cpu: fix _pdep_u64 usage on Linux x86 32-bit",
+      "updated": "2026-10-29T14:35:42Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/3864",
+      "title": "fix: gguf: validate tensor dimensions and key names against zero/empty values",
+      "updated": "2026-10-29T14:35:42Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/3939",
+      "title": "ggml-cpu: gelu optimizqation using simd",
+      "updated": "2026-10-29T14:35:41Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/4038",
+      "title": "devops : reduce Vulkan Docker image to 39.4% of its original size (now 692 MB)",
+      "updated": "2026-09-23T05:22:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ggml-org/whisper.cpp/pull/4127",
+      "title": "whisper : fix flash attention attending to padded K/V",
+      "updated": "2026-10-29T15:01:48Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/issues/2605",
+      "title": "Bug: IQ*_KT quantization silently produces a broken model on hosts without AVX2 (find_best_match has no fallback)",
+      "updated": "2026-10-07T05:47:56Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 1,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/1570",
+      "title": "Bonsai support (AVX2, generic)",
+      "updated": "2026-09-25T13:03:00Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 11,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2421",
+      "title": "mtmd: load a sharded mmproj GGUF, and fix string_format's trailing NUL",
+      "updated": "2026-09-14T09:13:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2471",
+      "title": "Better MXFP4_R8 GEMM on vanilla AVX2",
+      "updated": "2026-09-17T12:10:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2472",
+      "title": "Faster GEMM for Q4_0_R8 on vanilla AVX2 CPUs",
+      "updated": "2026-09-17T12:35:04Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2555",
+      "title": "Fix k-quants repacking on AVX2",
+      "updated": "2026-09-28T17:08:40Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2571",
+      "title": "IQ3KS_R16: CUDA MMQ + AVX2 GEMM kernels; drop Q3KS_G128; renumber out of low-ID zone",
+      "updated": "2026-10-09T10:37:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 27,
+      "files": 25,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2581",
+      "title": "Fix V cache store for 3-D V tensors without flash attention (Gemma-4 -fa 0)",
+      "updated": "2026-10-02T06:30:23Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2602",
+      "title": "Use AVX2 for IQ4_XS/NL quantization",
+      "updated": "2026-10-06T14:05:06Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2606",
+      "title": "AVX2 quantization for IQ4_K and IQ4_KS ",
+      "updated": "2026-10-06T14:04:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2608",
+      "title": "AVX2 quantization for IQ5_K and IQ5_KS",
+      "updated": "2026-10-06T15:51:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2613",
+      "title": "Abort Trellis quantization on non-AVX2 CPUs",
+      "updated": "2026-10-07T05:47:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2614",
+      "title": "AVX2 quantization for IQ3_K and IQ3_KS",
+      "updated": "2026-10-08T07:12:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2619",
+      "title": "AVX2 quantization for IQ6_K",
+      "updated": "2026-10-09T04:54:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/ikawrakow/ik_llama.cpp/pull/2750",
+      "title": "gguf-py: fix IQ3_KS_R16 row sizes (stale 354 enum) + rename the type string to iq3_ks_r16",
+      "updated": "2026-10-25T16:03:24Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/10",
+      "title": "ggml : add packed int4 convrot mul_mat for CPU, CUDA, HIP and Vulkan",
+      "updated": "2026-11-06T22:02:21Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 16,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/11",
+      "title": "ggml-vulkan : clamp workgroup counts for ops dispatching raw tensor dims",
+      "updated": "2026-10-04T11:49:52Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 67,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/12",
+      "title": "rpc : bump proto patch version and op count assert (GGML_OP_ROPE_APPLY)",
+      "updated": "2026-10-26T09:19:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 55,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/13",
+      "title": "ggml-cuda : INT8 convrot on RDNA2 via hipblasGemmEx",
+      "updated": "2026-10-16T23:33:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/14",
+      "title": "ggml-cuda : support convrot group size 64",
+      "updated": "2026-11-06T22:02:21Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/15",
+      "title": "feat: use hipBLASLt for HIP INT8 GEMM",
+      "updated": "2026-10-29T17:27:43Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/16",
+      "title": "ggml-cuda: reduce MOSS Q8 inference overhead with guarded exact fusions",
+      "updated": "2026-10-25T20:42:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 17,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/17",
+      "title": "ggml: add basic F32 SiTU support for CPU and CUDA",
+      "updated": "2026-10-29T17:07:59Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/18",
+      "title": "perf(cuda): reuse RMSNorm/RoPE fusion for direct F16 casts",
+      "updated": "2026-11-03T18:18:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/19",
+      "title": "perf(cuda): fuse SiTU activation with Q8 input packing",
+      "updated": "2026-10-29T11:57:00Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 12,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/20",
+      "title": "perf(cuda): fuse SM86 modulated normalization with Q8 packing",
+      "updated": "2026-11-04T16:34:49Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 12,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/21",
+      "title": "feat(vulkan): support F32 SiTU activation",
+      "updated": "2026-11-03T12:36:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/22",
+      "title": "perf(vulkan): use subgroup reduction for 128-wide weighted RMSNorm",
+      "updated": "2026-11-04T18:54:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/26",
+      "title": "perf(vulkan): fuse Q8 matmul gating and residual output",
+      "updated": "2026-11-04T18:58:32Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/27",
+      "title": "perf(vulkan): serialize eligible large self-attention graphs per context",
+      "updated": "2026-11-04T18:57:29Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/6",
+      "title": "ggml : enable INT8 convrot on HIP for RDNA3/RDNA4/CDNA",
+      "updated": "2026-09-30T08:59:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/7",
+      "title": "ggml : support convrot group size 64 in CUDA/HIP and Vulkan kernels",
+      "updated": "2026-09-30T09:15:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/8",
+      "title": "ggml : support F32 input for int8 convrot tensorwise mulmat in Vulkan",
+      "updated": "2026-09-30T08:59:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/ggml/pull/9",
+      "title": "CUDA/HIP: INT8 convrot support on RDNA2",
+      "updated": "2026-09-30T09:15:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/issues/804",
+      "title": "i think something is broken for us cpu users [avx2]",
+      "updated": "2026-09-28T01:52:07Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 18,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/1982",
+      "title": "perf: eliminate temporary allocations in Philox rounds",
+      "updated": "2026-09-16T18:09:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/1987",
+      "title": "fix: honor flash attention flag in LLM text encoder attention",
+      "updated": "2026-10-14T03:27:59Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 8,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/1992",
+      "title": "perf: pad small attention heads to 64 for MMA Flash Attention",
+      "updated": "2026-09-20T14:54:43Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/1997",
+      "title": "perf: reduce CPU overhead in graph execution and sampling",
+      "updated": "2026-09-20T14:54:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/1998",
+      "title": "perf: parallelize host tensor elementwise and broadcast ops",
+      "updated": "2026-09-20T14:54:28Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2038",
+      "title": "perf: run one-frame Wan VAE convolutions as 2D convolutions",
+      "updated": "2026-09-23T16:24:14Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2044",
+      "title": "perf: store Qwen Image 2.1 prefix cache as F16 with flash attention",
+      "updated": "2026-09-24T17:52:41Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2062",
+      "title": "fix: improve GGUF metadata parsing and reader selection",
+      "updated": "2026-10-06T07:39:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2070",
+      "title": "fix: keep scaled INT8 convrot matmuls on Vulkan",
+      "updated": "2026-09-27T12:43:20Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2122",
+      "title": "fix: support flux-2-klein-4b Q4_0 GGUF checkpoint",
+      "updated": "2026-10-10T14:31:49Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2124",
+      "title": "fix: reclaim before accepting wrapped Vulkan iGPU memory estimates",
+      "updated": "2026-10-13T13:10:06Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2223",
+      "title": "fix: avoid repeated seeks when skipping small GGUF metadata values",
+      "updated": "2026-10-26T16:48:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2280",
+      "title": "perf(vulkan): accelerate packed INT4 with cooperative matrices",
+      "updated": "2026-11-06T16:58:26Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/leejet/stable-diffusion.cpp/pull/2283",
+      "title": "fix: clean LoRA multiplier and prompt spacing in image metadata",
+      "updated": "2026-11-07T01:53:05Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/16894",
+      "title": "mlx: route fast quantized matmul on CUDA",
+      "updated": "2026-10-07T21:51:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/17477",
+      "title": "fix(llm): request flash attention explicitly for architectures that default to it",
+      "updated": "2026-10-29T03:05:29Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/18130",
+      "title": "fs/gguf: add regression test for uint32 general.alignment",
+      "updated": "2026-10-16T01:31:50Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/18291",
+      "title": "fs/gguf: fix integer overflow in TensorInfo.NumValues/NumBytes",
+      "updated": "2026-09-07T15:27:29Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/18466",
+      "title": "linux: fix Vulkan inference support on ARM64",
+      "updated": "2026-09-15T14:12:18Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/18866",
+      "title": "llm,fs/gguf: count VRAM per context and predict the KV cache from metadata",
+      "updated": "2026-10-08T08:21:03Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/ollama/ollama/pull/19568",
+      "title": "Intel IGPU architecture detection for running vulkan default OOB",
+      "updated": "2026-11-06T16:57:32Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 14,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/36879",
+      "title": "[GPU] Enable post-op fusion for eltwise with FC/MatMul/Transpose when reshape place in middle",
+      "updated": "2026-11-02T16:12:57Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/37606",
+      "title": "[GGUF FE] Fix PagedAttention: RoPE position axis and inp_out_ids selection under SDPAToPagedAttention",
+      "updated": "2026-09-25T08:49:26Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/37836",
+      "title": "[GGUF] Fix Coverity copy diagnostics",
+      "updated": "2026-10-13T08:01:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 53,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/37924",
+      "title": "[GGUF] Fix TinyLlama and Hunyuan frontend accuracy",
+      "updated": "2026-10-13T08:01:36Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 19,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/38407",
+      "title": "[CPU] Fix MatMul with zero length dimensions",
+      "updated": "2026-10-06T15:51:44Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/38528",
+      "title": "[GPU] Fix FP16 SDPA reference softmax normalization",
+      "updated": "2026-10-02T05:38:23Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/38581",
+      "title": "[Snippets][CPU][RV64] Fuse transpose with MatMul",
+      "updated": "2026-10-06T16:27:22Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/38693",
+      "title": "Add INT8 KV cache support for Host Flash Attention",
+      "updated": "2026-11-04T14:36:26Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 17,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/38848",
+      "title": "[GGUF] Skip image-window PagedAttention test on ARM64 without SVE",
+      "updated": "2026-10-16T21:11:04Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/38874",
+      "title": "[ONNX] Fix Softmax translation when axis == rank -1",
+      "updated": "2026-10-16T17:38:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39081",
+      "title": "[GGUF] Preserve packed ternary weights and expose GPU fusion patterns",
+      "updated": "2026-10-28T23:21:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 35,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39102",
+      "title": "[GGUF] Fix Coverity reports in scaling and weight requantization",
+      "updated": "2026-10-26T12:55:53Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39262",
+      "title": "[CPU][ARM] Fix NaN in f16 softmax for all-negative score rows",
+      "updated": "2026-11-06T17:03:30Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39336",
+      "title": "[GGUF] Reduce recurrent-attention decode overhead",
+      "updated": "2026-10-30T17:33:08Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 20,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39482",
+      "title": "[GGUF FE] Reuse weight buffers across graph conversions",
+      "updated": "2026-11-05T11:19:15Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 13,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39503",
+      "title": "[GGUF] Reuse translators without migrating native builders",
+      "updated": "2026-11-06T20:25:21Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 57,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/openvinotoolkit/openvino/pull/39569",
+      "title": "[GGUF] Skip Q1_0 Bonsai checkpoints in nightly model tests",
+      "updated": "2026-11-06T10:02:02Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/issues/276",
+      "title": "norm-gated fusion: the pre-dispatched gate MUL_MAT can overwrite x before the fused kernel reads it (latent, allocator-dependent)",
+      "updated": "2026-11-06T19:54:51Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 2,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/15",
+      "title": "block 08: don't fuse mul_mat + add through a view when the add's shape differs",
+      "updated": "2026-10-17T11:27:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/267",
+      "title": "wip/mmap-host-experts-r204: optional `--host-experts mmap` with a bounded pinned footprint (greedy byte-identical, 72.4 vs 74.7 t/s pinned, r204)",
+      "updated": "2026-11-06T23:18:19Z",
+      "state": "open",
+      "pr": true,
+      "comments": 17,
+      "files": 11,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/issues/8458",
+      "title": "[Bug] AMD RX 580 not detected with UNSLOTH_FORCE_VULKAN=1 until clean reinstall",
+      "updated": "2026-09-15T14:28:04Z",
+      "state": "closed",
+      "pr": false,
+      "comments": 2,
+      "files": 0,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/10158",
+      "title": "fix(studio): keep GGUF compaction for multimodal chats",
+      "updated": "2026-09-09T21:55:20Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 12,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/10210",
+      "title": "Fix GGUF catalog snapshot selection",
+      "updated": "2026-09-07T22:09:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 9,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/10393",
+      "title": "fix(save): collapse identical if/else arms in the GGUF llama.cpp install path",
+      "updated": "2026-10-04T12:45:13Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/10438",
+      "title": "fix(studio): preserve chat GGUF variants across cache-folder changes",
+      "updated": "2026-09-25T20:28:03Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 18,
+      "files": 38,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/10618",
+      "title": "fix(studio): avoid resident GGUF mappings for Windows no-reserve loads",
+      "updated": "2026-09-14T00:48:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 11,
+      "files": 23,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/10794",
+      "title": "fix(studio): count rendered GGUF prompts before shared-KV admission",
+      "updated": "2026-09-25T18:03:38Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 8,
+      "files": 5,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11043",
+      "title": "Studio: make the GGUF memory estimate match the compute buffers llama.cpp allocates",
+      "updated": "2026-09-16T12:44:48Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 8,
+      "files": 19,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11049",
+      "title": "Studio: fix structured columns in Data Recipes on non-GGUF models",
+      "updated": "2026-09-16T08:53:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11360",
+      "title": "fix(studio): PQ2_0 GGUF variant labels and resolver (#11343)",
+      "updated": "2026-10-01T09:58:55Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 11,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11562",
+      "title": "fix(loader): raise a clear error for a GGUF checkpoint routed to from_pretrained",
+      "updated": "2026-10-06T09:48:30Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11696",
+      "title": "Fix GGUF vision capability selection",
+      "updated": "2026-09-24T12:15:36Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11808",
+      "title": "Unsloth Studio / Desktop: add a Benchmarks page that sweeps speculative decoding, KV cache and RAM offload settings on the loaded GGUF",
+      "updated": "2026-11-06T23:42:16Z",
+      "state": "open",
+      "pr": true,
+      "comments": 16,
+      "files": 71,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/11938",
+      "title": "fix(studio): retain GGUF quants across cache-folder switches",
+      "updated": "2026-09-25T20:27:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 0,
+      "files": 36,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/12090",
+      "title": "Require unsloth_zoo>=2026.9.8 for GGUF export merge fix (#11785)",
+      "updated": "2026-10-01T10:05:27Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/12449",
+      "title": "fix(studio): dequant 1-D GGUF norms on no-conversion load path",
+      "updated": "2026-10-08T21:19:58Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 9,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/12451",
+      "title": "fix(studio): keep On Device GGUF discovery local when offline",
+      "updated": "2026-10-11T04:05:51Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/12495",
+      "title": "studio: reuse ssl setup for local gguf requests",
+      "updated": "2026-10-02T10:47:49Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/12641",
+      "title": "Studio: never fail, slow down or render noise on an explicit SageAttention or FlashAttention 4 request",
+      "updated": "2026-10-04T10:47:24Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 8,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/13349",
+      "title": "Studio: size sd.cpp's thread pool from the Apple fast cores",
+      "updated": "2026-10-20T16:36:11Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 12,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/14197",
+      "title": "Studio: keep the FLUX.3 Image Klein GGUF row under its Fast FP8 row at the top of the Images picker",
+      "updated": "2026-10-19T06:09:44Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/14514",
+      "title": "Studio: fix host memory checks and improve logging for GGUF image loads",
+      "updated": "2026-10-26T07:01:51Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 16,
+      "files": 7,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15152",
+      "title": "Studio video: cache the offloaded native int8 DiT per expert (Wan2.2-A14B warm load 210 s to 21 s)",
+      "updated": "2026-10-24T20:54:51Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15168",
+      "title": "Fix MOSS-Image GGUF discovery in On Device",
+      "updated": "2026-10-26T06:47:12Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15331",
+      "title": "Studio video: write the offloaded native int8 build to the prequant cache after the load (Wan2.2-A14B first clip 97 s sooner)",
+      "updated": "2026-10-26T07:30:34Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15368",
+      "title": "Tensor parallel: generate, adapter / tokenizer saves, merged and GGUF exports, and reload cells under UNSLOTH_TP_SIZE",
+      "updated": "2026-10-26T22:54:16Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 14,
+      "files": 15,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15421",
+      "title": "fix(studio): reject standalone GGUF adapters before model teardown",
+      "updated": "2026-10-28T02:51:31Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15902",
+      "title": "Studio: skip the route's GPU probe when the GGUF fits in RAM",
+      "updated": "2026-10-29T11:06:48Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/15967",
+      "title": "Tests: pin bf16 support and the HF cache location in the GGUF preflight fixtures",
+      "updated": "2026-11-01T13:54:54Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 7,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/16086",
+      "title": "Studio: keep a resident GGUF's repo identity for Hub shared-blob cache files",
+      "updated": "2026-10-30T10:11:40Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/16127",
+      "title": "Studio: MOSS-Image negative-branch layer skip follows the reference workflows per checkpoint",
+      "updated": "2026-10-30T16:45:42Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 4,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/16255",
+      "title": "Studio: MOSS-Image GGUF path follows the per-checkpoint negative-branch skip",
+      "updated": "2026-10-31T06:05:09Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 8,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/16884",
+      "title": "Studio GGUF: fuse Q8_0 dequant and cast into one kernel (LTX-2.5 Q8_0 denoise -12%, bit-identical)",
+      "updated": "2026-11-06T09:58:18Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/4635",
+      "title": "Add dedicated streaming server for fast GGUF SSE inference",
+      "updated": "2026-09-21T12:17:02Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 1,
+      "files": 6,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/6986",
+      "title": "Fix GGUF vision capability selection",
+      "updated": "2026-09-24T12:16:24Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 13,
+      "files": 8,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/unslothai/unsloth/pull/7033",
+      "title": "Fix packed and grouped Q2 GGUF variant detection",
+      "updated": "2026-09-29T13:51:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 2,
+      "files": 10,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/30410",
+      "title": "fix(gguf): Auto-select compatible dtype for GGUF models on Blackwell",
+      "updated": "2026-10-29T01:39:57Z",
+      "state": "open",
+      "pr": true,
+      "comments": 7,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/30412",
+      "title": "fix(gguf): Skip lm_head mapping for models with tied word embeddings",
+      "updated": "2026-10-29T01:39:55Z",
+      "state": "open",
+      "pr": true,
+      "comments": 6,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/37489",
+      "title": "[WIP] SP+AsyncTP piecewise compilation fix + per-matmul heuristic gating",
+      "updated": "2026-10-12T00:46:49Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 10,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/38140",
+      "title": "[Bugfix] Fix Qwen 3.5 GGUF loading: add model type mapping and vision config d…",
+      "updated": "2026-10-29T01:36:48Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 12,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/38882",
+      "title": "[Bugfix] Fix GGUF parameter mapping for Transformers v5 fused MoE experts",
+      "updated": "2026-10-29T01:36:09Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/39297",
+      "title": "feat: skip-softmax support for FlashInfer attention path",
+      "updated": "2026-09-09T01:07:29Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 54,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/42232",
+      "title": "[Bugfix][GGUF] Fix deepseek2 architecture not supported when loading without config.json",
+      "updated": "2026-10-05T01:58:18Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/42674",
+      "title": "[Core] Per-layer parallelism policy + TPA-GQA on FlashAttention",
+      "updated": "2026-10-13T02:02:09Z",
+      "state": "open",
+      "pr": true,
+      "comments": 5,
+      "files": 15,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/43895",
+      "title": "[PERF] Vedic 4-bit quantized matmul for MLA attention — 3.5x CPU speedup",
+      "updated": "2026-10-24T01:46:21Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/45120",
+      "title": "[Kernel] Fuse softmax into grouped_topk CUDA kernel",
+      "updated": "2026-10-16T01:45:21Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/46454",
+      "title": "[Bugfix][Model] Fix DiffusionGemma GGUF tied embedding loading",
+      "updated": "2026-09-12T14:14:05Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 5,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/46539",
+      "title": "[Perf][V1] Apply min-p in log-space to avoid a redundant softmax",
+      "updated": "2026-10-19T01:50:18Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/47323",
+      "title": "Fix OOB scale reads in Triton MXFP4 matmul kernel causing NaN outputs",
+      "updated": "2026-10-31T01:33:35Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/49131",
+      "title": "[Perf] Shape-adaptive tile config for batch-invariant matmul on SM80",
+      "updated": "2026-11-02T21:31:23Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/53446",
+      "title": "[Kernel][Perf] Add Hopper (SM90) tuned config for batch-invariant persistent matmul",
+      "updated": "2026-09-20T08:02:35Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/54417",
+      "title": "[Perf] Fuse temperature scaling into the sampler's softmax",
+      "updated": "2026-09-10T12:39:38Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 5,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/54450",
+      "title": "[Bugfix][Model] Fix Nemotron GGUF LayerNorm and embedding handling",
+      "updated": "2026-10-01T08:09:03Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/55249",
+      "title": "[Bugfix][Determinism] Fix the batch-invariant softmax override",
+      "updated": "2026-11-02T21:31:43Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/55676",
+      "title": "[Perf] Tune batch-invariant matmul for Granite on Ada",
+      "updated": "2026-11-02T21:31:47Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/55752",
+      "title": " fix(determinism): pin matmul config selection to max_num_seqs to fix async-scheduling non-determinism",
+      "updated": "2026-11-05T10:12:01Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/56226",
+      "title": "[ROCm][Perf] Route softmax MoE top-k, including fused shared-expert sigmoid, through AITER topk_gating",
+      "updated": "2026-10-15T17:53:19Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 6,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/57246",
+      "title": "[Bugfix][ROCm][MoE] Fix AITER MoE routing fallback to eager torch.topk for scoring_func=softmax",
+      "updated": "2026-09-17T07:31:04Z",
+      "state": "open",
+      "pr": true,
+      "comments": 0,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/57456",
+      "title": "[Kernel][Perf] Add sm_120 (RTX PRO 6000 / RTX 50) tuned configs for batch-invariant persistent matmul",
+      "updated": "2026-09-19T13:30:56Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 15,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/57586",
+      "title": "[Perf] Use breakable CUDA graphs (no torch.compile) by default under VLLM_BATCH_INVARIANT so the tuned matmul configs see the runtime M",
+      "updated": "2026-09-23T18:39:39Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 10,
+      "files": 3,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/57682",
+      "title": "[Kernel][torch.compile] CUDA fused QK-norm + RoPE + KV-cache write (fuse_qk_norm_rope_kvcache on FlashAttention)",
+      "updated": "2026-10-19T09:54:43Z",
+      "state": "open",
+      "pr": true,
+      "comments": 4,
+      "files": 9,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/58221",
+      "title": "[Perf] DiffusionGemma: skip the self-conditioning matmul on a read's last step",
+      "updated": "2026-11-04T21:47:09Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/58495",
+      "title": "[Kernel][Perf] Add TP=2/4/8 per-rank shapes to the sm_120 batch-invariant matmul table",
+      "updated": "2026-09-29T23:51:50Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 23,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/58718",
+      "title": "[Kernel][Perf] Add an sm121 batch-invariant matmul table tuned on GB10",
+      "updated": "2026-09-30T21:17:33Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 9,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/60577",
+      "title": "[Perf][Model] Gemma 4: remove trailing image padding to enable FlashAttention in vision SDPA",
+      "updated": "2026-10-30T18:06:52Z",
+      "state": "open",
+      "pr": true,
+      "comments": 7,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/60579",
+      "title": "[Bugfix][ROCm] Fix CUDA-only FlashAttention import in MiMo audio encoder",
+      "updated": "2026-10-08T09:21:24Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 1,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/61129",
+      "title": "[Perf][Attention] Cache FlashAttention KV cache transpose+split views",
+      "updated": "2026-11-02T09:05:38Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/61193",
+      "title": "[ROCm][Perf] W4A16: dequantize then matmul for large prefill on gfx1151",
+      "updated": "2026-10-23T23:25:39Z",
+      "state": "open",
+      "pr": true,
+      "comments": 7,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/62219",
+      "title": "[Kernel][Perf] Add H100 tuned configs for Llama-3.1-8B and Qwen3-8B to the batch-invariant matmul table",
+      "updated": "2026-10-26T16:44:44Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 6,
+      "files": 1,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/63232",
+      "title": "[Perf][FlashAttention] FA4: pass no FP8 descale for a unit per-tensor scale",
+      "updated": "2026-11-02T02:43:20Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 9,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/63629",
+      "title": "[Bugfix] Fix MOSS-Audio meta initialization",
+      "updated": "2026-10-26T04:07:32Z",
+      "state": "closed",
+      "pr": true,
+      "comments": 4,
+      "files": 2,
+      "merged": true
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/64157",
+      "title": "[Bugfix][CPU Offloading] Fix CPU offloading for GGUF models which breaks because weights are lazily loaded by moving offloading logic later.",
+      "updated": "2026-10-27T23:03:49Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/64571",
+      "title": "[Perf][Attention] Cache FlashAttention K/V cache views per tensor",
+      "updated": "2026-11-02T12:08:59Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 4,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/65222",
+      "title": "[Perf][Attention] Serve PrefixLM prefill with FlashAttention-2 in the Triton backend",
+      "updated": "2026-11-06T18:42:33Z",
+      "state": "open",
+      "pr": true,
+      "comments": 3,
+      "files": 2,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/65903",
+      "title": "[Kernel][Perf] Add Blackwell BF16 tuned configs for Qwen2.5-1.5B to the batch-invariant matmul table",
+      "updated": "2026-11-05T11:55:12Z",
+      "state": "open",
+      "pr": true,
+      "comments": 1,
+      "files": 3,
+      "merged": false
+    },
+    {
+      "url": "https://github.com/vllm-project/vllm/pull/65931",
+      "title": "[Kernel][Perf] Add H100 BF16 tuned configs for Qwen2.5-7B to the batch-invariant matmul table",
+      "updated": "2026-11-06T22:33:57Z",
+      "state": "open",
+      "pr": true,
+      "comments": 2,
+      "files": 2,
+      "merged": false
+    }
+  ],
+  "limit": "All rows in direct REST inventories were screened by metadata. Detailed coverage is scoped, and does not imply a line-by-line review of unrelated repositories or changes."
+}

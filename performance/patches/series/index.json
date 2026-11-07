@@ -1,7 +1,7 @@
 {
   "upstream": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
-  "tree": "bf7ad2c50b1e7cb5766c6de019678dda329f931e",
-  "snapshot_sha256": "60c3448f504286403c1cedd72cb7121ef6a14a3e0804e581bb45c591ba86dd79",
+  "tree": "0b59db48962eff49600dfb6be43c52e3212162ea",
+  "snapshot_sha256": "d93b804d433035c1ab2ca226a8ab5e0182740149e529b0bca9e482b0b6376945",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -224,6 +224,24 @@
       "title": "Polaris wide scalar Q4_K prefill",
       "source": "https://github.com/KessokuNet/infr/pull/12",
       "sha256": "087e6a04a789f34c74bf19e24aace19b6e15d0063781ad0083f4a625b7d5d913"
+    },
+    {
+      "path": "38-vulkan-small-bar/change.patch",
+      "title": "Reserve the small Vulkan BAR for transfers",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31658",
+      "sha256": "57e384953405c6295ab6b2fed85bd3b2dc83d75c43dcf3ed3698bf082bf93101"
+    },
+    {
+      "path": "39-haswell-softmax-rows/change.patch",
+      "title": "Spread CPU Softmax rows across heads and batches",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/30923",
+      "sha256": "1b9f52eec60b1cabd8560d7ca7cdda32b41c0d7fe101870cd21189e91b5c0fec"
+    },
+    {
+      "path": "40-tallocr-size-bounds/change.patch",
+      "title": "Check tensor allocator size before padding",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/26318",
+      "sha256": "224fad6db9f8a71757d421a3037d59f7900d674cb97df51a7d6738a5affdec53"
     }
   ],
   "empty_ports": [
