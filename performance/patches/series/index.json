@@ -1,7 +1,7 @@
 {
   "upstream": "6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d",
-  "tree": "0b59db48962eff49600dfb6be43c52e3212162ea",
-  "snapshot_sha256": "d93b804d433035c1ab2ca226a8ab5e0182740149e529b0bca9e482b0b6376945",
+  "tree": "cf604155f2ab45d22cf4e3083abc037a120241de",
+  "snapshot_sha256": "0306bea833766b221ed24fcefb01eb49543490eb16027d9151fa09d816068505",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -242,6 +242,24 @@
       "title": "Check tensor allocator size before padding",
       "source": "https://github.com/ggml-org/llama.cpp/pull/26318",
       "sha256": "224fad6db9f8a71757d421a3037d59f7900d674cb97df51a7d6738a5affdec53"
+    },
+    {
+      "path": "41-haswell-gelu-table/change.patch",
+      "title": "AVX2 GELU and GEGLU table lookup",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/30232",
+      "sha256": "ba904008bdd9ef9156a6bd1e3ee56444873a0e41f7244b93e8edde490577eae7"
+    },
+    {
+      "path": "42-vulkan-rms-row-stride/change.patch",
+      "title": "Vulkan RMSNorm beyond the X workgroup limit",
+      "source": "https://github.com/0xShug0/audio.cpp/pull/1120",
+      "sha256": "1fedb40b41fec066ed63bb1a68b71fe5e47e0db84a9d510f90829a1c2c32c81d"
+    },
+    {
+      "path": "43-buffer-split-view-tail/change.patch",
+      "title": "Keep view-only tails in the allocation plan",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/25584",
+      "sha256": "38cf3daa10545d578a0f8b23eef16916bc40801d2a11db9e8779fc06bf1a15a5"
     }
   ],
   "empty_ports": [

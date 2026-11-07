@@ -5,7 +5,9 @@ Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **
 
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
-**1.125 · 2026-11-07 · upstream `6ae75742` · Native `05e9dc7a`.** O3/Haswell + LTO with monolithic `KCPP_COMMONIZE=0`. [40 patch diffs](performance/patches/series/) · [Review](performance/review-2026-11-07.md) · [Isolated operation tests](results/operations-2026-11-07.json).
+**1.125 · 2026-11-07 · diff follow-up · Native `da9c0018`.** Official `6ae75742`, O3/Haswell + LTO. [43 patch diffs](performance/patches/series/) · [Diff review](performance/review-2026-11-07-r1.md) · [New measurement data](results/performance-2026-11-07-r1.json).
+
+Matched warm Normal from `05e9dc7a` to `da9c0018` was 146.334 → 146.483 s in the engine and 155.312 → 155.430 s through the public API. Separate 4× was 5.499 → 5.498 s. All output RGB hashes matched. CPU GELU/GEGLU gains are isolated operation results. [All repeats](results/performance-2026-11-07-r1.json).
 
 ## Manual Normal and 4× · 2026-11-06
 

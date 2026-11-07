@@ -3352,6 +3352,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         const std::string suffix = "_" + std::to_string(block_size);
         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_f32[i], "rms_norm_f32" + suffix, RMS_SHADER(rms_norm_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 0, 0, block_size}, 1, true, rms_subgroups);
         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_f32[i], "rms_norm_mul_f32" + suffix, RMS_SHADER(rms_norm_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, block_size}, 1, true, rms_subgroups);
+        ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_rows_f32[i], "rms_norm_rows_f32" + suffix, RMS_SHADER(rms_norm_rows_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 0, 0, block_size}, 1, true, rms_subgroups);
+        ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_rows_f32[i], "rms_norm_mul_rows_f32" + suffix, RMS_SHADER(rms_norm_rows_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, block_size}, 1, true, rms_subgroups);
         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add_f32[i], "rms_norm_mul_add_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, block_size}, 1, true, rms_subgroups);
         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add_mul_f32[i], "rms_norm_mul_add_mul_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 1, block_size}, 1, true, rms_subgroups);
     }
@@ -9240,6 +9242,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const 
             if (ctx->do_add_rms_partials) {
                 return ctx->fused_rms_norm_mode == RMS_NORM_MUL ? ctx->device->pipeline_rms_norm_mul_partials_f32 : ctx->device->pipeline_rms_norm_partials_f32;
             }
+            if (src0->ne[1] > ctx->device->properties.limits.maxComputeWorkGroupCount[0]) {
+                return ggml_vk_rms_norm_pipeline(ctx->fused_rms_norm_mode == RMS_NORM_MUL ? ctx->device->pipeline_rms_norm_mul_rows_f32 : ctx->device->pipeline_rms_norm_rows_f32, src0->ne[0]);
+            }
             return ggml_vk_rms_norm_pipeline(ctx->fused_rms_norm_mode == RMS_NORM_MUL ? ctx->device->pipeline_rms_norm_mul_f32 : ctx->device->pipeline_rms_norm_f32, src0->ne[0]);
         }
         return nullptr;
@@ -9848,6 +9853,7 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
             elements = { (uint32_t)CEIL_DIV(ne00, 128), 1, 1 };
         } else {
             elements = { (uint32_t)ne01, (uint32_t)ne02, (uint32_t)ne03 };
+            elements[0] = std::min(elements[0], ctx->device->properties.limits.maxComputeWorkGroupCount[0]);
             elements[1] = std::min(elements[1], ctx->device->properties.limits.maxComputeWorkGroupCount[1]);
             elements[2] = std::min(elements[2], ctx->device->properties.limits.maxComputeWorkGroupCount[2]);
         }
@@ -13928,6 +13934,12 @@ bool ggml_vk_can_fuse(const ggml_backend_vk_context * ctx, const struct ggml_cgr
         return false;
     }
 
+    // The row-stride pipeline implements RMSNorm and RMSNorm+MUL only.
+    if (ops.size() > 2 && ops.begin()[0] == GGML_OP_RMS_NORM &&
+        cgraph->nodes[node_idx]->ne[1] > ctx->device->properties.limits.maxComputeWorkGroupCount[0]) {
+        return false;
+    }
+
     if ((ops.size() == 2 || ops.size() == 3 || ops.size() == 4) &&
         ops.begin()[0] == GGML_OP_RMS_NORM && ops.begin()[1] == GGML_OP_MUL) {
         // additional constraints specific to this fusion
@@ -14407,6 +14419,9 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct 
 bool ggml_vk_can_fuse_rms_norm_set_rows(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
                                                int node_idx) {
     const ggml_tensor * rms = cgraph->nodes[node_idx];
+    if (rms->ne[1] > ctx->device->properties.limits.maxComputeWorkGroupCount[0]) {
+        return false;
+    }
     const ggml_tensor * view = cgraph->nodes[node_idx + 1];
     const ggml_tensor * set_rows = cgraph->nodes[node_idx + 2];
 
@@ -14512,6 +14527,9 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool 
 bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
                                                int node_idx) {
     const ggml_tensor *rms = cgraph->nodes[node_idx + 0];
+    if (rms->ne[1] > ctx->device->properties.limits.maxComputeWorkGroupCount[0]) {
+        return false;
+    }
     const ggml_tensor *mul = cgraph->nodes[node_idx + 1];
     const ggml_tensor *rope = cgraph->nodes[node_idx + 2];
 

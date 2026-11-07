@@ -42,3 +42,6 @@ Apply in numeric order to `6ae75742c8b5ad67ea14ce7ef712b24db20d7f0d`. [Index and
 - [Reserve the small Vulkan BAR for transfers](38-vulkan-small-bar/README.md)
 - [Spread CPU Softmax rows across heads and batches](39-haswell-softmax-rows/README.md)
 - [Check tensor allocator size before padding](40-tallocr-size-bounds/README.md)
+- [AVX2 GELU and GEGLU table lookup](41-haswell-gelu-table/README.md)
+- [Vulkan RMSNorm beyond the X workgroup limit](42-vulkan-rms-row-stride/README.md)
+- [Keep view-only tails in the allocation plan](43-buffer-split-view-tail/README.md)

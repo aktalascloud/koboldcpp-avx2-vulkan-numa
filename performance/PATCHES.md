@@ -1,8 +1,12 @@
 # Retained patches and sources
 
+## November 7 diff follow-up
+
+The [ordered series](patches/series/) contains 43 individual diffs. It adds Haswell GELU/GEGLU, Polaris RMSNorm over the X limit and the buffer-split view fix. [Diff review](review-2026-11-07-r1.md) · [Measurements](../results/performance-2026-11-07-r1.json).
+
 ## November 7, 2026
 
-The [ordered series](patches/series/) contains 40 diffs, each with its own description and SHA-256. The latest changes reserve the small Vulkan BAR for transfers, distribute CPU Softmax rows over available workers and guard tensor allocation arithmetic. [Source decisions](review-2026-11-07.md) · [Isolated tests](../results/operations-2026-11-07.json).
+The [earlier November 7 series](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/v1.125-20261107-05e9dc7a/performance/patches/series) contains 40 diffs, each with its own description and SHA-256. The latest changes reserve the small Vulkan BAR for transfers, distribute CPU Softmax rows over available workers and guard tensor allocation arithmetic. [Source decisions](review-2026-11-07.md) · [Isolated tests](../results/operations-2026-11-07.json).
 
 ## November 6, 2026
 

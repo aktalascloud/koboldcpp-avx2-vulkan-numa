@@ -860,6 +860,8 @@ struct vk_device_struct {
     vk_pipeline pipeline_group_norm_f32;
     std::array<vk_pipeline, 3> pipeline_rms_norm_f32;
     std::array<vk_pipeline, 3> pipeline_rms_norm_mul_f32;
+    std::array<vk_pipeline, 3> pipeline_rms_norm_rows_f32;
+    std::array<vk_pipeline, 3> pipeline_rms_norm_mul_rows_f32;
     std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add_f32;
     std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add_mul_f32;
     vk_pipeline pipeline_rms_norm_mul_add_partials_f32;
