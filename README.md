@@ -3,6 +3,8 @@
 
 Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **concedo_experimental**. Windows x64; target Xeon Haswell/AVX2 and RX 580 Polaris/gfx803. Direct GUI/CLI launch: **koboldcpp-nocuda.exe**. No model weights included.
 
+**Source update · 2026-11-07:** [all 46 accepted patches](performance/patches/series/), official `0041730`, installed Native `9d261c98`. Remaining source review and controlled measurements are in progress; the previously published release evidence follows below.
+
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
 **1.125 · 2026-11-07 · diff follow-up · Native `da9c0018`.** Official `6ae75742`, O3/Haswell + LTO. [43 patch diffs](performance/patches/series/) · [Diff review](performance/review-2026-11-07-r1.md) · [New measurement data](results/performance-2026-11-07-r1.json).

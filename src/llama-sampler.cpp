@@ -882,7 +882,7 @@ uint32_t llama_sampler_backend_n_nodes(const llama_sampler * sampler) {
     return chain->n_nodes;
 }
 
-#if defined(__AVX2__)
+#if defined(__x86_64__) || defined(_M_X64)
 template<typename GetLogit>
 static size_t llama_sampler_greedy_select(size_t size, GetLogit get_logit) {
     if (size == 0) {
@@ -942,7 +942,7 @@ llama_token llama_sampler_sample(struct llama_sampler * smpl, struct llama_conte
 
     const int n_vocab = llama_vocab_n_tokens(vocab);
 
-#if defined(__AVX2__)
+#if defined(__x86_64__) || defined(_M_X64)
     // A bare greedy sampler consumes only logits. Keep compact backend IDs and
     // the single accept callback while avoiding a vocabulary-sized candidate copy.
     if (smpl->iface->apply == llama_sampler_greedy_apply) {
@@ -1100,7 +1100,7 @@ static void llama_sampler_greedy_free(struct llama_sampler * smpl) {
 }
 
 static void llama_sampler_greedy_apply(struct llama_sampler * /*smpl*/, llama_token_data_array * cur_p) {
-#if defined(__AVX2__)
+#if defined(__x86_64__) || defined(_M_X64)
     cur_p->selected = llama_sampler_greedy_select(cur_p->size, [&](size_t i) { return cur_p->data[i].logit; });
 #else
     cur_p->selected = 0;

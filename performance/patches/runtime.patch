@@ -4300,7 +4300,7 @@ index 6c8e365..6666f5f 100644
      bool copy(ggml_backend_t backend, const ggml_tensor * src, ggml_tensor * dst, ggml_cgraph * graph);
  
 diff --git a/src/llama-sampler.cpp b/src/llama-sampler.cpp
-index 9004efa..c2ffee8 100644
+index 9004efa..d65d23e 100644
 --- a/src/llama-sampler.cpp
 +++ b/src/llama-sampler.cpp
 @@ -1,3 +1,4 @@
@@ -4368,7 +4368,7 @@ index 9004efa..c2ffee8 100644
      return chain->n_nodes;
  }
  
-+#if defined(__AVX2__)
++#if defined(__x86_64__) || defined(_M_X64)
 +template<typename GetLogit>
 +static size_t llama_sampler_greedy_select(size_t size, GetLogit get_logit) {
 +    if (size == 0) {
@@ -4417,7 +4417,7 @@ index 9004efa..c2ffee8 100644
  
      const int n_vocab = llama_vocab_n_tokens(vocab);
  
-+#if defined(__AVX2__)
++#if defined(__x86_64__) || defined(_M_X64)
 +    // A bare greedy sampler consumes only logits. Keep compact backend IDs and
 +    // the single accept callback while avoiding a vocabulary-sized candidate copy.
 +    if (smpl->iface->apply == llama_sampler_greedy_apply) {
@@ -4441,7 +4441,7 @@ index 9004efa..c2ffee8 100644
  }
  
  static void llama_sampler_greedy_apply(struct llama_sampler * /*smpl*/, llama_token_data_array * cur_p) {
-+#if defined(__AVX2__)
++#if defined(__x86_64__) || defined(_M_X64)
 +    cur_p->selected = llama_sampler_greedy_select(cur_p->size, [&](size_t i) { return cur_p->data[i].logit; });
 +#else
      cur_p->selected = 0;

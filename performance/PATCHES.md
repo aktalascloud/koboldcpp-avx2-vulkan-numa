@@ -1,8 +1,14 @@
 # Retained patches and sources
 
+## November 7 continued source review
+
+The [ordered series](patches/series/) now contains **46 individual patches**, each with a description, source link and SHA-256. It reproduces official `004173000d5384a5d9c953d97d45475b5efbb395` plus the accepted local changes; installed Native SHA-256 is `9d261c9884c715e89e0c10f537d53a72f66fec47938b4b1ba1c7be400f9cf4fd`.
+
+New carries cover x64 greedy selection (the baseline-ISA sampler build is explicitly supported), short CPU RMSNorm row distribution with unchanged double accumulation, and release of copied Windows weight pages from the working set. Source review and controlled performance measurements are still in progress; no new whole-model speed claim is made here.
+
 ## November 7 diff follow-up
 
-The [ordered series](patches/series/) contains 43 individual diffs. It adds Haswell GELU/GEGLU, Polaris RMSNorm over the X limit and the buffer-split view fix. [Diff review](review-2026-11-07-r1.md) · [Measurements](../results/performance-2026-11-07-r1.json).
+The [previous series](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/v1.125-20261107-da9c0018/performance/patches/series) contains 43 individual diffs. It adds Haswell GELU/GEGLU, Polaris RMSNorm over the X limit and the buffer-split view fix. [Diff review](review-2026-11-07-r1.md) · [Measurements](../results/performance-2026-11-07-r1.json).
 
 ## November 7, 2026
 
