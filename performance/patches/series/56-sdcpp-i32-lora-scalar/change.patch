@@ -1,5 +1,5 @@
 diff --git a/otherarch/sdcpp/src/model_loader.cpp b/otherarch/sdcpp/src/model_loader.cpp
-index 77c6942..4433eba 100644
+index 77c69424d..4433eba4b 100644
 --- a/otherarch/sdcpp/src/model_loader.cpp
 +++ b/otherarch/sdcpp/src/model_loader.cpp
 @@ -147,6 +147,10 @@ void convert_tensor(void* src,

@@ -1,5 +1,5 @@
 diff --git a/otherarch/sdcpp/src/core/compute_workspace.cpp b/otherarch/sdcpp/src/core/compute_workspace.cpp
-index 54f0538..0d45043 100644
+index 54f0538f0..0d4504373 100644
 --- a/otherarch/sdcpp/src/core/compute_workspace.cpp
 +++ b/otherarch/sdcpp/src/core/compute_workspace.cpp
 @@ -138,7 +138,8 @@ namespace sd {
@@ -87,7 +87,7 @@ index 54f0538..0d45043 100644
          allocator_ = nullptr;
          ggml_backend_sched_free(scheduler_);
 diff --git a/otherarch/sdcpp/src/core/compute_workspace.h b/otherarch/sdcpp/src/core/compute_workspace.h
-index fcf14b8..dcebfda 100644
+index fcf14b85d..dcebfda48 100644
 --- a/otherarch/sdcpp/src/core/compute_workspace.h
 +++ b/otherarch/sdcpp/src/core/compute_workspace.h
 @@ -23,6 +23,8 @@ namespace sd {
@@ -110,7 +110,7 @@ index fcf14b8..dcebfda 100644
          bool segment_end() noexcept;
          bool release();
 diff --git a/otherarch/sdcpp/src/core/ggml_runner.cpp b/otherarch/sdcpp/src/core/ggml_runner.cpp
-index 1efcb9f..e22d4c3 100644
+index 1efcb9fa2..e22d4c30f 100644
 --- a/otherarch/sdcpp/src/core/ggml_runner.cpp
 +++ b/otherarch/sdcpp/src/core/ggml_runner.cpp
 @@ -716,7 +716,7 @@ ComputeWorkspace::Measurement GGMLRunner::measure(ggml_cgraph* graph, size_t dir

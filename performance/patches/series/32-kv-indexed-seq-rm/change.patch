@@ -1,5 +1,5 @@
 diff --git a/src/llama-kv-cache.cpp b/src/llama-kv-cache.cpp
-index 6a1a3dc..27a385b 100644
+index 6a1a3dcdf..27a385b73 100644
 --- a/src/llama-kv-cache.cpp
 +++ b/src/llama-kv-cache.cpp
 @@ -459,15 +459,12 @@ bool llama_kv_cache::seq_rm(llama_seq_id seq_id, llama_pos p0, llama_pos p1) {

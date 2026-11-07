@@ -37,7 +37,7 @@ layout (binding = 6) readonly buffer R_I {uvec2 rope_data_i[];}; // indices for 
 #define GGML_ROPE_TYPE_MROPE  8
 #define GGML_ROPE_TYPE_VISION 24
 
-#elif RMS_NORM_ADD_FUSION
+#elif RMS_NORM_ADD_FUSION || RMS_NORM_MODULATE_FUSION
 
 layout (binding = 3) readonly buffer C {float data_c[];};
 layout (binding = 4) readonly buffer E {float data_e[];};
@@ -54,6 +54,19 @@ layout (constant_id = 2) const bool do_post_multiply = false;
 #endif
 
 shared FLOAT_TYPE sumsh[BLOCK_SIZE];
+#if RMS_NORM_MODULATE_FUSION
+shared float modulation_input[BLOCK_SIZE];
+float kcpp_rms_modulate(float value, uint col) {
+    // Match the stored weighted result, MUL, ADD, ADD stages; never fold to (1+scale)*x.
+    modulation_input[gl_LocalInvocationIndex] = value;
+    memoryBarrierShared();
+    float weighted = modulation_input[gl_LocalInvocationIndex];
+    precise float product = weighted * data_c[col];
+    precise float result = weighted + product;
+    result += data_e[col];
+    return result;
+}
+#endif
 
 void rms_norm(uint num_iters) {
     const uint ncols     = p.ne00;
@@ -152,6 +165,9 @@ void rms_norm(uint num_iters) {
                             value *= FLOAT_TYPE(data_e[0]);
                         }
 #endif
+#if RMS_NORM_MODULATE_FUSION
+                        value = kcpp_rms_modulate(value, col);
+#endif
                         data_d[d_offset + col] = D_TYPE(value);
                     }
                 } else {
@@ -165,6 +181,9 @@ void rms_norm(uint num_iters) {
                         if (do_post_multiply) {
                             value *= FLOAT_TYPE(data_e[0]);
                         }
+#endif
+#if RMS_NORM_MODULATE_FUSION
+                        value = kcpp_rms_modulate(value, col);
 #endif
                         data_d[d_offset + col] = D_TYPE(value);
                     }

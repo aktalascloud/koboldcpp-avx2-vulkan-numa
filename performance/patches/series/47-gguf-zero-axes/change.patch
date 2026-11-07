@@ -1,5 +1,5 @@
 diff --git a/ggml/src/gguf.cpp b/ggml/src/gguf.cpp
-index baea1c0..ed4452e 100644
+index baea1c020..ed4452ea4 100644
 --- a/ggml/src/gguf.cpp
 +++ b/ggml/src/gguf.cpp
 @@ -1588,7 +1588,11 @@ struct gguf_writer_base {

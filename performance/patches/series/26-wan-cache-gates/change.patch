@@ -1,5 +1,5 @@
 diff --git a/otherarch/sdcpp/src/runtime/cache_dit.hpp b/otherarch/sdcpp/src/runtime/cache_dit.hpp
-index 666e61c..d833a46 100644
+index 666e61cad..d833a4630 100644
 --- a/otherarch/sdcpp/src/runtime/cache_dit.hpp
 +++ b/otherarch/sdcpp/src/runtime/cache_dit.hpp
 @@ -13,6 +13,8 @@
@@ -53,7 +53,7 @@ index 666e61c..d833a46 100644
  
          if (skip_current_step) {
 diff --git a/otherarch/sdcpp/src/runtime/sample-cache.cpp b/otherarch/sdcpp/src/runtime/sample-cache.cpp
-index 0b92c73..4ff4e5e 100644
+index 0b92c7335..4ff4e5e0b 100644
 --- a/otherarch/sdcpp/src/runtime/sample-cache.cpp
 +++ b/otherarch/sdcpp/src/runtime/sample-cache.cpp
 @@ -112,6 +112,7 @@ namespace sd_sample {

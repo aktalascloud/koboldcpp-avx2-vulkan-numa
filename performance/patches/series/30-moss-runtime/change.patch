@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 8e10116..14b0ceb 100644
+index 8e1011655..14b0ceb81 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -767,7 +767,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel
@@ -13,7 +13,7 @@ index 8e10116..14b0ceb 100644
  include vendor/tinylibwebp/sources.mk
 diff --git a/otherarch/sdcpp/src/core/pe_cache.cpp b/otherarch/sdcpp/src/core/pe_cache.cpp
 new file mode 100644
-index 0000000..df4aa62
+index 000000000..df4aa62cb
 --- /dev/null
 +++ b/otherarch/sdcpp/src/core/pe_cache.cpp
 @@ -0,0 +1,30 @@
@@ -49,7 +49,7 @@ index 0000000..df4aa62
 +}
 diff --git a/otherarch/sdcpp/src/core/pe_cache.h b/otherarch/sdcpp/src/core/pe_cache.h
 new file mode 100644
-index 0000000..3539707
+index 000000000..3539707bd
 --- /dev/null
 +++ b/otherarch/sdcpp/src/core/pe_cache.h
 @@ -0,0 +1,82 @@
@@ -136,7 +136,7 @@ index 0000000..3539707
 +
 +#endif  // __SD_CORE_PE_CACHE_H__
 diff --git a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
-index f1cbbc7..188c741 100644
+index f1cbbc7f3..188c74196 100644
 --- a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
 +++ b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
 @@ -2,7 +2,9 @@

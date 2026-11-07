@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index fc31553..348d1a4 100644
+index fc31553fc..348d1a4a3 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -15560,7 +15560,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {

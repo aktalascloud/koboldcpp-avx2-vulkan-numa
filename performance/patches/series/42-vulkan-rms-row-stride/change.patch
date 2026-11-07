@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index fce5a20..17b92bd 100644
+index fce5a208f..17b92bdde 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 @@ -860,6 +860,8 @@ struct vk_device_struct {
@@ -12,7 +12,7 @@ index fce5a20..17b92bd 100644
      std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add_mul_f32;
      vk_pipeline pipeline_rms_norm_mul_add_partials_f32;
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 5fa1fed..f1a0573 100644
+index 5fa1feded..f1a057308 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -3352,6 +3352,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
@@ -76,7 +76,7 @@ index 5fa1fed..f1a0573 100644
      const ggml_tensor *rope = cgraph->nodes[node_idx + 2];
  
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
-index 5847b46..573a43f 100644
+index 5847b46c4..573a43f6f 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
 @@ -57,17 +57,23 @@ shared FLOAT_TYPE sumsh[BLOCK_SIZE];
@@ -116,7 +116,7 @@ index 5847b46..573a43f 100644
  
  void main() {
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index f5d3940..a105650 100644
+index f5d394091..a10565086 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 @@ -884,6 +884,7 @@ void process_shaders() {

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cinttypes>
+#include <cstring>
 #include "core/pe_cache.h"
 
 #include "model/common/ggml_block.hpp"
@@ -55,7 +56,19 @@ namespace MOSSImage {
         }
     };
 
-    inline ggml_tensor* situ(ggml_context* c, ggml_tensor* hidden, ggml_tensor* gate) {
+    inline ggml_tensor* situ(GGMLRunnerContext* ctx, ggml_tensor* hidden, ggml_tensor* gate) {
+        auto c = ctx->ggml_ctx;
+        auto device = ctx->backend ? ggml_backend_get_device(ctx->backend) : nullptr;
+        auto registry = device ? ggml_backend_dev_backend_reg(device) : nullptr;
+        const char * name = registry ? ggml_backend_reg_name(registry) : "";
+        if ((std::strcmp(name, "CPU") == 0 || std::strcmp(name, "Vulkan") == 0) &&
+            hidden->type == GGML_TYPE_F32 && gate->type == GGML_TYPE_F32 &&
+            ggml_are_same_shape(hidden, gate) && ggml_is_contiguous_1(hidden) && ggml_is_contiguous_1(gate)) {
+            auto out = ggml_glu_split(c, gate, hidden, GGML_GLU_OP_SITU);
+            if (ggml_backend_supports_op(ctx->backend, out)) {
+                return out;
+            }
+        }
         auto a = ggml_scale(c, ggml_tanh(c, ggml_scale(c, gate, 0.25f)), 4.f);
         a      = ggml_mul(c, a, ggml_sigmoid(c, gate));
         auto b = ggml_scale(c, ggml_tanh(c, ggml_scale(c, hidden, 1.f / 25.f)), 25.f);
@@ -94,7 +107,7 @@ namespace MOSSImage {
             y      = linear("proj", y);
             x      = ggml_add(c, x, y);
             y      = norm("norm2", x);
-            y      = situ(c, linear("ffn_up", y), linear("ffn_gate", y));
+            y      = situ(ctx, linear("ffn_up", y), linear("ffn_gate", y));
             y      = linear("ffn_down", y);
             return ggml_add(c, x, y);
         }
@@ -148,7 +161,7 @@ namespace MOSSImage {
                 hidden = ggml_cont(c, hidden);
                 gate = ggml_cont(c, gate);
             }
-            y = situ(c, hidden, gate);
+            y = situ(ctx, hidden, gate);
             y            = linear("proj.ffn_down", y);
             y            = ggml_mul(c, y, part(5));
             return ggml_add(c, x, y);

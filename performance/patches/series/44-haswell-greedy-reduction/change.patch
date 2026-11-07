@@ -1,5 +1,5 @@
 diff --git a/src/llama-sampler.cpp b/src/llama-sampler.cpp
-index dc76b03..0fbb0f9 100644
+index dc76b0362..0fbb0f921 100644
 --- a/src/llama-sampler.cpp
 +++ b/src/llama-sampler.cpp
 @@ -882,6 +882,48 @@ uint32_t llama_sampler_backend_n_nodes(const llama_sampler * sampler) {

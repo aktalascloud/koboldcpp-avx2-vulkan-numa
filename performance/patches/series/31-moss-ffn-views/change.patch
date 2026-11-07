@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 348d1a4..0acc033 100644
+index 348d1a4a3..0acc033c0 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -10831,6 +10831,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
@@ -42,7 +42,7 @@ index 348d1a4..0acc033 100644
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
-index 35ec726..0dc989d 100644
+index 35ec726a0..0dc989d50 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 @@ -18,7 +18,13 @@ void main() {
@@ -61,7 +61,7 @@ index 35ec726..0dc989d 100644
      }
  }
 diff --git a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
-index 188c741..37891d8 100644
+index 188c74196..37891d874 100644
 --- a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
 +++ b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
 @@ -137,7 +137,18 @@ namespace MOSSImage {

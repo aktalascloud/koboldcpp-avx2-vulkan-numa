@@ -1,5 +1,5 @@
 diff --git a/otherarch/sdcpp/src/model_io/gguf_reader_ext.h b/otherarch/sdcpp/src/model_io/gguf_reader_ext.h
-index f02fe3c..7ddd390 100644
+index f02fe3c6f..7ddd3906b 100644
 --- a/otherarch/sdcpp/src/model_io/gguf_reader_ext.h
 +++ b/otherarch/sdcpp/src/model_io/gguf_reader_ext.h
 @@ -60,7 +60,12 @@ private:

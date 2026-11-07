@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
-index 6a25258..5847b46 100644
+index 6a2525849..5847b46c4 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
 @@ -83,6 +83,9 @@ void rms_norm(uint num_iters) {
@@ -48,7 +48,7 @@ index 6a25258..5847b46 100644
              }
  #if RMS_NORM_ROPE_FUSION
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
-index cf7ab21..9a8094a 100644
+index cf7ab21f2..9a8094a60 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
 @@ -45,6 +45,16 @@ void main() {

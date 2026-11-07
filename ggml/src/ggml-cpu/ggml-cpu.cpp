@@ -422,6 +422,12 @@ static ggml_backend_buffer_t ggml_backend_cpu_device_buffer_from_host_ptr(ggml_b
 }
 
 static bool ggml_backend_cpu_device_supports_op(ggml_backend_dev_t dev, const struct ggml_tensor * op) {
+    if (op->op == GGML_OP_GLU && ggml_get_glu_op(op) == GGML_GLU_OP_SITU) {
+        return op->type == GGML_TYPE_F32 && op->src[0]->type == GGML_TYPE_F32 &&
+               ggml_is_contiguous_1(op->src[0]) &&
+               (!op->src[1] || (op->src[1]->type == GGML_TYPE_F32 && ggml_is_contiguous_1(op->src[1])));
+    }
+
     const struct ggml_tensor * src0 = op->src[0];
     const struct ggml_tensor * src1 = op->src[1];
 

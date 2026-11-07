@@ -1,5 +1,5 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index bdb1424..0dcfd9a 100644
+index bdb1424ed..0dcfd9a7a 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -9656,6 +9656,26 @@ def show_gui():

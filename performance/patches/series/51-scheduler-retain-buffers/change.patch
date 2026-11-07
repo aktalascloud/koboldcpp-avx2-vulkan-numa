@@ -1,5 +1,5 @@
 diff --git a/src/llama-context.cpp b/src/llama-context.cpp
-index 573a9e7..3aea7c8 100644
+index 573a9e70f..3aea7c862 100644
 --- a/src/llama-context.cpp
 +++ b/src/llama-context.cpp
 @@ -795,6 +795,7 @@ static int llama_graph_n_input_tensors(ggml_cgraph * gf) {
@@ -22,7 +22,7 @@ index 573a9e7..3aea7c8 100644
      if (memory) { //added by kcpp to reduce embeddings memory usage
      llama_memory_context_ptr mctx;
 diff --git a/src/llama-context.h b/src/llama-context.h
-index 39c5619..a4e56fb 100644
+index 39c5619df..a4e56fbab 100644
 --- a/src/llama-context.h
 +++ b/src/llama-context.h
 @@ -376,6 +376,7 @@ private:

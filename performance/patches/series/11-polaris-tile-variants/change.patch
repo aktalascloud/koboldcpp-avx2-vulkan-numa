@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index a9613a9..0d024f7 100644
+index a9613a9f7..0d024f7e7 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1913,6 +1913,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
@@ -23,7 +23,7 @@ index a9613a9..0d024f7 100644
          }
  
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
-index 19d3787..ea1d43e 100644
+index 19d37870b..ea1d43e18 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
 @@ -170,7 +170,8 @@ layout (constant_id = 9) const uint TK = 1;  // Only needed for coopmat

@@ -1,0 +1,22 @@
+diff --git a/otherarch/sdcpp/src/core/layer_split_partition.cpp b/otherarch/sdcpp/src/core/layer_split_partition.cpp
+index e19f47b26..3a7bd1e45 100644
+--- a/otherarch/sdcpp/src/core/layer_split_partition.cpp
++++ b/otherarch/sdcpp/src/core/layer_split_partition.cpp
+@@ -212,7 +212,7 @@ namespace sd {
+                 }
+                 ggml_tensor* node = ggml_graph_node(gf, node_index);
+                 if (node != nullptr) {
+-                    assignment.node_assignments[node] = backend;
++                    assignment.node_assignments.emplace(node, backend);
+                 }
+             }
+             for (int node_index : segment.output_node_indices) {
+@@ -221,7 +221,7 @@ namespace sd {
+                 }
+                 ggml_tensor* node = ggml_graph_node(gf, node_index);
+                 if (node != nullptr) {
+-                    assignment.node_assignments[node] = backend;
++                    assignment.node_assignments.emplace(node, backend);
+                 }
+             }
+         }

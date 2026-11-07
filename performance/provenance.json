@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "9958bb20b97595a9b19238aa4750c9498668e4c3",
+  "commit": "2d469743d30d09737633607071fe83dc2283bfec",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,16 +20,16 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "0519dcbfe1f2b90bee8e22c4017520f3c279c214449c3018f68b342be6057f70",
-  "patch_sha256": "b85178a8b60e947d2c4ba2fa92b9a712e9ce8e1d0bf67f52140fbb27de239c48",
-  "seconds": 987.6809415817261,
+  "executable_sha256": "efddce0e7f8518d735c809cbf925e3718786dddd6221da30eb9bc96107eaaca7",
+  "patch_sha256": "7bd8728c5d77449c2165c693fd9fd3099fdb0736f53446e85779dc20cd6813e4",
+  "seconds": 988.9181432723999,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "b5f7d26045216536bdcc7f467c47b63f95df38e9d631ac3330227e86a047ec68",
-  "native_input_count": 3337,
+  "native_source_signature": "b5a5715d4c3716caa4fbe28e438e0cfa22807ff6ef591e2f5c7b76e783414628",
+  "native_input_count": 3338,
   "native_dlls_reused": false,
   "native_validation_parent_sha256": null,
   "build_date": "2026-11-07",
@@ -39,8 +39,8 @@
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "8acbaf4d34a1f57fd7afc2b8b89529da83d01edb4f3dc26a6b3df6cc2924177c",
-    "koboldcpp_vulkan.dll": "b3e2e5b1b726f8c5eeb649fe39ba97867a7893b85f080fbacb6ebe649a66d208"
+    "koboldcpp_default.dll": "cdfee08e804518c2fdf6055e638eb4b84702f2df732e37c83540b5006217b53a",
+    "koboldcpp_vulkan.dll": "a00d4f9fdcd5e89cdad5534b1fbcc374a71299e3b77a6827934fe86ebd341b64"
   },
   "cpu_threads": {
     "threads": 16,

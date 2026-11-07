@@ -1,0 +1,23 @@
+#version 450
+#include "glu_head.glsl"
+// Preserve the existing multi-kernel FP32 stage boundaries and tanh expression.
+shared float situ_stage[512];
+float situ_round(float x) {
+    situ_stage[gl_LocalInvocationIndex] = x;
+    memoryBarrierShared();
+    return situ_stage[gl_LocalInvocationIndex];
+}
+float situ_tanh(float x) {
+    return 1.0f - 2.0f / (exp(2.0f*x) + 1.0f);
+}
+float op(float g,float h) {
+    precise float a = situ_round(g*0.25f + 0.0f);
+    a = situ_round(situ_tanh(a));
+    a = situ_round(a*4.0f + 0.0f);
+    a = situ_round((1.0f/(1.0f+exp(-g)))*a);
+    precise float b = situ_round(h*(1.0f/25.0f) + 0.0f);
+    b = situ_round(situ_tanh(b));
+    b = situ_round(b*25.0f + 0.0f);
+    return a*b;
+}
+#include "glu_main.glsl"

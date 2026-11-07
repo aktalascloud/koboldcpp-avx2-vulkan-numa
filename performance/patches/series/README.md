@@ -1,6 +1,6 @@
 # Native patch stack
 
-Apply in numeric order to `9958bb20b97595a9b19238aa4750c9498668e4c3`. [Index and SHA-256](index.json).
+Apply in numeric order to `2d469743d30d09737633607071fe83dc2283bfec`. [Index and SHA-256](index.json).
 
 - [Polaris Vulkan queue initialization](01-polaris-queue/README.md)
 - [Vulkan batched submissions](02-vulkan-batched-submits/README.md)
@@ -60,3 +60,10 @@ Apply in numeric order to `9958bb20b97595a9b19238aa4750c9498668e4c3`. [Index and
 - [Read integer LoRA scalars as FP32](56-sdcpp-i32-lora-scalar/README.md)
 - [Cache matching fallback workspace measurements](57-sdcpp-workspace-measure-cache/README.md)
 - [Honor the final reclaimed-memory capacity check](58-sdcpp-reclaimed-capacity/README.md)
+- [F32 native GLU for packed activations and LLM MLP](59-sdcpp-f32-glu/README.md)
+- [Prefer a usable discrete GPU only for automatic placement](60-sdcpp-auto-discrete-device/README.md)
+- [Preserve the first assigned backend for shared graph nodes](61-sdcpp-shared-node-owner/README.md)
+- [Native F32 SiTU with preserved stage rounding](62-native-f32-situ/README.md)
+- [Check CPU expert indices in release builds](63-cpu-release-expert-bounds/README.md)
+- [Preserve external consumers in segmented graph fusion checks](64-sdcpp-segment-use-counts/README.md)
+- [Polaris F32 RMS weight and vector modulation fusion](65-polaris-rms-vector-modulate/README.md)

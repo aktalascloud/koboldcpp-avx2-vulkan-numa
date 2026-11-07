@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 7714bc3..30903fd 100644
+index 7714bc389..30903fdb5 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 @@ -834,6 +834,7 @@ struct vk_device_struct {
@@ -11,7 +11,7 @@ index 7714bc3..30903fd 100644
      vk_pipeline pipeline_scale_f32;
      vk_pipeline pipeline_log[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 7bd1a69..6ff6110 100644
+index 7bd1a698e..6ff61109c 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -3459,6 +3459,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
@@ -62,7 +62,7 @@ index 7bd1a69..6ff6110 100644
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp b/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp
-index e404698..e3ab1c1 100644
+index e40469838..e3ab1c160 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/concat.comp
 @@ -3,6 +3,44 @@
@@ -117,7 +117,7 @@ index e404698..e3ab1c1 100644
 +
 +#endif
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 81b7314..f5d3940 100644
+index 81b7314f0..f5d394091 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 @@ -995,6 +995,7 @@ void process_shaders() {

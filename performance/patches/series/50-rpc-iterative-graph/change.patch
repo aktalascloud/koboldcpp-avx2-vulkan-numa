@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-rpc/ggml-rpc.cpp b/ggml/src/ggml-rpc/ggml-rpc.cpp
-index fc542e9..25474ef 100644
+index fc542e980..25474ef48 100644
 --- a/ggml/src/ggml-rpc/ggml-rpc.cpp
 +++ b/ggml/src/ggml-rpc/ggml-rpc.cpp
 @@ -2076,56 +2076,52 @@ ggml_tensor * rpc_server::create_node(uint64_t id,

@@ -1,8 +1,7 @@
-Haswell / Polaris PR,security and SDCPP update · 2026-11-07
+Haswell/Polaris remaining-PR update ·2026-11-07
 
-- Official SOURCE_COMMIT; Native SHA-256 NATIVE_SHA256. O3/Haswell + LTO,no PGO.
-- [58 separate patches](performance/patches/series/README.md),12 additions since the last published Native: GGUF/RPC/int8,Vulkan queues,scheduler/SDCPP memory,integer LoRA and exact IQ4_NL decoding.
-- [20 PR/security/P40 reviews plus8 SDCPP diffs](performance/review-2026-11-07-r4.md). Repeated fallback planning 789.67→221.76µs,operator-only. First-miss cost and all repeats retained. [Checks and limits](results/operations-2026-11-07-r4.json).
-- Exact user profiles/settings,visible dated startup and GET readiness verified. [Security scope](results/security-2026-11-07.json) · [Licenses](performance/NOTICE.md).
-
-Manual Normal+4×: **187.107→158.073s**, **29.034s / 15.52% less time**,sum of independently measured phase medians. Same settings/seed,no High,exact RGB. [All repeats,cohort identities and scope](results/performance-2026-11-07-r3.json). No new LLM token benchmark.
+- Official SOURCE_COMMIT;Native SHA256 NATIVE_SHA256.65 separate Native patches,7 new adaptations;O3/Haswell+LTO,no PGO.
+- Normal+separate4× phase medians **188.025→155.105s**,save32.920s/17.51% vs latest official rolling1.125. Previous0519dcbf→new saves2.745s/1.74%.9 Normal/6 SR outputs have identical RGB;settings preserved. SR against previous is33ms slower and retained. [All repeats/ranges/hashes/limits](results/performance-2026-11-07-r4.json).
+- Total is a sum of phase medians,not a joint public API request;model load/return/public queue/transport excluded. Fixed arm order,small warm sample. No High/new LLM tokens/s.
+- [332 scoped PR dispositions](results/pr-review-2026-11-07-r4.json),including ancestry/post-image checks and explicit model/backend deferrals;not every foreign kernel manually audited. [Operator gains and rejected experiments](results/operations-2026-11-07-r5.json). No isolated gains summed into pipeline percentages.
+- Native GLU/SiTU/RMS,device/shared-node/segment ownership and release CPU expert bounds. Existing Pillow13/runtime assets/licenses preserved;no model or non-commercial weights mirrored. Exact patch catalog:[Core](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/concedo_experimental/performance/patches/series).

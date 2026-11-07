@@ -3363,6 +3363,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add_f32[i], "rms_norm_mul_add_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, block_size}, 1, true, rms_subgroups);
         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add_mul_f32[i], "rms_norm_mul_add_mul_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 1, block_size}, 1, true, rms_subgroups);
     }
+    ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_modulate_f32, "rms_norm_modulate_f32", RMS_SHADER(rms_norm_modulate_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, 512}, 1, true, rms_subgroups);
     ggml_vk_create_pipeline(device, device->pipeline_rms_norm_mul_add_partials_f32, "rms_norm_mul_add_partials_f32", rms_norm_mul_add_partials_f32_len, rms_norm_mul_add_partials_f32_data, "main", 6, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0}, 1, true);
     ggml_vk_create_pipeline(device, device->pipeline_rms_norm_mul_add_mul_partials_f32, "rms_norm_mul_add_mul_partials_f32", rms_norm_mul_add_partials_f32_len, rms_norm_mul_add_partials_f32_data, "main", 6, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 1}, 1, true);
     ggml_vk_create_pipeline(device, device->pipeline_rms_norm_set_rows_f32_f32, "rms_norm_set_rows_f32_f32", RMS_SHADER(rms_norm_set_rows_f32_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 0, 0, rms_set_rows_block_size}, 1, true, rms_subgroups);
@@ -3586,6 +3587,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
     CREATE_GLU(geglu)
     CREATE_GLU(reglu)
     CREATE_GLU(swiglu)
+    ggml_vk_create_pipeline(device, device->pipeline_situ_f32, "situ_f32", situ_f32_len, situ_f32_data, "main", 3, sizeof(vk_op_glu_push_constants), {512, 1, 1}, {}, 1, true);
     CREATE_GLU(swiglu_oai)
     CREATE_GLU(swiglu_clamp)
     CREATE_GLU(geglu_erf)
@@ -9334,6 +9336,8 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const 
                 return ctx->device->pipeline_reglu[dst->type == GGML_TYPE_F16];
             case GGML_GLU_OP_SWIGLU:
                 return ctx->device->pipeline_swiglu[dst->type == GGML_TYPE_F16];
+            case GGML_GLU_OP_SITU:
+                return dst->type == GGML_TYPE_F32 ? ctx->device->pipeline_situ_f32 : nullptr;
             case GGML_GLU_OP_SWIGLU_OAI:
                 return ctx->device->pipeline_swiglu_oai[dst->type == GGML_TYPE_F16];
             case GGML_GLU_OP_SWIGLU_CLAMP:
@@ -11200,6 +11204,27 @@ void ggml_vk_rms_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const s
         return;
     }
 
+    if (ctx->fused_rms_norm_mode == RMS_NORM_MODULATE) {
+        GGML_ASSERT(!ctx->do_add_rms_partials && ctx->num_additional_fused_ops == 4);
+        const ggml_tensor * weight = cgraph->nodes[node_idx + 1]->src[1];
+        const ggml_tensor * scale = cgraph->nodes[node_idx + 2]->src[1];
+        const ggml_tensor * shift = cgraph->nodes[node_idx + 4]->src[1];
+        ggml_tensor * dst = cgraph->nodes[node_idx + 4];
+        auto pc = ggml_vk_rms_norm_push_constants(src0, weight, dst, op_params[0], 0);
+        init_pushconst_tensor_offsets(ctx, pc, src0, weight, scale, shift, dst);
+        auto pipeline = ctx->device->pipeline_rms_norm_modulate_f32;
+        ggml_pipeline_request_descriptor_sets(ctx, pipeline, 1);
+        ggml_vk_dispatch_pipeline(ctx, subctx, pipeline, {
+            ggml_vk_tensor_subbuffer(ctx, src0, true), ggml_vk_tensor_subbuffer(ctx, weight, true),
+            ggml_vk_tensor_subbuffer(ctx, dst, true), ggml_vk_tensor_subbuffer(ctx, scale),
+            ggml_vk_tensor_subbuffer(ctx, shift),
+        }, pc, { (uint32_t)src0->ne[1],
+            std::min((uint32_t)src0->ne[2], ctx->device->properties.limits.maxComputeWorkGroupCount[1]),
+            std::min((uint32_t)src0->ne[3], ctx->device->properties.limits.maxComputeWorkGroupCount[2]) });
+        ggml_vk_rms_norm_finish(ctx, src0);
+        return;
+    }
+
     if (ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD || ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD_MUL) {
         ggml_tensor * mul = cgraph->nodes[node_idx + 1];
         ggml_tensor * add = cgraph->nodes[node_idx + 2];
@@ -12964,6 +12989,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
         case GGML_GLU_OP_GEGLU:
         case GGML_GLU_OP_REGLU:
         case GGML_GLU_OP_SWIGLU:
+        case GGML_GLU_OP_SITU:
         case GGML_GLU_OP_SWIGLU_OAI:
         case GGML_GLU_OP_GEGLU_ERF:
         case GGML_GLU_OP_GEGLU_QUICK:
@@ -14530,6 +14556,34 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool 
     return false;
 }
 
+// Deliberately narrow: local Polaris, F32 vectors, native512-lane RMS reduction.
+static bool ggml_vk_can_fuse_rms_modulate(ggml_backend_vk_context * ctx, const ggml_cgraph * graph, int i) {
+    const auto & d = ctx->device;
+    if (d->architecture != AMD_GCN || d->subgroup_size != 64 || !d->subgroup_arithmetic ||
+        (d->properties.deviceID != 0x67df && d->properties.deviceID != 0x6fdf) ||
+        i + 5 > graph->n_nodes || !ggml_can_fuse_subgraph(graph, i, rms_norm_modulate_pattern, {i + 4})) {
+        return false;
+    }
+    const auto rms = graph->nodes[i], weighted = graph->nodes[i+1], scaled = graph->nodes[i+2];
+    const auto add = graph->nodes[i+3], dst = graph->nodes[i+4];
+    if (weighted->src[0] != rms || scaled->src[0] != weighted ||
+        add->src[0] != weighted || add->src[1] != scaled || dst->src[0] != add ||
+        rms->ne[0] <= 256 || rms->ne[0] > 4096 ||
+        rms->ne[1] > d->properties.limits.maxComputeWorkGroupCount[0] ||
+        !ggml_is_contiguous_rows(rms->src[0])) { return false; }
+    for (const ggml_tensor * t : {rms, weighted, scaled, add, dst}) {
+        if (t->type != GGML_TYPE_F32 || !ggml_are_same_shape(t, rms) || !ggml_is_contiguous(t)) { return false; }
+    }
+    if (rms->src[0]->type != GGML_TYPE_F32 || get_misalign_bytes(ctx, dst) != 0) { return false; }
+    for (const ggml_tensor * t : {weighted->src[1], scaled->src[1], dst->src[1]}) {
+        if (!t || t->type != GGML_TYPE_F32 || t->ne[0] != rms->ne[0] || !ggml_is_vector(t) ||
+            !ggml_is_contiguous(t) || get_misalign_bytes(ctx, t) != 0 ||
+            !t->buffer || !dst->buffer || !ggml_backend_buffer_is_vk(t->buffer) || !ggml_backend_buffer_is_vk(dst->buffer) ||
+            ggml_vk_tensors_overlap(t, dst, false)) { return false; }
+    }
+    return true;
+}
+
 bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
                                                int node_idx) {
     const ggml_tensor *rms = cgraph->nodes[node_idx + 0];
@@ -14862,6 +14916,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
                 ctx->fused_hc_post_gate = true;
                 fusion_string = "HC_POST_GATE";
                 std::fill_n(op_srcs_fused_elementwise, ctx->num_additional_fused_ops + 1, false);
+            } else if (ggml_vk_can_fuse_rms_modulate(ctx, cgraph, i)) {
+                ctx->num_additional_fused_ops = 4;
+                ctx->fused_rms_norm_mode = RMS_NORM_MODULATE;
+                fusion_string = "RMS_NORM_MODULATE";
+                std::fill_n(op_srcs_fused_elementwise, 5, true);
             } else if (ggml_vk_can_fuse(ctx, cgraph, i, rms_norm_mul_add_mul_pattern)) {
                 ctx->num_additional_fused_ops = 3;
                 ctx->fused_rms_norm_mode = RMS_NORM_MUL_ADD_MUL;
@@ -15292,6 +15351,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph, 
             continue;
         }
 
+        if (match_pattern(rms_norm_modulate_pattern, first_unused)) {
+            add_pattern_alloc_deps(rms_norm_modulate_pattern, first_unused + 4);
+            if (keep_pattern(rms_norm_modulate_pattern)) { continue; }
+        }
         if (keep_pattern(rms_norm_mul_add_mul_pattern)) {
             continue;
         }
@@ -15347,6 +15410,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph, 
                 match_pattern(topk_moe_late_softmax, j) ||
                 match_pattern(snake_pattern, j) ||
                 in_qsa_pattern(j) ||
+                match_pattern(rms_norm_modulate_pattern, j) ||
                 match_pattern(rms_norm_mul_add_mul_pattern, j) ||
                 match_pattern(rms_norm_mul_add_pattern, j) ||
                 match_pattern(rms_norm_mul_rope_view_set_rows_pattern, j) ||
@@ -15856,6 +15920,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
                     return false;
             }
         case GGML_OP_GLU:
+            if (ggml_get_glu_op(op) == GGML_GLU_OP_SITU) {
+                return op->type == GGML_TYPE_F32 && op->src[0]->type == GGML_TYPE_F32 &&
+                       (!op->src[1] || op->src[1]->type == GGML_TYPE_F32);
+            }
             switch (ggml_get_glu_op(op)) {
                 case GGML_GLU_OP_GEGLU:
                 case GGML_GLU_OP_REGLU:

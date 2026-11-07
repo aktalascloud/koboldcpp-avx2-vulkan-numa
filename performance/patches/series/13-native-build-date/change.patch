@@ -1,5 +1,5 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 697f4be..64b9dd4 100644
+index 697f4bea5..64b9dd4b4 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img

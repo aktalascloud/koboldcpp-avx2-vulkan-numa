@@ -1,5 +1,5 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 64b9dd4..bdb1424 100644
+index 64b9dd4b4..bdb1424ed 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -9062,6 +9062,9 @@ Change Mode<br>
@@ -13,7 +13,7 @@ index 64b9dd4..bdb1424 100644
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 6110d73..9aa9c8b 100644
+index 6110d7377..9aa9c8b0c 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
 @@ -2346,6 +2346,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
@@ -59,7 +59,7 @@ index 6110d73..9aa9c8b 100644
          {
              printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",vid_req_frames, generated_num_results);
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
-index 778bba6..f8ba726 100644
+index 778bba6e0..f8ba726b9 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 +++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 @@ -3059,6 +3059,12 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
