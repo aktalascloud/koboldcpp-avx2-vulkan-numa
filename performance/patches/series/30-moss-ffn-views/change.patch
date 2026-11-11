@@ -1,0 +1,86 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 59a020eba..490c79f59 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -10851,6 +10851,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+     vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
+     p.param1 = ggml_get_op_params_f32(dst, 0);
+     p.param2 = ggml_get_op_params_f32(dst, 1);
++    // KCPP_POLARIS_SCALE_ROWS: support is limited below to packed 2D rows.
++    p.param3 = ggml_is_contiguous(src0) ? 0.0f : 1.0f;
+ 
+     ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
+ }
+@@ -13884,7 +13886,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+     const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
+ 
+     // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
+-    return ggml_get_unary_op(sigmoid) == GGML_UNARY_OP_SIGMOID &&
++    // KCPP_SCALE_ROWS_FUSION_GUARD: HC fusion still uses contiguous flat input.
++    return ggml_is_contiguous(scale_in->src[0]) &&
++           ggml_get_unary_op(sigmoid) == GGML_UNARY_OP_SIGMOID &&
+            ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
+            ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
+            scale_in->src[0]->type == GGML_TYPE_F32 &&
+@@ -16176,8 +16180,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+             return op->type == GGML_TYPE_F32;
+         case GGML_OP_FILL:
+             return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
+-        case GGML_OP_SCALE:
+-            return ggml_is_contiguous(op->src[0]) && op->src[0]->type == GGML_TYPE_F32;
++        case GGML_OP_SCALE: {
++            // KCPP_POLARIS_SCALE_SUPPORT: keep untested layouts/devices upstream.
++            const ggml_tensor * source = op->src[0];
++            const bool polaris_rows = device->vendor_id == VK_VENDOR_ID_AMD &&
++                device->architecture == AMD_GCN && device->subgroup_size == 64 &&
++                (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
++                source->ne[2] == 1 && source->ne[3] == 1 && source->nb[0] == sizeof(float) &&
++                source->nb[1] >= size_t(source->ne[0]) * sizeof(float) && ggml_is_contiguous(op);
++            return source->type == GGML_TYPE_F32 && (ggml_is_contiguous(source) || polaris_rows);
++        }
+         case GGML_OP_PAD:
+         case GGML_OP_PAD_REFLECT_1D:
+         case GGML_OP_ROLL:
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
+index 35ec726a0..0dc989d50 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
+@@ -18,7 +18,13 @@ void main() {
+             continue;
+         }
+ 
+-        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
++        // KCPP_POLARIS_SCALE_ROWS: contiguous path retains the original expression.
++        uint source_idx = idx;
++        if (p.param3 != 0.0f) {
++            const uint row = fastdiv(idx, p.ne0_0mp, fastdiv_L(p.ne0_Ls, 2));
++            source_idx += row * (p.nb01 - p.ne00);
++        }
++        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + source_idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
+         idx += num_threads;
+     }
+ }
+diff --git a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
+index 188c74196..37891d874 100644
+--- a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
++++ b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
+@@ -137,7 +137,18 @@ namespace MOSSImage {
+             y            = norm("norm2", x);
+             y            = ggml_add(c, ggml_add(c, y, ggml_mul(c, y, part(4))), part(3));
+             auto up_gate = linear("proj.ffn_up_gate", y);
+-            y            = situ(c, ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim), ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim));
++            // KCPP_MOSS_FFN_VIEWS: avoid copies only when the backend accepts the consumers.
++            auto hidden = ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim, false);
++            auto gate = ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim, false);
++            const bool use_views = ctx->backend != nullptr &&
++                ggml_backend_dev_type(ggml_backend_get_device(ctx->backend)) == GGML_BACKEND_DEVICE_TYPE_GPU &&
++                ggml_backend_supports_op(ctx->backend, ggml_scale(c, hidden, 1.f / 25.f)) &&
++                ggml_backend_supports_op(ctx->backend, ggml_sigmoid(c, gate));
++            if (!use_views) {
++                hidden = ggml_cont(c, hidden);
++                gate = ggml_cont(c, gate);
++            }
++            y = situ(c, hidden, gate);
+             y            = linear("proj.ffn_down", y);
+             y            = ggml_mul(c, y, part(5));
+             return ggml_add(c, x, y);

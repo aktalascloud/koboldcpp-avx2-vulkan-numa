@@ -2,7 +2,7 @@
 
 KoboldCpp: LostRuins/Concedo and contributors, AGPL-3.0. GGML/llama.cpp/stable-diffusion.cpp retain upstream MIT notices and author credits. Full original source/license files remain in this fork.
 
-HybridMoE implementation: [MohammadR3za/llama.cpp-hybrid-moe](https://github.com/MohammadR3za/llama.cpp-hybrid-moe), commit eed95add (MIT; retained under licenses/HybridMoE-MIT.txt). The HybridMoE wrapper scripts are not redistributed. Additional ideas for prefetch from ponyol/llama.cpp.patch.speed and cubetitled-ui/llama.cpp. Vulkan geometry was adapted to GGML from ideas investigated in lakitu12/vkblas; no vkblas runtime is linked. Additional inspiration/decisions: sources.json and PATCHES.md. No endorsement is claimed.
+Historical HybridMoE port: [MohammadR3za/llama.cpp-hybrid-moe](https://github.com/MohammadR3za/llama.cpp-hybrid-moe), commit eed95add (MIT; retained under licenses/HybridMoE-MIT.txt). The HybridMoE wrapper scripts are not redistributed. Additional ideas for prefetch from ponyol/llama.cpp.patch.speed and cubetitled-ui/llama.cpp. Vulkan geometry was adapted to GGML from ideas investigated in lakitu12/vkblas; no vkblas runtime is linked. Additional inspiration/decisions: sources.json and PATCHES.md. No endorsement is claimed.
 
 The Windows executable also packages upstream aria2c 1.37.0 (GPL-2.0-or-later), simplecpuinfo (source in kcpp_src), Python, PyInstaller bootloader (GPL exception), CustomTkinter/darkdetect, Jinja2/MarkupSafe and psutil. Release notices retain actual installed dependency licenses. An official aria2 source archive and the exact Kobold fork source accompany the binary release. Original compiler runtime exceptions apply to statically linked GCC/libstdc++ runtime components. No third-party license is replaced by this fork's AGPL label.
 
@@ -21,3 +21,5 @@ Compute ports28October2026: CPU row-copy parallelism is an independent GGML adap
 Native architecture adaptation follows madebyollin/taehv at commit 011dfc2112197741c540e0bdd5b7b67bcc930771 (MIT). Full copyright/license is retained in otherarch/sdcpp/SDCPP_LICENSE. Checkpoint downloads remain with the original distributor. The advanced-lvl-up VAE workflow supplies a configuration idea; no HIP/Tensile binary or code is redistributed.
 
 Exact IQ4_NL decoder idea from Strata, adapted to AVX2: Copyright(c)2026 Niko1221 and the Strata contributors; [MIT notice](licenses/strata/LICENSE.txt), [pinned source](https://github.com/aktalascloud/strata-legacy-gpu/tree/157f5810bf0458b940521baf59f32fd2f71345c2/p40/patches/avx1-ple-iq4nl-shuffle). No P40 model timing is transferred to RX580.
+
+November 11 ports follow the GGML/llama.cpp MIT terms. [CLIP allocation](https://github.com/ggml-org/llama.cpp/pull/31988), [graph metadata](https://github.com/ggml-org/llama.cpp/pull/32043), [Gated Delta Net](https://github.com/ggml-org/llama.cpp/pull/32028).

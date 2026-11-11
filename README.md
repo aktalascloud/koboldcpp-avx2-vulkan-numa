@@ -5,20 +5,20 @@ Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **
 
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
-**1.125 · 2026-11-07 · Native `ebe56a51`.** Official `2d46974`,O3/Haswell+LTO,no PGO. [70 separate patches](performance/patches/series/) · [12 deferred-PR follow-ups](performance/review-2026-11-07-r6.md).
+**1.125 · 2026-11-11 · Native `33615ff0`.** Official base `f49df57`. [72 separate patches](performance/patches/series/).
 
-## Manual Normal+4× · 2026-11-07
+## ABDM Normal + 4× · 2026-11-11
 
-Official rolling1.125 `db00fc38`,updated November3 → `ebe56a51`. Three arms:stock,preceding efddce0e,new EXE. Current models,settings,prompt and seed424242 preserved;no High.3 Normal/arm,first separate,warm median of two;2 separate4×/arm,photo resident before every call.
+`ebe56a51` → `33615ff0`. Same ABDM MOSS Q8_0 profile and seed 424242. Three Normal and two separate 4× runs per build. The first Normal run is listed separately. The total sums the phase medians. Raw, finished and upscaled RGB matched in all repeats.
 
-| Stage | Official1.125 | New fork | Less time |
+| Stage | Before | After | Time change |
 |---|---:|---:|---:|
-| Native | 176.000 s | 142.968 s | 33.032 s / 18.77% |
-| Normal ready | 182.848 s | 150.999 s | 31.849 s / 17.42% |
-| Separate4× | 2.809 s | 2.744 s | 0.065 s / 2.33% |
-| Normal+4×* | 185.657 s | 153.743 s | 31.914 s / 17.19% |
+| Native | 143.178 s | 143.509 s | +0.330 s (+0.23%) |
+| Finished Normal | 151.348 s | 151.950 s | +0.602 s (+0.40%) |
+| Separate 4× | 2.737 s | 2.686 s | -0.051 s (-1.87%) |
+| Phase sum | 154.085 s | 154.636 s | +0.551 s (+0.36%) |
 
-*Sum of separately measured phase medians,not one API request. Production Pipeline/private Native HTTP includes PNG/base64/JSON;public5001 queue/transport,model loading and photo return are excluded. All9 raw/finished RGB and6 SR outputs match. Against preceding efddce0e,no additional photo speedup is demonstrated:phase ranges overlap and Native is essentially unchanged. Observed phase-sum change **-0.119s / -0.08%**;4× changes by **-17.5ms**. SR code is shared,this is not an upscaler-kernel gain. [Every repeat,range,load,hash and limit](results/performance-2026-11-07-r5.json). Arm order is fixed.
+The report lists all repeat ranges. [Repeats and hashes](results/performance-2026-11-11-abdm.json) · [CPU operations](results/operations-2026-11-11.json) · [PR review](results/pr-review-2026-11-11.json)
 
 ## Last LLM token comparison · 2026-10-25
 Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, CPU 4 / Vulkan 2 repeats per arm. Tokens/s means:
@@ -30,7 +30,7 @@ Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, 
 | Vulkan prompt | 411.010 | 712.810 | +73.4% |
 | Vulkan output | 17.035 | 23.655 | +38.9% |
 
-Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **The current1.125 / 2d46974 build has no new token benchmark; these historical speeds are not its benchmark.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
+Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **Token timings above are historical.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
 
 Vulkan starting point: threads 6 / BLAS 4, batch/ubatch 1024, GPU layers 99, NUMA auto. CPU-only 16/20; media encoder 20 separately. Graphics queue 1, batched submits 1, node 100 and gated Polaris controls are described in [RUN.txt](performance/RUN.txt).
 

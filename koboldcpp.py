@@ -401,9 +401,7 @@ class load_model_inputs(ctypes.Structure):
                 ("rpc_targets", ctypes.c_char_p),
                 ("lazy_mode", ctypes.c_int),
                 ("moe_cache_mib", ctypes.c_int),
-                ("parallel_total_context", ctypes.c_int),
-                ("moe_hybrid_threads", ctypes.c_int),
-                ("moe_hybrid_uploads", ctypes.c_int)]
+                ("parallel_total_context", ctypes.c_int)]
 
 class generation_inputs(ctypes.Structure):
     _fields_ = [("seed", ctypes.c_int),
@@ -2247,14 +2245,6 @@ def load_model(model_filename):
     inputs = load_model_inputs()
     inputs.lazy_mode = {"off": 0, "auto": 1, "on": 2}[args.lazy_mode]
     inputs.moe_cache_mib = args.moe_cache_mib
-    if type(args.moe_hybrid_threads) is not int or not 0 <= args.moe_hybrid_threads <= 512:
-        raise ValueError("--moe-hybrid must be an integer between0 and512")
-    if type(args.moe_hybrid_uploads) is not int or not 0 <= args.moe_hybrid_uploads <= 1024:
-        raise ValueError("--moe-hybrid-uploads must be an integer between0 and1024")
-    if args.moe_hybrid_threads and not args.moe_cache_mib:
-        raise ValueError("--moe-hybrid requires --moe-cache-mib")
-    inputs.moe_hybrid_threads = args.moe_hybrid_threads
-    inputs.moe_hybrid_uploads = args.moe_hybrid_uploads
     inputs.model_filename = model_filename.encode("UTF-8")
     inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
     inputs.threads = args.threads
@@ -14939,8 +14929,6 @@ if __name__ == '__main__':
     advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
     advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
     advparser.add_argument("--moe-prefill-copy-all", action="store_true", help="Experimental: upload full CPU expert tensors for large prefill batches, avoiding routing readback. Requires local speed validation.")
-    advparser.add_argument("--moe-hybrid", dest="moe_hybrid_threads", type=check_range(int,0,512), default=0, help="Experimental CPU threads for expert cache misses; requires --moe-cache-mib.0 disables hybrid.")
-    advparser.add_argument("--moe-hybrid-uploads", type=check_range(int,0,1024), default=0, help="Expert replacements per layer step in hybrid mode; default0 avoids decode uploads.")
     advparser.add_argument("--moe-cache-mib", "--moecache", dest="moe_cache_mib", type=check_range(int, 0, 2147483647), default=0, metavar="MiB", help="Experimental GPU cache size in MiB for CPU-resident MoE experts. Split among GPUs like layers. Uses additional VRAM; combine with --moecpu or --autofit (default=0, disabled).")
     advparser.add_argument("--moecpu","--n-cpu-moe", "-ncmoe", metavar=('[layers affected]'), help="Keep the Mixture of Experts (MoE) weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
     advparser.add_argument("--ffncpu","--n-cpu-ffn", "-ncffn", metavar=('[layers affected]'), help="Keep the dense FFN weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)

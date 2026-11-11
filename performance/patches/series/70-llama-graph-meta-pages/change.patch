@@ -1,0 +1,38 @@
+diff --git a/src/llama-graph.cpp b/src/llama-graph.cpp
+index 5a70d6a54..57a812a5d 100644
+--- a/src/llama-graph.cpp
++++ b/src/llama-graph.cpp
+@@ -1426,11 +1426,16 @@ void llm_graph_result::reset() {
+     fused_nodes.clear();
+     hdmd_inputs.clear();
+ 
+-    buf_compute_meta.resize(ggml_tensor_overhead()*max_nodes + ggml_graph_overhead_custom(max_nodes, false));
++    const size_t meta_size = ggml_tensor_overhead()*max_nodes + ggml_graph_overhead_custom(max_nodes, false);
++    if (meta_size != buf_compute_meta_size) {
++        // GGML initializes each graph object when it is allocated.
++        buf_compute_meta.reset(new uint8_t[meta_size]);
++        buf_compute_meta_size = meta_size;
++    }
+ 
+     ggml_init_params params = {
+-        /*.mem_size   =*/ buf_compute_meta.size(),
+-        /*.mem_buffer =*/ buf_compute_meta.data(),
++        /*.mem_size   =*/ buf_compute_meta_size,
++        /*.mem_buffer =*/ buf_compute_meta.get(),
+         /*.no_alloc   =*/ true,
+     };
+ 
+diff --git a/src/llama-graph.h b/src/llama-graph.h
+index 9867c9540..cd10ee2f9 100644
+--- a/src/llama-graph.h
++++ b/src/llama-graph.h
+@@ -987,7 +987,8 @@ public:
+     ggml_context_ptr ctx_compute;
+ 
+     // memory buffers used to evaluate the model
+-    std::vector<uint8_t> buf_compute_meta;
++    std::unique_ptr<uint8_t[]> buf_compute_meta;
++    size_t buf_compute_meta_size = 0;
+ 
+     ggml_cgraph * gf;
+ 

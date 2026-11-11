@@ -1,0 +1,200 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+index 4f9fc1c34..c0a63a852 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+@@ -537,6 +537,8 @@ static constexpr std::initializer_list<std::array<int, 3>> topk_qsa_edges {
+ 
+ static constexpr std::initializer_list<ggml_op> rms_norm_mul_add_mul_pattern { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_ADD, GGML_OP_MUL };
+ 
++static constexpr std::initializer_list<ggml_op> rms_norm_modulate_pattern { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_MUL, GGML_OP_ADD, GGML_OP_ADD };
++
+ static constexpr std::initializer_list<ggml_op> rms_norm_mul_add_pattern     { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_ADD };
+ 
+ static constexpr std::initializer_list<ggml_op> rms_norm_mul_rope_view_set_rows_pattern { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_ROPE, GGML_OP_VIEW, GGML_OP_SET_ROWS };
+@@ -631,6 +633,7 @@ enum rms_norm_mode {
+     RMS_NORM_MUL_ROPE,
+     RMS_NORM_MUL_ROPE_VIEW_SET_ROWS,
+     RMS_NORM_VIEW_SET_ROWS,
++    RMS_NORM_MODULATE,
+     RMS_NORM_COUNT,
+ };
+ 
+@@ -864,6 +867,7 @@ struct vk_device_struct {
+     std::array<vk_pipeline, 3> pipeline_rms_norm_mul_rows_f32;
+     std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add_f32;
+     std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add_mul_f32;
++    vk_pipeline pipeline_rms_norm_modulate_f32;
+     vk_pipeline pipeline_rms_norm_mul_add_partials_f32;
+     vk_pipeline pipeline_rms_norm_mul_add_mul_partials_f32;
+     vk_pipeline pipeline_rms_norm_set_rows_f32_f32;
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index e0d1622d1..ca7cac15e 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -3363,6 +3363,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add_f32[i], "rms_norm_mul_add_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, block_size}, 1, true, rms_subgroups);
+         ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add_mul_f32[i], "rms_norm_mul_add_mul_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 1, block_size}, 1, true, rms_subgroups);
+     }
++    ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_modulate_f32, "rms_norm_modulate_f32", RMS_SHADER(rms_norm_modulate_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, 512}, 1, true, rms_subgroups);
+     ggml_vk_create_pipeline(device, device->pipeline_rms_norm_mul_add_partials_f32, "rms_norm_mul_add_partials_f32", rms_norm_mul_add_partials_f32_len, rms_norm_mul_add_partials_f32_data, "main", 6, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0}, 1, true);
+     ggml_vk_create_pipeline(device, device->pipeline_rms_norm_mul_add_mul_partials_f32, "rms_norm_mul_add_mul_partials_f32", rms_norm_mul_add_partials_f32_len, rms_norm_mul_add_partials_f32_data, "main", 6, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 1}, 1, true);
+     ggml_vk_create_pipeline(device, device->pipeline_rms_norm_set_rows_f32_f32, "rms_norm_set_rows_f32_f32", RMS_SHADER(rms_norm_set_rows_f32_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 0, 0, rms_set_rows_block_size}, 1, true, rms_subgroups);
+@@ -11199,6 +11200,27 @@ void ggml_vk_rms_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const s
+         return;
+     }
+ 
++    if (ctx->fused_rms_norm_mode == RMS_NORM_MODULATE) {
++        GGML_ASSERT(!ctx->do_add_rms_partials && ctx->num_additional_fused_ops == 4);
++        const ggml_tensor * weight = cgraph->nodes[node_idx + 1]->src[1];
++        const ggml_tensor * scale = cgraph->nodes[node_idx + 2]->src[1];
++        const ggml_tensor * shift = cgraph->nodes[node_idx + 4]->src[1];
++        ggml_tensor * dst = cgraph->nodes[node_idx + 4];
++        auto pc = ggml_vk_rms_norm_push_constants(src0, weight, dst, op_params[0], 0);
++        init_pushconst_tensor_offsets(ctx, pc, src0, weight, scale, shift, dst);
++        auto pipeline = ctx->device->pipeline_rms_norm_modulate_f32;
++        ggml_pipeline_request_descriptor_sets(ctx, pipeline, 1);
++        ggml_vk_dispatch_pipeline(ctx, subctx, pipeline, {
++            ggml_vk_tensor_subbuffer(ctx, src0, true), ggml_vk_tensor_subbuffer(ctx, weight, true),
++            ggml_vk_tensor_subbuffer(ctx, dst, true), ggml_vk_tensor_subbuffer(ctx, scale),
++            ggml_vk_tensor_subbuffer(ctx, shift),
++        }, pc, { (uint32_t)src0->ne[1],
++            std::min((uint32_t)src0->ne[2], ctx->device->properties.limits.maxComputeWorkGroupCount[1]),
++            std::min((uint32_t)src0->ne[3], ctx->device->properties.limits.maxComputeWorkGroupCount[2]) });
++        ggml_vk_rms_norm_finish(ctx, src0);
++        return;
++    }
++
+     if (ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD || ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD_MUL) {
+         ggml_tensor * mul = cgraph->nodes[node_idx + 1];
+         ggml_tensor * add = cgraph->nodes[node_idx + 2];
+@@ -14530,6 +14552,34 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
+     return false;
+ }
+ 
++// Deliberately narrow: local Polaris, F32 vectors, native512-lane RMS reduction.
++static bool ggml_vk_can_fuse_rms_modulate(ggml_backend_vk_context * ctx, const ggml_cgraph * graph, int i) {
++    const auto & d = ctx->device;
++    if (d->architecture != AMD_GCN || d->subgroup_size != 64 || !d->subgroup_arithmetic ||
++        (d->properties.deviceID != 0x67df && d->properties.deviceID != 0x6fdf) ||
++        i + 5 > graph->n_nodes || !ggml_can_fuse_subgraph(graph, i, rms_norm_modulate_pattern, {i + 4})) {
++        return false;
++    }
++    const auto rms = graph->nodes[i], weighted = graph->nodes[i+1], scaled = graph->nodes[i+2];
++    const auto add = graph->nodes[i+3], dst = graph->nodes[i+4];
++    if (weighted->src[0] != rms || scaled->src[0] != weighted ||
++        add->src[0] != weighted || add->src[1] != scaled || dst->src[0] != add ||
++        rms->ne[0] <= 256 || rms->ne[0] > 4096 ||
++        rms->ne[1] > d->properties.limits.maxComputeWorkGroupCount[0] ||
++        !ggml_is_contiguous_rows(rms->src[0])) { return false; }
++    for (const ggml_tensor * t : {rms, weighted, scaled, add, dst}) {
++        if (t->type != GGML_TYPE_F32 || !ggml_are_same_shape(t, rms) || !ggml_is_contiguous(t)) { return false; }
++    }
++    if (rms->src[0]->type != GGML_TYPE_F32 || get_misalign_bytes(ctx, dst) != 0) { return false; }
++    for (const ggml_tensor * t : {weighted->src[1], scaled->src[1], dst->src[1]}) {
++        if (!t || t->type != GGML_TYPE_F32 || t->ne[0] != rms->ne[0] || !ggml_is_vector(t) ||
++            !ggml_is_contiguous(t) || get_misalign_bytes(ctx, t) != 0 ||
++            !t->buffer || !dst->buffer || !ggml_backend_buffer_is_vk(t->buffer) || !ggml_backend_buffer_is_vk(dst->buffer) ||
++            ggml_vk_tensors_overlap(t, dst, false)) { return false; }
++    }
++    return true;
++}
++
+ bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
+                                                int node_idx) {
+     const ggml_tensor *rms = cgraph->nodes[node_idx + 0];
+@@ -14862,6 +14912,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+                 ctx->fused_hc_post_gate = true;
+                 fusion_string = "HC_POST_GATE";
+                 std::fill_n(op_srcs_fused_elementwise, ctx->num_additional_fused_ops + 1, false);
++            } else if (ggml_vk_can_fuse_rms_modulate(ctx, cgraph, i)) {
++                ctx->num_additional_fused_ops = 4;
++                ctx->fused_rms_norm_mode = RMS_NORM_MODULATE;
++                fusion_string = "RMS_NORM_MODULATE";
++                std::fill_n(op_srcs_fused_elementwise, 5, true);
+             } else if (ggml_vk_can_fuse(ctx, cgraph, i, rms_norm_mul_add_mul_pattern)) {
+                 ctx->num_additional_fused_ops = 3;
+                 ctx->fused_rms_norm_mode = RMS_NORM_MUL_ADD_MUL;
+@@ -15292,6 +15347,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+             continue;
+         }
+ 
++        if (match_pattern(rms_norm_modulate_pattern, first_unused)) {
++            add_pattern_alloc_deps(rms_norm_modulate_pattern, first_unused + 4);
++            if (keep_pattern(rms_norm_modulate_pattern)) { continue; }
++        }
+         if (keep_pattern(rms_norm_mul_add_mul_pattern)) {
+             continue;
+         }
+@@ -15347,6 +15406,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+                 match_pattern(topk_moe_late_softmax, j) ||
+                 match_pattern(snake_pattern, j) ||
+                 in_qsa_pattern(j) ||
++                match_pattern(rms_norm_modulate_pattern, j) ||
+                 match_pattern(rms_norm_mul_add_mul_pattern, j) ||
+                 match_pattern(rms_norm_mul_add_pattern, j) ||
+                 match_pattern(rms_norm_mul_rope_view_set_rows_pattern, j) ||
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
+index 573a43f6f..1af02ab3a 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
+@@ -37,7 +37,7 @@ layout (binding = 6) readonly buffer R_I {uvec2 rope_data_i[];}; // indices for
+ #define GGML_ROPE_TYPE_MROPE  8
+ #define GGML_ROPE_TYPE_VISION 24
+ 
+-#elif RMS_NORM_ADD_FUSION
++#elif RMS_NORM_ADD_FUSION || RMS_NORM_MODULATE_FUSION
+ 
+ layout (binding = 3) readonly buffer C {float data_c[];};
+ layout (binding = 4) readonly buffer E {float data_e[];};
+@@ -54,6 +54,19 @@ layout (constant_id = 2) const bool do_post_multiply = false;
+ #endif
+ 
+ shared FLOAT_TYPE sumsh[BLOCK_SIZE];
++#if RMS_NORM_MODULATE_FUSION
++shared float modulation_input[BLOCK_SIZE];
++float kcpp_rms_modulate(float value, uint col) {
++    // Match the stored weighted result, MUL, ADD, ADD stages; never fold to (1+scale)*x.
++    modulation_input[gl_LocalInvocationIndex] = value;
++    memoryBarrierShared();
++    float weighted = modulation_input[gl_LocalInvocationIndex];
++    precise float product = weighted * data_c[col];
++    precise float result = weighted + product;
++    result += data_e[col];
++    return result;
++}
++#endif
+ 
+ void rms_norm(uint num_iters) {
+     const uint ncols     = p.ne00;
+@@ -151,6 +164,9 @@ void rms_norm(uint num_iters) {
+                         if (do_post_multiply) {
+                             value *= FLOAT_TYPE(data_e[0]);
+                         }
++#endif
++#if RMS_NORM_MODULATE_FUSION
++                        value = kcpp_rms_modulate(value, col);
+ #endif
+                         data_d[d_offset + col] = D_TYPE(value);
+                     }
+@@ -165,6 +181,9 @@ void rms_norm(uint num_iters) {
+                         if (do_post_multiply) {
+                             value *= FLOAT_TYPE(data_e[0]);
+                         }
++#endif
++#if RMS_NORM_MODULATE_FUSION
++                        value = kcpp_rms_modulate(value, col);
+ #endif
+                         data_d[d_offset + col] = D_TYPE(value);
+                     }
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index 305b2bd44..7aa5afd64 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -886,6 +886,7 @@ void process_shaders() {
+         string_to_spv("rms_norm_f32" + suffix, "rms_norm.comp", rms_dict);
+         string_to_spv("rms_norm_rows_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"RMS_NORM_ROW_STRIDE", "1"}}));
+         string_to_spv("rms_norm_mul_add_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"RMS_NORM_ADD_FUSION", "1"}}));
++        string_to_spv("rms_norm_modulate_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"RMS_NORM_MODULATE_FUSION", "1"}}));
+         string_to_spv("rms_norm_set_rows_f32_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"RMS_NORM_SET_ROWS_FUSION", "1"}}));
+         string_to_spv("rms_norm_set_rows_f32_f16" + suffix, "rms_norm.comp", merge_maps({{"D_TYPE", "float16_t"}, {"RMS_NORM_SET_ROWS_FUSION", "1"}}, rms_dict)); // keep rms_dict last so 'merge_maps' overwrites the value for key 'D_TYPE'
+         string_to_spv("rms_norm_mul_rope_f32_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"ROPE_D_TYPE", "float"}, {"RMS_NORM_ROPE_FUSION", "1"}}));

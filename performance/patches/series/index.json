@@ -1,31 +1,31 @@
 {
-  "upstream": "2d469743d30d09737633607071fe83dc2283bfec",
-  "tree": "990df61c1f0573da01208952a68f5ab01e0bf04f",
-  "snapshot_sha256": "af2cc7d11aa67c8ef5fe945f4bc49de141e33780a21897a795f0fe758aa7448c",
+  "upstream": "f49df57b4a82f6d641c419c7fadc9e4b896f6781",
+  "tree": "7f11c227c0675d86d3630a64dcd968bd9efa123f",
+  "snapshot_sha256": "0008ad1a466b666f462cc22ba972788dc799f168c5dbf41d7becf1b8c762c1b0",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
       "title": "Polaris Vulkan queue initialization",
       "source": "https://github.com/andrewdhannah/vulkan-polaris-llama",
-      "sha256": "d597888886c9470ed7946324f059d55f295c310f0d5aeeed202293a14110a612"
+      "sha256": "188de3b1e4747f5c339f3cc3b1f9ae5ec0778e33a352c7eb70ec668784604886"
     },
     {
       "path": "02-vulkan-batched-submits/change.patch",
       "title": "Vulkan batched submissions",
       "source": "https://github.com/MohammadR3za/HybridMoE",
-      "sha256": "4f38de2e304bd4f2f37772e5c6d8ba9da31c3a1204d9f8bbdafcfbac28c79f48"
+      "sha256": "fcac877f06856adb0e98219d65dbc0b3660865cf67d258316c9a7396de3fd543"
     },
     {
       "path": "03-polaris-tile64/change.patch",
       "title": "Polaris scalar FP32 64×64 tile",
       "source": "https://github.com/lakitu12/vkblas",
-      "sha256": "4d71b9c5ca57d9ddd16e754a4cf666157f4a0cb6cceb1726b5bee685654e0ab8"
+      "sha256": "ba3c0a3955bfd5ee1e63e959c5a09171c15f3f47e0af5afc6a1980151eba2da6"
     },
     {
       "path": "04-cpu-moe-prefetch/change.patch",
       "title": "CPU MoE input prefetch",
       "source": "https://github.com/ponyol/llama.cpp.patch.speed",
-      "sha256": "c26aadcb380222e4f17993171153c67a23c40707dfd1cea43798c5021562aded"
+      "sha256": "eb7ec16fb487ed0591e4128dc5588ac7f82642270f1895951764697441154c4a"
     },
     {
       "path": "05-win64-avx-inline/change.patch",
@@ -40,396 +40,410 @@
       "sha256": "3e99f31b731efa8ae3970493c7f952bdaf69604372517299953cc200e8f9e332"
     },
     {
-      "path": "07-hybrid-moe/change.patch",
-      "title": "HybridMoE and SLRU expert cache",
-      "source": "https://github.com/MohammadR3za/HybridMoE",
-      "sha256": "870918dc347265c8b18f679641598a6bf9028ca9b69082a2dae3d9ed293c6d72"
-    },
-    {
-      "path": "08-windows-numa/change.patch",
+      "path": "07-windows-numa/change.patch",
       "title": "Windows NUMA affinity",
       "source": "https://github.com/ggml-org/llama.cpp/pull/6832",
-      "sha256": "4cd07f1a2206065a86205f1e5e39c94ab3582fe44ebfdf913889c75b7ca05219"
+      "sha256": "268a66f8b6dca8d88398551798526269d0e0055d9d552b5e2410db7bbb5f28cb"
     },
     {
-      "path": "09-moe-prefill/change.patch",
+      "path": "08-moe-prefill/change.patch",
       "title": "MoE prefill routing readback bypass",
       "source": "https://github.com/pauldmartinphd/llm-performance-engineering-notebook",
-      "sha256": "482c451004743e12a96b2051150e52e7d20b11fd31c46a0e90f5918a6811eeb1"
+      "sha256": "de7dc61aedefed9eb6da66d0519b58bc970bf3d226e766fb231052b2c056bdd8"
     },
     {
-      "path": "10-shader-dependencies/change.patch",
+      "path": "09-shader-dependencies/change.patch",
       "title": "Invalidate shader artifacts on source changes",
       "source": null,
-      "sha256": "67b10cbb1573dc9b32e5be6458c9a573b65cb8c73eb95544fc27886ebb6913d6"
+      "sha256": "8f7c8cccd1b348eda94b55648ad279af06991df28b22e3e03b9b9706e310b1a8"
     },
     {
-      "path": "11-polaris-tile-variants/change.patch",
+      "path": "10-polaris-tile-variants/change.patch",
       "title": "Polaris scalar FP32 tile variants",
       "source": "https://github.com/lakitu12/vkblas",
-      "sha256": "4dd8e6e64af968d127e9040dbbc8cea1dff38cb4994072d1bc19f286ebda5904"
+      "sha256": "fa85ab92d78049b81f13a426d6857e393422b9c14e6327ee5576af156106d919"
     },
     {
-      "path": "12-polaris-iq4-xs/change.patch",
+      "path": "11-polaris-iq4-xs/change.patch",
       "title": "Polaris IQ4_XS matrix-vector geometry",
       "source": null,
-      "sha256": "30c6392679298eea9a2b074ae9affc8cf8f7df6632c83eea4588e13355d46947"
+      "sha256": "08803ba0a4bd1adbdfae3620ff8c85ed779fdbec2a2f31dab3e109f497998985"
     },
     {
-      "path": "13-native-build-date/change.patch",
+      "path": "12-native-build-date/change.patch",
       "title": "Native build date in the UI",
       "source": null,
-      "sha256": "97bc68fcd9803ffa8eb68171b84024713280fe170cf6162928835bd6a0471d47"
+      "sha256": "528b33a55d4e6bc5915539d74f9d1a6c8d6e1d4789f775c3a40ba6b36075d2cd"
     },
     {
-      "path": "14-gcn-lds/change.patch",
+      "path": "13-gcn-lds/change.patch",
       "title": "GCN shared memory and driver gates",
       "source": "https://github.com/doteyeso-ops/rx580-vulkan-fa-lds",
-      "sha256": "ae04d5794e972a6b9bed64063803b50077bede7e1dea5607310eb8456e3f4983"
+      "sha256": "fa76cebccc74c639b2e548ca294a8d207929a9537e2a6199f62130c9c6206638"
     },
     {
-      "path": "15-vulkan-transposed-concat/change.patch",
+      "path": "14-vulkan-transposed-concat/change.patch",
       "title": "Large Vulkan transposed concat",
       "source": "https://github.com/ggml-org/llama.cpp/pull/30591",
-      "sha256": "4d12ed6573dd357e6adf50346bcbffa5caba0e67dbb60885ead8f0668e35f8d0"
+      "sha256": "b5388f2efb885c94e488b87572400dddfaebdd1bfe7563b76a46a4c9461e3e9e"
     },
     {
-      "path": "16-sampler-cdf-reuse/change.patch",
+      "path": "15-sampler-cdf-reuse/change.patch",
       "title": "Reuse sampling CDF scratch storage",
       "source": "https://github.com/ikawrakow/ik_llama.cpp/pull/1187",
       "sha256": "2b8b624e764b14268709f5c8dd0713f90cdc404f30565a652318efda68186e58"
     },
     {
-      "path": "17-cpu-repeat-rows/change.patch",
+      "path": "16-cpu-repeat-rows/change.patch",
       "title": "Parallel CPU F32 repeat rows",
       "source": "https://github.com/ikawrakow/ik_llama.cpp/pull/2757",
-      "sha256": "31038e43875c4f4cdbf7bdb1b27bd32e65ccc981d0ed460575cab5d3ef876333"
+      "sha256": "fd8d4733b40dac924923d7d304a683174b3f6d8c765ef54b1b6cec6ba307f4bd"
     },
     {
-      "path": "18-vulkan-rms-cache/change.patch",
+      "path": "17-vulkan-rms-cache/change.patch",
       "title": "Vulkan RMS loads and partials",
       "source": "https://github.com/HarshaVardhan3002/ROCmFPX/commit/1fe09ec4e3",
       "sha256": "882569dd3f22fb01fbadbc8f0de290c5fd787adc97d6f1e2952b070669e85098"
     },
     {
-      "path": "19-video-jpeg95/change.patch",
+      "path": "18-video-jpeg95/change.patch",
       "title": "Video MJPEG quality 95",
       "source": null,
       "sha256": "1e3d13cfd4b4308f931d6de8b02c4f46ba65ba01a40a82a067a8b5d298e3b67c"
     },
     {
-      "path": "20-wan-super-tiny/change.patch",
+      "path": "19-wan-super-tiny/change.patch",
       "title": "Native Super-Tiny Wan5B decoder",
       "source": "https://github.com/madebyollin/taehv/tree/011dfc2112197741c540e0bdd5b7b67bcc930771",
       "sha256": "81750481fb3dcc6085cb33cc7d0baeaa63258c6c661dd4bd0b621f93c8d9569f"
     },
     {
-      "path": "21-polaris-conv-wg/change.patch",
+      "path": "20-polaris-conv-wg/change.patch",
       "title": "Optional Polaris convolution workgroup",
       "source": null,
-      "sha256": "5abefe681eae84860763649717126f5962dfa7a0cf4d0b24f546f99fd4b60066"
+      "sha256": "5113dcfc8fc9c03c898a3e12f5c4223202092c8b993b91ce7ad08a63e0d0d9b1"
     },
     {
-      "path": "22-wan-split-vae/change.patch",
+      "path": "21-wan-split-vae/change.patch",
       "title": "Separate Wan encoder and decoder",
       "source": "https://github.com/advanced-lvl-up/Rx470-Vega10-Rx580-gfx803-gfx900-fix-AMD-GPU",
       "sha256": "8289955291bf58f3a51de45243b48ab4b6b34d04269165a7a8f7f753eca121e0"
     },
     {
-      "path": "23-wan-latent-capture/change.patch",
+      "path": "22-wan-latent-capture/change.patch",
       "title": "Owned Wan latent snapshot",
       "source": null,
       "sha256": "e276333c19bd7ed17e74f5bf2d8eae235300bc8253f4dc23ed2046953da1d02a"
     },
     {
-      "path": "24-wan-latent-export/change.patch",
+      "path": "23-wan-latent-export/change.patch",
       "title": "Wan latent-only operation",
       "source": null,
-      "sha256": "2f0911dff21025384efaff7e976b3c962709a2750e177b582ab8e36cc8eecf1b"
+      "sha256": "a3c40aef798831174a92aa4fbdf5b64d0789479afddbffe075f928d8987a255e"
     },
     {
-      "path": "25-video-cache-forwarding/change.patch",
+      "path": "24-video-cache-forwarding/change.patch",
       "title": "Video cache options forwarding",
       "source": null,
       "sha256": "90e560fe1fa307a478739b0157c5d136253f9ecc72f9048f8afd75de54318be6"
     },
     {
-      "path": "26-wan-cache-gates/change.patch",
+      "path": "25-wan-cache-gates/change.patch",
       "title": "Wan Cache-DiT reuse guards",
       "source": null,
       "sha256": "c02129bd4c72f29f8ce4717eb3474d38829710e9163d75715cf9ab0b11cf17cd"
     },
     {
-      "path": "27-audio-lto-destructors/change.patch",
+      "path": "26-audio-lto-destructors/change.patch",
       "title": "Audio MinGW LTO destructor linkage",
       "source": null,
       "sha256": "91d6f8d48d17879181b7309c0de0dc55319b161b75b2344c278b7462c2169341"
     },
     {
-      "path": "28-native-media-launcher/change.patch",
+      "path": "27-native-media-launcher/change.patch",
       "title": "Native media launcher integration",
       "source": null,
-      "sha256": "28ae1da9fd1ce273b3ab96e1d60308029eb56b0b729c3e3e8162b1a190ab2d1c"
+      "sha256": "8b8f7924851a09871091de552b9aa13b49d159e6d0de9079c75a61cc5031bb2c"
     },
     {
-      "path": "29-legacy-vulkan-readback/change.patch",
+      "path": "28-legacy-vulkan-readback/change.patch",
       "title": "Independent legacy Vulkan readback",
       "source": "https://github.com/LostRuins/koboldcpp/pull/2564",
-      "sha256": "8919fe9f36cd4118f69e3244710f293c0a4a5c0ecdea29ae4a88a48c8ce1ca72"
+      "sha256": "410e32f0c322462f94c504728561ed575fec4db2d9bdfe1cc426f1561619d48a"
     },
     {
-      "path": "30-moss-runtime/change.patch",
+      "path": "29-moss-runtime/change.patch",
       "title": "MOSS QKV, modulation and position cache",
       "source": "https://github.com/LostRuins/koboldcpp/pull/2576",
-      "sha256": "f5b0cad423db514daa7452bd91c0e6b73a85932694e70015c649397b2119f966"
+      "sha256": "6c893a13bc520331a83e6385fdfd7ac31a5414af9e8a4e83d2417547d8d552e1"
     },
     {
-      "path": "31-moss-ffn-views/change.patch",
+      "path": "30-moss-ffn-views/change.patch",
       "title": "MOSS FFN views and Polaris SCALE",
       "source": "https://github.com/LostRuins/koboldcpp/pull/2576",
-      "sha256": "d7bc9ba137bda397ee0359710b969bc83a785805d72df0881700b5f203da5c68"
+      "sha256": "60aaf6cc14e2c01879a49b0e0b3a5b89cdf15888c2caa7e91a6a4889c5532cc2"
     },
     {
-      "path": "32-kv-indexed-seq-rm/change.patch",
+      "path": "31-kv-indexed-seq-rm/change.patch",
       "title": "Indexed KV rollback",
       "source": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/125",
-      "sha256": "a92c9768a636330dfabdadaef00fe8219ab8fe3a4276e00af688edb30c6ced08"
+      "sha256": "1a0730fbe6602f942cf8cea5123abe9d1e69f9a7960a48017991b1a36102f84e"
     },
     {
-      "path": "33-sdcpp-buffered-gguf-skip/change.patch",
+      "path": "32-sdcpp-buffered-gguf-skip/change.patch",
       "title": "Buffered SDCPP GGUF metadata skips",
       "source": "https://github.com/leejet/stable-diffusion.cpp/issues/2218",
       "sha256": "3eaf821f2918223d5514eb5803e299c4494384bfbb987460bf5f91febfd8b30a"
     },
     {
-      "path": "34-haswell-q8-gemm/change.patch",
+      "path": "33-haswell-q8-gemm/change.patch",
       "title": "Haswell Q8_0 GEMM register pressure",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31058",
       "sha256": "3b74a7cfc9c23dbc0f5be1f179b2f21630a3b8d4c5f6a38ce69c25c9e31f1838"
     },
     {
-      "path": "35-vulkan-fa-v-pack/change.patch",
+      "path": "34-vulkan-fa-v-pack/change.patch",
       "title": "Vulkan FA value staging",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2273",
       "sha256": "bd52cb34987b90ada9b0dec17055d5ddcb39dfe09824b1e72dbb4964dac4a473"
     },
     {
-      "path": "36-haswell-avx2-quant-dot/change.patch",
+      "path": "35-haswell-avx2-quant-dot/change.patch",
       "title": "AVX2 Q5_K, Q6_K and IQ3 dot products",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31061",
       "sha256": "e6ce87fc41ac163324ac35749ca811bc7e77bf14a2ef7cf05c7b00fa4d5d0607"
     },
     {
-      "path": "37-polaris-wide-k-prefill/change.patch",
+      "path": "36-polaris-wide-k-prefill/change.patch",
       "title": "Polaris wide scalar Q4_K prefill",
       "source": "https://github.com/KessokuNet/infr/pull/12",
-      "sha256": "f743fdcbc4c64bb77f335a6c53064e785c013676b7402c060f6b4ae9f0f8c029"
+      "sha256": "c91d11a7c438c9ec4d322d5d7794befc23e7480e6b4ee783f9a469c850ac90fd"
     },
     {
-      "path": "38-vulkan-small-bar/change.patch",
-      "title": "Reserve the small Vulkan BAR for transfers",
-      "source": "https://github.com/ggml-org/llama.cpp/pull/31658",
-      "sha256": "80d4d56221842d485f4dec6f5f9f1421108f55de55ca14733edccad6fa4f4fb4"
-    },
-    {
-      "path": "39-haswell-softmax-rows/change.patch",
+      "path": "37-haswell-softmax-rows/change.patch",
       "title": "Spread CPU Softmax rows across heads and batches",
       "source": "https://github.com/ggml-org/llama.cpp/pull/30923",
       "sha256": "01b7d12ca146e7cb7a0810d83dd8c1c9329081fe83f760d59121656324d95f40"
     },
     {
-      "path": "40-tallocr-size-bounds/change.patch",
+      "path": "38-tallocr-size-bounds/change.patch",
       "title": "Check tensor allocator size before padding",
       "source": "https://github.com/ggml-org/llama.cpp/pull/26318",
       "sha256": "c08bfb6f48a5859f177a73436ac09d7977392810ac2de8df9dd6cdad2c441dc3"
     },
     {
-      "path": "41-haswell-gelu-table/change.patch",
+      "path": "39-haswell-gelu-table/change.patch",
       "title": "AVX2 GELU and GEGLU table lookup",
       "source": "https://github.com/ggml-org/llama.cpp/pull/30232",
       "sha256": "a7397fd10f3cb19c4709d60db1f9f5d76a9b10b5623fd76756f3e67a320a946b"
     },
     {
-      "path": "42-vulkan-rms-row-stride/change.patch",
+      "path": "40-vulkan-rms-row-stride/change.patch",
       "title": "Vulkan RMSNorm beyond the X workgroup limit",
       "source": "https://github.com/0xShug0/audio.cpp/pull/1120",
-      "sha256": "c332eb1d09d1b4c36f3f8cdfdde50fa41a2fbf3a5dda6391fc25b0fbac209d0a"
+      "sha256": "dbf4a120f70bb0ae447b08b4afe7d151cb6ece2f4e74c0cff4cd62f6ae1dabb2"
     },
     {
-      "path": "43-buffer-split-view-tail/change.patch",
+      "path": "41-buffer-split-view-tail/change.patch",
       "title": "Keep view-only tails in the allocation plan",
       "source": "https://github.com/ggml-org/llama.cpp/pull/25584",
-      "sha256": "b97b2b5a877700c0e1d5e00c49203699d07c72057a7f6cc557ec7ac9c3f41f38"
+      "sha256": "5024df788082f6a4b1c4e794c6488a92362a40be3d0aef52daf2d42a29c34520"
     },
     {
-      "path": "44-haswell-greedy-reduction/change.patch",
+      "path": "42-haswell-greedy-reduction/change.patch",
       "title": "Haswell greedy selection and candidate-copy bypass",
       "source": "https://github.com/ggml-org/llama.cpp/pull/30659",
       "sha256": "ca3b8baa04ed450de7383b31718b6ebd612ab9df87870abb4fc7cba743b170d9"
     },
     {
-      "path": "45-windows-mmap-release/change.patch",
+      "path": "43-windows-mmap-release/change.patch",
       "title": "Release copied Windows weight pages from the working set",
       "source": "https://github.com/stew675/llama-cpp-rdna-boosts/pull/269",
-      "sha256": "9ed87e7212cf633aea29e27b9d885f828bd0f0d8adb3f32b771e6a5249e9e6f6"
+      "sha256": "267c381fef38343b04218a47b38571eafdf2d25a40134cebf8e865e51582c42f"
     },
     {
-      "path": "46-cpu-rms-head-rows/change.patch",
+      "path": "44-cpu-rms-head-rows/change.patch",
       "title": "Spread short CPU RMSNorm rows across heads and batches",
       "source": "https://github.com/ikawrakow/ik_llama.cpp/pull/2457",
       "sha256": "1712112d90852656c690ab2e96d421327a938a09482fdb10f2f05be37b35d09e"
     },
     {
-      "path": "47-gguf-zero-axes/change.patch",
+      "path": "45-gguf-zero-axes/change.patch",
       "title": "Preserve zero-sized GGUF tensor axes",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31845",
       "sha256": "333d074883f918e0ca3aa941b7928c2e7c8237ab4b9756c8d8e2f38d18dcc941"
     },
     {
-      "path": "48-gguf-shape-bound/change.patch",
+      "path": "46-gguf-shape-bound/change.patch",
       "title": "Reject GGUF shapes before constructor overflow asserts",
       "source": "https://github.com/ggml-org/ggml/pull/1673",
       "sha256": "a433fb431ddae75815010d30e10e6be781286116a12d605f029a4509dc2b9a08"
     },
     {
-      "path": "49-rpc-transfer-bounds/change.patch",
+      "path": "47-rpc-transfer-bounds/change.patch",
       "title": "Check RPC transfers without unsigned wrap",
       "source": "https://github.com/ggml-org/ggml/pull/1671",
       "sha256": "9da91f7b0f804fe4a901823bd17b2b2781e272e4ea1fb68daeea7fd0921c6fc2"
     },
     {
-      "path": "50-rpc-iterative-graph/change.patch",
+      "path": "48-rpc-iterative-graph/change.patch",
       "title": "Materialize deep RPC graphs iteratively",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31843",
       "sha256": "9c8b319562da8cad026829dc641e09b40828893368c22007c2918069fe7b3b8d"
     },
     {
-      "path": "51-scheduler-retain-buffers/change.patch",
+      "path": "49-scheduler-retain-buffers/change.patch",
       "title": "Retain scheduler buffers across graph reservations",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31841",
-      "sha256": "5cb52c917e527992c004c37c5623c62309c32ced4e318cdcb4fbde74367e128e"
+      "sha256": "e75e0909fa2570b44c3f465016bfe1388019d982c6c06c05a40a54dc43341a5a"
     },
     {
-      "path": "52-x86-exact-neg128/change.patch",
+      "path": "50-x86-exact-neg128/change.patch",
       "title": "Exact x86 int8 dot products at minus 128",
       "source": "https://github.com/ggml-org/llama.cpp/pull/29359",
       "sha256": "ff8979a498e0d6a4ed1a569156bf6690bcc4e42391344d8c25a0dd76a850ac8b"
     },
     {
-      "path": "53-vulkan-queue-padding/change.patch",
+      "path": "51-vulkan-queue-padding/change.patch",
       "title": "Deterministic Vulkan queue descriptors",
       "source": "https://github.com/ggml-org/ggml/pull/1672",
-      "sha256": "f8aa26cd1ab9da3abc5941ca1f047ae6177131ca71d0ba45c81f5c8e69e080e8"
+      "sha256": "8e48d9ccc6ef9a23a3559fa33325d7d45df42fcd1e7c043c6bacf5ef536f8f01"
     },
     {
-      "path": "54-native-repeat-window-bound/change.patch",
+      "path": "52-native-repeat-window-bound/change.patch",
       "title": "Bound the native repetition window",
       "source": "https://github.com/LostRuins/koboldcpp/security/advisories/GHSA-h59g-8cq4-cqjj",
-      "sha256": "dc2e89a97d4fea96c333f387a75c573762642c0fcb2ce2564bd6c9e0c3a13306"
+      "sha256": "5053a8969ec613c9c716e73485b24be01755df9284a3a968f788670d7ee4505f"
     },
     {
-      "path": "55-haswell-iq4nl-decode/change.patch",
+      "path": "53-haswell-iq4nl-decode/change.patch",
       "title": "Exact AVX2 IQ4_NL row decoding",
       "source": "https://github.com/aktalascloud/strata-legacy-gpu/tree/157f5810bf0458b940521baf59f32fd2f71345c2/p40/patches/avx1-ple-iq4nl-shuffle",
       "sha256": "b64168db1aafd0635e6561552bf61f29a14951131f1f224882e319edb3d20039"
     },
     {
-      "path": "56-sdcpp-i32-lora-scalar/change.patch",
+      "path": "54-sdcpp-i32-lora-scalar/change.patch",
       "title": "Read integer LoRA scalars as FP32",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2263",
       "sha256": "93547fc837a29d29e2d1e3155e99966327664b6e60853b2609b530330cdb998f"
     },
     {
-      "path": "57-sdcpp-workspace-measure-cache/change.patch",
+      "path": "55-sdcpp-workspace-measure-cache/change.patch",
       "title": "Cache matching fallback workspace measurements",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2251",
       "sha256": "ae24d54fc7a6cf5b6812da9c998201e72a6b8627c576d81019593c5009d7263e"
     },
     {
-      "path": "58-sdcpp-reclaimed-capacity/change.patch",
+      "path": "56-sdcpp-reclaimed-capacity/change.patch",
       "title": "Honor the final reclaimed-memory capacity check",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2256",
       "sha256": "a1aa09039dd5993d5c9d900cadd38da2972c995d2b1cbd19dd09f635c79cc9d5"
     },
     {
-      "path": "59-sdcpp-f32-glu/change.patch",
+      "path": "57-sdcpp-f32-glu/change.patch",
       "title": "F32 native GLU for packed activations and LLM MLP",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2250",
       "sha256": "5fa52d72f903e3574e41d127aa2d5d23a776c882f98d58b8e863ea181ad10531"
     },
     {
-      "path": "60-sdcpp-auto-discrete-device/change.patch",
+      "path": "58-sdcpp-auto-discrete-device/change.patch",
       "title": "Prefer a usable discrete GPU only for automatic placement",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2259",
       "sha256": "3857467647c593cac69e401aa509737a5b9b5b841106e990aa333b0555784c28"
     },
     {
-      "path": "61-sdcpp-shared-node-owner/change.patch",
+      "path": "59-sdcpp-shared-node-owner/change.patch",
       "title": "Preserve the first assigned backend for shared graph nodes",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2262",
       "sha256": "ebc3b269bf548f9d4765dfd1352080d7a2ca131ddea0173855403b77ebf914d9"
     },
     {
-      "path": "62-native-f32-situ/change.patch",
+      "path": "60-native-f32-situ/change.patch",
       "title": "Native F32 SiTU with preserved stage rounding",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2210",
-      "sha256": "4914e53df3eb49c20b08a13ed1ad89fa709f5d4788dcf61aa7609c0b6941dda9"
+      "sha256": "d604bd3b1446ebc61f1d8375eb5279da59080cf7000e10bfb8f0aa70770e8990"
     },
     {
-      "path": "63-cpu-release-expert-bounds/change.patch",
+      "path": "61-cpu-release-expert-bounds/change.patch",
       "title": "Check CPU expert indices in release builds",
       "source": "https://github.com/vllm-project/vllm/pull/65929",
-      "sha256": "117e9daba826426eed29a2c453e0ec0c48b3090b130f7a5f72ab92e2b96cec1f"
+      "sha256": "a36e50ba458230f7c7533ef46ef9be9a02998431f5786ef0f326d6eae4608bb9"
     },
     {
-      "path": "64-sdcpp-segment-use-counts/change.patch",
+      "path": "62-sdcpp-segment-use-counts/change.patch",
       "title": "Preserve external consumers in segmented graph fusion checks",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2240",
       "sha256": "2a16781c708a2c0823dfbfd99b3819001d9f4b09d9d8589a0148c75e8534c5dd"
     },
     {
-      "path": "65-polaris-rms-vector-modulate/change.patch",
+      "path": "63-polaris-rms-vector-modulate/change.patch",
       "title": "Polaris F32 RMS weight and vector modulation fusion",
       "source": "https://github.com/leejet/stable-diffusion.cpp/pull/2273",
-      "sha256": "a1031cfe06fbbd1da7ce6d863118d84ffa5ebfcb0c78f17cef6d95cf12f57947"
+      "sha256": "44b0ff1980e02a76820ac35e063d2fe0b25dfb24fe5dbe1dbfb9dddd5defb9f1"
     },
     {
-      "path": "66-vulkan-yarn-truncate/change.patch",
+      "path": "64-vulkan-yarn-truncate/change.patch",
       "title": "Respect model-selected YaRN truncation on Vulkan",
       "source": "https://github.com/ggml-org/llama.cpp/pull/30802",
-      "sha256": "594c6dfcfc7b0375a015f1b5cb22cfcb8cab81455260840a8fa5de29c2cdc104"
+      "sha256": "6c19c8d88260d8274e3d6d499fe48a1b177cba0f738d42a29d011b1f01b2bcaa"
     },
     {
-      "path": "67-vulkan-topk-mask-bitset/change.patch",
+      "path": "65-vulkan-topk-mask-bitset/change.patch",
       "title": "Duplicate-safe Vulkan TopK masks without half arithmetic",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31544",
-      "sha256": "59cb5052a65ba0fd8cb4af344a3eeb9947490df94a23af5948518b0d6c01db7f"
+      "sha256": "a39401f7ba59eb8bf383a5a0f0bf1c8716ea965c35df2fcf75427993aaea31ff"
     },
     {
-      "path": "68-cpu-fwht-12-20/change.patch",
+      "path": "66-cpu-fwht-12-20/change.patch",
       "title": "CPU Hadamard12/20 with typed strided input",
       "source": "https://github.com/ggml-org/llama.cpp/pull/28490",
       "sha256": "6959b0c9041e9eba3040af8d57b635241c2ac1cf20183a01c6c1a30f9d0d1b17"
     },
     {
-      "path": "69-haswell-fwht-low-stages/change.patch",
+      "path": "67-haswell-fwht-low-stages/change.patch",
       "title": "Fuse the first three Haswell FWHT stages",
       "source": null,
       "sha256": "2cde07f91c4f1ebec22c392af627a221bc7ffc5197639919d5124decf8ce133b"
     },
     {
-      "path": "70-polaris-rms-wide-cache8/change.patch",
+      "path": "68-polaris-rms-wide-cache8/change.patch",
       "title": "Retain wide fused RMS row inputs in registers",
       "source": null,
       "sha256": "2f0eb86fbc0569c83fcc4faae2bb82822c273e5a99c3643aae4b4353dcd47d99"
+    },
+    {
+      "path": "69-clip-reserve-error/change.patch",
+      "title": "Propagate CLIP compute allocation failure",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31988",
+      "sha256": "d1214bf8cb46b3a6e051da32b03b830833291cf994d4dc4ed8663280fd41186e"
+    },
+    {
+      "path": "70-llama-graph-meta-pages/change.patch",
+      "title": "Allocate graph metadata without eagerly zeroing unused pages",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/32043",
+      "sha256": "8d2e0d3e44d71a2bd2926ab5b3d5262b1e2b3698cf711ec78d0685811f2290b4"
+    },
+    {
+      "path": "71-haswell-scale-copy/change.patch",
+      "title": "Scale and copy wide F32 rows in one AVX2 pass",
+      "source": null,
+      "sha256": "d8ffe01be4f7459d4ae660200461ba86fc2803e1b0fe4187bea8f6dab085277c"
+    },
+    {
+      "path": "72-haswell-gdn-row-locality/change.patch",
+      "title": "Keep AVX2 Gated Delta Net state rows hot",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/32028",
+      "sha256": "cbb93f8163c8e2e95923fe13b268ae535ff332ec69000af3eeb30f0df6c89b4f"
     }
   ],
   "empty_ports": [
+    "hybrid-moe",
     "grammar-cache",
     "soprano-amalgamation",
     "startup-redaction",
-    "vulkan-comm-amalgamation"
+    "vulkan-comm-amalgamation",
+    "vulkan-small-bar"
   ],
-  "accepted_executable_sha256": "ebe56a513028935093bb2390d233975fcb71a8fd702e880e4b9f9419f57792b4",
-  "build_date": "2026-11-07"
+  "accepted_executable_sha256": "33615ff0474faa097deb188a4f326247f6f8ce99fd634da720b9573728c93a6e",
+  "build_date": "2026-11-11"
 }
