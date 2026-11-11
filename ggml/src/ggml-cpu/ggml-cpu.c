@@ -3526,7 +3526,6 @@ static thread_ret_t ggml_graph_compute_secondary_thread(void* data);
 // KCPP_WINDOWS_GROUP_AFFINITY: CPU IDs are group*64+processor number.
 static bool ggml_thread_apply_affinity(bool * mask) { return kcpp_win_apply_cpu_mask(mask); }
 
-static bool powethrottlemsgshown = false;
 static bool ggml_thread_apply_priority(int32_t prio) {
     // Note that on Windows the Process Priority Class must be updated in order to set Thread priority.
     // This is up to the applications.
@@ -3539,7 +3538,6 @@ static bool ggml_thread_apply_priority(int32_t prio) {
         case GGML_SCHED_PRIO_REALTIME: p = THREAD_PRIORITY_TIME_CRITICAL; break;
     }
 
-#ifndef USE_FAILSAFE
     if (prio != GGML_SCHED_PRIO_LOW) {
         // Tell Windows that this thread should not be throttled (needs its own CPU core).
         // Newer Windows 11 versions aggressively park (offline) CPU cores and often place
@@ -3552,19 +3550,22 @@ static bool ggml_thread_apply_priority(int32_t prio) {
         t.ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED;
         t.StateMask   = 0;
 
-        if (!SetProcessInformation(GetCurrentProcess(), ProcessPowerThrottling, &t, sizeof(t))) {
+        typedef BOOL (WINAPI * set_process_information_t)(
+                HANDLE, PROCESS_INFORMATION_CLASS, LPVOID, DWORD);
+        set_process_information_t pSetProcessInformation = NULL;
+        HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+        if (kernel32 != NULL) {
+            pSetProcessInformation = (set_process_information_t) (void *)
+                    GetProcAddress(kernel32, "SetProcessInformation");
+        }
+
+        if (pSetProcessInformation != NULL &&
+                !pSetProcessInformation(GetCurrentProcess(), ProcessPowerThrottling, &t, sizeof(t))) {
             // GGML_LOG_DEBUG("failed to disable process power throttling %d : (%d)\n", prio, (int) GetLastError());
             return false;
         }
         #endif
     }
-#else
-    if(!powethrottlemsgshown)
-    {
-        powethrottlemsgshown = true;
-        printf("\nPower Throttling skipped in compatibility mode.\n");
-    }
-#endif
 
     if (prio == GGML_SCHED_PRIO_NORMAL) {
         // Keep inherited policy/priority
