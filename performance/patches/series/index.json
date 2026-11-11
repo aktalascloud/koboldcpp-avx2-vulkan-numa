@@ -1,7 +1,7 @@
 {
   "upstream": "f49df57b4a82f6d641c419c7fadc9e4b896f6781",
-  "tree": "dbf597be9e4c7707e93cf8afd9040d76f5b89797",
-  "snapshot_sha256": "3583773e3fa0ba20b760ccc53764881557441d6983c0b201be0e0559c120eaa9",
+  "tree": "3c8d1734ad802029a712a977b74f2db5a26f4058",
+  "snapshot_sha256": "398ac3b244ec835be55da709a73e5e3fcf5cdf0a89742c10980292a57a01a36c",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -464,6 +464,30 @@
       "title": "Reject zero ranks in recurrent model metadata",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31948",
       "sha256": "8754482e49a9792e13affae65cedd7924948b2e2c10e16bfc36f5bf7edc3e993"
+    },
+    {
+      "path": "78-haswell-iq4-xs-pair/change.patch",
+      "title": "Decode two IQ4_XS subblocks together with AVX2",
+      "source": null,
+      "sha256": "616ba063e018775a6a54cfc35795308f5dd961eb2f4ee41540a0595b6bae4871"
+    },
+    {
+      "path": "79-haswell-q8-dot-guard/change.patch",
+      "title": "Shorten the AVX2 Q8_0 dot guard",
+      "source": null,
+      "sha256": "798acabfddab630ac6e1a5f83d39cc0a8f37a49e94bb19ec23b2a78aef3b6373"
+    },
+    {
+      "path": "80-polaris-fa-kv-staging/change.patch",
+      "title": "Stage dense FlashAttention K/V blocks once per Polaris workgroup",
+      "source": null,
+      "sha256": "6d86a10e27f617fbc92f9419afbe634470d4eed97babe2d57114786ea2ce66ad"
+    },
+    {
+      "path": "81-yue2-nar-render-scratch/change.patch",
+      "title": "Reuse YuE2 NAR midpoint and velocity buffers",
+      "source": null,
+      "sha256": "b51163a3a20060f8d7569b39bbc3b7f4cbe3dcf92128fbcd6ef88efbeefd9e15"
     }
   ],
   "empty_ports": [
@@ -474,6 +498,6 @@
     "vulkan-comm-amalgamation",
     "vulkan-small-bar"
   ],
-  "accepted_executable_sha256": "fdc3d11d36d0126856ce91c648af4d08d58ba179f3fb5954e40435d1f1db038d",
+  "accepted_executable_sha256": "5f103234e8de2dd31bca3146fc256dba4d45889e146381261784e19c7b316d0b",
   "build_date": "2026-11-11"
 }
