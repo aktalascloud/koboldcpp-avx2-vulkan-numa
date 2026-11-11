@@ -3497,6 +3497,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
     ggml_vk_create_pipeline(device, device->pipeline_upscale_bilinear_antialias_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS}, 1);
 
     ggml_vk_create_pipeline(device, device->pipeline_scale_f32, "scale_f32", scale_f32_len, scale_f32_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
+    if (device->vendor_id == VK_VENDOR_ID_AMD && device->architecture == AMD_GCN &&
+        device->subgroup_size == 64 &&
+        (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
+        device->properties.limits.minStorageBufferOffsetAlignment % 16 == 0) {
+        ggml_vk_create_pipeline(device, device->pipeline_scale_f32_vec4, "scale_f32_vec4", scale_f32_vec4_len, scale_f32_vec4_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
+    }
 
     ggml_vk_create_pipeline(device, device->pipeline_log[0], "log_f32", log_f32_len, log_f32_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
     ggml_vk_create_pipeline(device, device->pipeline_log[1], "log_f16", log_f16_len, log_f16_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
@@ -9915,8 +9921,13 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
         break;
     case GGML_OP_GROUP_NORM:
         {
-            const uint32_t num_groups = dst->op_params[0];
-            elements = { num_groups * (uint32_t)src0->ne[3], 1, 1 };
+            const auto & limits = ctx->device->properties.limits.maxComputeWorkGroupCount;
+            const uint32_t groups = uint64_t(dst->op_params[0]) * src0->ne[3];
+            const uint32_t x = std::min(groups, limits[0]);
+            const uint32_t y = std::min<uint64_t>(CEIL_DIV(uint64_t(groups), x), limits[1]);
+            const uint32_t z = CEIL_DIV(uint64_t(groups), uint64_t(x)*y);
+            GGML_ASSERT(z <= limits[2]);
+            elements = { x, y, z };
         } break;
     case GGML_OP_DIAG_MASK_INF:
         elements = { (uint32_t)ggml_nrows(src0), (uint32_t)ne00, 1 };
@@ -10934,7 +10945,12 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
     // KCPP_POLARIS_SCALE_ROWS: support is limited below to packed 2D rows.
     p.param3 = ggml_is_contiguous(src0) ? 0.0f : 1.0f;
 
-    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
+    const auto & vec4 = ctx->device->pipeline_scale_f32_vec4;
+    const bool aligned = vec4 && p.param3 == 0.0f && ggml_is_contiguous(dst) &&
+        p.ne >= 393216 && p.ne % 4 == 0 && std::isfinite(p.param1) && std::isfinite(p.param2) &&
+        (get_misalign_bytes(ctx, src0) | get_misalign_bytes(ctx, dst)) % 16 == 0;
+    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p),
+                   aligned ? vec4 : nullptr);
 }
 
 void ggml_vk_sqr(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * src0, ggml_tensor * dst) {
@@ -11143,7 +11159,8 @@ void ggml_vk_group_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const
     const float eps = float_op_params[1];
     const uint32_t group_size = src0->ne[0] * src0->ne[1] * ((src0->ne[2] + num_groups - 1) / num_groups);
 
-    ggml_vk_op_f32<vk_op_push_constants>(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_GROUP_NORM, { group_size, 0, eps, 0.0f, 0.0f, 0.0f });
+    const uint32_t groups = uint64_t(num_groups) * src0->ne[3];
+    ggml_vk_op_f32<vk_op_push_constants>(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_GROUP_NORM, { group_size, groups, eps, 0.0f, 0.0f, 0.0f });
 }
 
 static uint32_t ggml_vk_rms_num_partials(ggml_backend_vk_context * ctx, const ggml_tensor *node) {
@@ -16238,8 +16255,13 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
         case GGML_OP_TRANSPOSE:
         case GGML_OP_RMS_NORM:
             return true;
-        case GGML_OP_GROUP_NORM:
-            return ggml_is_contiguous(op->src[0]);
+        case GGML_OP_GROUP_NORM: {
+            const auto * src = op->src[0];
+            const int groups = op->op_params[0];
+            return op->type == GGML_TYPE_F32 && src->type == GGML_TYPE_F32 &&
+                   groups > 0 && src->ne[2] % groups == 0 && ggml_nelements(src) > 0 &&
+                   ggml_nelements(src) <= UINT32_MAX / 2 && ggml_is_contiguous(src);
+        }
         case GGML_OP_NORM:
         case GGML_OP_L2_NORM:
             return op->src[0]->type == GGML_TYPE_F32 && op->type == GGML_TYPE_F32;

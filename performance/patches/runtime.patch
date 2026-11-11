@@ -2055,7 +2055,7 @@ index 219c477c6..944da1edf 100644
      static_assert(std::is_class<T>::value, "T must be a struct/class");
      GGML_UNUSED(t);
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 3da383550..9044b0b84 100644
+index 3da383550..439a6076d 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 @@ -537,6 +537,8 @@ static constexpr std::initializer_list<std::array<int, 3>> topk_qsa_edges {
@@ -2075,14 +2075,17 @@ index 3da383550..9044b0b84 100644
      RMS_NORM_COUNT,
  };
  
-@@ -835,6 +838,7 @@ struct vk_device_struct {
+@@ -835,8 +838,9 @@ struct vk_device_struct {
      vk_pipeline pipeline_add_id_f32;
  
      vk_pipeline pipeline_concat_i8, pipeline_concat_i16, pipeline_concat_i32, pipeline_concat_i64;
 +    vk_pipeline pipeline_concat_transpose_i32; // KCPP_TRANSPOSE_CONCAT32
      vk_pipeline pipeline_upscale_nearest_f32, pipeline_upscale_bilinear_f32, pipeline_upscale_bicubic_f32, pipeline_upscale_bilinear_antialias_f32;
-     vk_pipeline pipeline_scale_f32;
+-    vk_pipeline pipeline_scale_f32;
++    vk_pipeline pipeline_scale_f32, pipeline_scale_f32_vec4;
      vk_pipeline pipeline_log[2];
+     vk_pipeline pipeline_tri[2];
+     vk_pipeline pipeline_diag[2];
 @@ -859,8 +863,11 @@ struct vk_device_struct {
      vk_pipeline pipeline_group_norm_f32;
      std::array<vk_pipeline, 3> pipeline_rms_norm_f32;
@@ -2113,7 +2116,7 @@ index 3da383550..9044b0b84 100644
      vk_pipeline pipeline_im2col_f32, pipeline_im2col_f32_f16;
      vk_pipeline pipeline_im2col_3d_f32, pipeline_im2col_3d_f32_f16;
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index a1ea47726..287932e30 100644
+index a1ea47726..4c98c5d74 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1051,18 +1051,24 @@ std::unique_ptr<vk_queue> ggml_vk_create_queue(vk_device& device, uint32_t queue
@@ -2302,7 +2305,20 @@ index a1ea47726..287932e30 100644
      ggml_vk_create_pipeline(device, device->pipeline_concat_i64, "concat_i64", concat_i64_len, concat_i64_data, "main", 3, sizeof(vk_op_binary_push_constants), {512, 1, 1}, {}, 1);
  
      ggml_vk_create_pipeline(device, device->pipeline_upscale_nearest_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_NEAREST}, 1);
-@@ -3523,6 +3587,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3433,6 +3497,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     ggml_vk_create_pipeline(device, device->pipeline_upscale_bilinear_antialias_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS}, 1);
+ 
+     ggml_vk_create_pipeline(device, device->pipeline_scale_f32, "scale_f32", scale_f32_len, scale_f32_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
++    if (device->vendor_id == VK_VENDOR_ID_AMD && device->architecture == AMD_GCN &&
++        device->subgroup_size == 64 &&
++        (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
++        device->properties.limits.minStorageBufferOffsetAlignment % 16 == 0) {
++        ggml_vk_create_pipeline(device, device->pipeline_scale_f32_vec4, "scale_f32_vec4", scale_f32_vec4_len, scale_f32_vec4_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
++    }
+ 
+     ggml_vk_create_pipeline(device, device->pipeline_log[0], "log_f32", log_f32_len, log_f32_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
+     ggml_vk_create_pipeline(device, device->pipeline_log[1], "log_f16", log_f16_len, log_f16_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
+@@ -3523,6 +3593,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      CREATE_GLU(geglu)
      CREATE_GLU(reglu)
      CREATE_GLU(swiglu)
@@ -2310,7 +2326,7 @@ index a1ea47726..287932e30 100644
      CREATE_GLU(swiglu_oai)
      CREATE_GLU(swiglu_clamp)
      CREATE_GLU(geglu_erf)
-@@ -3660,6 +3725,10 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3660,6 +3731,10 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      ggml_vk_create_pipeline(device, device->pipeline_dsv4_hc_post_f32,       "dsv4_hc_post_f32",       dsv4_hc_post_f32_len, dsv4_hc_post_f32_data, "main", 5, sizeof(vk_op_dsv4_hc_post_push_constants), {256, 1, 1}, { 256, 1 }, 1);
      ggml_vk_create_pipeline(device, device->pipeline_dsv4_hc_post_nocomb_f32,"dsv4_hc_post_nocomb_f32",dsv4_hc_post_f32_len, dsv4_hc_post_f32_data, "main", 5, sizeof(vk_op_dsv4_hc_post_push_constants), {256, 1, 1}, { 256, 0 }, 1);
  
@@ -2321,7 +2337,7 @@ index a1ea47726..287932e30 100644
      for (auto &s : device->pipeline_solve_tri_f32) {
          const vk_solve_tri_pipeline_state &state = s.first;
  
-@@ -3811,6 +3880,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3811,6 +3886,17 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      for (uint32_t s = 0; s < CONV_SHAPE_COUNT; ++s) {
          // smaller WG for the small-tile fallback gives more concurrent WGs per SM
          uint32_t conv2d_WG_SIZE  = (s == CONV_SHAPE_64x32) ? 128 : 256;
@@ -2339,7 +2355,7 @@ index a1ea47726..287932e30 100644
          uint32_t use_collectives = 0;  // Enables subgroup ops for preventing the re-calculation of indices.
          uint32_t conv2d_TS_K     = (s == CONV_SHAPE_64x32) ? 4 : 8;
          uint32_t conv2d_SHMEM_PAD = 4;
-@@ -4392,11 +4472,23 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4392,11 +4478,23 @@ vk_device ggml_vk_get_device(size_t idx) {
          // Allow overriding avoiding the graphics queue because it can increase performance on RADV
          const bool allow_graphics_queue = (getenv("GGML_VK_ALLOW_GRAPHICS_QUEUE") != nullptr);
          const vk::QueueFlagBits graphics_flag = allow_graphics_queue ? (vk::QueueFlagBits)0 : vk::QueueFlagBits::eGraphics;
@@ -2366,7 +2382,7 @@ index a1ea47726..287932e30 100644
  
          std::vector<vk::DeviceQueueCreateInfo> device_queue_create_infos;
          vk::DeviceCreateInfo device_create_info{};
-@@ -4408,12 +4500,12 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4408,12 +4506,12 @@ vk_device ggml_vk_get_device(size_t idx) {
          device_features2.pNext = nullptr;
          device_features2.features = (VkPhysicalDeviceFeatures)device_features;
  
@@ -2381,7 +2397,7 @@ index a1ea47726..287932e30 100644
          vk12_features.pNext = nullptr;
          vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
          vk11_features.pNext = &vk12_features;
-@@ -4872,7 +4964,19 @@ vk_device ggml_vk_get_device(size_t idx) {
+@@ -4872,7 +4970,19 @@ vk_device ggml_vk_get_device(size_t idx) {
              .setQueueCreateInfos(device_queue_create_infos)
              .setPEnabledExtensionNames(device_extensions);
          device_create_info.setPNext(&device_features2);
@@ -2402,7 +2418,7 @@ index a1ea47726..287932e30 100644
  
          if (device->device_fault) {
              device->pfn_vkGetDeviceFaultInfoEXT = (PFN_vkGetDeviceFaultInfoEXT)
-@@ -5137,12 +5241,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+@@ -5137,12 +5247,12 @@ static void ggml_vk_print_gpu_info(size_t idx) {
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
      device_features2.pNext = nullptr;
  
@@ -2417,7 +2433,7 @@ index a1ea47726..287932e30 100644
      vk12_features.pNext = nullptr;
      vk12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
      vk11_features.pNext = &vk12_features;
-@@ -5731,6 +5835,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
+@@ -5731,6 +5841,17 @@ static vk_pipeline ggml_vk_get_dequantize_mul_mat_vec(ggml_backend_vk_context *
          }
      }
  
@@ -2435,7 +2451,7 @@ index a1ea47726..287932e30 100644
      if (b_type == GGML_TYPE_Q8_1) {
          if (ctx->device->vendor_id == VK_VENDOR_ID_INTEL) {
              dmmv_wg = DMMV_WG_SIZE_SUBGROUP;
-@@ -7447,6 +7562,46 @@ void ggml_vk_dsv4_hc_post(ggml_backend_vk_context * ctx, vk_context& subctx, con
+@@ -7447,6 +7568,46 @@ void ggml_vk_dsv4_hc_post(ggml_backend_vk_context * ctx, vk_context& subctx, con
      ggml_vk_dispatch_pipeline(ctx, subctx, pipeline, { x_buf, r_buf, p_buf, c_buf, d_buf }, pc, { n_embd, n_tokens, 1 });
  }
  
@@ -2482,7 +2498,7 @@ index a1ea47726..287932e30 100644
  void ggml_vk_mul_mat(ggml_backend_vk_context * ctx, vk_context& subctx, const struct ggml_cgraph * cgraph, int node_idx) {
      ggml_tensor * dst = cgraph->nodes[node_idx];
      ggml_tensor * src0 = dst->src[0];
-@@ -8881,6 +9036,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
+@@ -8881,6 +9042,17 @@ static vk_pipeline ggml_vk_rms_norm_pipeline(const std::array<vk_pipeline, 3> &
      return pipelines[2];
  }
  
@@ -2500,7 +2516,7 @@ index a1ea47726..287932e30 100644
  static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const ggml_tensor * src0, const ggml_tensor * src1, const ggml_tensor * src2, const ggml_tensor * dst, ggml_op op) {
      switch (op) {
      case GGML_OP_GET_ROWS:
-@@ -8973,6 +9139,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -8973,6 +9145,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
          if (!ggml_vk_concat_supported(src0, src1, dst)) {
              return nullptr;
          }
@@ -2510,7 +2526,7 @@ index a1ea47726..287932e30 100644
          switch (ggml_vk_concat_unit_size(src0->type)) {
          case 1:
              return ctx->device->pipeline_concat_i8;
-@@ -9121,6 +9290,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -9121,6 +9296,9 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
              if (ctx->do_add_rms_partials) {
                  return ctx->fused_rms_norm_mode == RMS_NORM_MUL ? ctx->device->pipeline_rms_norm_mul_partials_f32 : ctx->device->pipeline_rms_norm_partials_f32;
              }
@@ -2520,7 +2536,7 @@ index a1ea47726..287932e30 100644
              return ggml_vk_rms_norm_pipeline(ctx->fused_rms_norm_mode == RMS_NORM_MUL ? ctx->device->pipeline_rms_norm_mul_f32 : ctx->device->pipeline_rms_norm_f32, src0->ne[0]);
          }
          return nullptr;
-@@ -9204,6 +9376,8 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -9204,6 +9382,8 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
                  return ctx->device->pipeline_reglu[dst->type == GGML_TYPE_F16];
              case GGML_GLU_OP_SWIGLU:
                  return ctx->device->pipeline_swiglu[dst->type == GGML_TYPE_F16];
@@ -2529,7 +2545,7 @@ index a1ea47726..287932e30 100644
              case GGML_GLU_OP_SWIGLU_OAI:
                  return ctx->device->pipeline_swiglu_oai[dst->type == GGML_TYPE_F16];
              case GGML_GLU_OP_SWIGLU_CLAMP:
-@@ -9729,6 +9903,7 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -9729,6 +9909,7 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
              elements = { (uint32_t)CEIL_DIV(ne00, 128), 1, 1 };
          } else {
              elements = { (uint32_t)ne01, (uint32_t)ne02, (uint32_t)ne03 };
@@ -2537,7 +2553,23 @@ index a1ea47726..287932e30 100644
              elements[1] = std::min(elements[1], ctx->device->properties.limits.maxComputeWorkGroupCount[1]);
              elements[2] = std::min(elements[2], ctx->device->properties.limits.maxComputeWorkGroupCount[2]);
          }
-@@ -9905,6 +10080,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -9740,8 +9921,13 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+         break;
+     case GGML_OP_GROUP_NORM:
+         {
+-            const uint32_t num_groups = dst->op_params[0];
+-            elements = { num_groups * (uint32_t)src0->ne[3], 1, 1 };
++            const auto & limits = ctx->device->properties.limits.maxComputeWorkGroupCount;
++            const uint32_t groups = uint64_t(dst->op_params[0]) * src0->ne[3];
++            const uint32_t x = std::min(groups, limits[0]);
++            const uint32_t y = std::min<uint64_t>(CEIL_DIV(uint64_t(groups), x), limits[1]);
++            const uint32_t z = CEIL_DIV(uint64_t(groups), uint64_t(x)*y);
++            GGML_ASSERT(z <= limits[2]);
++            elements = { x, y, z };
+         } break;
+     case GGML_OP_DIAG_MASK_INF:
+         elements = { (uint32_t)ggml_nrows(src0), (uint32_t)ne00, 1 };
+@@ -9905,6 +10091,10 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
      case GGML_OP_GLU:
      case GGML_OP_CONV_2D_DW:
          {
@@ -2548,16 +2580,34 @@ index a1ea47726..287932e30 100644
              uint32_t ne = ggml_nelements(dst);
              if (op == GGML_OP_CPY && ggml_is_quantized(src0->type) && ggml_is_quantized(dst->type)) {
                  // Convert from number of logical elements to 2- or 4-byte units.
-@@ -10752,6 +10931,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -10752,8 +10942,15 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
 +    // KCPP_POLARIS_SCALE_ROWS: support is limited below to packed 2D rows.
 +    p.param3 = ggml_is_contiguous(src0) ? 0.0f : 1.0f;
  
-     ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
+-    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
++    const auto & vec4 = ctx->device->pipeline_scale_f32_vec4;
++    const bool aligned = vec4 && p.param3 == 0.0f && ggml_is_contiguous(dst) &&
++        p.ne >= 393216 && p.ne % 4 == 0 && std::isfinite(p.param1) && std::isfinite(p.param2) &&
++        (get_misalign_bytes(ctx, src0) | get_misalign_bytes(ctx, dst)) % 16 == 0;
++    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p),
++                   aligned ? vec4 : nullptr);
  }
-@@ -10982,7 +11163,6 @@ static vk_op_rope_push_constants ggml_vk_make_rope_constants(const ggml_tensor *
+ 
+ void ggml_vk_sqr(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * src0, ggml_tensor * dst) {
+@@ -10962,7 +11159,8 @@ void ggml_vk_group_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const
+     const float eps = float_op_params[1];
+     const uint32_t group_size = src0->ne[0] * src0->ne[1] * ((src0->ne[2] + num_groups - 1) / num_groups);
+ 
+-    ggml_vk_op_f32<vk_op_push_constants>(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_GROUP_NORM, { group_size, 0, eps, 0.0f, 0.0f, 0.0f });
++    const uint32_t groups = uint64_t(num_groups) * src0->ne[3];
++    ggml_vk_op_f32<vk_op_push_constants>(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_GROUP_NORM, { group_size, groups, eps, 0.0f, 0.0f, 0.0f });
+ }
+ 
+ static uint32_t ggml_vk_rms_num_partials(ggml_backend_vk_context * ctx, const ggml_tensor *node) {
+@@ -10982,7 +11180,6 @@ static vk_op_rope_push_constants ggml_vk_make_rope_constants(const ggml_tensor *
      const int n_dims        = ((const int32_t *) dst->op_params)[1];
      const int mode          = ((const int32_t *) dst->op_params)[2];
      const int n_offs        = ((const int32_t *) dst->op_params)[15];
@@ -2565,7 +2615,7 @@ index a1ea47726..287932e30 100644
      const int n_ctx_orig    = ((const int32_t *) dst->op_params)[4];
      const float freq_base   = ((const float *)   dst->op_params)[5];
      const float freq_scale  = ((const float *)   dst->op_params)[6];
-@@ -10998,7 +11178,7 @@ static vk_op_rope_push_constants ggml_vk_make_rope_constants(const ggml_tensor *
+@@ -10998,7 +11195,7 @@ static vk_op_rope_push_constants ggml_vk_make_rope_constants(const ggml_tensor *
      const bool is_imrope = mode == GGML_ROPE_TYPE_IMROPE;
  
      float corr_dims[2];
@@ -2574,7 +2624,7 @@ index a1ea47726..287932e30 100644
  
      const float theta_scale = powf(freq_base, -2.0f/n_dims);
  
-@@ -11063,6 +11243,27 @@ void ggml_vk_rms_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const s
+@@ -11063,6 +11260,27 @@ void ggml_vk_rms_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const s
          return;
      }
  
@@ -2602,7 +2652,7 @@ index a1ea47726..287932e30 100644
      if (ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD || ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD_MUL) {
          ggml_tensor * mul = cgraph->nodes[node_idx + 1];
          ggml_tensor * add = cgraph->nodes[node_idx + 2];
-@@ -11483,20 +11684,6 @@ void ggml_vk_rope(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_
+@@ -11483,20 +11701,6 @@ void ggml_vk_rope(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_
      const ggml_tensor * src1 = dst->src[1];
      const ggml_tensor * src2 = dst->src[2];
      const ggml_tensor * src3 = nullptr;
@@ -2623,7 +2673,7 @@ index a1ea47726..287932e30 100644
  
      uint32_t set_rows_stride = 0;
      // Fused rope + view + set_rows passes the set_rows destination stride in set_rows_stride
-@@ -12827,6 +13014,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
+@@ -12827,6 +13031,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
          case GGML_GLU_OP_GEGLU:
          case GGML_GLU_OP_REGLU:
          case GGML_GLU_OP_SWIGLU:
@@ -2631,7 +2681,7 @@ index a1ea47726..287932e30 100644
          case GGML_GLU_OP_SWIGLU_OAI:
          case GGML_GLU_OP_GEGLU_ERF:
          case GGML_GLU_OP_GEGLU_QUICK:
-@@ -13000,6 +13188,11 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
+@@ -13000,6 +13205,11 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
  
          break;
  
@@ -2643,7 +2693,7 @@ index a1ea47726..287932e30 100644
      case GGML_OP_GATED_DELTA_NET:
          ggml_vk_gated_delta_net(ctx, compute_ctx, node);
  
-@@ -13785,7 +13978,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+@@ -13785,7 +13995,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
      const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
  
      // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
@@ -2654,7 +2704,7 @@ index a1ea47726..287932e30 100644
             ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
             ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
             scale_in->src[0]->type == GGML_TYPE_F32 &&
-@@ -13801,6 +13996,12 @@ bool ggml_vk_can_fuse(const ggml_backend_vk_context * ctx, const struct ggml_cgr
+@@ -13801,6 +14013,12 @@ bool ggml_vk_can_fuse(const ggml_backend_vk_context * ctx, const struct ggml_cgr
          return false;
      }
  
@@ -2667,7 +2717,7 @@ index a1ea47726..287932e30 100644
      if ((ops.size() == 2 || ops.size() == 3 || ops.size() == 4) &&
          ops.begin()[0] == GGML_OP_RMS_NORM && ops.begin()[1] == GGML_OP_MUL) {
          // additional constraints specific to this fusion
-@@ -14274,12 +14475,15 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct
+@@ -14274,12 +14492,15 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct
          return false;
      }
  
@@ -2684,7 +2734,7 @@ index a1ea47726..287932e30 100644
      const ggml_tensor * view = cgraph->nodes[node_idx + 1];
      const ggml_tensor * set_rows = cgraph->nodes[node_idx + 2];
  
-@@ -14382,9 +14586,40 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
+@@ -14382,9 +14603,40 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
      return false;
  }
  
@@ -2725,7 +2775,7 @@ index a1ea47726..287932e30 100644
      const ggml_tensor *mul = cgraph->nodes[node_idx + 1];
      const ggml_tensor *rope = cgraph->nodes[node_idx + 2];
  
-@@ -14412,7 +14647,7 @@ bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const str
+@@ -14412,7 +14664,7 @@ bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const str
          return false;
      }
  
@@ -2734,7 +2784,7 @@ index a1ea47726..287932e30 100644
  }
  
  uint32_t ggml_vk_fuse_multi_add(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph, int node_idx) {
-@@ -14579,6 +14814,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14579,6 +14831,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
      uint64_t flops_per_submit = ctx->last_total_flops < 1'000'000'000ULL ? 0 :
          std::clamp(ctx->last_total_flops / 40u, std::min<uint64_t>(100'000'000ULL, flops_cap), flops_cap);
  
@@ -2747,7 +2797,7 @@ index a1ea47726..287932e30 100644
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -14603,7 +14844,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14603,7 +14861,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -2756,7 +2806,7 @@ index a1ea47726..287932e30 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -14705,6 +14946,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14705,6 +14963,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
                  ctx->fused_hc_post_gate = true;
                  fusion_string = "HC_POST_GATE";
                  std::fill_n(op_srcs_fused_elementwise, ctx->num_additional_fused_ops + 1, false);
@@ -2768,7 +2818,7 @@ index a1ea47726..287932e30 100644
              } else if (ggml_vk_can_fuse(ctx, cgraph, i, rms_norm_mul_add_mul_pattern)) {
                  ctx->num_additional_fused_ops = 3;
                  ctx->fused_rms_norm_mode = RMS_NORM_MUL_ADD_MUL;
-@@ -14890,7 +15136,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -14890,7 +15153,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -2777,7 +2827,7 @@ index a1ea47726..287932e30 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -15135,6 +15381,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+@@ -15135,6 +15398,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
              continue;
          }
  
@@ -2788,7 +2838,7 @@ index a1ea47726..287932e30 100644
          if (keep_pattern(rms_norm_mul_add_mul_pattern)) {
              continue;
          }
-@@ -15190,6 +15440,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+@@ -15190,6 +15457,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
                  match_pattern(topk_moe_late_softmax, j) ||
                  match_pattern(snake_pattern, j) ||
                  in_qsa_pattern(j) ||
@@ -2796,7 +2846,7 @@ index a1ea47726..287932e30 100644
                  match_pattern(rms_norm_mul_add_mul_pattern, j) ||
                  match_pattern(rms_norm_mul_add_pattern, j) ||
                  match_pattern(rms_norm_mul_rope_view_set_rows_pattern, j) ||
-@@ -15475,7 +15726,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -15475,7 +15743,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  
@@ -2806,7 +2856,7 @@ index a1ea47726..287932e30 100644
          vk_backend->iface.get_tensor_async = nullptr;
      }
  
-@@ -15698,6 +15950,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -15698,6 +15967,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
                      return false;
              }
          case GGML_OP_GLU:
@@ -2817,7 +2867,7 @@ index a1ea47726..287932e30 100644
              switch (ggml_get_glu_op(op)) {
                  case GGML_GLU_OP_GEGLU:
                  case GGML_GLU_OP_REGLU:
-@@ -15971,12 +16227,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -15971,12 +16244,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
          case GGML_OP_REPEAT_BACK:
              return op->type == GGML_TYPE_F32 && op->src[0]->type == GGML_TYPE_F32;
          case GGML_OP_ROPE:
@@ -2832,7 +2882,23 @@ index a1ea47726..287932e30 100644
          case GGML_OP_NONE:
          case GGML_OP_RESHAPE:
          case GGML_OP_VIEW:
-@@ -16070,8 +16324,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -15984,8 +16255,13 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+         case GGML_OP_TRANSPOSE:
+         case GGML_OP_RMS_NORM:
+             return true;
+-        case GGML_OP_GROUP_NORM:
+-            return ggml_is_contiguous(op->src[0]);
++        case GGML_OP_GROUP_NORM: {
++            const auto * src = op->src[0];
++            const int groups = op->op_params[0];
++            return op->type == GGML_TYPE_F32 && src->type == GGML_TYPE_F32 &&
++                   groups > 0 && src->ne[2] % groups == 0 && ggml_nelements(src) > 0 &&
++                   ggml_nelements(src) <= UINT32_MAX / 2 && ggml_is_contiguous(src);
++        }
+         case GGML_OP_NORM:
+         case GGML_OP_L2_NORM:
+             return op->src[0]->type == GGML_TYPE_F32 && op->type == GGML_TYPE_F32;
+@@ -16070,8 +16346,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32;
          case GGML_OP_FILL:
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
@@ -2851,7 +2917,7 @@ index a1ea47726..287932e30 100644
          case GGML_OP_PAD:
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
-@@ -16212,6 +16474,42 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16212,6 +16496,42 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
                  }
                  return true;
              }
@@ -2894,7 +2960,7 @@ index a1ea47726..287932e30 100644
          case GGML_OP_GATED_DELTA_NET:
              {
                  const uint32_t S_v = op->src[2]->ne[0];
-@@ -16592,7 +16890,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -16592,7 +16912,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  
@@ -2958,6 +3024,26 @@ index e40469838..e3ab1c160 100644
  }
 +
 +#endif
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/group_norm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/group_norm.comp
+index bdf97dbb5..2aebb0b22 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/group_norm.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/group_norm.comp
+@@ -18,8 +18,13 @@ void main() {
+     const float eps = p.param1;
+ 
+     const uint tid = gl_LocalInvocationID.x;
+-    const uint start = gl_WorkGroupID.x * group_size + tid;
+-    const uint end = (gl_WorkGroupID.x + 1) * group_size;
++    const uint group = gl_WorkGroupID.x + gl_NumWorkGroups.x *
++        (gl_WorkGroupID.y + gl_NumWorkGroups.y * gl_WorkGroupID.z);
++    if (group >= p.KY) {
++        return;
++    }
++    const uint start = group * group_size + tid;
++    const uint end = (group + 1) * group_size;
+ 
+     tmp[tid] = 0.0f;
+ 
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
 index 19d37870b..ea1d43e18 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
@@ -3161,10 +3247,30 @@ index cf7ab21f2..9a8094a60 100644
      }
  }
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
-index 35ec726a0..0dc989d50 100644
+index 35ec726a0..470680a97 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
-@@ -18,7 +18,13 @@ void main() {
+@@ -7,6 +7,19 @@ const uint num_threads = 128;
+ 
+ layout(local_size_x = num_threads, local_size_y = 1, local_size_z = 1) in;
+ 
++#ifdef KCPP_SCALE_VEC4
++layout (binding = 0) readonly buffer VA {vec4 data_a4[];};
++layout (binding = 1) writeonly buffer VD {vec4 data_d4[];};
++
++void main() {
++    const uint index = gl_GlobalInvocationID.z * 65536u +
++                       gl_GlobalInvocationID.y * 128u + gl_GlobalInvocationID.x;
++    if (index < p.ne / 4u) {
++        const vec4 x = data_a4[get_aoffset() / 4u + index];
++        data_d4[get_doffset() / 4u + index] = x * p.param1 + p.param2;
++    }
++}
++#else
+ void main() {
+     uint idx = get_idx();
+ 
+@@ -18,7 +31,14 @@ void main() {
              continue;
          }
  
@@ -3179,6 +3285,7 @@ index 35ec726a0..0dc989d50 100644
          idx += num_threads;
      }
  }
++#endif
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/situ.comp b/ggml/src/ggml-vulkan/vulkan-shaders/situ.comp
 new file mode 100644
 index 000000000..5b367ecaa
@@ -3251,7 +3358,7 @@ index 000000000..94803a30e
 +#endif
 +}
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index aaa0a61b1..83ad70b7c 100644
+index aaa0a61b1..0cefa4e67 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 @@ -354,7 +354,8 @@ using compile_count_guard = std::unique_ptr<uint32_t, decltype(&decrement_compil
@@ -3274,7 +3381,15 @@ index aaa0a61b1..83ad70b7c 100644
          string_to_spv("rms_norm_set_rows_f32_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"RMS_NORM_SET_ROWS_FUSION", "1"}}));
          string_to_spv("rms_norm_set_rows_f32_f16" + suffix, "rms_norm.comp", merge_maps({{"D_TYPE", "float16_t"}, {"RMS_NORM_SET_ROWS_FUSION", "1"}}, rms_dict)); // keep rms_dict last so 'merge_maps' overwrites the value for key 'D_TYPE'
          string_to_spv("rms_norm_mul_rope_f32_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"ROPE_D_TYPE", "float"}, {"RMS_NORM_ROPE_FUSION", "1"}}));
-@@ -994,6 +997,7 @@ void process_shaders() {
+@@ -987,6 +990,7 @@ void process_shaders() {
+     string_to_spv("repeat_i16", "repeat.comp", {{"A_TYPE", "int16_t"}, {"D_TYPE", "int16_t"}});
+ 
+     string_to_spv("scale_f32", "scale.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}, {"FLOAT_TYPE", "float"}});
++    string_to_spv("scale_f32_vec4", "scale.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}, {"FLOAT_TYPE", "float"}, {"KCPP_SCALE_VEC4", "1"}});
+ 
+     string_to_spv("pad_f32", "pad.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}});
+     string_to_spv("pad_reflect_1d_f32", "pad_reflect_1d.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}});
+@@ -994,6 +998,7 @@ void process_shaders() {
      string_to_spv("concat_i8", "concat.comp", {{"A_TYPE", "uint8_t"}, {"B_TYPE", "uint8_t"}, {"D_TYPE", "uint8_t"}});
      string_to_spv("concat_i16", "concat.comp", {{"A_TYPE", "uint16_t"}, {"B_TYPE", "uint16_t"}, {"D_TYPE", "uint16_t"}});
      string_to_spv("concat_i32", "concat.comp", {{"A_TYPE", "uint"}, {"B_TYPE", "uint"}, {"D_TYPE", "uint"}});
@@ -3282,7 +3397,7 @@ index aaa0a61b1..83ad70b7c 100644
      string_to_spv("concat_i64", "concat.comp", {{"A_TYPE", "uvec2"}, {"B_TYPE", "uvec2"}, {"D_TYPE", "uvec2"}});
  
      string_to_spv("upscale_f32", "upscale.comp", {{"A_TYPE", "float"}, {"B_TYPE", "float"}, {"D_TYPE", "float"}});
-@@ -1086,6 +1090,7 @@ void process_shaders() {
+@@ -1086,6 +1091,7 @@ void process_shaders() {
      string_to_spv("reglu_f32",      "reglu.comp",       {{"A_TYPE", "float"},       {"D_TYPE", "float"}});
      string_to_spv("swiglu_f16",     "swiglu.comp",      {{"A_TYPE", "float16_t"},   {"D_TYPE", "float16_t"}});
      string_to_spv("swiglu_f32",     "swiglu.comp",      {{"A_TYPE", "float"},       {"D_TYPE", "float"}});
@@ -3290,7 +3405,7 @@ index aaa0a61b1..83ad70b7c 100644
      string_to_spv("swiglu_oai_f16", "swiglu_oai.comp",  {{"A_TYPE", "float16_t"},   {"D_TYPE", "float16_t"}});
      string_to_spv("swiglu_oai_f32", "swiglu_oai.comp",  {{"A_TYPE", "float"},       {"D_TYPE", "float"}});
      string_to_spv("swiglu_clamp_f16", "swiglu_clamp.comp", {{"A_TYPE", "float16_t"}, {"D_TYPE", "float16_t"}});
-@@ -1144,6 +1149,8 @@ void process_shaders() {
+@@ -1144,6 +1150,8 @@ void process_shaders() {
      string_to_spv("dsv4_hc_comb_f32", "dsv4_hc_comb.comp", {});
      string_to_spv("dsv4_hc_pre_f32",  "dsv4_hc_pre.comp",  {});
      string_to_spv("dsv4_hc_post_f32", "dsv4_hc_post.comp", {});

@@ -74,3 +74,5 @@ Apply in numeric order to `f49df57b4a82f6d641c419c7fadc9e4b896f6781`. [Index and
 - [Allocate graph metadata without eagerly zeroing unused pages](70-llama-graph-meta-pages/README.md)
 - [Scale and copy wide F32 rows in one AVX2 pass](71-haswell-scale-copy/README.md)
 - [Keep AVX2 Gated Delta Net state rows hot](72-haswell-gdn-row-locality/README.md)
+- [Vectorize aligned FP32 Scale on Polaris](73-polaris-scale-vec4/README.md)
+- [Extend Vulkan GroupNorm dispatch beyond X](74-vulkan-group-norm-grid/README.md)

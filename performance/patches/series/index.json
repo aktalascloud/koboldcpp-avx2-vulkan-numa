@@ -1,7 +1,7 @@
 {
   "upstream": "f49df57b4a82f6d641c419c7fadc9e4b896f6781",
-  "tree": "7f11c227c0675d86d3630a64dcd968bd9efa123f",
-  "snapshot_sha256": "0008ad1a466b666f462cc22ba972788dc799f168c5dbf41d7becf1b8c762c1b0",
+  "tree": "cef6ab33f218b95e2239a92fd7d11f93b016be8d",
+  "snapshot_sha256": "c8e654aadbae5b353221e530598c902732b05a3f2ab46b10d6f0c9d6b5a8b80e",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -434,6 +434,18 @@
       "title": "Keep AVX2 Gated Delta Net state rows hot",
       "source": "https://github.com/ggml-org/llama.cpp/pull/32028",
       "sha256": "cbb93f8163c8e2e95923fe13b268ae535ff332ec69000af3eeb30f0df6c89b4f"
+    },
+    {
+      "path": "73-polaris-scale-vec4/change.patch",
+      "title": "Vectorize aligned FP32 Scale on Polaris",
+      "source": null,
+      "sha256": "2eaed3428fe104b22764106ec719d21c7477353962b32992890d794b804dd8dc"
+    },
+    {
+      "path": "74-vulkan-group-norm-grid/change.patch",
+      "title": "Extend Vulkan GroupNorm dispatch beyond X",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31930",
+      "sha256": "381f56350add0b975e899f38164d9335a3e1ac0beea6b9812b82741994c0e194"
     }
   ],
   "empty_ports": [
@@ -444,6 +456,6 @@
     "vulkan-comm-amalgamation",
     "vulkan-small-bar"
   ],
-  "accepted_executable_sha256": "33615ff0474faa097deb188a4f326247f6f8ce99fd634da720b9573728c93a6e",
+  "accepted_executable_sha256": "e8743bce1b4046a41c46ad07bb8fbdfec66b03ecbb350a98710e0150cc7b4b84",
   "build_date": "2026-11-11"
 }

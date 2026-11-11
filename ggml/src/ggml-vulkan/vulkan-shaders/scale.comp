@@ -7,6 +7,19 @@ const uint num_threads = 128;
 
 layout(local_size_x = num_threads, local_size_y = 1, local_size_z = 1) in;
 
+#ifdef KCPP_SCALE_VEC4
+layout (binding = 0) readonly buffer VA {vec4 data_a4[];};
+layout (binding = 1) writeonly buffer VD {vec4 data_d4[];};
+
+void main() {
+    const uint index = gl_GlobalInvocationID.z * 65536u +
+                       gl_GlobalInvocationID.y * 128u + gl_GlobalInvocationID.x;
+    if (index < p.ne / 4u) {
+        const vec4 x = data_a4[get_aoffset() / 4u + index];
+        data_d4[get_doffset() / 4u + index] = x * p.param1 + p.param2;
+    }
+}
+#else
 void main() {
     uint idx = get_idx();
 
@@ -28,3 +41,4 @@ void main() {
         idx += num_threads;
     }
 }
+#endif

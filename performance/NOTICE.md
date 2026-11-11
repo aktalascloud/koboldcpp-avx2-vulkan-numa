@@ -23,3 +23,5 @@ Native architecture adaptation follows madebyollin/taehv at commit 011dfc2112197
 Exact IQ4_NL decoder idea from Strata, adapted to AVX2: Copyright(c)2026 Niko1221 and the Strata contributors; [MIT notice](licenses/strata/LICENSE.txt), [pinned source](https://github.com/aktalascloud/strata-legacy-gpu/tree/157f5810bf0458b940521baf59f32fd2f71345c2/p40/patches/avx1-ple-iq4nl-shuffle). No P40 model timing is transferred to RX580.
 
 November 11 ports follow the GGML/llama.cpp MIT terms. [CLIP allocation](https://github.com/ggml-org/llama.cpp/pull/31988), [graph metadata](https://github.com/ggml-org/llama.cpp/pull/32043), [Gated Delta Net](https://github.com/ggml-org/llama.cpp/pull/32028).
+
+The Vulkan GroupNorm grid adapts [llama.cpp #31930](https://github.com/ggml-org/llama.cpp/pull/31930) under MIT.
