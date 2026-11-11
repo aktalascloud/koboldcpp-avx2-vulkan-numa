@@ -25,3 +25,5 @@ Exact IQ4_NL decoder idea from Strata, adapted to AVX2: Copyright(c)2026 Niko122
 November 11 ports follow the GGML/llama.cpp MIT terms. [CLIP allocation](https://github.com/ggml-org/llama.cpp/pull/31988), [graph metadata](https://github.com/ggml-org/llama.cpp/pull/32043), [Gated Delta Net](https://github.com/ggml-org/llama.cpp/pull/32028).
 
 The Vulkan GroupNorm grid adapts [llama.cpp #31930](https://github.com/ggml-org/llama.cpp/pull/31930) under MIT.
+
+The recurrent metadata guards adapt [llama.cpp #31948](https://github.com/ggml-org/llama.cpp/pull/31948) under MIT.

@@ -1,0 +1,56 @@
+diff --git a/src/models/granite-hybrid.cpp b/src/models/granite-hybrid.cpp
+index 9e77e2efd..123631061 100644
+--- a/src/models/granite-hybrid.cpp
++++ b/src/models/granite-hybrid.cpp
+@@ -11,6 +11,9 @@ void llama_model_granite_hybrid::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_SSM_INNER_SIZE,     hparams.ssm_d_inner);
+     ml.get_key(LLM_KV_SSM_STATE_SIZE,     hparams.ssm_d_state);
+     ml.get_key(LLM_KV_SSM_TIME_STEP_RANK, hparams.ssm_dt_rank);
++    if (hparams.ssm_dt_rank == 0) {
++        throw std::runtime_error("granite-hybrid: ssm_dt_rank must be > 0");
++    }
+     ml.get_key(LLM_KV_SSM_GROUP_COUNT,    hparams.ssm_n_group);
+ 
+     // Granite uses rope_finetuned as a switch for rope, so default to true
+diff --git a/src/models/mamba2.cpp b/src/models/mamba2.cpp
+index 9088d941e..014c41106 100644
+--- a/src/models/mamba2.cpp
++++ b/src/models/mamba2.cpp
+@@ -5,6 +5,9 @@ void llama_model_mamba2::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_SSM_INNER_SIZE,     hparams.ssm_d_inner);
+     ml.get_key(LLM_KV_SSM_STATE_SIZE,     hparams.ssm_d_state);
+     ml.get_key(LLM_KV_SSM_TIME_STEP_RANK, hparams.ssm_dt_rank);
++    if (hparams.ssm_dt_rank == 0) {
++        throw std::runtime_error("mamba2: ssm_dt_rank must be > 0");
++    }
+     ml.get_key(LLM_KV_SSM_GROUP_COUNT,    hparams.ssm_n_group);
+ 
+     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_RMS_EPS, hparams.f_norm_rms_eps);
+diff --git a/src/models/nemotron-h.cpp b/src/models/nemotron-h.cpp
+index 313f42f1c..5d6c66515 100644
+--- a/src/models/nemotron-h.cpp
++++ b/src/models/nemotron-h.cpp
+@@ -7,6 +7,9 @@ void llama_model_nemotron_h::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_SSM_INNER_SIZE,     hparams.ssm_d_inner);
+     ml.get_key(LLM_KV_SSM_STATE_SIZE,     hparams.ssm_d_state);
+     ml.get_key(LLM_KV_SSM_TIME_STEP_RANK, hparams.ssm_dt_rank);
++    if (hparams.ssm_dt_rank == 0) {
++        throw std::runtime_error("nemotron-h: ssm_dt_rank must be > 0");
++    }
+     ml.get_key(LLM_KV_SSM_GROUP_COUNT,    hparams.ssm_n_group);
+ 
+     // A layer is recurrent IFF the n_head_kv value is set to 0 and
+diff --git a/src/models/rwkv6.cpp b/src/models/rwkv6.cpp
+index 4cb5bce64..8d76d02df 100644
+--- a/src/models/rwkv6.cpp
++++ b/src/models/rwkv6.cpp
+@@ -4,6 +4,9 @@ void llama_model_rwkv6::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_EPS,     hparams.f_norm_eps, false);
+     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_RMS_EPS, hparams.f_norm_rms_eps, false);
+     ml.get_key(LLM_KV_WKV_HEAD_SIZE,               hparams.wkv_head_size);
++    if (hparams.wkv_head_size == 0) {
++        throw std::runtime_error("rwkv6: wkv_head_size must be > 0");
++    }
+     ml.get_key(LLM_KV_TIME_MIX_EXTRA_DIM,          hparams.time_mix_extra_dim);
+     ml.get_key(LLM_KV_TIME_DECAY_EXTRA_DIM,        hparams.time_decay_extra_dim);
+     ml.get_key(LLM_KV_RESCALE_EVERY_N_LAYERS,      hparams.rescale_every_n_layers, false);

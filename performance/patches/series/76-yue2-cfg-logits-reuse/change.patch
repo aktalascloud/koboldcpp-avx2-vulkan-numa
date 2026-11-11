@@ -1,0 +1,140 @@
+diff --git a/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h b/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h
+index b424a0a14..d14d57378 100644
+--- a/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h
++++ b/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h
+@@ -120,6 +120,7 @@ public:
+         const runtime::TransformerBatchedKVState & state,
+         int64_t required_cache_steps);
+     CausalDecoderStepResult decode_tokens_batched(const std::vector<int32_t> & tokens);
++    void decode_tokens_batched_into(const std::vector<int32_t> & tokens, CausalDecoderStepResult & out);
+     CausalDecoderStepResult decode_embeddings_batched(
+         const std::vector<float> & embeddings,
+         int64_t batch_size);
+diff --git a/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp b/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp
+index 52572dd16..adab1413d 100644
+--- a/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp
++++ b/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp
+@@ -795,6 +795,12 @@ public:
+     }
+ 
+     CausalDecoderStepResult decode_tokens_batched(const std::vector<int32_t> & tokens) {
++        CausalDecoderStepResult out;
++        decode_tokens_batched_into(tokens, out);
++        return out;
++    }
++
++    void decode_tokens_batched_into(const std::vector<int32_t> & tokens, CausalDecoderStepResult & out) {
+         ensure_batched_decode_started();
+         if (batched_decode_input_kind_ != InputKind::Token) {
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode graph expects tokens");
+@@ -803,7 +809,7 @@ public:
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode token size mismatch");
+         }
+         ggml_backend_tensor_set(batched_decode_input_, tokens.data(), 0, tokens.size() * sizeof(int32_t));
+-        return run_batched_decode_step();
++        run_batched_decode_step_into(out);
+     }
+ 
+     CausalDecoderStepResult decode_embeddings_batched(
+@@ -1682,6 +1688,12 @@ private:
+     }
+ 
+     CausalDecoderStepResult run_batched_decode_step() {
++        CausalDecoderStepResult out;
++        run_batched_decode_step_into(out);
++        return out;
++    }
++
++    void run_batched_decode_step_into(CausalDecoderStepResult & out) {
+         if (batched_decode_cache_.valid_steps() >= batched_decode_cache_steps_) {
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode cache exhausted");
+         }
+@@ -1743,7 +1755,6 @@ private:
+         if (status != GGML_STATUS_SUCCESS) {
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode graph compute failed");
+         }
+-        CausalDecoderStepResult out;
+         if (batched_decode_logits_ != nullptr) {
+             out.logits.resize(static_cast<size_t>(ggml_nelements(batched_decode_logits_)));
+             ggml_backend_tensor_get(
+@@ -1751,6 +1762,8 @@ private:
+                 out.logits.data(),
+                 0,
+                 out.logits.size() * sizeof(float));
++        } else {
++            out.logits.clear();
+         }
+         if (batched_decode_hidden_ != nullptr) {
+             out.hidden.resize(static_cast<size_t>(ggml_nelements(batched_decode_hidden_)));
+@@ -1760,9 +1773,10 @@ private:
+                 0,
+                 out.hidden.size() * sizeof(float));
+             round_readback(out.hidden, config_);
++        } else {
++            out.hidden.clear();
+         }
+         batched_decode_cache_.advance_after_direct_append(1);
+-        return out;
+     }
+ 
+     void release_prefill_graph() {
+@@ -2123,6 +2137,11 @@ CausalDecoderStepResult CausalDecoderRuntime::decode_tokens_batched(const std::v
+     return impl_->decode_tokens_batched(tokens);
+ }
+ 
++void CausalDecoderRuntime::decode_tokens_batched_into(
++    const std::vector<int32_t> & tokens, CausalDecoderStepResult & out) {
++    impl_->decode_tokens_batched_into(tokens, out);
++}
++
+ CausalDecoderStepResult CausalDecoderRuntime::decode_embeddings_batched(
+     const std::vector<float> & embeddings,
+     int64_t batch_size) {
+diff --git a/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp b/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp
+index 07b5fb28c..67dc337f3 100644
+--- a/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp
++++ b/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp
+@@ -827,15 +827,19 @@ struct Yue2ARRuntime::Impl {
+         emitted.insert(emitted.end(), forced.begin(), forced.end());
+         std::mt19937 rng(static_cast<uint32_t>(seed));
+         Yue2SamplerScratch scratch;
++        if (positive.logits.size() != negative.logits.size()) {
++            throw std::runtime_error("Yue2 CFG logits size mismatch");
++        }
+         std::vector<float> logits(positive.logits.size(), 0.0F);
++        const float * positive_row = positive.logits.data();
++        const float * negative_row = negative.logits.data();
++        engine::modules::CausalDecoderStepResult batched;
++        std::vector<int32_t> pair(2);
+         double sample_ms = 0.0;
+         double decode_batched_ms = 0.0;
+         for (int64_t step = static_cast<int64_t>(emitted.size()); step < window.max_tokens; ++step) {
+-            if (positive.logits.size() != negative.logits.size()) {
+-                throw std::runtime_error("Yue2 CFG logits size mismatch");
+-            }
+             for (size_t i = 0; i < logits.size(); ++i) {
+-                logits[i] = negative.logits[i] + (positive.logits[i] - negative.logits[i]) * guidance_scale;
++                logits[i] = negative_row[i] + (positive_row[i] - negative_row[i]) * guidance_scale;
+             }
+             const auto sample_start = Clock::now();
+             const int32_t token = compact_semantic ?
+@@ -854,14 +858,14 @@ struct Yue2ARRuntime::Impl {
+                 break;
+             }
+             const auto decode_start = Clock::now();
+-            auto batched = positive_runtime->decode_tokens_batched({token, token});
++            pair[0] = pair[1] = token;
++            positive_runtime->decode_tokens_batched_into(pair, batched);
+             decode_batched_ms += engine::debug::elapsed_ms(decode_start);
+-            if (batched.logits.size() % 2 != 0) {
++            if (batched.logits.size() != 2 * logits.size()) {
+                 throw std::runtime_error("Yue2 CFG batched logits shape mismatch");
+             }
+-            const size_t row = batched.logits.size() / 2;
+-            positive.logits.assign(batched.logits.begin(), batched.logits.begin() + static_cast<std::ptrdiff_t>(row));
+-            negative.logits.assign(batched.logits.begin() + static_cast<std::ptrdiff_t>(row), batched.logits.end());
++            positive_row = batched.logits.data();
++            negative_row = positive_row + logits.size();
+         }
+         engine::debug::timing_log_scalar("yue2.ar.cfg.sample_ms", sample_ms);
+         engine::debug::timing_log_scalar("yue2.ar.cfg.decode_batched_ms", decode_batched_ms);

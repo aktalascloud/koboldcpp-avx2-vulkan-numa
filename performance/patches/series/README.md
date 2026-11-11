@@ -76,3 +76,6 @@ Apply in numeric order to `f49df57b4a82f6d641c419c7fadc9e4b896f6781`. [Index and
 - [Keep AVX2 Gated Delta Net state rows hot](72-haswell-gdn-row-locality/README.md)
 - [Vectorize aligned FP32 Scale on Polaris](73-polaris-scale-vec4/README.md)
 - [Extend Vulkan GroupNorm dispatch beyond X](74-vulkan-group-norm-grid/README.md)
+- [Pack four sampling candidates per host iteration](75-sampler-candidate-pack/README.md)
+- [Reuse batched YuE2 logits across CFG decode steps](76-yue2-cfg-logits-reuse/README.md)
+- [Reject zero ranks in recurrent model metadata](77-recurrent-zero-rank/README.md)

@@ -3478,10 +3478,63 @@ index baea1c020..3a71e38a1 100644
  
          for (uint32_t j = 0; j < n_dims; ++j) {
 diff --git a/kcpp_src/gpttype_adapter.cpp b/kcpp_src/gpttype_adapter.cpp
-index e2d5db6b3..e502cde9f 100644
+index e2d5db6b3..2a5181f20 100644
 --- a/kcpp_src/gpttype_adapter.cpp
 +++ b/kcpp_src/gpttype_adapter.cpp
-@@ -7777,6 +7777,8 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
+@@ -19,6 +19,9 @@
+ #include <sstream>
+ #include <map>
+ #include <cstdint>
++#if defined(__SSE2__) || defined(_M_X64)
++#include <emmintrin.h>
++#endif
+ #include <string>
+ #include <cctype>
+ #include <cstdlib>
+@@ -2475,6 +2478,31 @@ static void grammar_accept_token(FileFormat file_format, int32_t n_vocab, struct
+     llama_grammar_accept_token(*grammar, token, piece);
+ }
+ 
++static void initialize_candidates(llama_token_data * candidates, const float * logits, int n_vocab) {
++    int i = 0;
++#if defined(__SSE2__) || defined(_M_X64)
++    static_assert(sizeof(llama_token_data) == 12 && offsetof(llama_token_data, logit) == 4 &&
++                  offsetof(llama_token_data, p) == 8);
++    __m128i ids = _mm_set_epi32(3, 2, 1, 0);
++    const __m128i step = _mm_set1_epi32(4);
++    const __m128i first_mask = _mm_set_epi32(-1, 0, -1, -1);
++    const __m128i last_mask = _mm_set_epi32(0, -1, -1, 0);
++    for (; i + 3 < n_vocab; i += 4) {
++        const __m128i scores = _mm_castps_si128(_mm_loadu_ps(logits + i));
++        const __m128i lo = _mm_unpacklo_epi32(ids, scores);
++        const __m128i hi = _mm_unpackhi_epi32(ids, scores);
++        auto * dst = reinterpret_cast<__m128i *>(candidates + i);
++        _mm_storeu_si128(dst, _mm_and_si128(_mm_shuffle_epi32(lo, _MM_SHUFFLE(2, 0, 1, 0)), first_mask));
++        _mm_storeu_si128(dst + 1, _mm_unpacklo_epi64(_mm_srli_si128(lo, 12), hi));
++        _mm_storeu_si128(dst + 2, _mm_and_si128(_mm_shuffle_epi32(hi, _MM_SHUFFLE(0, 3, 2, 0)), last_mask));
++        ids = _mm_add_epi32(ids, step);
++    }
++#endif
++    for (; i < n_vocab; ++i) {
++        candidates[i] = llama_token_data{i, logits[i], 0.0f};
++    }
++}
++
+ int SampleLogits(const float * logits, int n_ctx, int n_vocab, int rep_pen_range, float rep_pen, float rep_pen_slope, float presence_penalty, float top_k, float top_a, float top_p, float min_p, float typical_p, float tfs, float nsigma, float temp, std::mt19937 & rng,
+ int mirostat, float mirostat_tau, float mirostat_eta, float dry_multiplier, float dry_base, int dry_allowed_length, int dry_penalty_last_n, float xtc_threshold, float xtc_probability,
+ const std::vector<samplers> & sampler_order, llama_grammar * grammar, float dynatemp_range, float dynatemp_exponent, float smoothing_factor, float smoothing_curve, float adaptive_target, float adaptive_decay,
+@@ -2485,9 +2513,7 @@ const std::vector<int> & think_start_seq, const std::vector<int> & think_end_seq
+ 
+     static thread_local std::vector<llama_token_data> candidates;
+     candidates.resize(n_vocab);
+-    for (llama_token token_id = 0; token_id < n_vocab; token_id++) {
+-        candidates[token_id] = llama_token_data{token_id, logits[token_id], 0.0f};
+-    }
++    initialize_candidates(candidates.data(), logits, n_vocab);
+     int id = 0;
+ 
+     for(int i=0;i<logit_biases.size();++i)
+@@ -7777,6 +7803,8 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
      {
          kcpp_data->repeat_last_n = 1;
      }
@@ -3784,6 +3837,18 @@ index b4a9f2fcc..19acbdd4b 100644
      advparser.add_argument("--moe-cache-mib", "--moecache", dest="moe_cache_mib", type=check_range(int, 0, 2147483647), default=0, metavar="MiB", help="Experimental GPU cache size in MiB for CPU-resident MoE experts. Split among GPUs like layers. Uses additional VRAM; combine with --moecpu or --autofit (default=0, disabled).")
      advparser.add_argument("--moecpu","--n-cpu-moe", "-ncmoe", metavar=('[layers affected]'), help="Keep the Mixture of Experts (MoE) weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
      advparser.add_argument("--ffncpu","--n-cpu-ffn", "-ncffn", metavar=('[layers affected]'), help="Keep the dense FFN weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
+diff --git a/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h b/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h
+index b424a0a14..d14d57378 100644
+--- a/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h
++++ b/otherarch/audiocpp/upstream/include/engine/framework/modules/transformers/causal_decoder_runtime.h
+@@ -120,6 +120,7 @@ public:
+         const runtime::TransformerBatchedKVState & state,
+         int64_t required_cache_steps);
+     CausalDecoderStepResult decode_tokens_batched(const std::vector<int32_t> & tokens);
++    void decode_tokens_batched_into(const std::vector<int32_t> & tokens, CausalDecoderStepResult & out);
+     CausalDecoderStepResult decode_embeddings_batched(
+         const std::vector<float> & embeddings,
+         int64_t batch_size);
 diff --git a/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h b/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h
 index 3b12bf87c..464b8d64e 100644
 --- a/otherarch/audiocpp/upstream/include/engine/models/omnivoice/session.h
@@ -3823,6 +3888,86 @@ index 0f484c594..c140ac072 100644
      VibeVoiceSession(
          runtime::TaskSpec task,
          runtime::SessionOptions options,
+diff --git a/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp b/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp
+index 52572dd16..adab1413d 100644
+--- a/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp
++++ b/otherarch/audiocpp/upstream/src/framework/modules/transformers/causal_decoder_runtime.cpp
+@@ -795,6 +795,12 @@ public:
+     }
+ 
+     CausalDecoderStepResult decode_tokens_batched(const std::vector<int32_t> & tokens) {
++        CausalDecoderStepResult out;
++        decode_tokens_batched_into(tokens, out);
++        return out;
++    }
++
++    void decode_tokens_batched_into(const std::vector<int32_t> & tokens, CausalDecoderStepResult & out) {
+         ensure_batched_decode_started();
+         if (batched_decode_input_kind_ != InputKind::Token) {
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode graph expects tokens");
+@@ -803,7 +809,7 @@ public:
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode token size mismatch");
+         }
+         ggml_backend_tensor_set(batched_decode_input_, tokens.data(), 0, tokens.size() * sizeof(int32_t));
+-        return run_batched_decode_step();
++        run_batched_decode_step_into(out);
+     }
+ 
+     CausalDecoderStepResult decode_embeddings_batched(
+@@ -1682,6 +1688,12 @@ private:
+     }
+ 
+     CausalDecoderStepResult run_batched_decode_step() {
++        CausalDecoderStepResult out;
++        run_batched_decode_step_into(out);
++        return out;
++    }
++
++    void run_batched_decode_step_into(CausalDecoderStepResult & out) {
+         if (batched_decode_cache_.valid_steps() >= batched_decode_cache_steps_) {
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode cache exhausted");
+         }
+@@ -1743,7 +1755,6 @@ private:
+         if (status != GGML_STATUS_SUCCESS) {
+             throw std::runtime_error("QwenCausalDecodeRuntime batched decode graph compute failed");
+         }
+-        CausalDecoderStepResult out;
+         if (batched_decode_logits_ != nullptr) {
+             out.logits.resize(static_cast<size_t>(ggml_nelements(batched_decode_logits_)));
+             ggml_backend_tensor_get(
+@@ -1751,6 +1762,8 @@ private:
+                 out.logits.data(),
+                 0,
+                 out.logits.size() * sizeof(float));
++        } else {
++            out.logits.clear();
+         }
+         if (batched_decode_hidden_ != nullptr) {
+             out.hidden.resize(static_cast<size_t>(ggml_nelements(batched_decode_hidden_)));
+@@ -1760,9 +1773,10 @@ private:
+                 0,
+                 out.hidden.size() * sizeof(float));
+             round_readback(out.hidden, config_);
++        } else {
++            out.hidden.clear();
+         }
+         batched_decode_cache_.advance_after_direct_append(1);
+-        return out;
+     }
+ 
+     void release_prefill_graph() {
+@@ -2123,6 +2137,11 @@ CausalDecoderStepResult CausalDecoderRuntime::decode_tokens_batched(const std::v
+     return impl_->decode_tokens_batched(tokens);
+ }
+ 
++void CausalDecoderRuntime::decode_tokens_batched_into(
++    const std::vector<int32_t> & tokens, CausalDecoderStepResult & out) {
++    impl_->decode_tokens_batched_into(tokens, out);
++}
++
+ CausalDecoderStepResult CausalDecoderRuntime::decode_embeddings_batched(
+     const std::vector<float> & embeddings,
+     int64_t batch_size) {
 diff --git a/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp b/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp
 index 6434e7234..349c61b1a 100644
 --- a/otherarch/audiocpp/upstream/src/models/omnivoice/session.cpp
@@ -3865,6 +4010,54 @@ index 9c218ca53..96f0eb4b6 100644
  namespace {
  
  using Clock = std::chrono::steady_clock;
+diff --git a/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp b/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp
+index 07b5fb28c..67dc337f3 100644
+--- a/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp
++++ b/otherarch/audiocpp/upstream/src/models/yue2/ar_runtime.cpp
+@@ -827,15 +827,19 @@ struct Yue2ARRuntime::Impl {
+         emitted.insert(emitted.end(), forced.begin(), forced.end());
+         std::mt19937 rng(static_cast<uint32_t>(seed));
+         Yue2SamplerScratch scratch;
++        if (positive.logits.size() != negative.logits.size()) {
++            throw std::runtime_error("Yue2 CFG logits size mismatch");
++        }
+         std::vector<float> logits(positive.logits.size(), 0.0F);
++        const float * positive_row = positive.logits.data();
++        const float * negative_row = negative.logits.data();
++        engine::modules::CausalDecoderStepResult batched;
++        std::vector<int32_t> pair(2);
+         double sample_ms = 0.0;
+         double decode_batched_ms = 0.0;
+         for (int64_t step = static_cast<int64_t>(emitted.size()); step < window.max_tokens; ++step) {
+-            if (positive.logits.size() != negative.logits.size()) {
+-                throw std::runtime_error("Yue2 CFG logits size mismatch");
+-            }
+             for (size_t i = 0; i < logits.size(); ++i) {
+-                logits[i] = negative.logits[i] + (positive.logits[i] - negative.logits[i]) * guidance_scale;
++                logits[i] = negative_row[i] + (positive_row[i] - negative_row[i]) * guidance_scale;
+             }
+             const auto sample_start = Clock::now();
+             const int32_t token = compact_semantic ?
+@@ -854,14 +858,14 @@ struct Yue2ARRuntime::Impl {
+                 break;
+             }
+             const auto decode_start = Clock::now();
+-            auto batched = positive_runtime->decode_tokens_batched({token, token});
++            pair[0] = pair[1] = token;
++            positive_runtime->decode_tokens_batched_into(pair, batched);
+             decode_batched_ms += engine::debug::elapsed_ms(decode_start);
+-            if (batched.logits.size() % 2 != 0) {
++            if (batched.logits.size() != 2 * logits.size()) {
+                 throw std::runtime_error("Yue2 CFG batched logits shape mismatch");
+             }
+-            const size_t row = batched.logits.size() / 2;
+-            positive.logits.assign(batched.logits.begin(), batched.logits.begin() + static_cast<std::ptrdiff_t>(row));
+-            negative.logits.assign(batched.logits.begin() + static_cast<std::ptrdiff_t>(row), batched.logits.end());
++            positive_row = batched.logits.data();
++            negative_row = positive_row + logits.size();
+         }
+         engine::debug::timing_log_scalar("yue2.ar.cfg.sample_ms", sample_ms);
+         engine::debug::timing_log_scalar("yue2.ar.cfg.decode_batched_ms", decode_batched_ms);
 diff --git a/otherarch/sdcpp/SDCPP_LICENSE b/otherarch/sdcpp/SDCPP_LICENSE
 index 56e1e5a63..33293a1e7 100644
 --- a/otherarch/sdcpp/SDCPP_LICENSE
@@ -5247,6 +5440,62 @@ index 9004efa20..0fbb0f921 100644
  }
  
  static bool llama_sampler_greedy_backend_init(
+diff --git a/src/models/granite-hybrid.cpp b/src/models/granite-hybrid.cpp
+index 9e77e2efd..123631061 100644
+--- a/src/models/granite-hybrid.cpp
++++ b/src/models/granite-hybrid.cpp
+@@ -11,6 +11,9 @@ void llama_model_granite_hybrid::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_SSM_INNER_SIZE,     hparams.ssm_d_inner);
+     ml.get_key(LLM_KV_SSM_STATE_SIZE,     hparams.ssm_d_state);
+     ml.get_key(LLM_KV_SSM_TIME_STEP_RANK, hparams.ssm_dt_rank);
++    if (hparams.ssm_dt_rank == 0) {
++        throw std::runtime_error("granite-hybrid: ssm_dt_rank must be > 0");
++    }
+     ml.get_key(LLM_KV_SSM_GROUP_COUNT,    hparams.ssm_n_group);
+ 
+     // Granite uses rope_finetuned as a switch for rope, so default to true
+diff --git a/src/models/mamba2.cpp b/src/models/mamba2.cpp
+index 9088d941e..014c41106 100644
+--- a/src/models/mamba2.cpp
++++ b/src/models/mamba2.cpp
+@@ -5,6 +5,9 @@ void llama_model_mamba2::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_SSM_INNER_SIZE,     hparams.ssm_d_inner);
+     ml.get_key(LLM_KV_SSM_STATE_SIZE,     hparams.ssm_d_state);
+     ml.get_key(LLM_KV_SSM_TIME_STEP_RANK, hparams.ssm_dt_rank);
++    if (hparams.ssm_dt_rank == 0) {
++        throw std::runtime_error("mamba2: ssm_dt_rank must be > 0");
++    }
+     ml.get_key(LLM_KV_SSM_GROUP_COUNT,    hparams.ssm_n_group);
+ 
+     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_RMS_EPS, hparams.f_norm_rms_eps);
+diff --git a/src/models/nemotron-h.cpp b/src/models/nemotron-h.cpp
+index 313f42f1c..5d6c66515 100644
+--- a/src/models/nemotron-h.cpp
++++ b/src/models/nemotron-h.cpp
+@@ -7,6 +7,9 @@ void llama_model_nemotron_h::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_SSM_INNER_SIZE,     hparams.ssm_d_inner);
+     ml.get_key(LLM_KV_SSM_STATE_SIZE,     hparams.ssm_d_state);
+     ml.get_key(LLM_KV_SSM_TIME_STEP_RANK, hparams.ssm_dt_rank);
++    if (hparams.ssm_dt_rank == 0) {
++        throw std::runtime_error("nemotron-h: ssm_dt_rank must be > 0");
++    }
+     ml.get_key(LLM_KV_SSM_GROUP_COUNT,    hparams.ssm_n_group);
+ 
+     // A layer is recurrent IFF the n_head_kv value is set to 0 and
+diff --git a/src/models/rwkv6.cpp b/src/models/rwkv6.cpp
+index 4cb5bce64..8d76d02df 100644
+--- a/src/models/rwkv6.cpp
++++ b/src/models/rwkv6.cpp
+@@ -4,6 +4,9 @@ void llama_model_rwkv6::load_arch_hparams(llama_model_loader & ml) {
+     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_EPS,     hparams.f_norm_eps, false);
+     ml.get_key(LLM_KV_ATTENTION_LAYERNORM_RMS_EPS, hparams.f_norm_rms_eps, false);
+     ml.get_key(LLM_KV_WKV_HEAD_SIZE,               hparams.wkv_head_size);
++    if (hparams.wkv_head_size == 0) {
++        throw std::runtime_error("rwkv6: wkv_head_size must be > 0");
++    }
+     ml.get_key(LLM_KV_TIME_MIX_EXTRA_DIM,          hparams.time_mix_extra_dim);
+     ml.get_key(LLM_KV_TIME_DECAY_EXTRA_DIM,        hparams.time_decay_extra_dim);
+     ml.get_key(LLM_KV_RESCALE_EVERY_N_LAYERS,      hparams.rescale_every_n_layers, false);
 diff --git a/tools/mtmd/clip.cpp b/tools/mtmd/clip.cpp
 index e5a66588c..b57e07c63 100644
 --- a/tools/mtmd/clip.cpp

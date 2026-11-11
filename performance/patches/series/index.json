@@ -1,7 +1,7 @@
 {
   "upstream": "f49df57b4a82f6d641c419c7fadc9e4b896f6781",
-  "tree": "cef6ab33f218b95e2239a92fd7d11f93b016be8d",
-  "snapshot_sha256": "c8e654aadbae5b353221e530598c902732b05a3f2ab46b10d6f0c9d6b5a8b80e",
+  "tree": "dbf597be9e4c7707e93cf8afd9040d76f5b89797",
+  "snapshot_sha256": "3583773e3fa0ba20b760ccc53764881557441d6983c0b201be0e0559c120eaa9",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -446,6 +446,24 @@
       "title": "Extend Vulkan GroupNorm dispatch beyond X",
       "source": "https://github.com/ggml-org/llama.cpp/pull/31930",
       "sha256": "381f56350add0b975e899f38164d9335a3e1ac0beea6b9812b82741994c0e194"
+    },
+    {
+      "path": "75-sampler-candidate-pack/change.patch",
+      "title": "Pack four sampling candidates per host iteration",
+      "source": null,
+      "sha256": "68bb72cb2c2defbc8f481bc798452022bcaa85ced9fec2783e0c5c5d48d066d2"
+    },
+    {
+      "path": "76-yue2-cfg-logits-reuse/change.patch",
+      "title": "Reuse batched YuE2 logits across CFG decode steps",
+      "source": null,
+      "sha256": "be24e7aa4dd828e86e025b041421f7aeb371f460cdea909ce521d52936d1965a"
+    },
+    {
+      "path": "77-recurrent-zero-rank/change.patch",
+      "title": "Reject zero ranks in recurrent model metadata",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/31948",
+      "sha256": "8754482e49a9792e13affae65cedd7924948b2e2c10e16bfc36f5bf7edc3e993"
     }
   ],
   "empty_ports": [
@@ -456,6 +474,6 @@
     "vulkan-comm-amalgamation",
     "vulkan-small-bar"
   ],
-  "accepted_executable_sha256": "e8743bce1b4046a41c46ad07bb8fbdfec66b03ecbb350a98710e0150cc7b4b84",
+  "accepted_executable_sha256": "fdc3d11d36d0126856ce91c648af4d08d58ba179f3fb5954e40435d1f1db038d",
   "build_date": "2026-11-11"
 }
