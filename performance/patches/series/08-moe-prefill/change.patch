@@ -1,5 +1,5 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index d4b9f3b61..29ae2f12e 100644
+index 885db0442..6090e1952 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -1011,6 +1011,8 @@ def init_library():
@@ -11,7 +11,7 @@ index d4b9f3b61..29ae2f12e 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -14828,6 +14830,7 @@ if __name__ == '__main__':
+@@ -14836,6 +14838,7 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")

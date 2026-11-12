@@ -3521,7 +3521,7 @@ index baea1c020..3a71e38a1 100644
  
          for (uint32_t j = 0; j < n_dims; ++j) {
 diff --git a/kcpp_src/gpttype_adapter.cpp b/kcpp_src/gpttype_adapter.cpp
-index e2d5db6b3..2a5181f20 100644
+index 139bcacbf..ee6d19f25 100644
 --- a/kcpp_src/gpttype_adapter.cpp
 +++ b/kcpp_src/gpttype_adapter.cpp
 @@ -19,6 +19,9 @@
@@ -3587,7 +3587,7 @@ index e2d5db6b3..2a5181f20 100644
      {
          kcpp_data->rep_pen_slope = 1;
 diff --git a/koboldcpp.py b/koboldcpp.py
-index b4a9f2fcc..19acbdd4b 100644
+index 4552a9948..6d79fe9ad 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -3661,7 +3661,7 @@ index b4a9f2fcc..19acbdd4b 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -9058,6 +9104,9 @@ Change Mode<br>
+@@ -9066,6 +9112,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -3671,7 +3671,7 @@ index b4a9f2fcc..19acbdd4b 100644
                          if not keepalive_started:
                              self.send_response(200)
                              self.send_header('content-length', str(len(genresp)))
-@@ -9650,7 +9699,27 @@ def show_gui():
+@@ -9658,7 +9707,27 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -3700,7 +3700,7 @@ index b4a9f2fcc..19acbdd4b 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -9735,6 +9804,7 @@ def show_gui():
+@@ -9743,6 +9812,7 @@ def show_gui():
  
      # trigger empty tooltip then remove it
      def show_tooltip(event, tooltip_text=None):
@@ -3708,7 +3708,7 @@ index b4a9f2fcc..19acbdd4b 100644
          nonlocal gtooltip_box, gtooltip_label
          if not gtooltip_box and not gtooltip_label:
              gtooltip_box = ctk.CTkToplevel(root)
-@@ -9762,7 +9832,7 @@ def show_gui():
+@@ -9770,7 +9840,7 @@ def show_gui():
  
      tabs = ctk.CTkFrame(root, corner_radius = 0, width=windowwidth, height=windowheight-50)
      tabs.grid(row=0, stick="nsew")
@@ -3717,7 +3717,7 @@ index b4a9f2fcc..19acbdd4b 100644
      navbuttons = {}
      navbuttonframe = ctk.CTkFrame(tabs, width=int(104), height=int(tabs.cget("height")))
      navbuttonframe.grid(row=0, column=0, padx=2,pady=2)
-@@ -9980,7 +10050,7 @@ def show_gui():
+@@ -9988,7 +10058,7 @@ def show_gui():
          navbuttons[name] = ctk.CTkButton(navbuttonframe, text=name, width = 100, corner_radius=0 , command = lambda d=name:tabbuttonaction(d), hover_color="#868a94" )
          navbuttons[name].grid(row=idx)
  
@@ -3726,7 +3726,7 @@ index b4a9f2fcc..19acbdd4b 100644
      # Quick Launch Tab
      quick_tab = tabcontent["Quick Launch"]
  
-@@ -10896,6 +10966,8 @@ def show_gui():
+@@ -10904,6 +10974,8 @@ def show_gui():
      # Image Gen Tab
  
      images_tab = tabcontent["Image Gen"]
@@ -3735,7 +3735,7 @@ index b4a9f2fcc..19acbdd4b 100644
      makefileentry(images_tab, "Image Model:", "Select Image Gen Model File (safetensors/gguf)", sd_model_var, 1, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")], tooltiptxt="Select a .safetensors or .gguf Image Generation model file on disk to be loaded.")
  
      def togglesdlora(a,b,c):
-@@ -10936,7 +11008,7 @@ def show_gui():
+@@ -10944,7 +11016,7 @@ def show_gui():
      makefileentry(images_tab, "Clip-1 File:", "Select First Clip model file",sd_clip1_var, 26, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="Select a .safetensors Clip-1 file to be loaded.")
      makefileentry(images_tab, "Clip-2 File:", "Select Second Clip model file, or tokenizer",sd_clip2_var, 28, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf *.json","*.safetensors *.gguf *.json")],tooltiptxt="Select a .safetensors Clip-2 file to be loaded, or tokenizer json.")
      makefileentry(images_tab, "PhotoMaker:", "Select Optional PhotoMaker model file (SDXL)",sd_photomaker_var, 30, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf","*.safetensors *.gguf")],tooltiptxt="PhotoMaker is a model that allows face cloning.\nSelect a .safetensors PhotoMaker file to be loaded (SDXL only).")
@@ -3744,7 +3744,7 @@ index b4a9f2fcc..19acbdd4b 100644
  
  
      sdvaeitem1,sdvaeitem2,sdvaeitem3 = makefileentry(images_tab, "Image VAE:", "Select Optional SD VAE file",sd_vae_var, 40, width=280, singlerow=True, filetypes=[("*.safetensors *.gguf", "*.safetensors *.gguf")],tooltiptxt="Select a .safetensors or .gguf SD VAE file to be loaded.")
-@@ -10964,6 +11036,8 @@ def show_gui():
+@@ -10972,6 +11044,8 @@ def show_gui():
  
      # audio tab
      audio_tab = tabcontent["Audio"]
@@ -3753,7 +3753,7 @@ index b4a9f2fcc..19acbdd4b 100644
      makefileentry(audio_tab, "Transcriber:", "Select Whisper or Audio.cpp Transcription Model", whisper_model_var, 1, width=280, singlerow=True, filetypes=[("*.bin *.gguf","*.bin *.gguf")], tooltiptxt="Select a Whisper .bin or Audio.cpp ASR .gguf for speech-to-text, or a SheetSage2 .gguf for music-to-ABC transcription.")
      whisper_model_var.trace_add("write", gui_changed_modelfile)
      makefileentry(audio_tab, "STT Aligner:", "Optional Qwen3 or MMS Forced Aligner GGUF", transcribe_aligner_var, 2, width=280, singlerow=True, filetypes=[("*.gguf","*.gguf")], tooltiptxt="Optional Qwen3 or MMS Forced Aligner model used for word timestamps.")
-@@ -11051,6 +11125,8 @@ def show_gui():
+@@ -11059,6 +11133,8 @@ def show_gui():
  
      # extra tab
      extra_tab = tabcontent["Extra"]
@@ -3762,7 +3762,7 @@ index b4a9f2fcc..19acbdd4b 100644
      makelabel(extra_tab, "Extract KoboldCpp Files", 3, 0,tooltiptxt="Unpack KoboldCpp to a local directory to modify its files. You can also launch via koboldcpp.py for faster startup.")
      ctk.CTkButton(extra_tab , text = "Unpack KoboldCpp To Folder", command = unpack_to_dir ).grid(row=3,column=0, stick="w", padx=(210), pady=2)
      makelabel(extra_tab, "Export as .kcppt template", 4, 0,tooltiptxt="Creates a KoboldCpp launch template for others to use.\nEmbeds JSON files directly into exported file when saving.\nWhen loaded, forces the backend to be automatically determined.\nWarning! Not recommended for beginners!")
-@@ -11116,6 +11192,8 @@ def show_gui():
+@@ -11124,6 +11200,8 @@ def show_gui():
  
      # launch
      def guilaunch():
@@ -3771,7 +3771,7 @@ index b4a9f2fcc..19acbdd4b 100644
          if model_var.get() == "" and sd_model_var.get() == "" and whisper_model_var.get() == "" and tts_model_var.get() == "" and embeddings_model_var.get() == "" and musicdiffusion_var.get() == "" and musicllm_var.get() == "" and nomodel.get()!=1 and rpcmode_var.get()!="host":
              # prevent launch without at least one valid model
              givehelp = show_gui_yesnobox("No Models Selected","Error: You need to load at least one AI model to continue.\n\nDo you want help finding a model?")
-@@ -11709,6 +11787,8 @@ def show_gui():
+@@ -11717,6 +11795,8 @@ def show_gui():
              auto_set_backend_gui(True)
  
      def save_config_gui():
@@ -3780,7 +3780,7 @@ index b4a9f2fcc..19acbdd4b 100644
          nonlocal kcpp_exporting_template
          kcpp_exporting_template = False
          export_vars()
-@@ -11724,6 +11804,8 @@ def show_gui():
+@@ -11732,6 +11812,8 @@ def show_gui():
          pass
  
      def load_config_gui(): #this is used to populate the GUI with a config file, whereas load_config_cli simply overwrites cli args
@@ -3789,7 +3789,7 @@ index b4a9f2fcc..19acbdd4b 100644
          file_type = [("KoboldCpp Settings", "*.kcpps *.kcppt")]
          global runmode_untouched, zenity_permitted
          filename = zentk_askopenfilename(filetypes=file_type, defaultextension=".kcppt", initialdir=None, title="Select kcpps or kcppt settings config file")
-@@ -11844,6 +11926,22 @@ def show_gui():
+@@ -11852,6 +11934,22 @@ def show_gui():
              mydict = vars(args)
              import_vars(mydict)
  
@@ -3812,7 +3812,7 @@ index b4a9f2fcc..19acbdd4b 100644
      # runs main loop until closed or launch clicked
      try:
          root.mainloop()
-@@ -13198,7 +13296,7 @@ def main(launch_args, default_args):
+@@ -13206,7 +13304,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':
@@ -3821,7 +3821,7 @@ index b4a9f2fcc..19acbdd4b 100644
              os.system(f'title {windowtitle}')
      except Exception:
          pass
-@@ -14716,8 +14814,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
+@@ -14724,8 +14822,42 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
          if not args.prompt or args.benchmark or args.cli:
              print("Server was not started, main function complete. Idling.", flush=True)
  
@@ -3864,7 +3864,7 @@ index b4a9f2fcc..19acbdd4b 100644
  
      def check_range(value_type, min_value, max_value):
          def range_checker(arg: str):
-@@ -14761,6 +14893,7 @@ if __name__ == '__main__':
+@@ -14769,6 +14901,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)
@@ -3872,7 +3872,7 @@ index b4a9f2fcc..19acbdd4b 100644
      advparser.add_argument("--blasthreads","--batchthreads","--threadsbatch","--threads-batch", help="Use a different number of threads during batching if specified. Otherwise, has the same value as --threads",metavar=('[threads]'), type=int, default=0)
      advparser.add_argument("--chatcompletionsadapter", metavar=('[filename]'), help="Select an optional ChatCompletions Adapter JSON file to force custom instruct tags.", default="AutoGuess")
      advparser.add_argument("--cli", help="Runs interactive terminal chat without an HTTP server. With --agent, runs the agent in this terminal using a loopback HTTP server.", action='store_true')
-@@ -14795,6 +14928,7 @@ if __name__ == '__main__':
+@@ -14803,6 +14936,7 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")

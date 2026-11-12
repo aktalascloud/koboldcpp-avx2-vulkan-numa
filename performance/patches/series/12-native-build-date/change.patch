@@ -1,5 +1,5 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 29ae2f12e..311bb2d3f 100644
+index 6090e1952..2b04e3b38 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -92,6 +92,18 @@ extra_images_max = 4 # for kontext/qwen img
@@ -21,7 +21,7 @@ index 29ae2f12e..311bb2d3f 100644
  showdebug = True
  kcpp_instance = None #global running instance
  global_memory = {"tunnel_url": "", "restart_target":"", "input_to_exit":False, "load_complete":False, "restart_override_base_config":"", "last_active_timestamp":datetime.now(), "triggered_sleeping":False, "current_model":"initial_model", "base_config":"", "swapReqType": None, "loadedReqTypes": [], "autoswapmode": False}
-@@ -9684,7 +9696,7 @@ def show_gui():
+@@ -9692,7 +9704,7 @@ def show_gui():
          print("Adjusting tk scaling to try and fix scaling issues...")
          root.tk.call('tk','scaling', 2.25)
      root.geometry(str(windowwidth) + "x" + str(windowheight))
@@ -30,7 +30,7 @@ index 29ae2f12e..311bb2d3f 100644
  
      gtooltip_box = None
      gtooltip_label = None
-@@ -13232,7 +13244,7 @@ def main(launch_args, default_args):
+@@ -13240,7 +13252,7 @@ def main(launch_args, default_args):
      # assign title to terminal on windows
      try:
          if os.name == 'nt':

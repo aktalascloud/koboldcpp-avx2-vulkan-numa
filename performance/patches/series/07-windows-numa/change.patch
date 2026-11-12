@@ -204,7 +204,7 @@ index f2b8c436d..ea494edb0 100644
  #endif
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index b4a9f2fcc..d4b9f3b61 100644
+index 4552a9948..885db0442 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -922,6 +922,18 @@ def restore_stdout():
@@ -257,7 +257,7 @@ index b4a9f2fcc..d4b9f3b61 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -14761,6 +14793,7 @@ if __name__ == '__main__':
+@@ -14769,6 +14801,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)

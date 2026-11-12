@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "f49df57b4a82f6d641c419c7fadc9e4b896f6781",
+  "commit": "d73312954a1b115124aec4535de2021584004976",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,27 +20,27 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=4 -fuse-linker-plugin",
-  "executable_sha256": "5f103234e8de2dd31bca3146fc256dba4d45889e146381261784e19c7b316d0b",
-  "patch_sha256": "398ac3b244ec835be55da709a73e5e3fcf5cdf0a89742c10980292a57a01a36c",
-  "seconds": 1039.668484210968,
+  "executable_sha256": "743938b28361121bdcf943caa220fdfaca61e7c03505af449082eee8cbcf3117",
+  "patch_sha256": "2c6c4e7c535045376172332ef82d46a5eb0524051943e071856011449f60b0e6",
+  "seconds": 1101.6488752365112,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "9e4c7f6fc6a098a29e2382542db26619e1c9d8e360e5d782b55bed4cdbf713df",
+  "native_source_signature": "8b466e80137c17df68645f5662bf3f71eb714af94fa7c3decb26b33204066aa4",
   "native_input_count": 3353,
   "native_dlls_reused": false,
   "native_validation_parent_sha256": null,
-  "build_date": "2026-11-11",
+  "build_date": "2026-11-12",
   "native_link_layout": "upstream-supported monolithic; KCPP_COMMONIZE=0; full backend LTO and explicit C ABI",
   "build_verified": true,
   "pgo_disabled_verified": true,
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "fa14adbf636b0ad743cb50d9d37803253d69f9dc674dbf853861a94f31fb13e9",
-    "koboldcpp_vulkan.dll": "cddf4831ed7ac8f39db00c52e480e0e5c029a2da1fa993125f47c8f2bfc5a0b3"
+    "koboldcpp_default.dll": "5afd927ee5f30cb7af8918acca6f1597226d873345d040c3d76d3d2501a44c59",
+    "koboldcpp_vulkan.dll": "6a593ca9b099abc815fb9374cb88ea8367b70f33cae9b5caa3460bc1613c4cca"
   },
   "cpu_threads": {
     "threads": 16,

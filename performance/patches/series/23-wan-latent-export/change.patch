@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 311bb2d3f..5f56907ba 100644
+index 2b04e3b38..8454bb092 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -9104,6 +9104,9 @@ Change Mode<br>
+@@ -9112,6 +9112,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())

@@ -1,5 +1,5 @@
 diff --git a/kcpp_src/gpttype_adapter.cpp b/kcpp_src/gpttype_adapter.cpp
-index e2d5db6b3..e502cde9f 100644
+index 139bcacbf..0d04296fd 100644
 --- a/kcpp_src/gpttype_adapter.cpp
 +++ b/kcpp_src/gpttype_adapter.cpp
 @@ -7777,6 +7777,8 @@ generation_outputs gpttype_generate(const generation_inputs inputs)

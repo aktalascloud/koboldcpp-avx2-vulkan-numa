@@ -5,9 +5,11 @@ Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **
 
 Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
 
-**1.125 · 2026-11-11 · Native 5f103234.** Official base f49df57. [81 patches](performance/patches/series/).
+**1.125 · 2026-11-12 · Native 743938b2.** Official base d7331295. [81 patches](performance/patches/series/).
 
 ## FlashAttention, decode and render · November 11
+
+This table reports the November 11 Native 5f103234 build.
 
 | Workload | Before → after | Change |
 |---|---:|---:|

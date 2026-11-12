@@ -1,7 +1,7 @@
 {
-  "upstream": "f49df57b4a82f6d641c419c7fadc9e4b896f6781",
-  "tree": "3c8d1734ad802029a712a977b74f2db5a26f4058",
-  "snapshot_sha256": "398ac3b244ec835be55da709a73e5e3fcf5cdf0a89742c10980292a57a01a36c",
+  "upstream": "d73312954a1b115124aec4535de2021584004976",
+  "tree": "6c76ff5d345b8394a2eacf4c99f7f1b74948b9ed",
+  "snapshot_sha256": "2c6c4e7c535045376172332ef82d46a5eb0524051943e071856011449f60b0e6",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -43,13 +43,13 @@
       "path": "07-windows-numa/change.patch",
       "title": "Windows NUMA affinity",
       "source": "https://github.com/ggml-org/llama.cpp/pull/6832",
-      "sha256": "268a66f8b6dca8d88398551798526269d0e0055d9d552b5e2410db7bbb5f28cb"
+      "sha256": "ed00ee789ea008e55fe631ee0bb6a0c06f6690ad838f6b5f04742dc5b79eedf6"
     },
     {
       "path": "08-moe-prefill/change.patch",
       "title": "MoE prefill routing readback bypass",
       "source": "https://github.com/pauldmartinphd/llm-performance-engineering-notebook",
-      "sha256": "de7dc61aedefed9eb6da66d0519b58bc970bf3d226e766fb231052b2c056bdd8"
+      "sha256": "e4d2a6fb6765cdb25d5ddc1f6b05a4e983aa8c6190e2857303bd5bb5969ecfab"
     },
     {
       "path": "09-shader-dependencies/change.patch",
@@ -73,7 +73,7 @@
       "path": "12-native-build-date/change.patch",
       "title": "Native build date in the UI",
       "source": null,
-      "sha256": "528b33a55d4e6bc5915539d74f9d1a6c8d6e1d4789f775c3a40ba6b36075d2cd"
+      "sha256": "340a58113d25b3bbbd3d8ba9adccf2225d069ec58022acdd12e32e9f156303ac"
     },
     {
       "path": "13-gcn-lds/change.patch",
@@ -139,7 +139,7 @@
       "path": "23-wan-latent-export/change.patch",
       "title": "Wan latent-only operation",
       "source": null,
-      "sha256": "a3c40aef798831174a92aa4fbdf5b64d0789479afddbffe075f928d8987a255e"
+      "sha256": "365eb987c11d46629053640cbd1f181ea032cdac9166fe016173a4d7dee1a386"
     },
     {
       "path": "24-video-cache-forwarding/change.patch",
@@ -163,7 +163,7 @@
       "path": "27-native-media-launcher/change.patch",
       "title": "Native media launcher integration",
       "source": null,
-      "sha256": "8b8f7924851a09871091de552b9aa13b49d159e6d0de9079c75a61cc5031bb2c"
+      "sha256": "86450cfde0186c4d1d5b4dabe0f09c216870e1a67cec09f6282a283ab3e052bb"
     },
     {
       "path": "28-legacy-vulkan-readback/change.patch",
@@ -313,7 +313,7 @@
       "path": "52-native-repeat-window-bound/change.patch",
       "title": "Bound the native repetition window",
       "source": "https://github.com/LostRuins/koboldcpp/security/advisories/GHSA-h59g-8cq4-cqjj",
-      "sha256": "5053a8969ec613c9c716e73485b24be01755df9284a3a968f788670d7ee4505f"
+      "sha256": "6b7cb6ec1fd445729a20e5d24cd80172dc857e68e4af0f481abefda691ee9fee"
     },
     {
       "path": "53-haswell-iq4nl-decode/change.patch",
@@ -451,7 +451,7 @@
       "path": "75-sampler-candidate-pack/change.patch",
       "title": "Pack four sampling candidates per host iteration",
       "source": null,
-      "sha256": "68bb72cb2c2defbc8f481bc798452022bcaa85ced9fec2783e0c5c5d48d066d2"
+      "sha256": "f7c2d9705c8e4d6281065d0122621abd8460a2b5dc5f10e8a0c6940cc1a06a73"
     },
     {
       "path": "76-yue2-cfg-logits-reuse/change.patch",
@@ -498,6 +498,6 @@
     "vulkan-comm-amalgamation",
     "vulkan-small-bar"
   ],
-  "accepted_executable_sha256": "5f103234e8de2dd31bca3146fc256dba4d45889e146381261784e19c7b316d0b",
-  "build_date": "2026-11-11"
+  "accepted_executable_sha256": "743938b28361121bdcf943caa220fdfaca61e7c03505af449082eee8cbcf3117",
+  "build_date": "2026-11-12"
 }
