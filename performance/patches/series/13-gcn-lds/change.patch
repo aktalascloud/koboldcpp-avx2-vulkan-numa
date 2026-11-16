@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index f1023f1e1..b2d9b2c90 100644
+index 255bfccfa..e87a54f41 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -1278,7 +1278,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
+@@ -1286,7 +1286,7 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
      // On AMD RDNA, for small head sizes and big batch size the shader uses few registers, so too many subgroups get scheduled
      // at once and end up thrashing the cache. Fix this by setting a large (unused) shmem buffer that reduces occupancy.
      // This targets an occupancy of 4 subgroups per SIMD.
@@ -11,7 +11,7 @@ index f1023f1e1..b2d9b2c90 100644
          if (device->architecture != AMD_GCN && n_rows >= 64 && hsk <= 128) {
              // 30kb target for hsk > 64, 26kb for <= 64 due to smaller workgroup size
              // Values are guessed, tested on RDNA2
-@@ -1873,7 +1873,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2061,7 +2061,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          s_warptile_mmqid_int_k = { mul_mat_subgroup_size_32, 32,  32, 32, mul_mat_s_warptile_wm_16, 32, 1, 2, 1, 1, mul_mat_subgroup_size_16 };
  
          // chip specific tuning

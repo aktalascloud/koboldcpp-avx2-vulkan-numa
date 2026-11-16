@@ -1,0 +1,15 @@
+diff --git a/tools/mtmd/mtmd-subcontext.cpp b/tools/mtmd/mtmd-subcontext.cpp
+index 7f13b7f62..9efa06866 100644
+--- a/tools/mtmd/mtmd-subcontext.cpp
++++ b/tools/mtmd/mtmd-subcontext.cpp
+@@ -242,7 +242,9 @@ void mtmd_subcontext::warmup(const mtmd_image_f32_batch & batch) {
+ 
+ mtmd_subcontext::support_info_graph mtmd_subcontext::reserve_compute_meta(const mtmd_image_f32_batch & batch) {
+     ggml_cgraph * gf = mtmd_get_graph_builder(this, batch)->build();
+-    ggml_backend_sched_reserve(backends.sched.get(), gf);
++    if (!ggml_backend_sched_reserve(backends.sched.get(), gf)) {
++        throw std::runtime_error("mtmd: failed to reserve compute buffers");
++    }
+ 
+     const int n_splits = ggml_backend_sched_get_n_splits(backends.sched.get());
+     const int n_nodes  = ggml_graph_n_nodes(gf);
