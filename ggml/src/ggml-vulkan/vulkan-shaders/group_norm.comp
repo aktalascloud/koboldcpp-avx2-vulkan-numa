@@ -18,8 +18,7 @@ void main() {
     const float eps = p.param1;
 
     const uint tid = gl_LocalInvocationID.x;
-    const uint group = gl_WorkGroupID.x + gl_NumWorkGroups.x *
-        (gl_WorkGroupID.y + gl_NumWorkGroups.y * gl_WorkGroupID.z);
+    const uint group = gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.x + gl_WorkGroupID.z * gl_NumWorkGroups.x * gl_NumWorkGroups.y;
     if (group >= p.KY) {
         return;
     }
