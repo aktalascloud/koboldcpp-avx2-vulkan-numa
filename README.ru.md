@@ -1,43 +1,13 @@
-# KoboldCpp · Haswell AVX2 / Polaris Vulkan / NUMA
-[English](README.md) · [Сборка](performance/BUILD.md) · [Патчи](performance/PATCHES.md) · [Медиакомплект](https://github.com/aktalascloud/koboldcpp-media-pipeline)
+# KoboldCpp · Haswell AVX2 / Polaris Vulkan
 
-Форк [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), ветка concedo_experimental. Windows x64, Haswell/AVX2 и RX 580 Polaris/gfx803. Запуск напрямую **koboldcpp-nocuda.exe**, без весов моделей в пакете. O3 + LTO, без PGO и fast-math. Монолитная линковка KCPP_COMMONIZE=0 сохраняет LTO и явный C ABI.
+[English](README.md) · [Релиз Windows](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Сборка](performance/BUILD.md) · [Патчи](performance/patches/series/) · [Медиа-API](https://github.com/aktalascloud/koboldcpp-media-pipeline)
 
-Цель: максимальная корректная скорость генерации на AVX2/Polaris с постоянным слиянием официальной experimental и адаптацией полезных исправлений безопасности, моделей и функций из форков. Общий медиакомплект — один переносимый KoboldCpp.exe, один runtime и единый API фото/аудио/видео/эффектов с загрузкой по требованию; настройки и модели выбирает пользователь.
+Форк [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp) для Haswell AVX2 и AMD RX 580 Polaris. Ветка `concedo_experimental`. Запуск через `koboldcpp-nocuda.exe`. Веса подключаются отдельно.
 
-**1.125 · 2026-11-17 · Native d9b2e6b5.** Официальная ветка experimental `ed246f446`. [71 патча](performance/patches/series/) · [Обзор мейнстрима](results/mainstream-2026-11-17.json).
+**1.125 · 17 ноября 2026 · Native d9b2e6b5** · [Изменения мейнстрима и запуск](results/mainstream-2026-11-17.json).
 
-## FlashAttention, декодирование и рендер · 11 ноября
+Сборка O3/LTO через `py -3.12 performance/setup.py --build`. Проверенные параметры приведены в [RUN.txt](performance/RUN.txt).
 
-Замеры в этой таблице относятся к Native 5f103234 от 11 ноября.
+В сборке от 11 ноября ABDM Normal ускорилась со 151,281 до 129,601 с, а запрос YuE2 Vulkan — с 43,729 до 40,155 с. В отчёте указаны повторы, точные SHA и результаты CPU. [Замеры](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json)
 
-| Нагрузка | Было → стало | Изменение |
-|---|---:|---:|
-| CPU · промпт | 74.224 → 73.158 ток/с | ≈-1.44% |
-| CPU · декодирование | 17.436 → 17.317 ток/с | ≈-0.69% |
-| RX 580 · промпт | 305.191 → 311.772 ток/с | +2.16% |
-| RX 580 · декодирование | 33.118 → 34.034 ток/с | +2.77% |
-| YuE2 Vulkan · рендер из плана | 28.820 → 25.213 с | -12.52% |
-| YuE2 CPU · рендер из плана | 289.237 → 288.529 с | -0.24% |
-| YuE2 Vulkan · весь запрос | 43.729 → 40.155 с | -8.17% |
-| ABDM Normal | 151.281 → 129.601 с | -14.33% |
-| Отдельный 4× | 2.639 → 2.688 с | ≈+1.85% |
-
-Текст, семантические коды, MP3, PCM и RGB совпали. Для этапов YuE2 по одному замеру на сборку. Для CPU-decode по восемь замеров с чередованием сборок. Символ ≈ обозначает пересечение диапазонов. В отчёте по операциям сохранены результаты всех вариантов Q8_0.
-
-[Повторы и SHA](results/performance-2026-11-11-kernels.json) · [Операции](results/operations-2026-11-11-kernels.json) · [Диффы PR](results/pr-review-2026-11-11-kernels.json)
-
-Последний сопоставимый замер токенов: **2026-10-25**, одинаковые модель и параметры, по 4 повтора CPU и 2 Vulkan:
-
-| Этап, токенов/с | Исходный сток | Последний измеренный | Разница |
-|---|---:|---:|---:|
-| CPU prompt | 39.468 | 85.153 | +115.8% |
-| CPU output | 16.415 | 17.043 | +3.8% |
-| Vulkan prompt | 411.010 | 712.810 | +73.4% |
-| Vulkan output | 17.035 | 23.655 | +38.9% |
-
-[Все повторы, диапазоны, настройки и SHA](results/measurements.json). Диапазоны CPU перекрываются. **Замеры токенов относятся к указанной выше дате.** Исторические числа не приписываются свежему EXE. Ускорение операции не равно ускорению всей генерации. HIP/ROCm не выбран из-за падения медиа; физическая двухсокетная NUMA не измерена.
-
-Стартовые настройки: Vulkan — потоки 6/4, batch/ubatch 1024, gpulayers 99, NUMA auto; CPU — 16/20, SD-энкодер — отдельно 20. [Параметры](performance/RUN.txt).
-
-Сборка: `py -3.12 performance/setup.py --build`. Инструменты с проверкой SHA скачиваются локально; максимум 4 компилятора. [Правила](AGENTS.md) · [Лицензии](performance/NOTICE.md). Все замеры находятся в `results/`.
+[Лицензии и соответствующий исходный код](performance/NOTICE.md).

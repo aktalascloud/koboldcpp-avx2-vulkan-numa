@@ -1,46 +1,13 @@
-# KoboldCpp · Haswell AVX2 / Polaris Vulkan / NUMA
-[Русский](README.ru.md) · [Windows EXE](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Build](performance/BUILD.md) · [Patches](performance/PATCHES.md) · [Media pipeline](https://github.com/aktalascloud/koboldcpp-media-pipeline)
+# KoboldCpp · Haswell AVX2 / Polaris Vulkan
 
-Fork of [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp), branch **concedo_experimental**. Windows x64; target Xeon Haswell/AVX2 and RX 580 Polaris/gfx803. Direct GUI/CLI launch: **koboldcpp-nocuda.exe**. No model weights included.
+[Русский](README.ru.md) · [Windows release](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Build](performance/BUILD.md) · [Patch series](performance/patches/series/) · [Media API](https://github.com/aktalascloud/koboldcpp-media-pipeline)
 
-Goal: maximize correct AVX2/Polaris generation throughput while continuously merging official experimental commits and adapting useful security, local-model and fork features. The integrated [media product](https://github.com/aktalascloud/koboldcpp-media-pipeline) provides one portable KoboldCpp.exe, one runtime and a unified on-demand photo/audio/video/effects API; models and settings remain configurable.
+Windows x64 fork of [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp), branch `concedo_experimental`. Targets Haswell AVX2 and AMD RX 580 Polaris. Run `koboldcpp-nocuda.exe`. Weights are external.
 
-**1.125 · 2026-11-17 · Native d9b2e6b5.** Official experimental `ed246f446`. [71 patches](performance/patches/series/) · [Upstream review](results/mainstream-2026-11-17.json).
+**1.125 · 2026-11-17 · Native d9b2e6b5** · [Upstream and startup evidence](results/mainstream-2026-11-17.json).
 
-## FlashAttention, decode and render · November 11
+Use `py -3.12 performance/setup.py --build` for O3/LTO builds and [RUN.txt](performance/RUN.txt) for the tested configuration.
 
-This table reports the November 11 Native 5f103234 build.
+The November 11 build reduced ABDM Normal time from 151.281 to 129.601 s and YuE2 Vulkan request time from 43.729 to 40.155 s. The records include repeats, exact executable hashes and CPU results. [Dated measurements](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json)
 
-| Workload | Before → after | Change |
-|---|---:|---:|
-| CPU · prompt | 74.224 → 73.158 tok/s | ≈-1.44% |
-| CPU · decode | 17.436 → 17.317 tok/s | ≈-0.69% |
-| RX 580 · prompt | 305.191 → 311.772 tok/s | +2.16% |
-| RX 580 · decode | 33.118 → 34.034 tok/s | +2.77% |
-| YuE2 Vulkan · render from plan | 28.820 → 25.213 s | -12.52% |
-| YuE2 CPU · render from plan | 289.237 → 288.529 s | -0.24% |
-| YuE2 Vulkan · whole request | 43.729 → 40.155 s | -8.17% |
-| ABDM Normal | 151.281 → 129.601 s | -14.33% |
-| Separate 4× | 2.639 → 2.688 s | ≈+1.85% |
-
-Text, semantic codes, MP3, PCM and RGB matched. YuE2 phase comparisons use one sample per build. CPU decode uses eight counterbalanced samples per build. The ≈ marker means the ranges overlap. The operation report retains every tested Q8_0 variant.
-
-[Repeats and SHA](results/performance-2026-11-11-kernels.json) · [Operations](results/operations-2026-11-11-kernels.json) · [PR diffs](results/pr-review-2026-11-11-kernels.json)
-
-## Last LLM token comparison · 2026-10-25
-Date **2026-10-25**, same Qwen3-4B-Instruct-2507-heretic-uncens.i1-IQ4_XS.gguf, CPU 4 / Vulkan 2 repeats per arm. Tokens/s means:
-
-| Stage | Original stock | Last measured | Change |
-|---|---:|---:|---:|
-| CPU prompt | 39.468 | 85.153 | +115.8% |
-| CPU output | 16.415 | 17.043 | +3.8% |
-| Vulkan prompt | 411.010 | 712.810 | +73.4% |
-| Vulkan output | 17.035 | 23.655 | +38.9% |
-
-Full settings, SHA, repeats/ranges: [measurements](results/measurements.json). CPU ranges overlap; an operation-level gain is not a whole-generation gain. **Token timings above are historical.** HIP/ROCm was not selected: media crashed. Physical dual-socket NUMA is unmeasured.
-
-Vulkan starting point: threads 6 / BLAS 4, batch/ubatch 1024, GPU layers 99, NUMA auto. CPU-only 16/20; media encoder 20 separately. Graphics queue 1, batched submits 1, node 100 and gated Polaris controls are described in [RUN.txt](performance/RUN.txt).
-
-Build from a clean checkout: `py -3.12 performance/setup.py --build`. Original pinned toolchains download locally; max 4 compilers, sequential LTO links. [Local-model rules](AGENTS.md). Models, drivers, BIOS and clocks are not changed.
-
-[AGPL/MIT and third-party source/credit](performance/NOTICE.md). Source/toolchain/license files are necessary build inputs, not cleanup targets. Results live only in `results/`.
+[License and corresponding source notices](performance/NOTICE.md).
