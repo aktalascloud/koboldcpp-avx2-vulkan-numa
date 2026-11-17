@@ -33,10 +33,10 @@ index 56e1e5a63..33293a1e7 100644
 +OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 +SOFTWARE.
 diff --git a/otherarch/sdcpp/src/model/vae/tae.hpp b/otherarch/sdcpp/src/model/vae/tae.hpp
-index 84dd4d12e..05c7d6701 100644
+index 362feb567..c64d82519 100644
 --- a/otherarch/sdcpp/src/model/vae/tae.hpp
 +++ b/otherarch/sdcpp/src/model/vae/tae.hpp
-@@ -529,6 +529,63 @@ public:
+@@ -525,6 +525,63 @@ public:
      }
  };
  
@@ -82,17 +82,17 @@ index 84dd4d12e..05c7d6701 100644
 +        int index=1;
 +        for(int i=0;i<3;++i) {
 +            for(int j=0;j<3;++j) {
-+                auto memory=ggml_ext_pad_ext(ctx->ggml_ctx,ctx->backend,h,0,0,0,0,0,0,1,0);
++                auto memory=ggml_ext_pad_ext(ctx,h,0,0,0,0,0,0,1,0);
 +                memory=ggml_view_4d(ctx->ggml_ctx,memory,h->ne[0],h->ne[1],h->ne[2],h->ne[3],h->nb[1],h->nb[2],h->nb[3],0);
 +                h=std::dynamic_pointer_cast<KCPPTAEHVSuperMemBlock>(blocks[std::to_string(index++)])->forward(ctx,h,memory);
 +            }
 +            h=std::dynamic_pointer_cast<Conv2d>(blocks[std::to_string(index++)])->forward(ctx,h);
 +            h=ggml_relu_inplace(ctx->ggml_ctx,h);++index;
-+            h=unpatchify(ctx->ggml_ctx,ggml_cont(ctx->ggml_ctx,h),2);++index;
++            h=unpatchify(ctx,ggml_cont(ctx->ggml_ctx,h),2);++index;
 +            h=std::dynamic_pointer_cast<TGrow>(blocks[std::to_string(index++)])->forward(ctx,h);
 +        }
 +        h=std::dynamic_pointer_cast<Conv2d>(blocks[std::to_string(index)])->forward(ctx,h);
-+        if(patch>1)h=unpatchify(ctx->ggml_ctx,h,patch);
++        if(patch>1)h=unpatchify(ctx,h,patch);
 +        return ggml_view_4d(ctx->ggml_ctx,h,h->ne[0],h->ne[1],h->ne[2],h->ne[3]-(t_upscale-1),h->nb[1],h->nb[2],h->nb[3],(t_upscale-1)*h->nb[3]);
 +    }
 +};
@@ -100,7 +100,7 @@ index 84dd4d12e..05c7d6701 100644
  class TAEHV : public GGMLBlock {
  protected:
      bool decode_only;
-@@ -541,7 +598,7 @@ public:
+@@ -537,7 +594,7 @@ public:
      std::vector<bool> time_upscale   = {false, true, true};
  
  public:
@@ -109,7 +109,7 @@ index 84dd4d12e..05c7d6701 100644
          : decode_only(decode_only), version(version), is_wide(is_wide) {
          int patch = 1;
          if (version == VERSION_WAN2_2_TI2V) {
-@@ -560,7 +617,7 @@ public:
+@@ -556,7 +613,7 @@ public:
              patch          = 2;
              time_downscale = {true, true, false};
          }
@@ -118,7 +118,7 @@ index 84dd4d12e..05c7d6701 100644
          if (!decode_only) {
              blocks["encoder"] = std::shared_ptr<GGMLBlock>(new TinyVideoEncoder(z_channels, patch, time_downscale));
          }
-@@ -912,6 +969,7 @@ struct TinyVideoAutoEncoder : public VAE {
+@@ -908,6 +965,7 @@ struct TinyVideoAutoEncoder : public VAE {
      TAEHV taehv;
      bool decode_only = false;
      bool is_wide     = false;
@@ -126,7 +126,7 @@ index 84dd4d12e..05c7d6701 100644
  
      TinyVideoAutoEncoder(ggml_backend_t backend,
                           const String2TensorStorage& tensor_storage_map,
-@@ -927,13 +985,21 @@ struct TinyVideoAutoEncoder : public VAE {
+@@ -923,13 +981,21 @@ struct TinyVideoAutoEncoder : public VAE {
                  break;
              }
          }
@@ -150,7 +150,7 @@ index 84dd4d12e..05c7d6701 100644
      }
  
      bool supports_temporal_tiling(VAETemporalDirection direction) const override {
-@@ -973,7 +1039,7 @@ struct TinyVideoAutoEncoder : public VAE {
+@@ -969,7 +1035,7 @@ struct TinyVideoAutoEncoder : public VAE {
      }
  
      ggml_cgraph* build_graph(const sd::Tensor<float>& z_tensor, bool decode_graph) {

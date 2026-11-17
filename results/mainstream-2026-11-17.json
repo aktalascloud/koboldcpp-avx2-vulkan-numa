@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-17",
+  "koboldcpp": {
+    "commit": "ed246f4467157b3e5663feae28e7bf4d6990db39",
+    "url": "https://github.com/LostRuins/koboldcpp/commit/ed246f4467157b3e5663feae28e7bf4d6990db39"
+  },
+  "ggml": {
+    "commit": "d9fe7bff3d2bf4d077e25c654486d02c321734aa",
+    "url": "https://github.com/ggml-org/ggml/commit/d9fe7bff3d2bf4d077e25c654486d02c321734aa",
+    "new_commit_after": "417a024b4",
+    "change": "example CMake test stopped passing an explicit package version",
+    "native_backport": false
+  },
+  "reviewed_pull_requests": {
+    "LostRuins/koboldcpp": {
+      "2654": "Closed; official commits independently increased the slots.",
+      "2653": "Merged; custom sigma dictionary handling.",
+      "2652": "Merged; Windows CI build fix.",
+      "2648": "Open; changes model probing and image-token routing. Deferred for separate validation.",
+      "2647": "Merged; standalone LTX audio route removed upstream."
+    },
+    "ggml-org/ggml": {
+      "1697": "Open documentation translation.",
+      "1695": "Open C23 static_assert compatibility change.",
+      "1694": "Open. The November 16 Windows RX 580 adaptation had zero cache hits and increased photo median from 136.98 to 138.31 s (+0.97%); RGB and music matched. Excluded.",
+      "1692": "Merged CMake example change.",
+      "1691": "Merged Python example dependency update.",
+      "1690": "Merged version bump."
+    }
+  },
+  "reviewed_issues": {
+    "LostRuins/koboldcpp": {
+      "2656": "TTS voice reference requirements.",
+      "2655": "Oversize save response status.",
+      "2651": "POSIX C library build flags.",
+      "2644": "Mistral Jinja EOS behavior."
+    },
+    "ggml-org/ggml": {
+      "1696": "CUDA Volta MMQ report, outside the Windows Vulkan build."
+    }
+  },
+  "startup_only": {
+    "executable_sha256": "d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5",
+    "source_commit": "ed246f4467157b3e5663feae28e7bf4d6990db39",
+    "build_verified": true,
+    "cold_start_verified": true,
+    "visible_window_verified": true,
+    "startup_api_ready": true,
+    "inference_tests_run": false,
+    "benchmarks_run": false
+  },
+  "retained_patch_count": 71
+}

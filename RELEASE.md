@@ -1,9 +1,9 @@
 ## English
 
-KoboldCpp 1.125 · 2026-11-16 · Native e823acf0. Includes official experimental source f5576d37 and the GGML sync through 417a024b. The build includes batched Vulkan tensor transfers, the upstream transpose concat and the updated MTMD backend. Windows cold startup and API verified.
+1.125 · 2026-11-17 · Native d9b2e6b5. Updated to KoboldCpp experimental `ed246f446` with the latest Llama/SDCPP merge. Includes upstream model-loading and saved-slot changes. Checked Windows cold startup and API readiness. GGML `d9fe7bff3` changes its CMake example only.
 
 ## Русский
 
-KoboldCpp 1.125 · 2026-11-16 · Native e823acf0. Официальная база f5576d37 включает синхронизацию GGML до 417a024b. В сборке есть пакетные передачи тензоров Vulkan, transpose concat из мейнстрима и обновлённый MTMD. Проверены холодный запуск Windows и API.
+1.125 · 2026-11-17 · Native d9b2e6b5. Обновлена ветка KoboldCpp experimental до `ed246f446` со свежим слиянием Llama/SDCPP, изменениями загрузки моделей и слотов сохранений. Проверены холодный запуск Windows и готовность API. Коммит GGML `d9fe7bff3` меняет пример CMake.
 
-[Commits and checks / Коммиты и проверки](results/mainstream-2026-11-16.json) · [Native patches / Патчи](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/concedo_experimental/performance/patches/series) · [GGML Vulkan transfer measurements / Замеры передач](results/operations-2026-11-16-ggml.json).
+[KoboldCpp](https://github.com/LostRuins/koboldcpp/commit/ed246f4467157b3e5663feae28e7bf4d6990db39) · [GGML](https://github.com/ggml-org/ggml/commit/d9fe7bff3d2bf4d077e25c654486d02c321734aa) · [Review / Обзор](results/mainstream-2026-11-17.json) · [Patches / Патчи](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/concedo_experimental/performance/patches/series)

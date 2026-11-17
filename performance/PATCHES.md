@@ -1,7 +1,7 @@
 # Native patch catalog
 
-[78 patches](patches/series/README.md) in order on f5576d37c1c2fc0389dec1c9c367683be0fc9b4f. Accepted Native e823acf0221ec199fe64b0801e56e8b2062c9d0572874d0a9df1dfeb9f05f97b.
+[71 patches](patches/series/README.md) in order on `ed246f4467157b3e5663feae28e7bf4d6990db39`. Native SHA-256 `d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5`.
 
 [Series hashes](patches/series/index.json) · [Combined patch](patches/runtime.patch) · [Licenses](NOTICE.md).
 
-[Upstream update](../results/mainstream-2026-11-16.json) · [November 11 model timings](../results/performance-2026-11-11-kernels.json).
+[Upstream review](../results/mainstream-2026-11-17.json) · [Dated performance evidence](../results/measurements.json).

@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index bb7e9726b..133640383 100644
+index d8706debc..3434728f9 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -9396,6 +9396,9 @@ Change Mode<br>
+@@ -9407,6 +9407,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -13,10 +13,10 @@ index bb7e9726b..133640383 100644
                              self.send_response(202 if is_sdcpp_imggen else 200)
                              self.send_header('content-length', str(len(genresp)))
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 6110d7377..9aa9c8b0c 100644
+index f649788bb..751de2cb2 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -2346,6 +2346,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2365,6 +2365,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
  
          fflush(stdout);
  
@@ -30,7 +30,7 @@ index 6110d7377..9aa9c8b0c 100644
          vid_result = nullptr;
          generated_audio = nullptr;
          int output_fps = vid_fps;
-@@ -2357,6 +2364,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2376,6 +2383,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              generated_audio = vid_result->audio;
              output_fps = vid_result->fps;
          }
@@ -59,10 +59,10 @@ index 6110d7377..9aa9c8b0c 100644
          {
              printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",vid_req_frames, generated_num_results);
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
-index 778bba6e0..f8ba726b9 100644
+index ba601ba67..e0191d63d 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 +++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
-@@ -3059,6 +3059,12 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
+@@ -3134,6 +3134,12 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
          std::filesystem::rename(partial,target,error);
          if (error) { std::filesystem::remove(partial,error);LOG_ERROR("Wan latent capture commit failed");return {}; }
          LOG_INFO("Saved Wan5B raw posterior snapshot: %llu float32 values",static_cast<unsigned long long>(count));
@@ -73,5 +73,5 @@ index 778bba6e0..f8ba726b9 100644
 +            return {};
 +        }
      }
-     auto latents                      = decode_model->diffusion_to_vae_latents(x);
+     auto latents                      = decode_model->diffusion_to_vae_latents(image_latents);
      auto tiling_params                = decode_model->resolve_tiling_params(vae_tiling_params);

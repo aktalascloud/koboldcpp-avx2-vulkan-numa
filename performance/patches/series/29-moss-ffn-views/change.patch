@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 12ed93493..51a2697be 100644
+index f3a377e53..eede0de73 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -11162,6 +11162,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -11313,6 +11313,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
@@ -11,7 +11,7 @@ index 12ed93493..51a2697be 100644
  
      ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
  }
-@@ -14211,7 +14213,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+@@ -14362,7 +14364,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
      const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
  
      // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
@@ -22,7 +22,7 @@ index 12ed93493..51a2697be 100644
             ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
             ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
             scale_in->src[0]->type == GGML_TYPE_F32 &&
-@@ -16518,8 +16522,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16669,8 +16673,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32;
          case GGML_OP_FILL:
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
@@ -60,27 +60,30 @@ index 35ec726a0..0dc989d50 100644
          idx += num_threads;
      }
  }
-diff --git a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
-index 188c74196..37891d874 100644
---- a/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
-+++ b/otherarch/sdcpp/src/model/diffusion/moss_image.hpp
-@@ -137,7 +137,18 @@ namespace MOSSImage {
-             y            = norm("norm2", x);
-             y            = ggml_add(c, ggml_add(c, y, ggml_mul(c, y, part(4))), part(3));
-             auto up_gate = linear("proj.ffn_up_gate", y);
--            y            = situ(c, ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim), ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim));
-+            // KCPP_MOSS_FFN_VIEWS: avoid copies only when the backend accepts the consumers.
-+            auto hidden = ggml_ext_slice(c, up_gate, 0, 0, config.ffn_dim, false);
-+            auto gate = ggml_ext_slice(c, up_gate, 0, config.ffn_dim, 2 * config.ffn_dim, false);
-+            const bool use_views = ctx->backend != nullptr &&
-+                ggml_backend_dev_type(ggml_backend_get_device(ctx->backend)) == GGML_BACKEND_DEVICE_TYPE_GPU &&
-+                ggml_backend_supports_op(ctx->backend, ggml_scale(c, hidden, 1.f / 25.f)) &&
-+                ggml_backend_supports_op(ctx->backend, ggml_sigmoid(c, gate));
-+            if (!use_views) {
-+                hidden = ggml_cont(c, hidden);
-+                gate = ggml_cont(c, gate);
-+            }
-+            y = situ(c, hidden, gate);
-             y            = linear("proj.ffn_down", y);
-             y            = ggml_mul(c, y, part(5));
-             return ggml_add(c, x, y);
+diff --git a/otherarch/sdcpp/src/core/ggml_extend.cpp b/otherarch/sdcpp/src/core/ggml_extend.cpp
+index 52d9cfc83..8f55c5f49 100644
+--- a/otherarch/sdcpp/src/core/ggml_extend.cpp
++++ b/otherarch/sdcpp/src/core/ggml_extend.cpp
+@@ -129,8 +129,20 @@ ggml_tensor* ggml_ext_situ(GGMLRunnerContext* runner_ctx, ggml_tensor* hidden, g
+ #endif
+     if (!gate) {
+         const auto dim = hidden->ne[0] / 2;
+-        gate           = ggml_ext_slice(runner_ctx, hidden, 0, dim, 2 * dim);
+-        hidden         = ggml_ext_slice(runner_ctx, hidden, 0, 0, dim);
++        // KCPP_MOSS_FFN_VIEWS: preserve a supported native GLU above this fallback.
++        auto * c = runner_ctx->ggml_ctx;
++        auto * backend = runner_ctx->backend;
++        gate = ggml_ext_slice(runner_ctx, hidden, 0, dim, 2 * dim, false);
++        hidden = ggml_ext_slice(runner_ctx, hidden, 0, 0, dim, false);
++        const bool use_views = backend != nullptr &&
++            ggml_backend_dev_type(ggml_backend_get_device(backend)) == GGML_BACKEND_DEVICE_TYPE_GPU &&
++            ggml_backend_supports_op(backend, ggml_scale(c, hidden, 1.f / 25.f)) &&
++            ggml_backend_supports_op(backend, ggml_scale(c, gate, 0.25f)) &&
++            ggml_backend_supports_op(backend, ggml_sigmoid(c, gate));
++        if (!use_views) {
++            gate = ggml_cont(c, gate);
++            hidden = ggml_cont(c, hidden);
++        }
+     }
+     auto a = ggml_scale(runner_ctx->ggml_ctx, ggml_tanh(runner_ctx->ggml_ctx, ggml_scale(runner_ctx->ggml_ctx, gate, 0.25f)), 4.f);
+     a      = ggml_mul(runner_ctx->ggml_ctx, a, ggml_sigmoid(runner_ctx->ggml_ctx, gate));

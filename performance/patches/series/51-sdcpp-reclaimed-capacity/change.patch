@@ -1,0 +1,14 @@
+diff --git a/otherarch/sdcpp/src/core/execution_engine.cpp b/otherarch/sdcpp/src/core/execution_engine.cpp
+index 867fc730e..bddfa5faa 100644
+--- a/otherarch/sdcpp/src/core/execution_engine.cpp
++++ b/otherarch/sdcpp/src/core/execution_engine.cpp
+@@ -935,6 +935,9 @@ namespace sd {
+             } while (std::chrono::steady_clock::now() < deadline);
+         }
+         available               = manager.inspect_compute_backend_capacity(request, required_params, true);
++        if (available.fits(true)) {
++            return true;
++        }
+         const auto device_bytes = available.available_device_bytes == SIZE_MAX
+                                       ? std::string("unknown")
+                                       : sd_format("%.2f MB", available.available_device_bytes / (1024.0 * 1024.0));

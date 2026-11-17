@@ -1,5 +1,5 @@
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
-index 650ae582a..778bba6e0 100644
+index f85664ff6..ba601ba67 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 +++ b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 @@ -1,3 +1,6 @@
@@ -9,7 +9,7 @@ index 650ae582a..778bba6e0 100644
  #include "diffusion_engine.h"
  
  #include <algorithm>
-@@ -3021,6 +3024,42 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
+@@ -3096,6 +3099,42 @@ sd::Tensor<float> StableDiffusionGGML::decode_first_stage(const sd::Tensor<float
          decode_model = preview_vae;
          LOG_INFO("KCPP split VAE: final video decoder=%s", decode_model->get_desc().c_str());
      }
@@ -49,6 +49,6 @@ index 650ae582a..778bba6e0 100644
 +        if (error) { std::filesystem::remove(partial,error);LOG_ERROR("Wan latent capture commit failed");return {}; }
 +        LOG_INFO("Saved Wan5B raw posterior snapshot: %llu float32 values",static_cast<unsigned long long>(count));
 +    }
-     auto latents                      = decode_model->diffusion_to_vae_latents(x);
+     auto latents                      = decode_model->diffusion_to_vae_latents(image_latents);
      auto tiling_params                = decode_model->resolve_tiling_params(vae_tiling_params);
      const bool prefer_temporal_tiling = decode_video && latents.dim() == 5 && latents.shape()[2] > 1 &&

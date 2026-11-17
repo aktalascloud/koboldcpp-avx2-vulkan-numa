@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index 33b3e6f32..e0703b825 100644
+index 942459fef..457c8bc8d 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -1055,6 +1055,8 @@ def init_library():
+@@ -1056,6 +1056,8 @@ def init_library():
          if mode not in ('auto','disabled','distribute','isolate'):
              raise ValueError('--numa must be auto, disabled, distribute or isolate')
          _kcpp_set_native_environment('KCPP_WIN_NUMA_POLICY',str({'disabled':0,'auto':1,'distribute':2,'isolate':3}[mode]))
@@ -11,7 +11,7 @@ index 33b3e6f32..e0703b825 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -15748,6 +15750,7 @@ if __name__ == '__main__':
+@@ -15814,6 +15816,7 @@ if __name__ == '__main__':
      advparser.add_argument("--mmproj", metavar=('[filename]'), help="Select a multimodal projector file for vision models.", default="")
      advparser.add_argument("--mmprojcpu","--no-mmproj-offload", help="Force CLIP for Vision mmproj always on CPU.", action='store_true')
      advparser.add_argument("--lazy-mode", "--lazymode", dest="lazy_mode", choices=["auto", "on", "off"], default="auto", help="On-demand reading of architecture-marked tensors such as Qwen PLE embeddings: auto for tensors larger than 4 GiB, on to force lazy reading, off to keep them resident (default=auto).")
@@ -20,7 +20,7 @@ index 33b3e6f32..e0703b825 100644
      advparser.add_argument("--moecpu","--n-cpu-moe", "-ncmoe", metavar=('[layers affected]'), help="Keep the Mixture of Experts (MoE) weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
      advparser.add_argument("--ffncpu","--n-cpu-ffn", "-ncffn", metavar=('[layers affected]'), help="Keep the dense FFN weights of the first N layers in the CPU. If no value is provided, applies to all layers.", nargs='?', const=999, type=int, default=0)
 diff --git a/src/llama-context.cpp b/src/llama-context.cpp
-index 61c328d32..15932e0ef 100644
+index 844b7a4da..56704ed42 100644
 --- a/src/llama-context.cpp
 +++ b/src/llama-context.cpp
 @@ -1,3 +1,4 @@
@@ -28,7 +28,7 @@ index 61c328d32..15932e0ef 100644
  #include "llama-context.h"
  
  #include "ggml.h"
-@@ -3182,6 +3183,22 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
+@@ -3186,6 +3187,22 @@ bool llama_context::sched_copy_experts(ggml_backend_t backend, const ggml_tensor
      }
  
      const ggml_tensor * ids = node->src[2];
