@@ -1,6 +1,6 @@
 # KoboldCpp · Haswell AVX2 / Polaris Vulkan
 
-[Русский](README.ru.md) · [Windows release](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Build](performance/BUILD.md) · [Patch series](performance/patches/series/) · [Media API](https://github.com/aktalascloud/koboldcpp-media-pipeline)
+[Русский](README.ru.md) · [Windows release](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Build](performance/BUILD.md) · [Patch series](performance/patches/series/) · [Results](results/README.md) · [Media API](https://github.com/aktalascloud/koboldcpp-media-pipeline)
 
 Windows x64 fork of [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp), branch `concedo_experimental`. Targets Haswell AVX2 and AMD RX 580 Polaris. Run `koboldcpp-nocuda.exe`. Weights are external.
 

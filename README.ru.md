@@ -1,6 +1,6 @@
 # KoboldCpp · Haswell AVX2 / Polaris Vulkan
 
-[English](README.md) · [Релиз Windows](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Сборка](performance/BUILD.md) · [Патчи](performance/patches/series/) · [Медиа-API](https://github.com/aktalascloud/koboldcpp-media-pipeline)
+[English](README.md) · [Релиз Windows](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Сборка](performance/BUILD.md) · [Патчи](performance/patches/series/) · [Результаты](results/README.md) · [Медиа-API](https://github.com/aktalascloud/koboldcpp-media-pipeline)
 
 Форк [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp) для Haswell AVX2 и AMD RX 580 Polaris. Ветка `concedo_experimental`. Запуск через `koboldcpp-nocuda.exe`. Веса подключаются отдельно.
 
