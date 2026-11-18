@@ -2045,7 +2045,7 @@ index 818dc7f95..32cd6219c 100644
      vk_pipeline pipeline_swiglu_clamp[2];
      vk_pipeline pipeline_geglu_erf[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 9e3e48b48..b8984351a 100644
+index 9e3e48b48..97d29e5ac 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 @@ -1053,18 +1053,24 @@ std::unique_ptr<vk_queue> ggml_vk_create_queue(vk_device& device, uint32_t queue
@@ -2552,7 +2552,31 @@ index 9e3e48b48..b8984351a 100644
  }
  
  uint32_t ggml_vk_fuse_multi_add(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph, int node_idx) {
-@@ -15076,6 +15284,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -15009,10 +15217,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+     bool first_node_in_batch = true; // true if next node will be first node in a batch
+     int submit_node_idx = 0; // index to first node in a batch
+ 
+-    ggml_vk_submit_transfer_ctx(ctx);
+-
+     vk_context compute_ctx;
+     if (vk_perf_logger_enabled) {
++        // Async uploads and copies can already be recorded on the compute queue.
++        // Drain them before recording the first graph timestamp.
++        ggml_vk_synchronize(ctx);
++
+         // allocate/resize the query pool
+         if (ctx->num_queries < cgraph->n_nodes + 1) {
+             if (ctx->query_pool) {
+@@ -15040,6 +15250,8 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+         ctx->query_idx = 0;
+         compute_ctx->s->buffer->buf.writeTimestamp(vk::PipelineStageFlagBits::eAllCommands, ctx->query_pool, ctx->query_idx++);
+         ggml_vk_sync_buffers(ctx, compute_ctx);
++    } else {
++        ggml_vk_submit_transfer_ctx(ctx);
+     }
+ 
+     ctx->prealloc_y_last_pipeline_used = nullptr;
+@@ -15076,6 +15288,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
      uint64_t flops_per_submit = ctx->last_total_flops < 1'000'000'000ULL ? 0 :
          std::clamp(ctx->last_total_flops / 40u, std::min<uint64_t>(100'000'000ULL, flops_cap), flops_cap);
  
@@ -2565,7 +2589,7 @@ index 9e3e48b48..b8984351a 100644
      auto const submit_after = [&](int start, int end) {
          if (ctx->device->serialize_submissions) {
              try {
-@@ -15100,7 +15314,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -15100,7 +15318,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          first_node_in_batch = true;
          submitted_nodes = 0;
          batch_flops = 0;
@@ -2574,7 +2598,7 @@ index 9e3e48b48..b8984351a 100644
              flops_per_submit *= 2;
          }
          submit_count++;
-@@ -15202,6 +15416,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -15202,6 +15420,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
                  ctx->fused_hc_post_gate = true;
                  fusion_string = "HC_POST_GATE";
                  std::fill_n(op_srcs_fused_elementwise, ctx->num_additional_fused_ops + 1, false);
@@ -2586,7 +2610,7 @@ index 9e3e48b48..b8984351a 100644
              } else if (ggml_vk_can_fuse(ctx, cgraph, i, rms_norm_mul_add_mul_pattern)) {
                  ctx->num_additional_fused_ops = 3;
                  ctx->fused_rms_norm_mode = RMS_NORM_MUL_ADD_MUL;
-@@ -15387,7 +15606,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -15387,7 +15610,7 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
          }
  
          // Signal the almost_ready fence when the graph is mostly complete (< 20% remaining)
@@ -2595,7 +2619,7 @@ index 9e3e48b48..b8984351a 100644
          bool submit = (submitted_nodes >= ctx->device->max_nodes_per_submit) ||
                        (flops_per_submit != 0 && batch_flops >= flops_per_submit) ||
                        (i + ctx->num_additional_fused_ops >= last_node) ||
-@@ -15632,6 +15851,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+@@ -15632,6 +15855,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
              continue;
          }
  
@@ -2606,7 +2630,7 @@ index 9e3e48b48..b8984351a 100644
          if (keep_pattern(rms_norm_mul_add_mul_pattern)) {
              continue;
          }
-@@ -15687,6 +15910,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+@@ -15687,6 +15914,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
                  match_pattern(topk_moe_late_softmax, j) ||
                  match_pattern(snake_pattern, j) ||
                  in_qsa_pattern(j) ||
@@ -2614,7 +2638,7 @@ index 9e3e48b48..b8984351a 100644
                  match_pattern(rms_norm_mul_add_mul_pattern, j) ||
                  match_pattern(rms_norm_mul_add_pattern, j) ||
                  match_pattern(rms_norm_mul_rope_view_set_rows_pattern, j) ||
-@@ -15995,7 +16219,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -15995,7 +16223,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  
@@ -2624,7 +2648,7 @@ index 9e3e48b48..b8984351a 100644
          vk_backend->iface.get_tensor_async = nullptr;
      }
  
-@@ -16218,6 +16443,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16218,6 +16447,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
                      return false;
              }
          case GGML_OP_GLU:
@@ -2635,7 +2659,7 @@ index 9e3e48b48..b8984351a 100644
              switch (ggml_get_glu_op(op)) {
                  case GGML_GLU_OP_GEGLU:
                  case GGML_GLU_OP_REGLU:
-@@ -16491,16 +16720,23 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16491,16 +16724,23 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
          case GGML_OP_REPEAT_BACK:
              return op->type == GGML_TYPE_F32 && op->src[0]->type == GGML_TYPE_F32;
          case GGML_OP_ROPE:
@@ -2661,7 +2685,7 @@ index 9e3e48b48..b8984351a 100644
          case GGML_OP_NORM:
          case GGML_OP_RMS_NORM:
          case GGML_OP_L2_NORM:
-@@ -16582,8 +16818,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16582,8 +16822,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32;
          case GGML_OP_FILL:
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
@@ -2680,7 +2704,7 @@ index 9e3e48b48..b8984351a 100644
          case GGML_OP_PAD:
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
-@@ -16725,6 +16969,18 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16725,6 +16973,18 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
          case GGML_OP_TOP_K_MASK:
              {
                  const ggml_tensor * mask = op->src[0];
@@ -2699,7 +2723,7 @@ index 9e3e48b48..b8984351a 100644
                  if ((op->type != GGML_TYPE_F16 && op->type != GGML_TYPE_F32) || mask->type != op->type) {
                      return false;
                  }
-@@ -17126,7 +17382,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
+@@ -17126,7 +17386,7 @@ bool ggml_vk_device_is_supported(const vk::PhysicalDevice & vkdev) {
      VkPhysicalDeviceFeatures2 device_features2;
      device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
  

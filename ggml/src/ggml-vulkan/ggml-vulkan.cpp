@@ -15217,10 +15217,12 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
     bool first_node_in_batch = true; // true if next node will be first node in a batch
     int submit_node_idx = 0; // index to first node in a batch
 
-    ggml_vk_submit_transfer_ctx(ctx);
-
     vk_context compute_ctx;
     if (vk_perf_logger_enabled) {
+        // Async uploads and copies can already be recorded on the compute queue.
+        // Drain them before recording the first graph timestamp.
+        ggml_vk_synchronize(ctx);
+
         // allocate/resize the query pool
         if (ctx->num_queries < cgraph->n_nodes + 1) {
             if (ctx->query_pool) {
@@ -15248,6 +15250,8 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
         ctx->query_idx = 0;
         compute_ctx->s->buffer->buf.writeTimestamp(vk::PipelineStageFlagBits::eAllCommands, ctx->query_pool, ctx->query_idx++);
         ggml_vk_sync_buffers(ctx, compute_ctx);
+    } else {
+        ggml_vk_submit_transfer_ctx(ctx);
     }
 
     ctx->prealloc_y_last_pipeline_used = nullptr;

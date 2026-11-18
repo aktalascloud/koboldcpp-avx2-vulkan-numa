@@ -1,0 +1,828 @@
+{
+  "date": "2026-11-18",
+  "photo_request": {
+    "prompt": "Neutral daylight photograph of a brass compass on textured oak",
+    "seed": 606017,
+    "batch_size": 1,
+    "n_iter": 1,
+    "width": 736,
+    "height": 1104,
+    "steps": 8,
+    "cfg_scale": 1,
+    "sampler_name": "euler",
+    "scheduler": "simple",
+    "eta": 0,
+    "flow_shift": 5,
+    "clip_skip": -1,
+    "cache_mode": "cache-dit",
+    "cache_options": "threshold=0.08,warmup=4,Fn=16,Bn=2"
+  },
+  "profiles": {
+    "Helper.kcpps": "3f7c3b07a7f0be3d9088c49be2b63ef17ffa11eddd86946a07b90e6fa7a2295f",
+    "music.kcpps": "29ac6906664de8a22560f881f1c48911c0466fd9683510b0e194c4c95083661c",
+    "photo-normal.kcpps": "683b625d27c1f4671418918e7f874cea71a0176b442a5eb940e2c11034d08d09",
+    "photo-quality.kcpps": "f1d46f1944d2df06191be7658a7f643dcd69ab4a800053c6f91fc5372bd176a3",
+    "video.kcpps": "61eb6dabe7473049a793f749b89b8262dce2a084a2bf9b1771a18dcebb2a11ae"
+  },
+  "runs": [
+    {
+      "mode": "reproduce",
+      "sha256": "d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5",
+      "profiling": true,
+      "load_s": 14.560724099981599,
+      "error": "ConnectionResetError",
+      "assertions": [
+        "ggml/src/ggml-vulkan/ggml-vulkan.cpp:15246: GGML_ASSERT(ctx->compute_ctx.expired()) failed"
+      ],
+      "kernels": []
+    },
+    {
+      "mode": "baseline",
+      "sha256": "d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5",
+      "profiling": false,
+      "load_s": 12.036539299995638,
+      "request_s": 116.52857130009215,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39"
+    },
+    {
+      "mode": "profile-control",
+      "sha256": "7f20d6f583447f487daea7bd3e70712485dc5e0ce138a63fd6ffe7db0c10790e",
+      "profiling": true,
+      "load_s": 199.72114729997702,
+      "request_s": 122.74402300000656,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": [],
+      "kernels": [
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,3196,1),  q(128,3196,24,1),  k(128,3196,24,1),  v(128,3196,24,1),  m(0,0,0,0)",
+          "count": 252,
+          "gpu_ms": 28310.72
+        },
+        {
+          "op": "MUL_MAT q8_0 m=16384 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 26497.87
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 14650.56
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=8192",
+          "count": 252,
+          "gpu_ms": 12626.96
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 4710.514
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=3072",
+          "count": 2460,
+          "gpu_ms": 3374.544
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=8192",
+          "count": 492,
+          "gpu_ms": 2269.493
+        },
+        {
+          "op": "MUL_MAT bf16 m=16384 n=3196 k=16",
+          "count": 492,
+          "gpu_ms": 1392.001
+        },
+        {
+          "op": "MUL_MAT bf16 m=3072 n=3196 k=16",
+          "count": 2460,
+          "gpu_ms": 1295.578
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(384,1,1024,1),  q(384,1024,1,1),  k(384,1024,1,1),  v(384,1024,1,1),  m(0,0,0,0)",
+          "count": 28,
+          "gpu_ms": 704.8326
+        },
+        {
+          "op": "MUL_MAT q8_0 m=8192 n=22 k=3072",
+          "count": 24,
+          "gpu_ms": 20.273919999999997
+        },
+        {
+          "op": "MUL_MAT f32 m=384 n=1024 k=384",
+          "count": 112,
+          "gpu_ms": 13.574879999999995
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=8192",
+          "count": 12,
+          "gpu_ms": 11.50048
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 10.397120000000001
+        },
+        {
+          "op": "MUL_MAT q8_0 m=128 n=3174 k=3072",
+          "count": 6,
+          "gpu_ms": 8.4792
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3174 k=128",
+          "count": 6,
+          "gpu_ms": 5.0344
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 3.9302400000000004
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=4096",
+          "count": 6,
+          "gpu_ms": 2.8503999999999996
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=18432 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 1.9779200000000001
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=6144 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.7419199999999999
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,22,1),  q(128,22,24,1),  k(128,22,24,1),  v(128,22,24,1),  m(0,0,0,0)",
+          "count": 12,
+          "gpu_ms": 0.5472
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.38512
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=256",
+          "count": 6,
+          "gpu_ms": 0.12832
+        }
+      ]
+    },
+    {
+      "mode": "profile-both",
+      "sha256": "7f20d6f583447f487daea7bd3e70712485dc5e0ce138a63fd6ffe7db0c10790e",
+      "profiling": true,
+      "load_s": 13.70921110000927,
+      "request_s": 130.4421051000245,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": [
+        "ggml_vulkan: dispatched Polaris Q8_0 wide prefill (M=3072 N=3174)",
+        "ggml_vulkan: Polaris FA K-only staging q=3196 kv=3196 head=128"
+      ],
+      "kernels": [
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,3196,1),  q(128,3196,24,1),  k(128,3196,24,1),  v(128,3196,24,1),  m(0,0,0,0)",
+          "count": 252,
+          "gpu_ms": 37474.74
+        },
+        {
+          "op": "MUL_MAT q8_0 m=16384 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 27506.0
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 15348.57
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=8192",
+          "count": 252,
+          "gpu_ms": 13553.5
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 4849.445
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=3072",
+          "count": 2460,
+          "gpu_ms": 3153.981
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=8192",
+          "count": 492,
+          "gpu_ms": 2156.691
+        },
+        {
+          "op": "MUL_MAT bf16 m=16384 n=3196 k=16",
+          "count": 492,
+          "gpu_ms": 1379.574
+        },
+        {
+          "op": "MUL_MAT bf16 m=3072 n=3196 k=16",
+          "count": 2460,
+          "gpu_ms": 1219.929
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(384,1,1024,1),  q(384,1024,1,1),  k(384,1024,1,1),  v(384,1024,1,1),  m(0,0,0,0)",
+          "count": 28,
+          "gpu_ms": 704.6333999999999
+        },
+        {
+          "op": "MUL_MAT q8_0 m=8192 n=22 k=3072",
+          "count": 24,
+          "gpu_ms": 20.153119999999998
+        },
+        {
+          "op": "MUL_MAT f32 m=384 n=1024 k=384",
+          "count": 112,
+          "gpu_ms": 13.928960000000004
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=8192",
+          "count": 12,
+          "gpu_ms": 11.54032
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 10.35792
+        },
+        {
+          "op": "MUL_MAT q8_0 m=128 n=3174 k=3072",
+          "count": 6,
+          "gpu_ms": 8.217919999999998
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3174 k=128",
+          "count": 6,
+          "gpu_ms": 5.5403199999999995
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 3.90416
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=4096",
+          "count": 6,
+          "gpu_ms": 2.7408
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=18432 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 1.97376
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=6144 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.7464
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,22,1),  q(128,22,24,1),  k(128,22,24,1),  v(128,22,24,1),  m(0,0,0,0)",
+          "count": 12,
+          "gpu_ms": 0.548
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.3856
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=256",
+          "count": 6,
+          "gpu_ms": 0.11232
+        }
+      ]
+    },
+    {
+      "mode": "profile-q8",
+      "sha256": "7f20d6f583447f487daea7bd3e70712485dc5e0ce138a63fd6ffe7db0c10790e",
+      "profiling": true,
+      "load_s": 11.537013299996033,
+      "request_s": 120.30491890001576,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": [
+        "ggml_vulkan: dispatched Polaris Q8_0 wide prefill (M=3072 N=3174)"
+      ],
+      "kernels": [
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,3196,1),  q(128,3196,24,1),  k(128,3196,24,1),  v(128,3196,24,1),  m(0,0,0,0)",
+          "count": 252,
+          "gpu_ms": 28488.09
+        },
+        {
+          "op": "MUL_MAT q8_0 m=16384 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 27270.71
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 15376.57
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=8192",
+          "count": 252,
+          "gpu_ms": 13487.95
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 4985.087
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=3072",
+          "count": 2460,
+          "gpu_ms": 3151.073
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=8192",
+          "count": 492,
+          "gpu_ms": 2148.617
+        },
+        {
+          "op": "MUL_MAT bf16 m=16384 n=3196 k=16",
+          "count": 492,
+          "gpu_ms": 1375.338
+        },
+        {
+          "op": "MUL_MAT bf16 m=3072 n=3196 k=16",
+          "count": 2460,
+          "gpu_ms": 1229.061
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(384,1,1024,1),  q(384,1024,1,1),  k(384,1024,1,1),  v(384,1024,1,1),  m(0,0,0,0)",
+          "count": 28,
+          "gpu_ms": 705.8603999999999
+        },
+        {
+          "op": "MUL_MAT q8_0 m=8192 n=22 k=3072",
+          "count": 24,
+          "gpu_ms": 19.892799999999998
+        },
+        {
+          "op": "MUL_MAT f32 m=384 n=1024 k=384",
+          "count": 112,
+          "gpu_ms": 13.914239999999996
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=8192",
+          "count": 12,
+          "gpu_ms": 11.576
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 10.309119999999998
+        },
+        {
+          "op": "MUL_MAT q8_0 m=128 n=3174 k=3072",
+          "count": 6,
+          "gpu_ms": 8.344640000000002
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3174 k=128",
+          "count": 6,
+          "gpu_ms": 5.462719999999999
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 3.9112
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=4096",
+          "count": 6,
+          "gpu_ms": 2.6972799999999997
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=18432 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 1.9695999999999996
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=6144 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.7379199999999999
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,22,1),  q(128,22,24,1),  k(128,22,24,1),  v(128,22,24,1),  m(0,0,0,0)",
+          "count": 12,
+          "gpu_ms": 0.54848
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.37968
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=256",
+          "count": 6,
+          "gpu_ms": 0.11104
+        }
+      ]
+    },
+    {
+      "mode": "profile-fa-v",
+      "sha256": "7f20d6f583447f487daea7bd3e70712485dc5e0ce138a63fd6ffe7db0c10790e",
+      "profiling": true,
+      "load_s": 11.538474600063637,
+      "request_s": 127.62666159996297,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": [
+        "ggml_vulkan: Polaris FA V-only staging q=3196 kv=3196 head=128"
+      ],
+      "kernels": [
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,3196,1),  q(128,3196,24,1),  k(128,3196,24,1),  v(128,3196,24,1),  m(0,0,0,0)",
+          "count": 252,
+          "gpu_ms": 37104.65
+        },
+        {
+          "op": "MUL_MAT q8_0 m=16384 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 26840.79
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 14511.35
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=8192",
+          "count": 252,
+          "gpu_ms": 12727.85
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 4573.458
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=3072",
+          "count": 2460,
+          "gpu_ms": 3255.156
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=8192",
+          "count": 492,
+          "gpu_ms": 2401.652
+        },
+        {
+          "op": "MUL_MAT bf16 m=16384 n=3196 k=16",
+          "count": 492,
+          "gpu_ms": 1380.671
+        },
+        {
+          "op": "MUL_MAT bf16 m=3072 n=3196 k=16",
+          "count": 2460,
+          "gpu_ms": 1361.574
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(384,1,1024,1),  q(384,1024,1,1),  k(384,1024,1,1),  v(384,1024,1,1),  m(0,0,0,0)",
+          "count": 28,
+          "gpu_ms": 705.1410999999999
+        },
+        {
+          "op": "MUL_MAT q8_0 m=8192 n=22 k=3072",
+          "count": 24,
+          "gpu_ms": 19.80736
+        },
+        {
+          "op": "MUL_MAT f32 m=384 n=1024 k=384",
+          "count": 112,
+          "gpu_ms": 13.612
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=8192",
+          "count": 12,
+          "gpu_ms": 11.488959999999999
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 10.26992
+        },
+        {
+          "op": "MUL_MAT q8_0 m=128 n=3174 k=3072",
+          "count": 6,
+          "gpu_ms": 8.643519999999999
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3174 k=128",
+          "count": 6,
+          "gpu_ms": 4.812
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 3.9263999999999997
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=4096",
+          "count": 6,
+          "gpu_ms": 2.7008
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=18432 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 1.9686400000000002
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=6144 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.74064
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,22,1),  q(128,22,24,1),  k(128,22,24,1),  v(128,22,24,1),  m(0,0,0,0)",
+          "count": 12,
+          "gpu_ms": 0.54256
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.38144
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=256",
+          "count": 6,
+          "gpu_ms": 0.11295999999999999
+        }
+      ]
+    },
+    {
+      "mode": "default",
+      "sha256": "ec425dc00900e4a2b45d0b093952ed9aee0c7470adc5369a66e6f4411e61d421",
+      "profiling": false,
+      "load_s": 37.50645549991168,
+      "request_s": 122.39248999999836,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": []
+    },
+    {
+      "mode": "default-profile",
+      "sha256": "ec425dc00900e4a2b45d0b093952ed9aee0c7470adc5369a66e6f4411e61d421",
+      "profiling": true,
+      "load_s": 11.030260700033978,
+      "request_s": 118.30967360001523,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": [],
+      "kernels": [
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,3196,1),  q(128,3196,24,1),  k(128,3196,24,1),  v(128,3196,24,1),  m(0,0,0,0)",
+          "count": 252,
+          "gpu_ms": 28419.3
+        },
+        {
+          "op": "MUL_MAT q8_0 m=16384 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 26522.16
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 14552.65
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=8192",
+          "count": 252,
+          "gpu_ms": 12710.75
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3196 k=3072",
+          "count": 252,
+          "gpu_ms": 4712.771
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=3072",
+          "count": 2460,
+          "gpu_ms": 3257.925
+        },
+        {
+          "op": "MUL_MAT bf16 m=16 n=3196 k=8192",
+          "count": 492,
+          "gpu_ms": 2369.934
+        },
+        {
+          "op": "MUL_MAT bf16 m=16384 n=3196 k=16",
+          "count": 492,
+          "gpu_ms": 1383.764
+        },
+        {
+          "op": "MUL_MAT bf16 m=3072 n=3196 k=16",
+          "count": 2460,
+          "gpu_ms": 1353.745
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(384,1,1024,1),  q(384,1024,1,1),  k(384,1024,1,1),  v(384,1024,1,1),  m(0,0,0,0)",
+          "count": 28,
+          "gpu_ms": 705.7571
+        },
+        {
+          "op": "MUL_MAT q8_0 m=8192 n=22 k=3072",
+          "count": 24,
+          "gpu_ms": 19.956799999999998
+        },
+        {
+          "op": "MUL_MAT f32 m=384 n=1024 k=384",
+          "count": 112,
+          "gpu_ms": 13.60816
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=8192",
+          "count": 12,
+          "gpu_ms": 11.53968
+        },
+        {
+          "op": "MUL_MAT q8_0 m=9216 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 10.259519999999998
+        },
+        {
+          "op": "MUL_MAT q8_0 m=128 n=3174 k=3072",
+          "count": 6,
+          "gpu_ms": 8.71728
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=3174 k=128",
+          "count": 6,
+          "gpu_ms": 4.83936
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=3072",
+          "count": 12,
+          "gpu_ms": 3.9246399999999997
+        },
+        {
+          "op": "MUL_MAT q8_0 m=3072 n=22 k=4096",
+          "count": 6,
+          "gpu_ms": 2.6996800000000003
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=18432 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 1.9671999999999998
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=6144 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.74112
+        },
+        {
+          "op": "FLASH_ATTN_EXT dst(128,24,22,1),  q(128,22,24,1),  k(128,22,24,1),  v(128,22,24,1),  m(0,0,0,0)",
+          "count": 12,
+          "gpu_ms": 0.5436799999999999
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=3072",
+          "count": 6,
+          "gpu_ms": 0.3808
+        },
+        {
+          "op": "MUL_MAT_ADD MUL_MAT_VEC q8_0 m=3072 n=1 k=256",
+          "count": 6,
+          "gpu_ms": 0.11055999999999999
+        }
+      ]
+    },
+    {
+      "mode": "repeat-final",
+      "sha256": "ec425dc00900e4a2b45d0b093952ed9aee0c7470adc5369a66e6f4411e61d421",
+      "profiling": false,
+      "load_s": 11.045201199944131,
+      "request_s": 116.7176349000074,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": []
+    },
+    {
+      "mode": "repeat-baseline",
+      "sha256": "d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5",
+      "profiling": false,
+      "load_s": 11.547533000004478,
+      "request_s": 116.96834489994217,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": []
+    },
+    {
+      "mode": "repeat-baseline",
+      "sha256": "d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5",
+      "profiling": false,
+      "load_s": 11.036674299975857,
+      "request_s": 117.1058826999506,
+      "rgb_sha256": "a545336b2154ea5adff7832ba8a2c51f9527870e58636184c2eb94cf36c7f5d3",
+      "dispatch": []
+    },
+    {
+      "mode": "repeat-final",
+      "sha256": "ec425dc00900e4a2b45d0b093952ed9aee0c7470adc5369a66e6f4411e61d421",
+      "profiling": false,
+      "load_s": 11.04163700004574,
+      "request_s": 117.10149220004678,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "dispatch": []
+    }
+  ],
+  "service_restored": true,
+  "inputs": {
+    "manifest_sha256": "4c177b31bb55106080460b0cc98f9baa29807f1596eb6f17b3e228ad4673fa43",
+    "model_sha256": {
+      "MODELS/images/abdm-moss-Q8_0-GSQ-RCO-Vulkan-2026-11-17.gguf": "6778ae34feb1a294e3efcbe8120eb345a11514fa615356e323684beb0e522a91",
+      "MODELS/loras/afterlight-v1-BF16-original-2026-11-17.safetensors": "57d2a400af32a0afd9cd065c43ebeb6a0e44b153abaef0171ce6891b6b057d13",
+      "MODELS/loras/moss-realism-enhancer-v1-BF16-original-2026-11-17.safetensors": "4a187913365a862503a4297d26248d95b440636b68e60239e68ffc952b737e70",
+      "MODELS/text/moss-qwen35-text-Q8_0-Q6_K-GSQ-RCO-Vulkan-2026-11-17.gguf": "f4b29d947f9b374dde6de4d858ee44d75bbd7a41dac9f5a72493e55543456bc3",
+      "MODELS/text/moss-qwen35-tokenizer-2026-11-17.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+      "MODELS/vae/flux2-vae-FP32-original-2026-11-17.safetensors": "c3bdf94dc67ec69b30ea9fe1fa8340085679cae64d019f7c7e4a9921f1a7f17a"
+    },
+    "environment": {
+      "GGML_VK_ALLOW_GRAPHICS_QUEUE": "1",
+      "GGML_VK_BATCHED_SUBMITS": "1",
+      "GGML_VK_MAX_NODES_PER_SUBMIT": "100",
+      "GGML_VK_GCN_TILE64": "1",
+      "GGML_VK_GCN_TILE_VARIANT": "k16",
+      "GGML_VK_IQ4_XS_ROWS": "4",
+      "GGML_VK_IQ4_XS_WG": "64",
+      "GGML_VK_DISABLE_GET_TENSOR_ASYNC": "1"
+    }
+  },
+  "decision": {
+    "accepted": [
+      "vulkan-profiler-async-input"
+    ],
+    "rejected": [
+      "polaris-q8-wide",
+      "polaris-fa-k-only",
+      "polaris-fa-v-only"
+    ],
+    "matched_shape_totals": {
+      "profile-control": {
+        "q8_s": 58.485904,
+        "flash_s": 28.31072
+      },
+      "profile-both": {
+        "q8_s": 61.257515,
+        "flash_s": 37.47474
+      },
+      "profile-q8": {
+        "q8_s": 61.120317,
+        "flash_s": 28.48809
+      },
+      "profile-fa-v": {
+        "q8_s": 58.653448000000004,
+        "flash_s": 37.10465
+      }
+    },
+    "q8_calls": 1008,
+    "flash_calls": 252,
+    "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+    "before_binary": "d9b2e6b55ab795ed67cdae01d8f8495dd2a857fe3776b98f53fdf0ec5f9482f5",
+    "trial_binary": "7f20d6f583447f487daea7bd3e70712485dc5e0ce138a63fd6ffe7db0c10790e",
+    "en": "The Vulkan profiler now completes the ABDM Normal request on RX 580 with the same RGB. The tested Q8_0 wide tile took 61.12 s across the matched kernels versus 58.49 s in the control. Single-operand LDS staging took 37.47/37.10 s versus 28.31 s for FlashAttention. The build keeps the faster existing kernels. Warm unprofiled request medians were 117.04 and 116.91 s. One repeated run on the old binary gave a different RGB hash.",
+    "ru": "На RX 580 исправлена работа профилировщика Vulkan на ABDM Normal. RGB совпадает побайтно. Широкая плитка Q8_0 заняла 61,12 с GPU-времени против 58,49 с на тех же формах. FlashAttention со стадированием одного операнда занял 37,47 и 37,10 с против 28,31 с. В сборке используются более быстрые прежние ядра. Медианы прогретого запроса без профилировщика составили 117,04 и 116,91 с. В одном повторе на старом EXE RGB-хеш отличался.",
+    "unprofiled_abba": {
+      "median_wall_s": {
+        "baseline": 117.03711379994638,
+        "final": 116.90956355002709
+      },
+      "matching_reference": {
+        "baseline": 1,
+        "final": 2
+      },
+      "replicates_per_arm": 2
+    },
+    "trial_patch_sha256": {
+      "profiler": "0ad67eba2afe7a5626c20b01196c7e73c22e8dc6ebb4515c9efbaa1053e458f0",
+      "q8": "7d81fdf6bf5c262f410b4cb0ddc1ceede6c634dd07f3c8be2a445cc46cc58100",
+      "flash": "c560134202d2ced533e48fa210b230578ad2241ab9e70fcb96586f421b90647f"
+    },
+    "final_patch_sha256": {
+      "profiler": "0ad67eba2afe7a5626c20b01196c7e73c22e8dc6ebb4515c9efbaa1053e458f0"
+    }
+  },
+  "installation": {
+    "native_sha256": "ec425dc00900e4a2b45d0b093952ed9aee0c7470adc5369a66e6f4411e61d421",
+    "wrapper_sha256": "ef832226068e155f028ed24b0de47fe6308a294e3519695499c0032a6342ca64",
+    "source_commit": "ed246f4467157b3e5663feae28e7bf4d6990db39",
+    "patches": {
+      "profiler": "0ad67eba2afe7a5626c20b01196c7e73c22e8dc6ebb4515c9efbaa1053e458f0"
+    },
+    "settings_preserved": true,
+    "media_sha256": {
+      "tools/VideoPro.py": "8e55900d64a6084e7eff684bd4eddb6dabc2f06bbac0faa3b8003e2e4b0286c5",
+      "tools/OwnedMediaProcess.py": "199cad135148b6439acd74fc39b3be5976fb7038c96bb360e360bf22f815e8d0",
+      "tools/SfxService.py": "e686f18bf214a5e7a5d23670f535ba17ef67c08f2fd74f5274ac56d680692ea0",
+      "runtime/sa3/sa3-generate.exe": "55137f9fffded2c6a5bede0421cb086a892ed321428476184fc7472fca542fcc",
+      "runtime/sa3/provenance.json": "b22b701e5d2eaa51925563ef367b3d74b255701409d0742c6c7499c03c864a22",
+      "MODELS/manifest.json": "4c177b31bb55106080460b0cc98f9baa29807f1596eb6f17b3e228ad4673fa43",
+      "runtime/native-environment.json": "cfee531f14d40e8a76140363ada05d6a1bf1b8598b38b803f0c9ce0f1b1cf0a2"
+    },
+    "api_ports": [
+      5001,
+      5003
+    ]
+  }
+}

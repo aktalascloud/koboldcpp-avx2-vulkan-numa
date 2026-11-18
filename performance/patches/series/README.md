@@ -73,3 +73,4 @@ Apply in numeric order to `ed246f4467157b3e5663feae28e7bf4d6990db39`. [Index and
 - [Shorten the AVX2 Q8_0 dot guard](69-haswell-q8-dot-guard/README.md)
 - [Stage dense FlashAttention K/V blocks once per Polaris workgroup](70-polaris-fa-kv-staging/README.md)
 - [Reuse YuE2 NAR midpoint and velocity buffers](71-yue2-nar-render-scratch/README.md)
+- [Drain Vulkan profiler ingress copies](72-vulkan-profiler-async-input/README.md)

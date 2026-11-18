@@ -4,7 +4,7 @@
 
 Windows x64 fork of [LostRuins/KoboldCpp](https://github.com/LostRuins/koboldcpp), branch `concedo_experimental`. Targets Haswell AVX2 and AMD RX 580 Polaris. Run `koboldcpp-nocuda.exe`. Weights are external.
 
-**1.125 · 2026-11-17 · Native d9b2e6b5** · [Upstream and startup evidence](results/mainstream-2026-11-17.json).
+**1.125 · 2026-11-18 · Native ec425dc0** · [RX 580 Vulkan measurements](results/vulkan-rx580-20261118.json).
 
 Use `py -3.12 performance/setup.py --build` for O3/LTO builds and [RUN.txt](performance/RUN.txt) for the tested configuration.
 
