@@ -1794,7 +1794,7 @@ index c54ed3f07..07db7e5db 100644
              y[i] = 0.0f;
          } else if (x[i] >= 10.0f) {
 diff --git a/ggml/src/ggml-quants.c b/ggml/src/ggml-quants.c
-index 3586f67ae..1742adb90 100644
+index 3586f67ae..bd439ceaf 100644
 --- a/ggml/src/ggml-quants.c
 +++ b/ggml/src/ggml-quants.c
 @@ -13,6 +13,10 @@
@@ -1833,6 +1833,55 @@ index 3586f67ae..1742adb90 100644
          y  += QK4_NL;
          qs += QK4_NL/2;
      }
+@@ -2789,10 +2807,44 @@ void quantize_row_q8_K_ref(const float * GGML_RESTRICT x, block_q8_K * GGML_REST
+ 
+         float max = 0;
+         float amax = 0;
+-        for (int j = 0; j < QK_K; ++j) {
+-            float ax = fabsf(x[j]);
+-            if (ax > amax) {
+-                amax = ax; max = x[j];
++#if defined(__AVX2__) && defined(__BMI__)
++        // Float magnitudes have the same order as their unsigned bit patterns.
++        const __m256i abs_mask = _mm256_set1_epi32(0x7fffffff);
++        __m256i peaks[4] = {_mm256_setzero_si256(), _mm256_setzero_si256(),
++                            _mm256_setzero_si256(), _mm256_setzero_si256()};
++        for (int j = 0; j < QK_K; j += 32) {
++            for (int lane = 0; lane < 4; ++lane) {
++                const __m256i v = _mm256_castps_si256(_mm256_loadu_ps(x + j + lane*8));
++                peaks[lane] = _mm256_max_epu32(peaks[lane], _mm256_and_si256(v, abs_mask));
++            }
++        }
++        const __m256i peak = _mm256_max_epu32(_mm256_max_epu32(peaks[0], peaks[1]),
++                                              _mm256_max_epu32(peaks[2], peaks[3]));
++        __m128i magnitude = _mm_max_epu32(_mm256_castsi256_si128(peak), _mm256_extracti128_si256(peak, 1));
++        magnitude = _mm_max_epu32(magnitude, _mm_shuffle_epi32(magnitude, _MM_SHUFFLE(1, 0, 3, 2)));
++        magnitude = _mm_max_epu32(magnitude, _mm_shuffle_epi32(magnitude, _MM_SHUFFLE(2, 3, 0, 1)));
++        const uint32_t bits = (uint32_t) _mm_cvtsi128_si32(magnitude);
++        if (bits >= 0x00800000 && bits < 0x7f800000) {
++            memcpy(&amax, &bits, sizeof(amax));
++            const __m256i target = _mm256_set1_epi32((int) bits);
++            // The reference takes the first maximum, including ties with opposite signs.
++            for (int j = 0; j < QK_K; j += 8) {
++                const __m256i v = _mm256_castps_si256(_mm256_loadu_ps(x + j));
++                const __m256i eq = _mm256_cmpeq_epi32(_mm256_and_si256(v, abs_mask), target);
++                const unsigned mask = (unsigned) _mm256_movemask_ps(_mm256_castsi256_ps(eq));
++                if (mask) {
++                    max = x[j + _tzcnt_u32(mask)];
++                    break;
++                }
++            }
++        } else
++#endif
++        {
++            for (int j = 0; j < QK_K; ++j) {
++                float ax = fabsf(x[j]);
++                if (ax > amax) {
++                    amax = ax; max = x[j];
++                }
+             }
+         }
+         if (!amax) {
 diff --git a/ggml/src/ggml-rpc/ggml-rpc.cpp b/ggml/src/ggml-rpc/ggml-rpc.cpp
 index d52a51ea8..012f37b98 100644
 --- a/ggml/src/ggml-rpc/ggml-rpc.cpp

@@ -1,7 +1,7 @@
 {
   "upstream": "ed246f4467157b3e5663feae28e7bf4d6990db39",
-  "tree": "d67221e13f237a7fb2914f905dabfbd215bb3034",
-  "snapshot_sha256": "2907e22900276dd0482d01ca137b2b220f1805b2c5b814ee044ee0afd22fdfa4",
+  "tree": "6f1b4b03a191f4fe8569d7e38bbffb6e5a85f4ef",
+  "snapshot_sha256": "c7e745a205ec220254974a733fa469120ec016b70c7c741e45de22747d84d2ea",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -434,6 +434,12 @@
       "title": "Drain Vulkan profiler ingress copies",
       "source": "https://github.com/ggml-org/llama.cpp/issues/27544",
       "sha256": "81d4e18c54b3cbcefdfbab7e59734113b2027ad586ea786a8b567b37c1350a88"
+    },
+    {
+      "path": "73-haswell-q8k-peak/change.patch",
+      "title": "Find Q8_K activation peaks with AVX2",
+      "source": "https://github.com/ggml-org/llama.cpp/pull/32554",
+      "sha256": "515b353aabc88b4d52dc02d5ed179d923e620d7c0802e63fb72c1af2c0994ee6"
     }
   ],
   "empty_ports": [

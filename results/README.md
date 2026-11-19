@@ -1,6 +1,7 @@
 # Validation records
 
 - [Published build and executable hash](../performance/provenance.json) · [Build and recipes](../performance/BUILD.md) · [Ordered patches](../performance/patches/series/)
+- [November 19 Haswell Q8_K validation](haswell-q8k-20261119.json) · [Reproducible fixture](../performance/tests/check_q8k_haswell.py) · [Upstream and engine review](mainstream-2026-11-19.md)
 - [RX 580 Vulkan runs, November 18](vulkan-rx580-20261118.json) · [Stock comparison](measurements.json) · [Photo sample and its record](photo-latest.json)
 - [November 11 kernel and request measurements](performance-2026-11-11-kernels.json) · [Operation checks](operations.json) · [Upstream review](mainstream-2026-11-17.json) · [Security checks](security-2026-11-07.json)
 

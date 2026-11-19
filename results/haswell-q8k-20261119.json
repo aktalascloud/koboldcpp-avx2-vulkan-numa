@@ -1,0 +1,380 @@
+{
+  "date": "2026-11-19",
+  "hardware": {
+    "cpu": "Intel Xeon E5-2696 v3 (Haswell, AVX2/BMI1)",
+    "physical_cores_visible": 10,
+    "logical_cores_visible": 20,
+    "gpu": "AMD Radeon RX 580X (Polaris)"
+  },
+  "operator": "Q8_K activation conversion; portable scalar maximum vs Haswell AVX2/BMI1 maximum",
+  "conditions": "WinLibs 13.2 production ggml-quants.o flags; paired alternating QPC; warm cache; no model inference",
+  "upstream": "ed246f4467157b3e5663feae28e7bf4d6990db39",
+  "fixture_sha256": "d3c25762ae99bb3f3707138e994d776f5f7fc48650baf2d057956e8913eebf23",
+  "original_function_sha256": "410d02483568a94399f88656c90f678cb623e77066190eb4d23deff53485cdbb",
+  "candidate_function_sha256": "d1442c3aea246afcd4c9e205967f625026da9a857e59d76ef32c6c3525464180",
+  "matches": 1200,
+  "rows": [
+    {
+      "width": 256,
+      "ns_pairs": [
+        [
+          336.246,
+          103.9
+        ],
+        [
+          337.639,
+          103.589
+        ],
+        [
+          338.636,
+          103.896
+        ],
+        [
+          335.851,
+          103.747
+        ],
+        [
+          337.569,
+          103.843
+        ],
+        [
+          337.779,
+          103.522
+        ],
+        [
+          336.045,
+          103.787
+        ],
+        [
+          337.081,
+          103.522
+        ],
+        [
+          337.169,
+          103.863
+        ],
+        [
+          335.971,
+          105.619
+        ],
+        [
+          338.917,
+          103.663
+        ],
+        [
+          337.245,
+          106.004
+        ]
+      ],
+      "control_median_ns": 337.207,
+      "candidate_median_ns": 103.815,
+      "paired_speedup": 3.2485245720970246
+    },
+    {
+      "width": 1024,
+      "ns_pairs": [
+        [
+          1343.102,
+          412.211
+        ],
+        [
+          1355.336,
+          412.531
+        ],
+        [
+          1338.938,
+          412.215
+        ],
+        [
+          1343.121,
+          412.559
+        ],
+        [
+          1338.277,
+          412.902
+        ],
+        [
+          1346.273,
+          412.555
+        ],
+        [
+          1343.945,
+          411.836
+        ],
+        [
+          1338.914,
+          412.012
+        ],
+        [
+          1344.629,
+          412.676
+        ],
+        [
+          1339.754,
+          420.82
+        ],
+        [
+          1338.742,
+          416.875
+        ],
+        [
+          1338.625,
+          411.555
+        ]
+      ],
+      "control_median_ns": 1341.4279999999999,
+      "candidate_median_ns": 412.543,
+      "paired_speedup": 3.254094097261859
+    },
+    {
+      "width": 4096,
+      "ns_pairs": [
+        [
+          5358.656,
+          1618.031
+        ],
+        [
+          5351.219,
+          1618
+        ],
+        [
+          5347.75,
+          1616.875
+        ],
+        [
+          5329.75,
+          1616.328
+        ],
+        [
+          5403.609,
+          1619.828
+        ],
+        [
+          5327.922,
+          1617.812
+        ],
+        [
+          5350.656,
+          1617.969
+        ],
+        [
+          5328.516,
+          1622.031
+        ],
+        [
+          5365.062,
+          1620.797
+        ],
+        [
+          5327.312,
+          1641.047
+        ],
+        [
+          5326.688,
+          1648.031
+        ],
+        [
+          5360.531,
+          1621.938
+        ]
+      ],
+      "control_median_ns": 5349.2029999999995,
+      "candidate_median_ns": 1618.9295,
+      "paired_speedup": 3.306018036067548
+    },
+    {
+      "width": 8192,
+      "ns_pairs": [
+        [
+          10653.969,
+          3358.125
+        ],
+        [
+          10696.156,
+          3351.094
+        ],
+        [
+          10691.656,
+          3354.531
+        ],
+        [
+          10727.25,
+          3351.062
+        ],
+        [
+          10706.5,
+          3354.094
+        ],
+        [
+          10701.344,
+          3350.469
+        ],
+        [
+          10713.969,
+          3364.469
+        ],
+        [
+          10654.656,
+          3400.625
+        ],
+        [
+          10753.188,
+          3342.281
+        ],
+        [
+          10654.938,
+          3403.594
+        ],
+        [
+          10656.156,
+          3418.969
+        ],
+        [
+          10706.062,
+          3354.5
+        ]
+      ],
+      "control_median_ns": 10698.75,
+      "candidate_median_ns": 3354.5155,
+      "paired_speedup": 3.1893902512928847
+    },
+    {
+      "width": 12288,
+      "ns_pairs": [
+        [
+          15986.826,
+          5083.826
+        ],
+        [
+          16052.18,
+          5045.335
+        ],
+        [
+          16133.146,
+          5057.712
+        ],
+        [
+          16041.632,
+          5031.364
+        ],
+        [
+          15979.419,
+          5079.7
+        ],
+        [
+          16061.135,
+          5157.15
+        ],
+        [
+          16045.101,
+          5067.182
+        ],
+        [
+          15978.762,
+          5123.582
+        ],
+        [
+          15979.559,
+          5126.254
+        ],
+        [
+          16042.522,
+          5063.666
+        ],
+        [
+          15978.95,
+          5140.647
+        ],
+        [
+          16050.633,
+          5029.067
+        ]
+      ],
+      "control_median_ns": 16042.077000000001,
+      "candidate_median_ns": 5073.441,
+      "paired_speedup": 3.156107439795992
+    },
+    {
+      "width": 24576,
+      "ns_pairs": [
+        [
+          32277.111,
+          10138.931
+        ],
+        [
+          32070.169,
+          10124.953
+        ],
+        [
+          32654.784,
+          10142.964
+        ],
+        [
+          31944.184,
+          10130.769
+        ],
+        [
+          32140.432,
+          10115.478
+        ],
+        [
+          31971.764,
+          10128.987
+        ],
+        [
+          32118.668,
+          10156.848
+        ],
+        [
+          31946.811,
+          10171.576
+        ],
+        [
+          31953.94,
+          10269.043
+        ],
+        [
+          32106.191,
+          10123.452
+        ],
+        [
+          31960.319,
+          10119.325
+        ],
+        [
+          32073.64,
+          10100.938
+        ]
+      ],
+      "control_median_ns": 32071.9045,
+      "candidate_median_ns": 10129.878,
+      "paired_speedup": 3.1648530361283256
+    }
+  ],
+  "inputs": "Deterministic random and edge-case 256-element blocks, aligned and offset buffers. Cases include zeros, denormals, opposite-sign ties, saturation and nonfinite inputs in the release configuration.",
+  "output_check": "Compared every byte of each block including the scale, signed quants and block sums. The control and candidate start with the same nonzero output fill.",
+  "pairs_per_width": 12,
+  "fixture_scope": "The fixture compiles the exact control and candidate functions separately using the ggml-quants.o production compiler flags. Timings are for the CPU operator in warm memory.",
+  "upstream_idea": "https://github.com/ggml-org/llama.cpp/pull/32554",
+  "incorporated_into_native_sha256": "efeac32e6aefb9cbe4f4b72a426f5e2b8de4a980dfd71b0aa999003a84b2b3b1",
+  "reproduction": {
+    "fixture": "performance/tests/check_q8k_haswell.py",
+    "fixture_sha256": "c9f1e261a982f323ba81c3b5b48c0c56bf52201359389e407dc47d159eacef69",
+    "matches": 1200,
+    "paired_speedup": {
+      "256": 3.2799989062657935,
+      "1024": 3.2327907080762515,
+      "4096": 3.2604630012985782,
+      "8192": 3.1757180408556596,
+      "12288": 3.1595754388046764,
+      "24576": 3.151832464954195
+    }
+  },
+  "native_package_check": {
+    "embedded_dlls": {
+      "koboldcpp_default.dll": "03518bede1dcea75f130c923ce615aeed6aaf73752ae47de311d812fdb30a028",
+      "koboldcpp_vulkan.dll": "9bef1a505d9ed2ac1be699835072f1693defb5ab8d45de251e8ce83f049d08d0"
+    },
+    "c_abi_exports_per_dll": 62
+  }
+}
