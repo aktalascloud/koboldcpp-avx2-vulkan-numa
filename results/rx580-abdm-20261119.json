@@ -1,0 +1,211 @@
+{
+  "date": "2026-11-19",
+  "hardware": "RX 580 2048SP, wave64, Windows AMD proprietary Vulkan",
+  "upstream": "ed246f4467157b3e5663feae28e7bf4d6990db39",
+  "executables": {
+    "active": "efeac32e6aefb9cbe4f4b72a426f5e2b8de4a980dfd71b0aa999003a84b2b3b1",
+    "trial": "a4bd0605ade1af9a31bb65225a76bc8fe1d60c3583158f88545b1e8d28fc9907"
+  },
+  "trial_source": {
+    "mul_mm.comp": "84df0dbb5f04fd1c365cba0d454fa47f9d46b1e1e586c334d935992a0baa088e",
+    "mul_mm_funcs.glsl": "3bc61925618b67f818e2c4609c72e2ca9d5e50befc30d7764c517bd096cb8059",
+    "flash_attn.comp": "7130822ddd4e94444bb3dc73962b8d5cc195a7784fd18a4fcac6863596f84452",
+    "ggml-vulkan.cpp": "62556c73e4d80f871682336b610ee73c7e871f4285ae4eb667c01eadcd87fa89"
+  },
+  "profile_sha256": "683b625d27c1f4671418918e7f874cea71a0176b442a5eb940e2c11034d08d09",
+  "manifest_sha256": "4c177b31bb55106080460b0cc98f9baa29807f1596eb6f17b3e228ad4673fa43",
+  "payload": {
+    "prompt": "Neutral daylight photograph of a brass compass on textured oak",
+    "seed": 606017,
+    "batch_size": 1,
+    "n_iter": 1,
+    "width": 736,
+    "height": 1104,
+    "steps": 8,
+    "cfg_scale": 1,
+    "sampler_name": "euler",
+    "scheduler": "simple",
+    "eta": 0,
+    "flow_shift": 5,
+    "clip_skip": -1,
+    "cache_mode": "cache-dit",
+    "cache_options": "threshold=0.08,warmup=4,Fn=16,Bn=2"
+  },
+  "environment": {
+    "GGML_VK_ALLOW_GRAPHICS_QUEUE": "1",
+    "GGML_VK_BATCHED_SUBMITS": "1",
+    "GGML_VK_MAX_NODES_PER_SUBMIT": "100",
+    "GGML_VK_GCN_TILE64": "1",
+    "GGML_VK_GCN_TILE_VARIANT": "k16",
+    "GGML_VK_IQ4_XS_ROWS": "4",
+    "GGML_VK_IQ4_XS_WG": "64",
+    "GGML_VK_DISABLE_GET_TENSOR_ASYNC": "1"
+  },
+  "timing_scope": "Real ABDM Native txt2img request wall time. Model load recorded separately. One request per newly loaded process, identical across arms.",
+  "checks": [
+    {
+      "mode": "control",
+      "profiling": false,
+      "request_s": 124.04697240000019,
+      "model_ready_s": 24.072189499999922,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": false,
+      "fa_gate_seen": false
+    },
+    {
+      "mode": "q8",
+      "profiling": false,
+      "request_s": 129.30246820000002,
+      "model_ready_s": 25.331710099999782,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": true,
+      "fa_gate_seen": false
+    },
+    {
+      "mode": "fa",
+      "profiling": false,
+      "request_s": 140.69477009999991,
+      "model_ready_s": 27.234558200000038,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": false,
+      "fa_gate_seen": true
+    },
+    {
+      "mode": "control",
+      "profiling": false,
+      "request_s": 119.89555880000012,
+      "model_ready_s": 26.299174100000073,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": false,
+      "fa_gate_seen": false
+    },
+    {
+      "mode": "fa",
+      "profiling": false,
+      "request_s": 140.31794620000005,
+      "model_ready_s": 26.382307399999945,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": false,
+      "fa_gate_seen": true
+    },
+    {
+      "mode": "q8",
+      "profiling": false,
+      "request_s": 132.07143459999998,
+      "model_ready_s": 84.17664490000016,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": true,
+      "fa_gate_seen": false
+    },
+    {
+      "mode": "control",
+      "profiling": false,
+      "request_s": 125.7272410999999,
+      "model_ready_s": 181.3575605000001,
+      "rgb_sha256": "174dad8475a96fba6d501fe017e5a213994854866302c7485097082813e58f39",
+      "size": [
+        736,
+        1104
+      ],
+      "q8_gate_seen": false,
+      "fa_gate_seen": false
+    }
+  ],
+  "service_restored": true,
+  "decision": {
+    "candidates": {
+      "q8": {
+        "control_s": [
+          124.04697240000019,
+          119.89555880000012,
+          125.7272410999999
+        ],
+        "candidate_s": [
+          129.30246820000002,
+          132.07143459999998
+        ],
+        "median_gain_percent": -5.35279408399314,
+        "bit_exact": true,
+        "specialization_seen": true,
+        "qualified": false
+      },
+      "fa": {
+        "control_s": [
+          124.04697240000019,
+          119.89555880000012,
+          125.7272410999999
+        ],
+        "candidate_s": [
+          140.69477009999991,
+          140.31794620000005
+        ],
+        "median_gain_percent": -13.268671884167471,
+        "bit_exact": true,
+        "specialization_seen": true,
+        "qualified": false
+      }
+    },
+    "winners": [],
+    "gate": "Exact RGB at matched seed, expected specialization observed, all candidate times below the control range, median improvement at least 1%."
+  },
+  "settings_preserved": true,
+  "arm_definitions": {
+    "control": "Installed scalar Vulkan kernels",
+    "q8": "One aligned 32-bit read on odd Q8_0 blocks; original 16-bit loads on other blocks; identical signed byte decode and scale.",
+    "fa": "On staged, dense-shape scalar FlashAttention, reuse Q across K columns in the existing alternate loop order. The per-output accumulation order is unchanged."
+  },
+  "vulkan_dlls": {
+    "active": "9bef1a505d9ed2ac1be699835072f1693defb5ab8d45de251e8ce83f049d08d0",
+    "trial": "cb6484cf25ca5104ffd12e5c416fad798e3234832eef7812a3ea27db99638874"
+  },
+  "request_summary": {
+    "control": {
+      "count": 3,
+      "median_s": 124.04697240000019,
+      "min_s": 119.89555880000012,
+      "max_s": 125.7272410999999
+    },
+    "q8": {
+      "count": 2,
+      "median_s": 130.6869514,
+      "min_s": 129.30246820000002,
+      "max_s": 132.07143459999998
+    },
+    "fa": {
+      "count": 2,
+      "median_s": 140.50635814999998,
+      "min_s": 140.31794620000005,
+      "max_s": 140.69477009999991
+    }
+  },
+  "result": "Both alternatives were slower in repeated ABDM requests. The two candidate kernels were discarded.",
+  "restored_service_http_status": {
+    "5001": 200,
+    "5003": 200,
+    "5005": 200
+  }
+}
