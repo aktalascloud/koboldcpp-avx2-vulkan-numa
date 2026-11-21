@@ -1,7 +1,12 @@
 # SenseNova Loop 9B on RX 580
 
-Copy the rebuilt `koboldcpp-nocuda.exe`, both profiles and the launcher to the folder containing the matching GGUF files. Open `Start-Native.cmd` for 16K or run `Start-Native.cmd 32K`. KoboldCpp serves its API on the loopback interface at port 5013.
+Copy the released EXE, launcher and profiles next to the three matching GGUFs. Run `Start-Native.cmd` for 16K or `Start-Native.cmd 32K`. Vulkan serves localhost on 5013.
 
-The profiles load the Q4_K_M target, its paired Q4_K_M DFlash drafter and the calibrated Q4_0 Qwen3-VL projector. Both keep vision on the CPU and use the full GPU drafter, FlashAttention, Q4_0 target KV and Q8_0 draft KV. The 16K profile uses 48 target layers on the GPU. The 32K profile uses 44 for more headroom. The tensor and cache estimates are 4.41 and 4.11 GiB, respectively. A single 16K start on the RX 580 reached the API in 23.06 seconds with DFlash and vision ready. WDDM recorded 6.88 GiB peak dedicated memory. The 32K profile and generated output remain to be tested.
+| Context | Main GPU layers | DFlash | Draft length | Decode before → after, tok/s | Prefill before → after, tok/s | Peak VRAM, GiB |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| 16K | 54 | CPU | 2 | 3.54 → 6.34 | 45.76 → 56.78 | 5.75 |
+| 32K | 54 | CPU | 2 | 3.78 → 6.35 | 41.80 → 56.78 | 5.98 |
 
-[Model source](https://huggingface.co/satellitedown/SenseNova-Loop-9B-abliterated-GGUF) · [Loop implementation](https://github.com/GuideboardLabs/llama.cpp-sensenova-loop/tree/a7f77a788893ef2cb17c82b9ac0cb1279bcd0918) · [DFlash hidden-state patch](https://huggingface.co/satellitedown/SenseNova-Loop-9B-abliterated-GGUF/tree/2644d93673251404271a0bdf22a4a4436c0d0a54/patches)
+The tested code uses the same GGUFs. Greedy completions can differ with offload or draft length changes. See the release receipt for prompt lengths, repeats, control answers and memory.
+
+[Benchmarks](../../../results/sensenova-loop-speed.json)

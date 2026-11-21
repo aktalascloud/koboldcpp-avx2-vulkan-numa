@@ -1,7 +1,7 @@
 {
-  "upstream": "58bb2a2d5de78736db7883579f9dd789ca55784d",
-  "tree": "ea0d198fd3876bacd60a1d67cceb77ca031454ff",
-  "snapshot_sha256": "658045d9821814b9a7c5986497d7b21bacc59c2be20817e4876971628877a0a8",
+  "upstream": "5b0cbafdcb5537c21e72e14c476930029062f9c9",
+  "tree": "d8a5826683ff959a91795bd595538149039bc33b",
+  "snapshot_sha256": "d79263f7de43f27c41bd3079bc0ca3fd7cf1191a6ff0c72ef3092285d6bba629",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -43,13 +43,13 @@
       "path": "07-windows-numa/change.patch",
       "title": "Windows NUMA affinity",
       "source": "https://github.com/ggml-org/llama.cpp/pull/6832",
-      "sha256": "cabb429fb3aed468820e18e40cd593802498ee4182dc8ae50006aed9833c8f26"
+      "sha256": "621d557390a8e4d23f708304a4edc549153d860b89f58a39532180dc9d0c74d7"
     },
     {
       "path": "08-moe-prefill/change.patch",
       "title": "MoE prefill routing readback bypass",
       "source": "https://github.com/pauldmartinphd/llm-performance-engineering-notebook",
-      "sha256": "eec7a13f95c3261542b349e5e358ef10773f914716b0eb9326822b009415be0b"
+      "sha256": "1d72d7ee5082f857ce013273c2226430f98bd7fbd141da9eaaf3be3b4df64a86"
     },
     {
       "path": "09-shader-dependencies/change.patch",
@@ -73,7 +73,7 @@
       "path": "12-native-build-date/change.patch",
       "title": "Native build date in the UI",
       "source": null,
-      "sha256": "ededacf706491b22adf70286867849d298dd37601e57526362be8f317925fdc4"
+      "sha256": "4cf9c5f583f8e38dee7087454861c5a5c09cbff53ef8fc7fec4c8d5eee105db3"
     },
     {
       "path": "13-gcn-lds/change.patch",
@@ -103,7 +103,7 @@
       "path": "17-video-jpeg95/change.patch",
       "title": "Video MJPEG quality 95",
       "source": null,
-      "sha256": "0904a444cf0d93b59a39b9b8ad7ec579d1db4e2950c7b36800b7be4a515e8372"
+      "sha256": "700661c34517a335c3915f8a731ba74c2248bcc82ce14c7f260dc78f1409983e"
     },
     {
       "path": "18-wan-super-tiny/change.patch",
@@ -121,7 +121,7 @@
       "path": "20-wan-split-vae/change.patch",
       "title": "Separate Wan encoder and decoder",
       "source": "https://github.com/advanced-lvl-up/Rx470-Vega10-Rx580-gfx803-gfx900-fix-AMD-GPU",
-      "sha256": "125a34e92951b4e4f536acd5fbca57712f40a0ed5336453eae0f188b0a9f56ae"
+      "sha256": "d2f0b6ddedab8d54f14bc8f5c9387d212a5eecf6b9b02d88597d8e092f1aa990"
     },
     {
       "path": "21-wan-latent-capture/change.patch",
@@ -133,13 +133,13 @@
       "path": "22-wan-latent-export/change.patch",
       "title": "Wan latent-only operation",
       "source": null,
-      "sha256": "009052c393161fe4f327ba1dcf422cb7115262c618dce057ff935f267656a240"
+      "sha256": "6715253d0ba9aa08e5a2b4ea3d065d253a181dada3d9e150dac00267f627c1bd"
     },
     {
       "path": "23-video-cache-forwarding/change.patch",
       "title": "Video cache options forwarding",
       "source": null,
-      "sha256": "d7b38e2c1413d18b8f7166b27e238b1de516cbe087d129cdfebbf1a927014fc2"
+      "sha256": "a05790d8b3722ba87b61e03c5867e84a26ec7bd43a46a27abb2c66d5c11e5753"
     },
     {
       "path": "24-wan-cache-gates/change.patch",
@@ -157,7 +157,7 @@
       "path": "26-native-media-launcher/change.patch",
       "title": "Native media launcher integration",
       "source": null,
-      "sha256": "a76dca0a1c1fc982d38c6072fb8b6fb19960cc17856dbc995bf51f91f0f7f44f"
+      "sha256": "242f49601e0fdaaa90a9271c5622f1251d1754c924bd2ea7aff70c9f02b63927"
     },
     {
       "path": "27-legacy-vulkan-readback/change.patch",
@@ -458,6 +458,12 @@
       "title": "Native SenseNova Loop text, DFlash and vision",
       "source": "https://github.com/GuideboardLabs/llama.cpp-sensenova-loop/tree/a7f77a788893ef2cb17c82b9ac0cb1279bcd0918",
       "sha256": "769d088994e8fd0c711ead123c4ca0f09d2a9f80705b2cab5e934ca460ea58d3"
+    },
+    {
+      "path": "77-sensenova-dflash-prefill-top1/change.patch",
+      "title": "DFlash prefill and Vulkan top-one",
+      "source": "https://huggingface.co/satellitedown/SenseNova-Loop-9B-abliterated-GGUF/blob/2644d93673251404271a0bdf22a4a4436c0d0a54/patches/0009-ggml-metal-top_k-of-one-value-as-an-argmax-speculati.patch",
+      "sha256": "9c1e9c5328173c3f4dffe0df4380067be7edd1b57bc8f59eec1497b8b3912f75"
     }
   ],
   "empty_ports": [

@@ -1,0 +1,1354 @@
+{
+  "method": "Polaris Vulkan on the local RX 580. Same three GGUFs, quantization, sampler seed 4242, temperature 0 and cache settings. Two 56-token generations on an 18-token prompt with no context reuse, a 491-token prompt with one output, and an RGB vision prompt with six outputs.",
+  "baseline_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+  "candidate_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+  "baseline": [
+    {
+      "name": "baseline-gpu",
+      "context": 16384,
+      "draft_gpu_layers": 999,
+      "executable_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+      "startup_seconds": 28.59,
+      "draft_initialized": true,
+      "errors": [],
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "5bc1c8a23e9bc42b55ad8524b578b7863ab8df579d6d0c710eb3836cfd81afad",
+          "last_process_speed": 13.235293820655064,
+          "last_eval_speed": 3.337505214851898,
+          "last_process_time": 1.3600000305175781,
+          "last_eval_time": 16.779,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 23,
+          "last_draft_failed": 30
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "5bc1c8a23e9bc42b55ad8524b578b7863ab8df579d6d0c710eb3836cfd81afad",
+          "last_process_speed": 19.6078431372549,
+          "last_eval_speed": 3.7435657463734207,
+          "last_process_time": 0.918,
+          "last_eval_time": 14.959,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 23,
+          "last_draft_failed": 30
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 45.75955131396981,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 10.730000314712525,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.9197080291970803,
+          "last_eval_speed": 8.708272666360383,
+          "last_process_time": 11.645,
+          "last_eval_time": 0.6890000152587891,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 3.540535480612659,
+      "prefill_tps": 45.75955131396981
+    },
+    {
+      "name": "baseline-cpu",
+      "context": 16384,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 48,
+      "executable_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+      "startup_seconds": 65.16,
+      "wddm": {
+        "samples": 163,
+        "dedicated": 6588256256,
+        "shared": 1114951680
+      },
+      "draft_initialized": true,
+      "errors": [],
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "5bc1c8a23e9bc42b55ad8524b578b7863ab8df579d6d0c710eb3836cfd81afad",
+          "last_process_speed": 18.10865218945282,
+          "last_eval_speed": 3.3865506563612233,
+          "last_process_time": 0.993999984741211,
+          "last_eval_time": 16.53599951171875,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 25,
+          "last_draft_failed": 28
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "5bc1c8a23e9bc42b55ad8524b578b7863ab8df579d6d0c710eb3836cfd81afad",
+          "last_process_speed": 19.629226389352727,
+          "last_eval_speed": 3.419847430219687,
+          "last_process_time": 0.9169999694824219,
+          "last_eval_time": 16.37499951171875,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 25,
+          "last_draft_failed": 28
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 44.934563989766374,
+          "last_eval_speed": 500.0,
+          "last_process_time": 10.927000429153443,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.490842535393103,
+          "last_eval_speed": 7.444169016349887,
+          "last_process_time": 13.649999755859374,
+          "last_eval_time": 0.8059999694824219,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 3.403199043290455,
+      "prefill_tps": 44.934563989766374
+    },
+    {
+      "name": "baseline-disabled",
+      "context": 16384,
+      "draft_gpu_layers": -1,
+      "main_gpu_layers": 48,
+      "executable_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+      "startup_seconds": 13.55,
+      "wddm": {
+        "samples": 116,
+        "dedicated": 5998653440,
+        "shared": 958160896
+      },
+      "draft_initialized": false,
+      "errors": [],
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "12b1e22c907e42f83685401cf7b4237005b508bbbd41aa1bdddfda9139160f29",
+          "last_process_speed": 21.53110126444625,
+          "last_eval_speed": 5.562176992756251,
+          "last_process_time": 0.835999969482422,
+          "last_eval_time": 10.068000366210939,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "12b1e22c907e42f83685401cf7b4237005b508bbbd41aa1bdddfda9139160f29",
+          "last_process_speed": 21.9512186952463,
+          "last_eval_speed": 5.5096418732782375,
+          "last_process_time": 0.8200000305175782,
+          "last_eval_time": 10.164,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 50.54560227769886,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 9.714000385284423,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.4957791186734286,
+          "last_eval_speed": 6.507591975492465,
+          "last_process_time": 13.623000427246094,
+          "last_eval_time": 0.9220000305175782,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        }
+      ],
+      "short_median_tps": 5.5359094330172445,
+      "prefill_tps": 50.54560227769886
+    },
+    {
+      "name": "baseline32-gpu",
+      "context": 32768,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 44,
+      "draft_amount": 4,
+      "executable_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+      "startup_seconds": 37.62,
+      "wddm": {
+        "samples": 175,
+        "dedicated": 7768633344,
+        "shared": 1121116160
+      },
+      "draft_initialized": true,
+      "errors": [],
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "bb30bec9bfa17324feef55eb9c7fee98c1442267b788305c3448da98ef7676d5",
+          "last_process_speed": 15.530630671194539,
+          "last_eval_speed": 3.796095633157774,
+          "last_process_time": 1.1589999389648438,
+          "last_eval_time": 14.751999267578125,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 26,
+          "last_draft_failed": 28
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "bb30bec9bfa17324feef55eb9c7fee98c1442267b788305c3448da98ef7676d5",
+          "last_process_speed": 16.86972796868639,
+          "last_eval_speed": 3.77078965983376,
+          "last_process_time": 1.067000015258789,
+          "last_eval_time": 14.851000732421875,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 26,
+          "last_draft_failed": 28
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 41.8014634594385,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 11.746000244140625,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.7843747023311574,
+          "last_eval_speed": 2.1208907741251326,
+          "last_process_time": 12.211000183105469,
+          "last_eval_time": 2.829,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 1,
+          "last_draft_failed": 3
+        }
+      ],
+      "short_median_tps": 3.783442646495767,
+      "prefill_tps": 41.8014634594385
+    }
+  ],
+  "tested": [
+    {
+      "name": "optimized-gpu",
+      "context": 16384,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 48,
+      "draft_amount": 4,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 21.05,
+      "wddm": {
+        "samples": 156,
+        "dedicated": 7582875648,
+        "shared": 994222080
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "5bc1c8a23e9bc42b55ad8524b578b7863ab8df579d6d0c710eb3836cfd81afad",
+          "last_process_speed": 13.225568841128096,
+          "last_eval_speed": 3.2687370064262486,
+          "last_process_time": 1.3610000610351562,
+          "last_eval_time": 17.131999267578124,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 23,
+          "last_draft_failed": 30
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "5bc1c8a23e9bc42b55ad8524b578b7863ab8df579d6d0c710eb3836cfd81afad",
+          "last_process_speed": 19.189765614505642,
+          "last_eval_speed": 3.736820972086627,
+          "last_process_time": 0.9379999923706055,
+          "last_eval_time": 14.986000244140625,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 23,
+          "last_draft_failed": 30
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 48.943380370650736,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 10.032000165939332,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.426664816255751,
+          "last_eval_speed": 8.57142875827089,
+          "last_process_time": 14.01099969482422,
+          "last_eval_time": 0.699999984741211,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 3.502778989256438,
+      "prefill_tps": 48.943380370650736,
+      "matching_text": true,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": true
+    },
+    {
+      "name": "optimized-gpu-ngl52",
+      "context": 16384,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 52,
+      "draft_amount": 4,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 31.61,
+      "wddm": {
+        "samples": 161,
+        "dedicated": 7624900608,
+        "shared": 993288192
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "9ecde13fe1dedee3f51c1cb0026f77dafb1b1030fa37a24f66a26393c94a578e",
+          "last_process_speed": 22.727272727272727,
+          "last_eval_speed": 3.6842107038418757,
+          "last_process_time": 0.792,
+          "last_eval_time": 15.199999267578125,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 20,
+          "last_draft_failed": 33
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "9ecde13fe1dedee3f51c1cb0026f77dafb1b1030fa37a24f66a26393c94a578e",
+          "last_process_speed": 23.904383196717014,
+          "last_eval_speed": 3.841668574721966,
+          "last_process_time": 0.7529999771118164,
+          "last_eval_time": 14.576999267578126,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 20,
+          "last_draft_failed": 33
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 55.3863478982444,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.865000467300415,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.2535885737559678,
+          "last_eval_speed": 9.803921568627452,
+          "last_process_time": 10.44999981689453,
+          "last_eval_time": 0.612,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 3.762939639281921,
+      "prefill_tps": 55.3863478982444,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "optimized-cpu-ngl54",
+      "context": 16384,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 54,
+      "draft_amount": 4,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 27.58,
+      "wddm": {
+        "samples": 144,
+        "dedicated": 6917632000,
+        "shared": 1008410624
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 22.988505747126435,
+          "last_eval_speed": 4.272526091283391,
+          "last_process_time": 0.783,
+          "last_eval_time": 13.107000122070312,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 29,
+          "last_draft_failed": 24
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 24.590163165540755,
+          "last_eval_speed": 4.366471818014281,
+          "last_process_time": 0.7320000228881836,
+          "last_eval_time": 12.824999755859375,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 29,
+          "last_draft_failed": 24
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 56.72366030156299,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.655999937057496,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.4109147815710252,
+          "last_eval_speed": 8.928571428571429,
+          "last_process_time": 9.968000427246094,
+          "last_eval_time": 0.672,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 4.319498954648836,
+      "prefill_tps": 56.72366030156299,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "optimized-gpu-ngl52-n2",
+      "context": 16384,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 52,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 31.59,
+      "wddm": {
+        "samples": 142,
+        "dedicated": 7428063232,
+        "shared": 979193856
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "9ecde13fe1dedee3f51c1cb0026f77dafb1b1030fa37a24f66a26393c94a578e",
+          "last_process_speed": 23.07692375408829,
+          "last_eval_speed": 5.798302145723925,
+          "last_process_time": 0.7799999771118165,
+          "last_eval_time": 9.657999633789062,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 19,
+          "last_draft_failed": 29
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "9ecde13fe1dedee3f51c1cb0026f77dafb1b1030fa37a24f66a26393c94a578e",
+          "last_process_speed": 24.06417014120295,
+          "last_eval_speed": 5.846121650105659,
+          "last_process_time": 0.7480000305175781,
+          "last_eval_time": 9.579000122070312,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 19,
+          "last_draft_failed": 29
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 55.51158596620587,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.845000398635865,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.0954113700444887,
+          "last_eval_speed": 4.874085988021689,
+          "last_process_time": 10.98400048828125,
+          "last_eval_time": 1.2310000305175781,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 5.8222118979147925,
+      "prefill_tps": 55.51158596620587,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "optimized-gpu-ngl44-n4-32K",
+      "context": 32768,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 44,
+      "draft_amount": 4,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 33.09,
+      "wddm": {
+        "samples": 185,
+        "dedicated": 7770902528,
+        "shared": 998678528
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "bb30bec9bfa17324feef55eb9c7fee98c1442267b788305c3448da98ef7676d5",
+          "last_process_speed": 16.72862429808685,
+          "last_eval_speed": 3.7763842987326504,
+          "last_process_time": 1.0760000152587892,
+          "last_eval_time": 14.828999267578125,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 26,
+          "last_draft_failed": 28
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "e33f39a98e1102af82db4813d44c80d211d3d6fbb97997445860dab05ed39637",
+          "last_process_speed": 16.18705013759462,
+          "last_eval_speed": 3.1182135818337415,
+          "last_process_time": 1.112000015258789,
+          "last_eval_time": 17.959000732421874,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 19,
+          "last_draft_failed": 35
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 43.996416093943516,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 11.15999991798401,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.3457982020796906,
+          "last_eval_speed": 4.05131676140201,
+          "last_process_time": 14.494000366210939,
+          "last_eval_time": 1.4809999694824219,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 1,
+          "last_draft_failed": 3
+        }
+      ],
+      "short_median_tps": 3.447298940283196,
+      "prefill_tps": 43.996416093943516,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "optimized-gpu-ngl50-n4-32K",
+      "context": 32768,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 50,
+      "draft_amount": 4,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 40.56,
+      "wddm": {
+        "samples": 179,
+        "dedicated": 7141842944,
+        "shared": 996032512
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "91c510b28f8f801cc8bb970cc4826c2f1a9adf8a2a197da57b00d0b014336662",
+          "last_process_speed": 19.758507300488965,
+          "last_eval_speed": 3.8538296785578154,
+          "last_process_time": 0.9109999923706055,
+          "last_eval_time": 14.531000244140625,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 23,
+          "last_draft_failed": 29
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "91c510b28f8f801cc8bb970cc4826c2f1a9adf8a2a197da57b00d0b014336662",
+          "last_process_speed": 20.7134633877303,
+          "last_eval_speed": 3.8162738083286727,
+          "last_process_time": 0.8690000152587891,
+          "last_eval_time": 14.673999511718751,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 23,
+          "last_draft_failed": 29
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 51.853418907773666,
+          "last_eval_speed": 500.0,
+          "last_process_time": 9.468999544143678,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.1507737751544833,
+          "last_eval_speed": 9.188361194175704,
+          "last_process_time": 10.791000061035156,
+          "last_eval_time": 0.653000015258789,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 3.835051743443244,
+      "prefill_tps": 51.853418907773666,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "optimized-cpu-ngl54-n4-32K",
+      "context": 32768,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 54,
+      "draft_amount": 4,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 34.11,
+      "wddm": {
+        "samples": 162,
+        "dedicated": 6492381184,
+        "shared": 1011150848
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 22.959182779772124,
+          "last_eval_speed": 4.287902111047217,
+          "last_process_time": 0.7840000305175782,
+          "last_eval_time": 13.059999633789063,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 29,
+          "last_draft_failed": 24
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 24.72527576175211,
+          "last_eval_speed": 4.379448002174221,
+          "last_process_time": 0.7279999694824218,
+          "last_eval_time": 12.786999633789062,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 29,
+          "last_draft_failed": 24
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 56.573340279543224,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.678999641418457,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.665203494240548,
+          "last_eval_speed": 8.57142875827089,
+          "last_process_time": 12.756999633789063,
+          "last_eval_time": 0.699999984741211,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 3,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 4.333675056610719,
+      "prefill_tps": 56.573340279543224,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "optimized-disabled",
+      "context": 16384,
+      "draft_gpu_layers": -1,
+      "main_gpu_layers": 48,
+      "draft_amount": 0,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 42.09,
+      "wddm": {
+        "samples": 167,
+        "dedicated": 5406580736,
+        "shared": 955072512
+      },
+      "draft_initialized": false,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "12b1e22c907e42f83685401cf7b4237005b508bbbd41aa1bdddfda9139160f29",
+          "last_process_speed": 19.480519963066794,
+          "last_eval_speed": 5.426882578246197,
+          "last_process_time": 0.9239999771118165,
+          "last_eval_time": 10.318999755859375,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "12b1e22c907e42f83685401cf7b4237005b508bbbd41aa1bdddfda9139160f29",
+          "last_process_speed": 20.737327553486757,
+          "last_eval_speed": 5.444293149466598,
+          "last_process_time": 0.867999984741211,
+          "last_eval_time": 10.286000122070313,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 50.358975600263335,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 9.749999759674072,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 2.975409198216752,
+          "last_eval_speed": 6.224066193004744,
+          "last_process_time": 11.42699969482422,
+          "last_eval_time": 0.9640000305175781,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        }
+      ],
+      "short_median_tps": 5.435587863856398,
+      "prefill_tps": 50.358975600263335,
+      "matching_text": true,
+      "under_8_gib": true,
+      "quality_preserved": false,
+      "release_eligible": false
+    },
+    {
+      "name": "refined-gpu-ngl52-n2",
+      "context": 16384,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 52,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 35.31,
+      "quality": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      },
+      "wddm": {
+        "samples": 163,
+        "dedicated": 6860345344,
+        "shared": 981864448
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "9ecde13fe1dedee3f51c1cb0026f77dafb1b1030fa37a24f66a26393c94a578e",
+          "last_process_speed": 22.14022077890598,
+          "last_eval_speed": 5.806117012181541,
+          "last_process_time": 0.8130000228881836,
+          "last_eval_time": 9.645000244140626,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 19,
+          "last_draft_failed": 29
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "9ecde13fe1dedee3f51c1cb0026f77dafb1b1030fa37a24f66a26393c94a578e",
+          "last_process_speed": 24.193549131379562,
+          "last_eval_speed": 5.847342740688515,
+          "last_process_time": 0.7439999771118164,
+          "last_eval_time": 9.576999755859376,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 19,
+          "last_draft_failed": 29
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 55.52414328246804,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.843000017166139,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.1835206174444455,
+          "last_eval_speed": 8.264462809917356,
+          "last_process_time": 10.679999938964844,
+          "last_eval_time": 0.726,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 5.826729876435028,
+      "prefill_tps": 55.52414328246804,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": true,
+      "release_eligible": true
+    },
+    {
+      "name": "refined-cpu-ngl54-n2",
+      "context": 16384,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 54,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 29.56,
+      "quality": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      },
+      "wddm": {
+        "samples": 144,
+        "dedicated": 6170214400,
+        "shared": 1004863488
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 23.25581395348837,
+          "last_eval_speed": 6.2688908015774,
+          "last_process_time": 0.774,
+          "last_eval_time": 8.932999755859376,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 24.827585684360148,
+          "last_eval_speed": 6.410990089847381,
+          "last_process_time": 0.7250000152587891,
+          "last_eval_time": 8.735000244140625,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 56.776131344184826,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.648000284194946,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.34678598034948,
+          "last_eval_speed": 7.575757575757575,
+          "last_process_time": 10.159000366210938,
+          "last_eval_time": 0.792,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 6.33994044571239,
+      "prefill_tps": 56.776131344184826,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": true,
+      "release_eligible": true
+    },
+    {
+      "name": "refined-gpu-ngl50-n2-32K",
+      "context": 32768,
+      "draft_gpu_layers": 999,
+      "main_gpu_layers": 50,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 19.06,
+      "quality": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      },
+      "wddm": {
+        "samples": 132,
+        "dedicated": 7152631808,
+        "shared": 981135360
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "91c510b28f8f801cc8bb970cc4826c2f1a9adf8a2a197da57b00d0b014336662",
+          "last_process_speed": 21.53110126444625,
+          "last_eval_speed": 5.559416261292564,
+          "last_process_time": 0.835999969482422,
+          "last_eval_time": 10.073,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 20,
+          "last_draft_failed": 30
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "91c510b28f8f801cc8bb970cc4826c2f1a9adf8a2a197da57b00d0b014336662",
+          "last_process_speed": 22.33250578068611,
+          "last_eval_speed": 5.568814705627183,
+          "last_process_time": 0.8060000152587891,
+          "last_eval_time": 10.055999877929688,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 20,
+          "last_draft_failed": 30
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 52.10101687254973,
+          "last_eval_speed": 1000.0,
+          "last_process_time": 9.424000326156616,
+          "last_eval_time": 0.001,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.083061349703064,
+          "last_eval_speed": 7.915567122978932,
+          "last_process_time": 11.027999816894532,
+          "last_eval_time": 0.7580000152587891,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 5.564115483459874,
+      "prefill_tps": 52.10101687254973,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": true,
+      "release_eligible": true
+    },
+    {
+      "name": "refined-cpu-ngl54-n2-32K",
+      "context": 32768,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 54,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 29.61,
+      "quality": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      },
+      "wddm": {
+        "samples": 145,
+        "dedicated": 6416187392,
+        "shared": 1006034944
+      },
+      "draft_initialized": true,
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 23.316061945741662,
+          "last_eval_speed": 6.247211151561693,
+          "last_process_time": 0.7720000076293946,
+          "last_eval_time": 8.963999877929687,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 24.72527576175211,
+          "last_eval_speed": 6.452356080737154,
+          "last_process_time": 0.7279999694824218,
+          "last_eval_time": 8.679000244140624,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 56.776131344184826,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.648000284194946,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.2380953698536756,
+          "last_eval_speed": 7.633587786259541,
+          "last_process_time": 10.499999572753907,
+          "last_eval_time": 0.786,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 6.349783616149423,
+      "prefill_tps": 56.776131344184826,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": true,
+      "release_eligible": true
+    }
+  ],
+  "quality_controls": [
+    {
+      "context": 16384,
+      "checks": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      }
+    },
+    {
+      "context": 32768,
+      "checks": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      }
+    }
+  ],
+  "selected": {
+    "16384": {
+      "name": "refined-cpu-ngl54-n2",
+      "context": 16384,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 54,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 29.56,
+      "quality": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      },
+      "wddm": {
+        "samples": 144,
+        "dedicated": 6170214400,
+        "shared": 1004863488
+      },
+      "draft_initialized": true,
+      "errors": [],
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 23.25581395348837,
+          "last_eval_speed": 6.2688908015774,
+          "last_process_time": 0.774,
+          "last_eval_time": 8.932999755859376,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 24.827585684360148,
+          "last_eval_speed": 6.410990089847381,
+          "last_process_time": 0.7250000152587891,
+          "last_eval_time": 8.735000244140625,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 56.776131344184826,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.648000284194946,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.34678598034948,
+          "last_eval_speed": 7.575757575757575,
+          "last_process_time": 10.159000366210938,
+          "last_eval_time": 0.792,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 6.33994044571239,
+      "prefill_tps": 56.776131344184826,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": true,
+      "release_eligible": true
+    },
+    "32768": {
+      "name": "refined-cpu-ngl54-n2-32K",
+      "context": 32768,
+      "draft_gpu_layers": 0,
+      "main_gpu_layers": 54,
+      "draft_amount": 2,
+      "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+      "startup_seconds": 29.61,
+      "quality": {
+        "sum": true,
+        "capital": true,
+        "antonym": true,
+        "units": true,
+        "oxygen": true
+      },
+      "wddm": {
+        "samples": 145,
+        "dedicated": 6416187392,
+        "shared": 1006034944
+      },
+      "draft_initialized": true,
+      "errors": [],
+      "ok": true,
+      "runs": [
+        {
+          "label": "short-1",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 23.316061945741662,
+          "last_eval_speed": 6.247211151561693,
+          "last_process_time": 0.7720000076293946,
+          "last_eval_time": 8.963999877929687,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "short-2",
+          "text_sha256": "997b9080faa4d2eee980c24167e8cf6daeaadc6e8f3c28b4f92e34f821f0408b",
+          "last_process_speed": 24.72527576175211,
+          "last_eval_speed": 6.452356080737154,
+          "last_process_time": 0.7279999694824218,
+          "last_eval_time": 8.679000244140624,
+          "last_token_count": 56,
+          "last_input_count": 18,
+          "last_draft_success": 27,
+          "last_draft_failed": 21
+        },
+        {
+          "label": "prefill",
+          "text_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+          "last_process_speed": 56.776131344184826,
+          "last_eval_speed": 500.0,
+          "last_process_time": 8.648000284194946,
+          "last_eval_time": 0.002,
+          "last_token_count": 1,
+          "last_input_count": 491,
+          "last_draft_success": 0,
+          "last_draft_failed": 0
+        },
+        {
+          "label": "vision",
+          "text_sha256": "381e8fa59a04619166aee0a434ea8f83c36601964be6dd533ab5a16826f3dc6c",
+          "last_process_speed": 3.2380953698536756,
+          "last_eval_speed": 7.633587786259541,
+          "last_process_time": 10.499999572753907,
+          "last_eval_time": 0.786,
+          "last_token_count": 6,
+          "last_input_count": 34,
+          "last_draft_success": 2,
+          "last_draft_failed": 1
+        }
+      ],
+      "short_median_tps": 6.349783616149423,
+      "prefill_tps": 56.776131344184826,
+      "matching_text": false,
+      "under_8_gib": true,
+      "quality_preserved": true,
+      "release_eligible": true
+    }
+  },
+  "media_restored": true,
+  "release_passed": true
+}

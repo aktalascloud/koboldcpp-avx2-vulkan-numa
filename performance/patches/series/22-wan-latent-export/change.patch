@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index c67584ad6..4b8a8e231 100644
+index 0eb01ffda..1cc64d3fc 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -9499,6 +9499,9 @@ Change Mode<br>
+@@ -9501,6 +9501,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -13,7 +13,7 @@ index c67584ad6..4b8a8e231 100644
                              self.send_response(202 if is_sdcpp_imggen else 200)
                              self.send_header('content-length', str(len(genresp)))
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index d70d8fb12..8bc4b8a82 100644
+index 5e86e8922..897e7d6ed 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
 @@ -2982,6 +2982,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)

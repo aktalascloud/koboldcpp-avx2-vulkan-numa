@@ -1,13 +1,13 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "58bb2a2d5de78736db7883579f9dd789ca55784d",
+  "commit": "5b0cbafdcb5537c21e72e14c476930029062f9c9",
   "flags": [
     "-O3",
     "-march=haswell",
     "-mtune=haswell"
   ],
-  "jobs": 2,
+  "jobs": 3,
   "host_cxx_flags": [
     "-O3",
     "-mtune=haswell",
@@ -19,16 +19,16 @@
   "cpu_optimization": "lto-tuned",
   "compiler_policy": "winlibs",
   "profile_flags": "",
-  "lto_flags": "-flto=2 -fuse-linker-plugin",
-  "executable_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
-  "patch_sha256": "658045d9821814b9a7c5986497d7b21bacc59c2be20817e4876971628877a0a8",
-  "seconds": 1989.0758838653564,
+  "lto_flags": "-flto=3 -fuse-linker-plugin",
+  "executable_sha256": "3ccc5579e96c5cf20017635b553454ae5f0e718c4ca9f254d9917adf59505e41",
+  "patch_sha256": "d79263f7de43f27c41bd3079bc0ca3fd7cf1191a6ff0c72ef3092285d6bba629",
+  "seconds": 1427.9417295455933,
   "deployed": true,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "6a8b7db83f1a23054dbb4eca66bcc6f707624e911304c65099b36428bf28d493",
+  "native_source_signature": "377eb96dcf03fc5282bce7ba455056fd5be1f9775da7e145a69bd38f0d100ede",
   "native_input_count": 3424,
   "native_dlls_reused": false,
   "native_validation_parent_sha256": null,
@@ -39,8 +39,8 @@
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "ebbedf1f26acfaff96fb07be9624893287fd949f2b1fb87a9df134f6f709a624",
-    "koboldcpp_vulkan.dll": "8495ec61c2bd730cb85eafa0b445bb7d985298858c9ed7be68709ea76652c2a5"
+    "koboldcpp_default.dll": "bbf45de4fc835f6cefdc72830b2c94627564f3fdcbe769fde8368d0a27adb72e",
+    "koboldcpp_vulkan.dll": "bbc4cae9fdb31faa57f07f37b6ddbb1ce56fd1e6905a3111d4a80f8e3418e2cb"
   },
   "cpu_threads": {
     "threads": 16,

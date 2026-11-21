@@ -1,6 +1,6 @@
 # KoboldCpp · Haswell AVX2 and Polaris Vulkan
 
-The current release adds SenseNova Loop, DFlash and vision in KoboldCpp. [RX 580 profiles and verification scope](performance/configs/sensenova-loop/).
+SenseNova Loop on the local RX 580. 16K 3.54 → 6.34 tok/s, 32K 3.78 → 6.35 tok/s. [Paired measurements](results/sensenova-loop-speed.json).
 
 [Русский](README.ru.md) · [Release / Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Guide / Документация](performance/RUN.txt) · [Evidence / Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
 

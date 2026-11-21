@@ -1,5 +1,5 @@
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 1baba4386..d70d8fb12 100644
+index 955e97b07..5e86e8922 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
 @@ -316,6 +316,7 @@ struct KcppLoadParams {
