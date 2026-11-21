@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/arch/x86/quants.c b/ggml/src/ggml-cpu/arch/x86/quants.c
-index 288942895..c9de9b07f 100644
+index 4cddc7adb..30c3a564c 100644
 --- a/ggml/src/ggml-cpu/arch/x86/quants.c
 +++ b/ggml/src/ggml-cpu/arch/x86/quants.c
-@@ -4144,8 +4144,8 @@ void ggml_vec_dot_iq4_xs_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const v
+@@ -4162,8 +4162,8 @@ void ggml_vec_dot_iq4_xs_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const v
  
  #if defined __AVX2__
  
@@ -13,7 +13,7 @@ index 288942895..c9de9b07f 100644
  
      __m256 accum = _mm256_setzero_ps();
      for (int ibl = 0; ibl < nb; ++ibl) {
-@@ -4155,14 +4155,14 @@ void ggml_vec_dot_iq4_xs_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const v
+@@ -4173,14 +4173,14 @@ void ggml_vec_dot_iq4_xs_q8_K(int n, float * GGML_RESTRICT s, size_t bs, const v
          __m256i sumi1 = _mm256_setzero_si256();
          __m256i sumi2 = _mm256_setzero_si256();
          for (int ib = 0; ib < QK_K/32; ib += 2) {

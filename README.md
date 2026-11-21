@@ -1,10 +1,12 @@
 # KoboldCpp · Haswell AVX2 and Polaris Vulkan
 
-[Русский](README.ru.md) · [Release / Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/tag/v1.125-20261119-efeac32e) · [Guide / Документация](performance/RUN.txt) · [Evidence / Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
+[Русский](README.ru.md) · [Release / Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/tag/v1.125-20261121-f1df2675) · [Guide / Документация](performance/RUN.txt) · [Evidence / Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
 
 Portable Windows x64 inference for Intel Haswell and AMD Polaris / RX 580. This experimental KoboldCpp fork carries compiler, kernel and NUMA patches for local GGUF text and media workloads.
 
 **Quick start.** Extract the Windows ZIP and run `koboldcpp-nocuda.exe`. Supply your own GGUF weights. For an O3/LTO build, run `py -3.12 performance/setup.py --build` and start with the tested configuration in [RUN.txt](performance/RUN.txt).
+
+The November 21 build adds the measured Haswell AVX2 Q8_0 row decoder. At width 4,096, the operator median fell from 0.706 to 0.553 µs with byte-identical results. [Operator data / Замеры](results/haswell-q8-0-decode-20261121.json).
 
 The November 19 Haswell build speeds up Q8_K activation conversion by 3.16–3.31× in isolated paired tests. All 1,200 cases matched the reference byte for byte. [Operator proof](results/haswell-q8k-20261119.json).
 

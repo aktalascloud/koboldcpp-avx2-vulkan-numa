@@ -63,7 +63,11 @@ def main():
     if shader_object.exists():shader_object.unlink()  # -o must not preserve stale embedded SPIR-V.
     args=[*common,'-B','-f',str(BASE/'haswell.mk').replace('\\','/'),'-f',str(recipe_path).replace('\\','/'),
           '-j'+str(options.jobs),'-o','ggml/src/ggml-vulkan-shaders.cpp','-o','vulkan-shaders-gen']
-    run([*args,'koboldcpp_vulkan'],environment,'vulkan.log')
+    embed_args=['-j1' if arg==f'-j{options.jobs}' else arg for arg in args]
+    run([*embed_args,'ggml-vulkan-shaders.o'],environment,'shader-embed.log')
+    if not shader_object.is_file() or shader_object.stat().st_mtime_ns < (SRC/'ggml/src/ggml-vulkan-shaders.cpp').stat().st_mtime_ns:
+        raise RuntimeError('Embedded Vulkan shader object is missing or stale.')
+    run([*args,'-o','ggml-vulkan-shaders.o','koboldcpp_vulkan'],environment,'vulkan.log')
     # Full rebuild also prevents instrumentation objects reaching the CPU link.
     cpu_args=[str(cpu_recipe_path).replace('\\','/') if value==str(recipe_path).replace('\\','/') else value for value in args]
     run([*cpu_args,'koboldcpp_default'],environment,'cpu.log')

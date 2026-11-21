@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 6ad9255f9..eaed8ad30 100644
+index 82b8e7d36..80cc18bf5 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -2148,6 +2148,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2180,6 +2180,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              !device->coopmat_support && getenv("GGML_VK_GCN_TILE64") != nullptr) {
              l_warptile = m_warptile = { 256, 64, 64, 32, 16, 64, 1, 4, 4, 1, 64 };
              l_wg_denoms = m_wg_denoms = { 64, 64, 1 };
@@ -23,10 +23,10 @@ index 6ad9255f9..eaed8ad30 100644
          }
  
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
-index 19d37870b..ea1d43e18 100644
+index 68de76373..051fd2324 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/mul_mm.comp
-@@ -170,7 +170,8 @@ layout (constant_id = 9) const uint TK = 1;  // Only needed for coopmat
+@@ -186,7 +186,8 @@ layout (constant_id = 9) const uint TK = 1;  // Only needed for coopmat
  layout (constant_id = 10) const uint WARP = 32;
  
  #if defined(DATA_A_F32) || defined(DATA_A_F16)

@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index b774dc40b..6ad9255f9 100644
+index 0fa34f75a..82b8e7d36 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -2142,6 +2142,15 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2174,6 +2174,15 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              }
          }
  

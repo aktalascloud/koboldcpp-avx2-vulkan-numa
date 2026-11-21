@@ -1,40 +1,40 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 90fdeabde..32cd6219c 100644
+index bb4fac6be..6833cf497 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -860,7 +860,7 @@ struct vk_device_struct {
-     vk_pipeline pipeline_concat_i8, pipeline_concat_i16, pipeline_concat_i32, pipeline_concat_i64;
-     vk_pipeline pipeline_concat_transpose_i8, pipeline_concat_transpose_i16, pipeline_concat_transpose_i32;
+@@ -898,6 +898,7 @@ struct vk_device_struct {
      vk_pipeline pipeline_upscale_nearest_f32, pipeline_upscale_bilinear_f32, pipeline_upscale_bicubic_f32, pipeline_upscale_bilinear_antialias_f32;
--    vk_pipeline pipeline_scale_f32;
-+    vk_pipeline pipeline_scale_f32, pipeline_scale_f32_vec4;
-     vk_pipeline pipeline_log[2];
-     vk_pipeline pipeline_tri[2];
-     vk_pipeline pipeline_diag[2];
+     // [src/dst 0=fp32,1=fp16,2=bf16]
+     vk_pipeline pipeline_scale[3];
++    vk_pipeline pipeline_scale_f32_vec4;
+     vk_pipeline pipeline_log[3];
+     vk_pipeline pipeline_tri[3];
+     vk_pipeline pipeline_diag[3];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 21d44abdf..d128bb94c 100644
+index 46a091985..eaee7903e 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -3810,6 +3810,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
-     ggml_vk_create_pipeline(device, device->pipeline_upscale_bilinear_antialias_f32, "upscale_f32", upscale_f32_len, upscale_f32_data, "main", 2, sizeof(vk_op_upscale_push_constants), {512, 1, 1}, {GGML_SCALE_MODE_BILINEAR | GGML_SCALE_FLAG_ANTIALIAS}, 1);
+@@ -3916,6 +3916,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     ggml_vk_create_pipeline(device, device->pipeline_ ## name [2], #name "_bf16", name ## _bf16_len, name ## _bf16_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
  
-     ggml_vk_create_pipeline(device, device->pipeline_scale_f32, "scale_f32", scale_f32_len, scale_f32_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
+     CREATE_UNARY(scale)
 +    if (device->vendor_id == VK_VENDOR_ID_AMD && device->architecture == AMD_GCN &&
 +        device->subgroup_size == 64 &&
 +        (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
 +        device->properties.limits.minStorageBufferOffsetAlignment % 16 == 0) {
 +        ggml_vk_create_pipeline(device, device->pipeline_scale_f32_vec4, "scale_f32_vec4", scale_f32_vec4_len, scale_f32_vec4_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
 +    }
- 
-     ggml_vk_create_pipeline(device, device->pipeline_log[0], "log_f32", log_f32_len, log_f32_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
-     ggml_vk_create_pipeline(device, device->pipeline_log[1], "log_f16", log_f16_len, log_f16_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
-@@ -11352,7 +11358,12 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+     CREATE_UNARY(log)
+     CREATE_UNARY(sqr)
+     CREATE_UNARY(sqrt)
+@@ -11789,7 +11795,13 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      // KCPP_POLARIS_SCALE_ROWS: support is limited below to packed 2D rows.
      p.param3 = ggml_is_contiguous(src0) ? 0.0f : 1.0f;
  
 -    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
 +    const auto & vec4 = ctx->device->pipeline_scale_f32_vec4;
-+    const bool aligned = vec4 && p.param3 == 0.0f && ggml_is_contiguous(dst) &&
++    const bool aligned = vec4 && src0->type == GGML_TYPE_F32 && dst->type == GGML_TYPE_F32 &&
++        p.param3 == 0.0f && ggml_is_contiguous(dst) &&
 +        p.ne >= 393216 && p.ne % 4 == 0 && std::isfinite(p.param1) && std::isfinite(p.param2) &&
 +        (get_misalign_bytes(ctx, src0) | get_misalign_bytes(ctx, dst)) % 16 == 0;
 +    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p),
@@ -43,7 +43,7 @@ index 21d44abdf..d128bb94c 100644
  
  void ggml_vk_sqr(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * src0, ggml_tensor * dst) {
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
-index 0dc989d50..470680a97 100644
+index 9bdb3ffcc..8c9a404f7 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 @@ -7,6 +7,19 @@ const uint num_threads = 128;
@@ -72,14 +72,14 @@ index 0dc989d50..470680a97 100644
  }
 +#endif
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 7899ba299..1b06d2753 100644
+index 092c57340..977e34c5d 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -999,6 +999,7 @@ void process_shaders() {
-     string_to_spv("repeat_i16", "repeat.comp", {{"A_TYPE", "int16_t"}, {"D_TYPE", "int16_t"}});
+@@ -1023,6 +1023,7 @@ void process_shaders() {
+     string_to_spv("concat_transpose_i32", "concat_transpose.comp", {{"A_TYPE", "uint"}, {"B_TYPE", "uint"}, {"D_TYPE", "uint"}});
  
-     string_to_spv("scale_f32", "scale.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}, {"FLOAT_TYPE", "float"}});
+     string_to_spv("upscale_f32", "upscale.comp", {{"A_TYPE", "float"}, {"B_TYPE", "float"}, {"D_TYPE", "float"}});
 +    string_to_spv("scale_f32_vec4", "scale.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}, {"FLOAT_TYPE", "float"}, {"KCPP_SCALE_VEC4", "1"}});
  
-     string_to_spv("pad_f32", "pad.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}});
-     string_to_spv("pad_reflect_1d_f32", "pad_reflect_1d.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}});
+     const std::vector<std::pair<std::string, std::map<std::string, std::string>>> float_types = {
+         {"f32",  {{"A_TYPE", "float"},     {"D_TYPE", "float"}}},

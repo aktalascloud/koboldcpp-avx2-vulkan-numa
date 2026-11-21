@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 59cfe2f5c..f3a377e53 100644
+index 184687fdd..c86d80e62 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -16081,7 +16081,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
+@@ -16564,7 +16564,8 @@ ggml_backend_t ggml_backend_vk_init(size_t dev_num) {
          /* .context = */ ctx,
      };
  

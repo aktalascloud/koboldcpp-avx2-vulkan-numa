@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-quants.c b/ggml/src/ggml-quants.c
-index 1742adb90..bd439ceaf 100644
+index 3b0b1ffac..8bcf8590a 100644
 --- a/ggml/src/ggml-quants.c
 +++ b/ggml/src/ggml-quants.c
 @@ -2807,10 +2807,44 @@ void quantize_row_q8_K_ref(const float * GGML_RESTRICT x, block_q8_K * GGML_REST

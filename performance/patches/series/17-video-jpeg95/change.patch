@@ -1,8 +1,8 @@
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index e1c52e940..bd6b75109 100644
+index 63c71e35b..de1f06de3 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -2553,7 +2553,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -3172,7 +3172,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              }
              if(output_avi)
              {

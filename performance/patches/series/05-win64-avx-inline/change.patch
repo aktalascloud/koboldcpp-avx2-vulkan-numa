@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/vec.h b/ggml/src/ggml-cpu/vec.h
-index c54ed3f07..f29cc9be5 100644
+index 4aac5e966..fc5c2b2f5 100644
 --- a/ggml/src/ggml-cpu/vec.h
 +++ b/ggml/src/ggml-cpu/vec.h
-@@ -1276,14 +1276,14 @@ inline static __m512 ggml_v_gelu_quick(__m512 x) {
+@@ -1270,14 +1270,14 @@ inline static __m512 ggml_v_gelu_quick(__m512 x) {
      const __m512 exp_cx = ggml_v_expf(_mm512_mul_ps(x, _mm512_set1_ps(GELU_QUICK_COEF)));
      return _mm512_div_ps(x, _mm512_add_ps(one, exp_cx));
  }
@@ -24,7 +24,7 @@ index c54ed3f07..f29cc9be5 100644
    const __m256 r = _mm256_set1_ps(0x1.8p23f);
    const __m256 z = _mm256_fmadd_ps(x, _mm256_set1_ps(0x1.715476p+0f), r);
    const __m256 n = _mm256_sub_ps(z, r);
-@@ -1323,7 +1323,7 @@ inline static __m256 ggml_v_expf(__m256 x) {
+@@ -1317,7 +1317,7 @@ inline static __m256 ggml_v_expf(__m256 x) {
  }
  
  // computes silu x/(1+exp(-x)) in single precision vector

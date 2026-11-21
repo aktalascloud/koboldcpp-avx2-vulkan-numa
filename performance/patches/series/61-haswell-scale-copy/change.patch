@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 4b1213caa..e104fbace 100644
+index 1a18a255e..3b6c270b4 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
-@@ -5030,6 +5030,15 @@ static void ggml_compute_forward_scale_f32(
+@@ -5066,6 +5066,15 @@ static void ggml_compute_forward_scale_f32(
          const float * x = (const float *) ((char *) src0->data + i1*nb01 + i2*nb02 + i3*nb03);
  
          if (b == 0.0f) {

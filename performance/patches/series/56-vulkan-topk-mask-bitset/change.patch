@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index e822ecb80..21d44abdf 100644
+index 47cf88533..46a091985 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -16938,6 +16938,18 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -17419,6 +17419,18 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
          case GGML_OP_TOP_K_MASK:
              {
                  const ggml_tensor * mask = op->src[0];
@@ -154,10 +154,10 @@ index 0e2c5b160..94803a30e 100644
 +#endif
  }
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 949aed1d3..7899ba299 100644
+index 9fe5b82a1..092c57340 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -1158,8 +1158,8 @@ void process_shaders() {
+@@ -1114,8 +1114,8 @@ void process_shaders() {
      string_to_spv("dsv4_hc_comb_f32", "dsv4_hc_comb.comp", {});
      string_to_spv("dsv4_hc_pre_f32",  "dsv4_hc_pre.comp",  {});
      string_to_spv("dsv4_hc_post_f32", "dsv4_hc_post.comp", {});

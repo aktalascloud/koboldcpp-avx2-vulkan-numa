@@ -1,8 +1,8 @@
 diff --git a/ggml/include/ggml.h b/ggml/include/ggml.h
-index 486bf0aa6..c7ff148d9 100644
+index 26c3efad3..d8e29d3ff 100644
 --- a/ggml/include/ggml.h
 +++ b/ggml/include/ggml.h
-@@ -485,6 +485,7 @@ extern "C" {
+@@ -489,6 +489,7 @@ extern "C" {
          GGML_GLU_OP_GEGLU_ERF,
          GGML_GLU_OP_GEGLU_QUICK,
          GGML_GLU_OP_SWIGLU_CLAMP,
@@ -11,10 +11,10 @@ index 486bf0aa6..c7ff148d9 100644
          GGML_GLU_OP_COUNT,
      };
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index 5e937705e..6f3f194e9 100644
+index fe5eddadf..1476ebb3a 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
-@@ -3320,6 +3320,7 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
+@@ -3325,6 +3325,7 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
                  case GGML_GLU_OP_GEGLU_ERF:
                  case GGML_GLU_OP_GEGLU_QUICK:
                  case GGML_GLU_OP_SWIGLU_CLAMP:
@@ -40,10 +40,10 @@ index 50d2f79c8..5548807d1 100644
      const struct ggml_tensor * src1 = op->src[1];
  
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 04ce3e95f..08782da62 100644
+index 3ce18d3aa..46904725e 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
-@@ -3310,6 +3310,72 @@ static void ggml_compute_forward_swiglu_f32(
+@@ -3337,6 +3337,72 @@ static void ggml_compute_forward_swiglu_f32(
      }
  }
  
@@ -116,7 +116,7 @@ index 04ce3e95f..08782da62 100644
  static void ggml_compute_forward_swiglu_f16(
      const ggml_compute_params * params,
      ggml_tensor * dst) {
-@@ -10438,6 +10504,12 @@ void ggml_compute_forward_glu(
+@@ -10521,6 +10587,12 @@ void ggml_compute_forward_glu(
              {
                  ggml_compute_forward_swiglu(params, dst);
              } break;
@@ -129,40 +129,19 @@ index 04ce3e95f..08782da62 100644
          case GGML_GLU_OP_SWIGLU_OAI:
              {
                  ggml_compute_forward_swiglu_oai(params, dst);
-diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 924ccedcc..234cec2db 100644
---- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-+++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -938,6 +938,7 @@ struct vk_device_struct {
-     vk_pipeline pipeline_geglu[2];
-     vk_pipeline pipeline_reglu[2];
-     vk_pipeline pipeline_swiglu[2];
-+    vk_pipeline pipeline_situ_f32;
-     vk_pipeline pipeline_swiglu_oai[2];
-     vk_pipeline pipeline_swiglu_clamp[2];
-     vk_pipeline pipeline_geglu_erf[2];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 857429302..a8e190140 100644
+index cc54e5166..f1db42fcf 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -3895,6 +3895,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
-     CREATE_GLU(geglu)
-     CREATE_GLU(reglu)
-     CREATE_GLU(swiglu)
-+    ggml_vk_create_pipeline(device, device->pipeline_situ_f32, "situ_f32", situ_f32_len, situ_f32_data, "main", 3, sizeof(vk_op_glu_push_constants), {512, 1, 1}, {}, 1, true);
-     CREATE_GLU(swiglu_oai)
-     CREATE_GLU(swiglu_clamp)
-     CREATE_GLU(geglu_erf)
-@@ -9801,6 +9802,8 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
-                 return ctx->device->pipeline_reglu[dst->type == GGML_TYPE_F16];
-             case GGML_GLU_OP_SWIGLU:
-                 return ctx->device->pipeline_swiglu[dst->type == GGML_TYPE_F16];
-+            case GGML_GLU_OP_SITU:
-+                return dst->type == GGML_TYPE_F32 ? ctx->device->pipeline_situ_f32 : nullptr;
-             case GGML_GLU_OP_SWIGLU_OAI:
-                 return ctx->device->pipeline_swiglu_oai[dst->type == GGML_TYPE_F16];
-             case GGML_GLU_OP_SWIGLU_CLAMP:
-@@ -13385,6 +13388,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
+@@ -3999,6 +3999,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     CREATE_GLU(geglu, GEGLU)
+     CREATE_GLU(reglu, REGLU)
+     CREATE_GLU(swiglu, SWIGLU)
++    ggml_vk_create_pipeline(device, device->pipeline_glu[GGML_GLU_OP_SITU][0], "situ_f32", situ_f32_len, situ_f32_data, "main", 3, sizeof(vk_op_glu_push_constants), {512, 1, 1}, {}, 1, true);
+     CREATE_GLU(swiglu_oai, SWIGLU_OAI)
+     CREATE_GLU(swiglu_clamp, SWIGLU_CLAMP)
+     CREATE_GLU(geglu_erf, GEGLU_ERF)
+@@ -13857,6 +13858,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
          case GGML_GLU_OP_GEGLU:
          case GGML_GLU_OP_REGLU:
          case GGML_GLU_OP_SWIGLU:
@@ -170,7 +149,7 @@ index 857429302..a8e190140 100644
          case GGML_GLU_OP_SWIGLU_OAI:
          case GGML_GLU_OP_GEGLU_ERF:
          case GGML_GLU_OP_GEGLU_QUICK:
-@@ -16353,6 +16357,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16839,6 +16841,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
                      return false;
              }
          case GGML_OP_GLU:
@@ -211,22 +190,24 @@ index 000000000..5b367ecaa
 +}
 +#include "glu_main.glsl"
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 17fc72046..ee77a6818 100644
+index 171198830..8db032ab8 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -1100,6 +1100,7 @@ void process_shaders() {
-     string_to_spv("reglu_f32",      "reglu.comp",       {{"A_TYPE", "float"},       {"D_TYPE", "float"}});
-     string_to_spv("swiglu_f16",     "swiglu.comp",      {{"A_TYPE", "float16_t"},   {"D_TYPE", "float16_t"}});
-     string_to_spv("swiglu_f32",     "swiglu.comp",      {{"A_TYPE", "float"},       {"D_TYPE", "float"}});
-+    string_to_spv("situ_f32", "situ.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}});
-     string_to_spv("swiglu_oai_f16", "swiglu_oai.comp",  {{"A_TYPE", "float16_t"},   {"D_TYPE", "float16_t"}});
-     string_to_spv("swiglu_oai_f32", "swiglu_oai.comp",  {{"A_TYPE", "float"},       {"D_TYPE", "float"}});
-     string_to_spv("swiglu_clamp_f16", "swiglu_clamp.comp", {{"A_TYPE", "float16_t"}, {"D_TYPE", "float16_t"}});
+@@ -1034,6 +1034,9 @@ void process_shaders() {
+                                      "elu", "xielu", "sgn", "softplus", "step", "round", "ceil", "floor", "trunc"}) {
+             string_to_spv(op + "_" + t, "unary.comp", merge_maps(dict, {{"OP", "op_" + op}}));
+         }
++        if (t == "f32") {
++            string_to_spv("situ_f32", "situ.comp", dict);
++        }
+         for (const std::string op : {"geglu", "reglu", "swiglu", "swiglu_oai", "swiglu_clamp", "geglu_erf", "geglu_quick"}) {
+             string_to_spv(op + "_" + t, op + ".comp", dict);
+         }
 diff --git a/ggml/src/ggml.c b/ggml/src/ggml.c
-index ba45636f1..fc4f09ab0 100644
+index 728e1ef54..3f79d7cba 100644
 --- a/ggml/src/ggml.c
 +++ b/ggml/src/ggml.c
-@@ -1282,9 +1282,10 @@ static const char * GGML_GLU_OP_NAME[GGML_GLU_OP_COUNT] = {
+@@ -1289,9 +1289,10 @@ static const char * GGML_GLU_OP_NAME[GGML_GLU_OP_COUNT] = {
      "GEGLU_ERF",
      "GEGLU_QUICK",
      "SWIGLU_CLAMP",

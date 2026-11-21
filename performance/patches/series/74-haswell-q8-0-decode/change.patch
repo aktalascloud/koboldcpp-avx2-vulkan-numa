@@ -1,0 +1,23 @@
+diff --git a/ggml/src/ggml-quants.c b/ggml/src/ggml-quants.c
+index 8bcf8590a..ca8a6236f 100644
+--- a/ggml/src/ggml-quants.c
++++ b/ggml/src/ggml-quants.c
+@@ -567,9 +567,18 @@ void dequantize_row_q8_0(const block_q8_0 * GGML_RESTRICT x, float * GGML_RESTRI
+     for (int i = 0; i < nb; i++) {
+         const float d = GGML_FP16_TO_FP32(x[i].d);
+ 
++#if defined(__AVX2__) && defined(__GNUC__)
++        const __m256 scale = _mm256_set1_ps(d);
++        for (int j = 0; j < qk; j += 8) {
++            const __m128i bytes = _mm_loadl_epi64((const __m128i_u *)(x[i].qs + j));
++            const __m256 quants = _mm256_cvtepi32_ps(_mm256_cvtepi8_epi32(bytes));
++            _mm256_storeu_ps(y + i*qk + j, _mm256_mul_ps(quants, scale));
++        }
++#else
+         for (int j = 0; j < qk; ++j) {
+             y[i*qk + j] = x[i].qs[j]*d;
+         }
++#endif
+     }
+ }
+ 

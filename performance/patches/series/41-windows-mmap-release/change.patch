@@ -1,8 +1,8 @@
 diff --git a/src/llama-mmap.cpp b/src/llama-mmap.cpp
-index 5eb0a3902..ceff703d2 100644
+index cbe623165..70ebf589f 100644
 --- a/src/llama-mmap.cpp
 +++ b/src/llama-mmap.cpp
-@@ -870,8 +870,34 @@ struct llama_mmap::impl {
+@@ -866,8 +866,34 @@ struct llama_mmap::impl {
      }
  
      void unmap_fragment(size_t first, size_t last) {

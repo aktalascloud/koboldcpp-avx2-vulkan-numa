@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
-index 6a2525849..5847b46c4 100644
+index b73fdeca4..48c8396a2 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm.comp
-@@ -83,6 +83,9 @@ void rms_norm(uint num_iters) {
+@@ -85,6 +85,9 @@ void rms_norm(uint num_iters) {
  #else
              uint32_t d_offset = ((samp*nchannels + channel)*nrows + row)*ncols + get_doffset();
  #endif
@@ -11,42 +11,42 @@ index 6a2525849..5847b46c4 100644
 +            const bool kcpp_keep_values = num_iters <= 4;
              FLOAT_TYPE sum = FLOAT_TYPE(0.0f); // partial sum for thread in warp
  
-             [[unroll]] for (uint col = tid, idx = 0; idx < num_iters; col += BLOCK_SIZE, ++idx) {
-@@ -90,6 +93,7 @@ void rms_norm(uint num_iters) {
+ #if RMS_NORM_ROPE_FUSION
+@@ -98,6 +101,7 @@ void rms_norm(uint num_iters) {
                  if (col < ncols) {
-                     xi = FLOAT_TYPE(data_a[a_offset + col]);
+                     xi = FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col]));
                  }
 +                if (kcpp_keep_values) { kcpp_values[idx & 3u] = xi; }
                  sum += xi * xi;
              }
- 
-@@ -135,7 +139,7 @@ void rms_norm(uint num_iters) {
+ #endif
+@@ -153,7 +157,7 @@ void rms_norm(uint num_iters) {
                          if (col >= ncols) {
                              continue;
                          }
--                        FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
-+                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])) * FLOAT_TYPE(data_b[b_offset + fastmod(col, p.ne10)]);
+-                        FLOAT_TYPE value = scale * FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col])) * FLOAT_TYPE(B_TO_FLOAT(data_b[b_offset + fastmod(col, p.ne10)]));
++                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col]))) * FLOAT_TYPE(B_TO_FLOAT(data_b[b_offset + fastmod(col, p.ne10)]));
  #if RMS_NORM_ADD_FUSION
-                         value += FLOAT_TYPE(data_c[d_offset + col]);
+                         value += FLOAT_TYPE(C_TO_FLOAT(data_c[d_offset + col]));
                          if (do_post_multiply) {
-@@ -149,7 +153,7 @@ void rms_norm(uint num_iters) {
+@@ -167,7 +171,7 @@ void rms_norm(uint num_iters) {
                          if (col >= ncols) {
                              continue;
                          }
--                        FLOAT_TYPE value = scale * FLOAT_TYPE(data_a[a_offset + col]) * FLOAT_TYPE(data_b[b_offset + col]);
-+                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])) * FLOAT_TYPE(data_b[b_offset + col]);
+-                        FLOAT_TYPE value = scale * FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col])) * FLOAT_TYPE(B_TO_FLOAT(data_b[b_offset + col]));
++                        FLOAT_TYPE value = scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col]))) * FLOAT_TYPE(B_TO_FLOAT(data_b[b_offset + col]));
  #if RMS_NORM_ADD_FUSION
-                         value += FLOAT_TYPE(data_c[d_offset + col]);
+                         value += FLOAT_TYPE(C_TO_FLOAT(data_c[d_offset + col]));
                          if (do_post_multiply) {
-@@ -164,7 +168,7 @@ void rms_norm(uint num_iters) {
+@@ -182,7 +186,7 @@ void rms_norm(uint num_iters) {
                      if (col >= ncols) {
                          continue;
                      }
--                    data_d[d_offset + col] = D_TYPE(scale * FLOAT_TYPE(data_a[a_offset + col]));
-+                    data_d[d_offset + col] = D_TYPE(scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(data_a[a_offset + col])));
+-                    data_d[d_offset + col] = FLOAT_TO_D(scale * FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col])));
++                    data_d[d_offset + col] = FLOAT_TO_D(scale * (kcpp_keep_values ? kcpp_values[idx & 3u] : FLOAT_TYPE(A_TO_FLOAT(data_a[a_offset + col]))));
                  }
              }
- #if RMS_NORM_ROPE_FUSION
+ #endif
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp b/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp
 index cf7ab21f2..9a8094a60 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/rms_norm_partials.comp

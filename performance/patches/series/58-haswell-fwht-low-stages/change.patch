@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 89589505d..4b1213caa 100644
+index 1a88e6a2c..1a18a255e 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
-@@ -12354,6 +12354,27 @@ void ggml_compute_forward_opt_step_sgd(const ggml_compute_params * params, ggml_
+@@ -12437,6 +12437,27 @@ void ggml_compute_forward_opt_step_sgd(const ggml_compute_params * params, ggml_
      }
  }
  
@@ -30,7 +30,7 @@ index 89589505d..4b1213caa 100644
  static inline float ggml_fwht_load(const float value) {
      return value;
  }
-@@ -12481,6 +12502,11 @@ static void ggml_compute_forward_fwht_impl(const ggml_compute_params * params, g
+@@ -12564,6 +12585,11 @@ static void ggml_compute_forward_fwht_impl(const ggml_compute_params * params, g
  #endif
  #else
          const int step = n;

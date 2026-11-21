@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index f3a377e53..eede0de73 100644
+index c86d80e62..2277a17a7 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -11313,6 +11313,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -11747,6 +11747,8 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      vk_op_unary_push_constants p = vk_op_unary_push_constants_init(src0, dst);
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
@@ -11,7 +11,7 @@ index f3a377e53..eede0de73 100644
  
      ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
  }
-@@ -14362,7 +14364,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
+@@ -14829,7 +14831,9 @@ static bool ggml_vk_can_fuse_hc_post_gate(const struct ggml_cgraph * cgraph, int
      const ggml_tensor * scale_out = cgraph->nodes[node_idx + 2];
  
      // the shader folds scale -> sigmoid -> scale; a bias on either scale is not handled
@@ -22,12 +22,12 @@ index f3a377e53..eede0de73 100644
             ggml_get_op_params_f32(scale_in, 1) == 0.0f &&
             ggml_get_op_params_f32(scale_out, 1) == 0.0f &&
             scale_in->src[0]->type == GGML_TYPE_F32 &&
-@@ -16669,8 +16673,16 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
-             return op->type == GGML_TYPE_F32;
-         case GGML_OP_FILL:
+@@ -17146,8 +17150,17 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
              return op->type == GGML_TYPE_F32 || op->type == GGML_TYPE_F16;
+         case GGML_OP_SLEEP:
+             return device->shader_clock;
 -        case GGML_OP_SCALE:
--            return ggml_is_contiguous(op->src[0]) && op->src[0]->type == GGML_TYPE_F32;
+-            return ggml_is_contiguous(op->src[0]) && ggml_vk_is_float_elementwise(op);
 +        case GGML_OP_SCALE: {
 +            // KCPP_POLARIS_SCALE_SUPPORT: keep untested layouts/devices upstream.
 +            const ggml_tensor * source = op->src[0];
@@ -36,27 +36,28 @@ index f3a377e53..eede0de73 100644
 +                (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
 +                source->ne[2] == 1 && source->ne[3] == 1 && source->nb[0] == sizeof(float) &&
 +                source->nb[1] >= size_t(source->ne[0]) * sizeof(float) && ggml_is_contiguous(op);
-+            return source->type == GGML_TYPE_F32 && (ggml_is_contiguous(source) || polaris_rows);
++            return ggml_vk_is_float_elementwise(op) && (ggml_is_contiguous(source) ||
++                (source->type == GGML_TYPE_F32 && op->type == GGML_TYPE_F32 && polaris_rows));
 +        }
          case GGML_OP_PAD:
          case GGML_OP_PAD_REFLECT_1D:
          case GGML_OP_ROLL:
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
-index 35ec726a0..0dc989d50 100644
+index 83ee31a72..9bdb3ffcc 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
 @@ -18,7 +18,13 @@ void main() {
              continue;
          }
  
--        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
+-        data_d[get_doffset() + idx] = FLOAT_TO_D(A_TO_FLOAT(data_a[get_aoffset() + idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
 +        // KCPP_POLARIS_SCALE_ROWS: contiguous path retains the original expression.
 +        uint source_idx = idx;
 +        if (p.param3 != 0.0f) {
 +            const uint row = fastdiv(idx, p.ne0_0mp, fastdiv_L(p.ne0_Ls, 2));
 +            source_idx += row * (p.nb01 - p.ne00);
 +        }
-+        data_d[get_doffset() + idx] = D_TYPE(FLOAT_TYPE(data_a[get_aoffset() + source_idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
++        data_d[get_doffset() + idx] = FLOAT_TO_D(A_TO_FLOAT(data_a[get_aoffset() + source_idx]) * FLOAT_TYPE(p.param1) + FLOAT_TYPE(p.param2));
          idx += num_threads;
      }
  }

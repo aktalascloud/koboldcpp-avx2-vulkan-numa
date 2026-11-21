@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 639d4a065..e822ecb80 100644
+index 7c796638f..47cf88533 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -14919,7 +14919,7 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct
+@@ -15401,7 +15401,7 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct
          return false;
      }
  
@@ -11,7 +11,7 @@ index 639d4a065..e822ecb80 100644
  }
  
  bool ggml_vk_can_fuse_rms_norm_set_rows(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
-@@ -15091,7 +15091,7 @@ bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const str
+@@ -15577,7 +15577,7 @@ bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const str
          return false;
      }
  
@@ -20,14 +20,14 @@ index 639d4a065..e822ecb80 100644
  }
  
  uint32_t ggml_vk_fuse_multi_add(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph, int node_idx) {
-@@ -16694,8 +16694,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -17175,8 +17175,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
          case GGML_OP_REPEAT_BACK:
              return op->type == GGML_TYPE_F32 && op->src[0]->type == GGML_TYPE_F32;
          case GGML_OP_ROPE:
 +            if (!ggml_rope_get_truncate(op) && op->type != GGML_TYPE_F32) { return false; }
-             return ggml_is_contiguous_rows(op) && ggml_is_contiguous_rows(op->src[0]);
+             return (op->src[0]->type == GGML_TYPE_F32 || op->src[0]->type == GGML_TYPE_F16) && ggml_is_contiguous_rows(op) && ggml_is_contiguous_rows(op->src[0]);
          case GGML_OP_ROPE_BACK:
 +            if (!ggml_rope_get_truncate(op) && op->type != GGML_TYPE_F32) { return false; }
+             return op->src[0]->type == GGML_TYPE_F32 || op->src[0]->type == GGML_TYPE_F16;
          case GGML_OP_NONE:
          case GGML_OP_RESHAPE:
-         case GGML_OP_VIEW:

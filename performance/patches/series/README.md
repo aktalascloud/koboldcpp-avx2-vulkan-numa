@@ -1,6 +1,6 @@
 # Native patch stack
 
-Apply in numeric order to `ed246f4467157b3e5663feae28e7bf4d6990db39`. [Index and SHA-256](index.json).
+Apply in numeric order to `eccf1a425d9e68be0dc0e291339c95ca132c0426`. [Index and SHA-256](index.json).
 
 - [Polaris Vulkan queue initialization](01-polaris-queue/README.md)
 - [Vulkan batched submissions](02-vulkan-batched-submits/README.md)
@@ -75,3 +75,5 @@ Apply in numeric order to `ed246f4467157b3e5663feae28e7bf4d6990db39`. [Index and
 - [Reuse YuE2 NAR midpoint and velocity buffers](71-yue2-nar-render-scratch/README.md)
 - [Drain Vulkan profiler ingress copies](72-vulkan-profiler-async-input/README.md)
 - [Find Q8_K activation peaks with AVX2](73-haswell-q8k-peak/README.md)
+- [Decode Q8_0 in eight-value AVX2 groups](74-haswell-q8-0-decode/README.md)
+- [Embed Vulkan modules with lower compiler memory use on MinGW](75-mingw-shader-literals/README.md)

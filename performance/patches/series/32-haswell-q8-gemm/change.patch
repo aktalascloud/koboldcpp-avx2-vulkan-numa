@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/llamafile/sgemm.cpp b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
-index 68105f029..cdb3ef9b7 100644
+index 5d6609113..1d083af37 100644
 --- a/ggml/src/ggml-cpu/llamafile/sgemm.cpp
 +++ b/ggml/src/ggml-cpu/llamafile/sgemm.cpp
-@@ -1799,42 +1799,80 @@ class tinyBLAS_Q0_AVX {
+@@ -2075,42 +2075,80 @@ class tinyBLAS_Q0_AVX {
              int64_t ii = m0 + job / xtiles * 4;
              int64_t jj = n0 + job % xtiles * RN;
              __m256 Cv[RN][4] = {};

@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index d128bb94c..3c1d2ca86 100644
+index eaee7903e..efde1f041 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -16715,8 +16715,13 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -17198,8 +17198,13 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
          case GGML_OP_PERMUTE:
          case GGML_OP_TRANSPOSE:
              return true;
@@ -16,5 +16,5 @@ index d128bb94c..3c1d2ca86 100644
 +                   ggml_nelements(src) <= UINT32_MAX / 2 && ggml_is_contiguous(src);
 +        }
          case GGML_OP_NORM:
-         case GGML_OP_RMS_NORM:
          case GGML_OP_L2_NORM:
+             return op->src[0]->type == GGML_TYPE_F32 && op->type == GGML_TYPE_F32;

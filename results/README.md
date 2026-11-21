@@ -3,6 +3,7 @@
 The [November 19 RX 580 ABDM comparison](rx580-abdm-20261119.json) records seven real requests with identical RGB output. The original kernels had the lowest request median, 124.05 s. Aligned Q8_0 reads took 130.69 s and Q register reuse in FlashAttention took 140.51 s.
 
 - [Published build and executable hash](../performance/provenance.json) · [Build and recipes](../performance/BUILD.md) · [Ordered patches](../performance/patches/series/)
+- [November 21 Haswell Q8_0 decoder](haswell-q8-0-decode-20261121.json) · [Upstream and engine review](mainstream-2026-11-21.md)
 - [November 19 Haswell Q8_K validation](haswell-q8k-20261119.json) · [Reproducible fixture](../performance/tests/check_q8k_haswell.py) · [Upstream and engine review](mainstream-2026-11-19.md)
 - [RX 580 Vulkan runs, November 18](vulkan-rx580-20261118.json) · [Stock comparison](measurements.json) · [Photo sample and its record](photo-latest.json)
 - [November 11 kernel and request measurements](performance-2026-11-11-kernels.json) · [Operation checks](operations.json) · [Upstream review](mainstream-2026-11-17.json) · [Security checks](security-2026-11-07.json)

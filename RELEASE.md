@@ -1,11 +1,11 @@
 ## English
 
-KoboldCpp 1.125, November 19, 2026. Native SHA-256 `NATIVE_SHA256`, base `SOURCE_COMMIT`.
+KoboldCpp 1.125, November 21, 2026. Native SHA-256 NATIVE_SHA256, official source SOURCE_COMMIT. This build incorporates 200 upstream commits and the verified 75-patch local series.
 
-Haswell uses AVX2/BMI1 to find the signed Q8_K block maximum. It chooses the same first maximum as the scalar code and keeps the original scale, rounding and sums. All 1,200 cases matched byte for byte. Median CPU operator time at width 4,096 fell from 5.35 to 1.62 µs. The release passed startup and API readiness checks.
+Haswell AVX2 Q8_0 decoding now widens eight signed bytes at once. At width 4,096, the operator median went from 0.706 to 0.553 µs. All 65,542 cases matched the reference byte for byte. MinGW embeds the same 1,599 SPIR-V modules using a lower-memory compiler input. This build passed startup and API readiness checks.
 
 ## Русский
 
-KoboldCpp 1.125 от 19 ноября 2026 года. AVX2/BMI1 ускоряет поиск максимума блока Q8_K на Haswell. Порядок выбора при равном модуле, масштаб, округление и суммы сохранены. Побайтно совпали все 1 200 проверок. При ширине 4 096 медиана времени оператора упала с 5,35 до 1,62 мкс. Проверены запуск и готовность API.
+KoboldCpp 1.125 от 21 ноября 2026 года. Перенесены 200 коммитов upstream и проверенная серия из 75 патчей. AVX2-распаковка Q8_0 на Haswell снизила медиану времени оператора при ширине 4096 с 0,706 до 0,553 мкс. Все 65 542 проверки совпали побайтно. При новой упаковке 1 599 модулей SPIR-V тоже совпали побайтно. Проверены запуск и готовность API.
 
-[Operator measurements / Замеры оператора](results/haswell-q8k-20261119.json) · [Mainstream review / Обзор upstream](results/mainstream-2026-11-19.md) · [Patch series / Серия патчей](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/v1.125-20261119-efeac32e/performance/patches/series)
+[Operator timings / Замеры оператора](results/haswell-q8-0-decode-20261121.json) · [Upstream review / Обзор](results/mainstream-2026-11-21.md) · [Patch series / Патчи](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/tree/v1.125-20261121-f1df2675/performance/patches/series)

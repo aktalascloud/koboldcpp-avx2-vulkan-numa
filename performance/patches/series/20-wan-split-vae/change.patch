@@ -1,26 +1,42 @@
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index bd6b75109..f649788bb 100644
+index de1f06de3..6f86d5f8d 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -978,6 +978,18 @@ static void kcpp_set_model_paths(sd_ctx_params_t& params, SDParams& sd_params, c
-         params.photo_maker_path = "";
+@@ -316,6 +316,7 @@ struct KcppLoadParams {
+     int quant = 0;              // decoded into wtype
+     bool flash_attention = false;
+     bool taesd = false;
++    bool wan_split_vae = false;
+     int tiled_vae_threshold = 0;
+     std::string upscaler_filename;
+     int img_hard_limit = 0;
+@@ -1513,6 +1514,18 @@ static void kcpp_set_model_paths(SDLoadParams& lp, KcppLoadParams& klp)
+         lp.photo_maker_path = "";
      }
  
 +    // KCPP_WAN_SPLIT_VAE: worker validates the independent decoder path/hash.
 +    const char* kcpp_wan_tae_decoder = std::getenv("KCPP_WAN_TAE_DECODER");
 +    const bool kcpp_wan_split_vae = tempver == VERSION_WAN2_2_TI2V && kcpp_wan_tae_decoder && *kcpp_wan_tae_decoder;
 +    if (kcpp_wan_split_vae) {
-+        if (!file_exists(kcpp_wan_tae_decoder) || path_empty(params.vae_path)) {
++        if (!file_exists(kcpp_wan_tae_decoder) || lp.vae_path.empty()) {
 +            printf("KCPP: split Wan VAE requires a full VAE and the reviewed external Tiny decoder.\n");
 +            GGML_ABORT("Reviewed split Wan decoder unavailable");
 +        }
 +        kcpp_taesd_path = kcpp_wan_tae_decoder;
-+        params.tae_preview_only = true;
++        klp.wan_split_vae = true;
 +        printf("KCPP: Wan5B full image encoder / independent Tiny video decoder enabled.\n");
 +    }
      //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
-     if(kcpp_taesd_path=="" && !path_empty(params.vae_path) && toLowerCase(params.vae_path).rfind("tae")!=std::string::npos)
+     if(kcpp_taesd_path=="" && !lp.vae_path.empty() && toLowerCase(lp.vae_path).rfind("tae")!=std::string::npos)
      {
+@@ -1828,6 +1841,7 @@ bool sdtype_load_model(const sd_load_model_inputs inputs) {
+     params.vae_path = lp.vae_path.c_str();
+     params.audio_vae_path = lp.audio_vae_path.c_str();
+     params.taesd_path = lp.taesd_path.c_str();
++    if (klp.wan_split_vae) { params.tae_preview_only = true; }
+     params.photo_maker_path = lp.photo_maker_path.c_str();
+     params.tokenizer = lp.tokenizer.c_str();
+     params.clip_vision_path = lp.clip_vision_path.c_str();
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 index 03d360764..f85664ff6 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp

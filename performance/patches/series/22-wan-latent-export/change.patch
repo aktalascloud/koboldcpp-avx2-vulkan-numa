@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index d8706debc..3434728f9 100644
+index c67584ad6..4b8a8e231 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -9407,6 +9407,9 @@ Change Mode<br>
+@@ -9499,6 +9499,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -13,10 +13,10 @@ index d8706debc..3434728f9 100644
                              self.send_response(202 if is_sdcpp_imggen else 200)
                              self.send_header('content-length', str(len(genresp)))
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index f649788bb..751de2cb2 100644
+index 6f86d5f8d..f2686a0fe 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -2365,6 +2365,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2982,6 +2982,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
  
          fflush(stdout);
  
@@ -30,7 +30,7 @@ index f649788bb..751de2cb2 100644
          vid_result = nullptr;
          generated_audio = nullptr;
          int output_fps = vid_fps;
-@@ -2376,6 +2383,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2993,6 +3000,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              generated_audio = vid_result->audio;
              output_fps = vid_result->fps;
          }

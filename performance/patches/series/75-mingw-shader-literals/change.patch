@@ -1,0 +1,31 @@
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index 977e34c5d..952b14b93 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -1289,6 +1289,18 @@ void write_output_files() {
+             }
+ 
+             src << "const uint64_t " << name << "_len = " << data.size() << ";\n";
++#if defined(__MINGW32__)
++            // MinGW GCC materializes every numeric initializer individually.
++            // The explicit module length above excludes the string terminator.
++            constexpr char hex[] = "0123456789abcdef";
++            src << "alignas(4) const unsigned char " << name << "_data[] =\n    \"";
++            for (size_t i = 0; i < data.size(); ++i) {
++                if (i != 0 && i % 64 == 0) src << "\"\n    \"";
++                const auto byte = static_cast<unsigned char>(data[i]);
++                src << "\\x" << hex[byte >> 4] << hex[byte & 15];
++            }
++            src << "\";\n\n";
++#else
+             src << "const unsigned char " << name << "_data[" << data.size() << "] = {\n" << std::hex;
+             auto bytes = reinterpret_cast<const uint8_t*>(data.data());
+             for (size_t i = 0; i < data.size(); ++i) {
+@@ -1296,6 +1308,7 @@ void write_output_files() {
+                 if ((i + 1) % 12 == 0) src << "\n";
+             }
+             src << std::dec << "\n};\n\n";
++#endif
+         //}
+         if (!no_clean) {
+             std::remove(path.c_str());
