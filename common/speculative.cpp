@@ -1089,11 +1089,13 @@ protected:
         batch        = common_batch(ctx_dft);
         batch_inject = common_batch(ctx_dft);
 
+        // Only the best candidate is used for greedy DFlash without a confidence cut.
+        const int32_t n_candidates = type == COMMON_SPECULATIVE_TYPE_DRAFT_DFLASH && this->params.p_min <= 0.0f ? 1 : 10;
         smpls.resize(n_seq);
         for (auto & s : smpls) {
             common_params_sampling sparams;
             sparams.no_perf  = false;
-            sparams.top_k    = 10;
+            sparams.top_k    = n_candidates;
             sparams.samplers = { COMMON_SAMPLER_TYPE_TOP_K };
             s.reset(common_sampler_init(model_dft, sparams));
         }
@@ -1103,7 +1105,7 @@ protected:
         if (this->params.backend_sampling && opt.backend_sampling) {
             for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
                 llama_sampler * chain = llama_sampler_chain_init(llama_sampler_chain_default_params());
-                llama_sampler_chain_add(chain, llama_sampler_init_top_k(10));
+                llama_sampler_chain_add(chain, llama_sampler_init_top_k(n_candidates));
 
                 if (!llama_set_sampler(ctx_dft, seq_id, chain)) {
                     SPC_WRN("backend offload failed for seq_id=%d; using CPU sampler\n", (int) seq_id);

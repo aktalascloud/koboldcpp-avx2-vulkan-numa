@@ -77,19 +77,41 @@ void topk(const uint row) {
     barrier();
 
     if (p.k == 1) {
-        // Fast path for single output - just do a max reduction
-        [[unroll]] for (int s = BLOCK_SIZE / 2; s >= 1; s /= 2) {
-            if (tid < s) {
-                ivec2 a = dst_row[tid];
-                ivec2 b = dst_row[tid + s];
-                // compare as floats: the bit patterns of negative values
-                // order the other way as integers
-                if (a.x >= p.orig_ncols ||
-                    b.x < p.orig_ncols && intBitsToFloat(b.y) > intBitsToFloat(a.y)) {
-                    dst_row[tid] = b;
+        if (BLOCK_SIZE <= SUBGROUP_SIZE * SUBGROUP_SIZE) {
+            // Reduce the score and the first matching input index in each subgroup.
+            // The first subgroup then reduces the partial results.
+            const ivec2 item = dst_row[tid];
+            const float value = item.x < p.orig_ncols ? intBitsToFloat(item.y) : uintBitsToFloat(0xFF800000);
+            const float maximum = subgroupMax(value);
+            const uint winner = subgroupMin(value == maximum ? uint(item.x) : p.orig_ncols);
+            if (subgroupElect()) {
+                offset_partials[gl_SubgroupID] = floatBitsToUint(maximum);
+                eq_min_partials[gl_SubgroupID] = winner;
+            }
+            barrier();
+            if (tid < SUBGROUP_SIZE) {
+                const float partial = tid < int(gl_NumSubgroups) ? uintBitsToFloat(offset_partials[tid]) : uintBitsToFloat(0xFF800000);
+                const float best = subgroupMax(partial);
+                const uint index = subgroupMin(tid < int(gl_NumSubgroups) && partial == best ? eq_min_partials[tid] : p.orig_ncols);
+                if (tid == 0) {
+                    dst_row[0] = ivec2(index, floatBitsToInt(best));
                 }
             }
             barrier();
+        } else {
+            [[unroll]] for (int s = BLOCK_SIZE / 2; s >= 1; s /= 2) {
+                if (tid < s) {
+                    ivec2 a = dst_row[tid];
+                    ivec2 b = dst_row[tid + s];
+                    // compare as floats: the bit patterns of negative values
+                    // order the other way as integers
+                    if (a.x >= p.orig_ncols ||
+                        b.x < p.orig_ncols && intBitsToFloat(b.y) > intBitsToFloat(a.y)) {
+                        dst_row[tid] = b;
+                    }
+                }
+                barrier();
+            }
         }
     } else {
         // Do an N-ary search to find the K-th largest value.

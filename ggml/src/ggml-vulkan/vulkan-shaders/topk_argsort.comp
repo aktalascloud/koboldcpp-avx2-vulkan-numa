@@ -52,7 +52,7 @@ void topk(bool needs_bounds_check, const uint row) {
                 ivec2 a = dst_row[col];
                 ivec2 b = dst_row[col + s];
                 if (a.x >= p.orig_ncols ||
-                    b.x < p.orig_ncols && b.y > a.y) {
+                    (b.x < p.orig_ncols && intBitsToFloat(b.y) > intBitsToFloat(a.y))) {
                     dst_row[col] = b;
                 }
             }

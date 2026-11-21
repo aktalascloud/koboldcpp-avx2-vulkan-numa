@@ -8484,7 +8484,9 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                 if(embd.size()!=1 || draft_ctx==nullptr || draft_spec==nullptr || remaining_tokens<=1 || grammar!=nullptr || startedsampling==false) //for large batch, or if no draft model, PP/TG as usual
                 {
                     draft_used = false;
-                    kcpp_embd_batch batch = kcpp_embd_batch(embd, n_past, use_mrope, draft_is_mtp);
+                    // DFlash consumes target layer inputs during prefill. Only the last token needs LM-head logits.
+                    const bool all_logits = draft_is_mtp && draft_spec_type_active != COMMON_SPECULATIVE_TYPE_DRAFT_DFLASH;
+                    kcpp_embd_batch batch = kcpp_embd_batch(embd, n_past, use_mrope, all_logits);
                     int32_t decode_status = -1;
                     bool skipdecodelater = false;
 
@@ -8513,7 +8515,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                                         smartcache_quick_snapshot();
                                     }
                                     std::vector<gpt_vocab::id> chunk = parts[p];
-                                    kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, draft_is_mtp);
+                                    kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, all_logits);
                                     decode_status = kcpp_decode_main_and_spec(llama_ctx_v4, smallbatch.batch);
                                     if(p==0 && decode_status==1)
                                     {
@@ -8539,7 +8541,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                             for(int p=0;p<parts.size();++p)
                             {
                                 std::vector<gpt_vocab::id> chunk = parts[p];
-                                kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, draft_is_mtp);
+                                kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, all_logits);
                                 int32_t decode_status2 = kcpp_decode_main_and_spec(llama_ctx_v4, smallbatch.batch);
                                 if(debugmode==1 && !is_quiet)
                                 {
