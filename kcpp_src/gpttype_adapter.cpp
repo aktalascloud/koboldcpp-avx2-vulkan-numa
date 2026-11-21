@@ -1072,6 +1072,12 @@ static void speculative_decoding_setup(std::string spec_model_filename, llama_co
     else if(draft_spec_type == COMMON_SPECULATIVE_TYPE_DRAFT_DFLASH)
     {
         printf("Detected DFlash draft model, using llama.cpp DFlash speculative decoding.\n");
+        if (llama_get_model(main_ctx)->arch == LLM_ARCH_SENSENOVA_LOOP &&
+            draft_ctx_params.type_k == GGML_TYPE_Q4_0 && draft_ctx_params.type_v == GGML_TYPE_Q4_0) {
+            // The matched SenseNova draft uses Q8_0 KV with the compact Q4_0 target cache.
+            draft_ctx_params.type_k = GGML_TYPE_Q8_0;
+            draft_ctx_params.type_v = GGML_TYPE_Q8_0;
+        }
         draft_ctx_params.ctx_other = main_ctx;
         speculative_apply_block_draft_output_limits(draft_ctx_params, draft_spec_type);
     }
@@ -2676,12 +2682,50 @@ static void load_grammar(const std::string & gammarstr)
     }
 }
 
+static bool kcpp_uses_dflash_media(llama_context * ctx) {
+    return draft_spec && draft_ctx && draft_spec_type_active == COMMON_SPECULATIVE_TYPE_DRAFT_DFLASH &&
+        llama_get_model(ctx)->arch == LLM_ARCH_SENSENOVA_LOOP;
+}
+
+static int32_t kcpp_decode_media_text(llama_context * ctx, llama_batch batch) {
+    if (kcpp_uses_dflash_media(ctx)) {
+        return kcpp_decode_main_and_spec(ctx, batch);
+    }
+    return llama_decode(ctx, batch);
+}
+
+static int32_t kcpp_process_dflash_media(const mtmd_helper_embd_batch * view, void * user_data) {
+    auto * ctx = static_cast<llama_context *>(user_data);
+    common_batch batch(ctx);
+    for (int32_t i = 0; i < view->n_tokens; ++i) {
+        llama_pos pos[GGML_MROPE_SECTIONS] = {};
+        for (int32_t j = 0; j < view->n_pos; ++j) {
+            pos[j] = view->pos[j * view->n_tokens + i];
+        }
+        batch.add_embd({ view->embd + (size_t) i * view->n_embd, 1, (size_t) view->n_embd },
+                       pos, view->seq_id, false);
+    }
+    return common_speculative_process(draft_spec, batch) ? 0 : 1;
+}
+
 static bool kcpp_eval_media(llama_context * ctx_llama, const media_chunk & mediachunk, int n_batch, int * n_past) {
     if (mtmd_ctx && mediachunk.mtmd_chunk) {
         llama_pos new_n_past = *n_past;
-        int32_t   result     = mtmd_helper_eval_chunk_single(mtmd_ctx, ctx_llama,
-                                                             static_cast<const mtmd_input_chunk *>(mediachunk.mtmd_chunk),
-                                                             *n_past, 0, n_batch, false, &new_n_past);
+        const auto * chunk = static_cast<const mtmd_input_chunk *>(mediachunk.mtmd_chunk);
+        int32_t result;
+        if (kcpp_uses_dflash_media(ctx_llama) && mtmd_input_chunk_get_type(chunk) != MTMD_INPUT_CHUNK_TYPE_TEXT) {
+            result = mtmd_encode_chunk(mtmd_ctx, chunk);
+            if (result == 0) {
+                llama_memory_seq_rm(llama_get_memory(draft_ctx), 0, *n_past, -1);
+                // Consume each target tap before decoding the next microbatch overwrites it.
+                const int32_t batch_size = std::min(n_batch, (int32_t) llama_n_ubatch(ctx_llama));
+                result = mtmd_helper_decode_image_chunk(mtmd_ctx, ctx_llama, chunk, mtmd_get_output_embd(mtmd_ctx),
+                    *n_past, 0, batch_size, &new_n_past, kcpp_process_dflash_media, ctx_llama);
+            }
+        } else {
+            result = mtmd_helper_eval_chunk_single(mtmd_ctx, ctx_llama, chunk,
+                *n_past, 0, n_batch, false, &new_n_past);
+        }
         if (result != 0) {
             fprintf(stderr, "\n%s : failed to eval mtmd media chunk, status %d\n", __func__, result);
             return false;
@@ -3997,7 +4041,7 @@ ModelLoadResult gpttype_load_model(const load_model_inputs inputs, FileFormat in
 
         if((draftmodel_filename != "" || inputs.use_mtp) && file_format==FileFormat::GGUF_GENERIC)
         {
-            if(mtmd_ctx!=nullptr)
+            if(mtmd_ctx!=nullptr && llamamodel->arch != LLM_ARCH_SENSENOVA_LOOP)
             {
                 printf("Warning: Speculative decoding and MTP may not work well with multimodal projectors!\n");
             }
@@ -9109,12 +9153,11 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                         }
                         if(curr_media_index < (int) media_objects.size())
                         {
-                            //note: no handling for draft_ctx as we don't support vision for it
                             if(include_media_header && introsize>0)
                             {
                                 //added at the start of everything
                                 kcpp_embd_batch batch = kcpp_embd_batch(media_intro, n_past, use_mrope, false);
-                                auto evr = llama_decode(llama_ctx_v4, batch.batch);
+                                auto evr = kcpp_decode_media_text(llama_ctx_v4, batch.batch);
                                 if(evr!=0)
                                 {
                                     printf("\nError when appending media intro: %d\n",evr);
@@ -9131,7 +9174,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                             if (start_size > 0) {
                                 //add a separator between each image
                                 kcpp_embd_batch batch = kcpp_embd_batch(media_objects[curr_media_index].chunk_start_seq, n_past, use_mrope, false);
-                                auto evr = llama_decode(llama_ctx_v4, batch.batch);
+                                auto evr = kcpp_decode_media_text(llama_ctx_v4, batch.batch);
                                 if(evr!=0)
                                 {
                                     printf("\nError when appending media separator: %d\n",evr);
@@ -9171,7 +9214,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                             if (end_size > 0) {
                                 //add a separator between each image
                                 kcpp_embd_batch batch = kcpp_embd_batch(media_objects[curr_media_index].chunk_end_seq, n_past, use_mrope, false);
-                                auto evr = llama_decode(llama_ctx_v4, batch.batch);
+                                auto evr = kcpp_decode_media_text(llama_ctx_v4, batch.batch);
                                 if(evr!=0)
                                 {
                                     printf("\nError when appending media separator: %d\n",evr);
@@ -9188,7 +9231,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
                         {
                             //added after all media but before prompt
                             kcpp_embd_batch batch = kcpp_embd_batch(media_outro, n_past, use_mrope, false);
-                            auto evr = llama_decode(llama_ctx_v4, batch.batch);
+                            auto evr = kcpp_decode_media_text(llama_ctx_v4, batch.batch);
                             if(evr!=0)
                             {
                                 printf("\nError when appending media outro: %d\n",evr);

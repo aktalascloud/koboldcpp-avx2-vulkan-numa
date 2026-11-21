@@ -13,7 +13,7 @@ index c67584ad6..4b8a8e231 100644
                              self.send_response(202 if is_sdcpp_imggen else 200)
                              self.send_header('content-length', str(len(genresp)))
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 6f86d5f8d..f2686a0fe 100644
+index d70d8fb12..8bc4b8a82 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
 @@ -2982,6 +2982,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)

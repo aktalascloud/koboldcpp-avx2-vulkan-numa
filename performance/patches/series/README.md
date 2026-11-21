@@ -1,6 +1,6 @@
 # Native patch stack
 
-Apply in numeric order to `eccf1a425d9e68be0dc0e291339c95ca132c0426`. [Index and SHA-256](index.json).
+Apply in numeric order to `58bb2a2d5de78736db7883579f9dd789ca55784d`. [Index and SHA-256](index.json).
 
 - [Polaris Vulkan queue initialization](01-polaris-queue/README.md)
 - [Vulkan batched submissions](02-vulkan-batched-submits/README.md)
@@ -77,3 +77,4 @@ Apply in numeric order to `eccf1a425d9e68be0dc0e291339c95ca132c0426`. [Index and
 - [Find Q8_K activation peaks with AVX2](73-haswell-q8k-peak/README.md)
 - [Decode Q8_0 in eight-value AVX2 groups](74-haswell-q8-0-decode/README.md)
 - [Embed Vulkan modules with lower compiler memory use on MinGW](75-mingw-shader-literals/README.md)
+- [Native SenseNova Loop text, DFlash and vision](76-sensenova-loop-native/README.md)

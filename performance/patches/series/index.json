@@ -1,7 +1,7 @@
 {
-  "upstream": "eccf1a425d9e68be0dc0e291339c95ca132c0426",
-  "tree": "2d159a921c20d50bb3b24e7c09a9e940d8ff8b2a",
-  "snapshot_sha256": "17807fc839ad12fb565f846fbbda3c1b707eb8eb3bdd873f81fc054e6a5685bb",
+  "upstream": "58bb2a2d5de78736db7883579f9dd789ca55784d",
+  "tree": "ea0d198fd3876bacd60a1d67cceb77ca031454ff",
+  "snapshot_sha256": "658045d9821814b9a7c5986497d7b21bacc59c2be20817e4876971628877a0a8",
   "patches": [
     {
       "path": "01-polaris-queue/change.patch",
@@ -103,7 +103,7 @@
       "path": "17-video-jpeg95/change.patch",
       "title": "Video MJPEG quality 95",
       "source": null,
-      "sha256": "9c1219064cdfa407db635bd666d8760afb1539724fddac936b2987c6088ba912"
+      "sha256": "0904a444cf0d93b59a39b9b8ad7ec579d1db4e2950c7b36800b7be4a515e8372"
     },
     {
       "path": "18-wan-super-tiny/change.patch",
@@ -121,7 +121,7 @@
       "path": "20-wan-split-vae/change.patch",
       "title": "Separate Wan encoder and decoder",
       "source": "https://github.com/advanced-lvl-up/Rx470-Vega10-Rx580-gfx803-gfx900-fix-AMD-GPU",
-      "sha256": "88f6913e4b480b82a8d3031002a67653cf0b098abe84c130ca429641f689fd6b"
+      "sha256": "125a34e92951b4e4f536acd5fbca57712f40a0ed5336453eae0f188b0a9f56ae"
     },
     {
       "path": "21-wan-latent-capture/change.patch",
@@ -133,13 +133,13 @@
       "path": "22-wan-latent-export/change.patch",
       "title": "Wan latent-only operation",
       "source": null,
-      "sha256": "4de14711e059299f752f855cbbbb84c9f579104c46d304c1787ca95c213f4bc7"
+      "sha256": "009052c393161fe4f327ba1dcf422cb7115262c618dce057ff935f267656a240"
     },
     {
       "path": "23-video-cache-forwarding/change.patch",
       "title": "Video cache options forwarding",
       "source": null,
-      "sha256": "c46e087bc64a434e429e8c1f38378fa70f7f17487937eebc3a8ebc0d4a3c5029"
+      "sha256": "d7b38e2c1413d18b8f7166b27e238b1de516cbe087d129cdfebbf1a927014fc2"
     },
     {
       "path": "24-wan-cache-gates/change.patch",
@@ -452,6 +452,12 @@
       "title": "Embed Vulkan modules with lower compiler memory use on MinGW",
       "source": null,
       "sha256": "0428dcc10ad20d3c416bf9c6aeb92bc9a66bc8fbc5dbf4aa0e4cd44769c0bf96"
+    },
+    {
+      "path": "76-sensenova-loop-native/change.patch",
+      "title": "Native SenseNova Loop text, DFlash and vision",
+      "source": "https://github.com/GuideboardLabs/llama.cpp-sensenova-loop/tree/a7f77a788893ef2cb17c82b9ac0cb1279bcd0918",
+      "sha256": "769d088994e8fd0c711ead123c4ca0f09d2a9f80705b2cab5e934ca460ea58d3"
     }
   ],
   "empty_ports": [

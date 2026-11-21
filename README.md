@@ -1,5 +1,7 @@
 # KoboldCpp · Haswell AVX2 and Polaris Vulkan
 
+This branch adds native SenseNova Loop text, DFlash and vision. [RX 580 profiles and verification scope](performance/configs/sensenova-loop/).
+
 [Русский](README.ru.md) · [Release / Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/tag/v1.125-20261121-f1df2675) · [Guide / Документация](performance/RUN.txt) · [Evidence / Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
 
 Portable Windows x64 inference for Intel Haswell and AMD Polaris / RX 580. This experimental KoboldCpp fork carries compiler, kernel and NUMA patches for local GGUF text and media workloads.

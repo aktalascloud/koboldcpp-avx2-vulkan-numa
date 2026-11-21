@@ -1,0 +1,115 @@
+{
+  "files": {
+    "model": {
+      "name": "SenseNova-Loop-9B-abliterated-Q4_K_M.gguf",
+      "bytes": 5637767264,
+      "sha256": "af9d1ee39eb2e5fe3bc6090ec57ea407e9057364f5a8fdc6c0458898490e6a4e"
+    },
+    "dflash": {
+      "name": "SenseNova-Loop-9B-abliterated-drafter-2-Q4_K_M.gguf",
+      "bytes": 917479392,
+      "sha256": "18f05878ae8790b0d28015be1a744f0c8207050d026917d5adddab5727261eaf"
+    },
+    "vision": {
+      "name": "mmproj-SenseNova-Loop-9B-Q4_0-ACTCAL.gguf",
+      "bytes": 462037312,
+      "sha256": "a1bc943b0f72513865637d2c256dacd48b9a1c5b4aa3202a2c3b3bb864340813"
+    }
+  },
+  "target": {
+    "logical_layers": 56,
+    "stored_layers": 32,
+    "hidden_size": 4096,
+    "recurrent_layers": 42,
+    "embedding_vocab": 248320
+  },
+  "draft": {
+    "d2t_rows": 65536,
+    "target_taps": [
+      2,
+      30,
+      34,
+      38,
+      42,
+      46,
+      50,
+      54
+    ],
+    "block_size": 8
+  },
+  "projector": {
+    "type": "qwen3vl_merger",
+    "projection_dimensions": 4096,
+    "position_table": "F32",
+    "q4_matrices": 83
+  },
+  "native_profiles": {
+    "16384": {
+      "main_gpu_layers": 48,
+      "draft_gpu_layers": "all",
+      "mmproj_gpu": false,
+      "target_cache_cells_padded": 16640,
+      "draft_swa_cells": 4480,
+      "static_payload_bytes": {
+        "target_payload_on_device": 3115444992,
+        "draft_payload_ceiling": 906532864,
+        "target_dense_kv_payload": 230031360,
+        "target_recurrent_payload": 395182080,
+        "draft_kv_payload": 84951040
+      },
+      "static_payload_total_bytes": 4732142336,
+      "headroom_before_graph_driver_and_desktop_bytes": 3857792256
+    },
+    "32768": {
+      "main_gpu_layers": 44,
+      "draft_gpu_layers": "all",
+      "mmproj_gpu": false,
+      "target_cache_cells_padded": 33024,
+      "draft_swa_cells": 4480,
+      "static_payload_bytes": {
+        "target_payload_on_device": 2603604224,
+        "draft_payload_ceiling": 906532864,
+        "target_dense_kv_payload": 418480128,
+        "target_recurrent_payload": 362250240,
+        "draft_kv_payload": 120602624
+      },
+      "static_payload_total_bytes": 4411470080,
+      "headroom_before_graph_driver_and_desktop_bytes": 4178464512
+    }
+  },
+  "runtime_loaded": false,
+  "gpu_peak_measured": false,
+  "accounting": "Tensor payload based on GGUF headers and the selected offload/cache settings. Excludes backend repacking, alignment, compute graph, allocator overhead, and display. Not a WDDM peak.",
+  "artifact": {
+    "name": "koboldcpp-nocuda.exe",
+    "bytes": 98399585,
+    "sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+    "version": "1.125",
+    "upstream": "58bb2a2d5de78736db7883579f9dd789ca55784d",
+    "verified_patch_count": 76,
+    "source_tree": "ea0d198fd3876bacd60a1d67cceb77ca031454ff",
+    "standalone_cli_help": true,
+    "cpu_and_vulkan": {
+      "koboldcpp_default.dll": {
+        "bytes": 32576000,
+        "sha256": "ebbedf1f26acfaff96fb07be9624893287fd949f2b1fb87a9df134f6f709a624",
+        "resolved_ffi_exports": 62
+      },
+      "koboldcpp_vulkan.dll": {
+        "bytes": 75983872,
+        "sha256": "8495ec61c2bd730cb85eafa0b445bb7d985298858c9ed7be68709ea76652c2a5",
+        "resolved_ffi_exports": 62
+      }
+    },
+    "embedded_vulkan_shaders": {
+      "mhc_route_f32": {
+        "bytes": 10068,
+        "sha256": "2ffbea1907707e3c3ff277dfaef31b407c4b632bdc9b936f0a96ba93241270f9"
+      },
+      "mhc_merge_f32": {
+        "bytes": 3556,
+        "sha256": "6919e1e57f44629dceea9e448e9f3e4caaf94a4b03bf988e4ff7a346db7155cb"
+      }
+    }
+  }
+}

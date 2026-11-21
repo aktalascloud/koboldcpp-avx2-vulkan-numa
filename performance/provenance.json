@@ -1,7 +1,7 @@
 {
   "source": "https://github.com/LostRuins/koboldcpp",
   "branch": "concedo_experimental",
-  "commit": "eccf1a425d9e68be0dc0e291339c95ca132c0426",
+  "commit": "58bb2a2d5de78736db7883579f9dd789ca55784d",
   "flags": [
     "-O3",
     "-march=haswell",
@@ -20,16 +20,16 @@
   "compiler_policy": "winlibs",
   "profile_flags": "",
   "lto_flags": "-flto=2 -fuse-linker-plugin",
-  "executable_sha256": "f1df2675f7476b56c97385992ddeb27b8d828ef56906019917cb6931692e54bf",
-  "patch_sha256": "17807fc839ad12fb565f846fbbda3c1b707eb8eb3bdd873f81fc054e6a5685bb",
-  "seconds": 2240.2008078098297,
-  "deployed": true,
+  "executable_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+  "patch_sha256": "658045d9821814b9a7c5986497d7b21bacc59c2be20817e4876971628877a0a8",
+  "seconds": 1989.0758838653564,
+  "deployed": false,
   "cpu_hot_variant": "tiled-haswell",
   "cpu_extra_flags": "-march=haswell -mprefer-vector-width=256",
   "vulkan_hot_variant": "baseline",
   "vulkan_host_flags": "-fno-semantic-interposition -fno-ipa-cp-clone",
-  "native_source_signature": "d6dc50a0b36e2ef1ea6ddf2cd0829990011c981b958d15e9957de4f954a3f41f",
-  "native_input_count": 3421,
+  "native_source_signature": "6a8b7db83f1a23054dbb4eca66bcc6f707624e911304c65099b36428bf28d493",
+  "native_input_count": 3424,
   "native_dlls_reused": false,
   "native_validation_parent_sha256": null,
   "build_date": "2026-11-21",
@@ -39,21 +39,10 @@
   "profile_units_used": 0,
   "profile_provenance": null,
   "native_dll_sha256": {
-    "koboldcpp_default.dll": "959b80680185a20bf35511db4ec164d484dbd236d32db0452b292bcca6f2528b",
-    "koboldcpp_vulkan.dll": "d50897f4211a0b380cfbadeed1f8cc8d2b89fec439d1a72ae1cbc82735761d38"
+    "koboldcpp_default.dll": "ebbedf1f26acfaff96fb07be9624893287fd949f2b1fb87a9df134f6f709a624",
+    "koboldcpp_vulkan.dll": "8495ec61c2bd730cb85eafa0b445bb7d985298858c9ed7be68709ea76652c2a5"
   },
-  "cpu_threads": {
-    "threads": 16,
-    "blasthreads": 20,
-    "sdthreads": 20
-  },
-  "runtime_settings": {
-    "threads": 6,
-    "blasthreads": 4,
-    "sdthreads": 20,
-    "batchsize": 1024,
-    "ubatchsize": 1024,
-    "gpulayers": 99
-  },
-  "binary_unchanged": false
+  "validation_mode": "build, embedded CPU/Vulkan/shaders, CLI help, GGUF metadata and SHA-256",
+  "model_inference_run": false,
+  "runtime_vram_peak_measured": false
 }
