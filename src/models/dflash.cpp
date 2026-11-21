@@ -15,6 +15,8 @@ void llama_model_dflash::load_arch_hparams(llama_model_loader & ml) {
     if (ml.get_key(LLM_KV_HIDDEN_ACT, hidden_act, false)) {
         if (hidden_act == "gelu" || hidden_act == "gelu_pytorch_tanh") {
             hparams.llm_ffn_op = LLM_FFN_GELU;
+        } else if (hidden_act == "swigluoai") {
+            hparams.llm_ffn_op = LLM_FFN_SWIGLU_OAI_MOE;
         } else if (hidden_act != "silu") {
             throw std::runtime_error("unsupported DFlash hidden activation: " + hidden_act);
         }
@@ -121,6 +123,20 @@ void llama_model_dflash::load_arch_tensors(llama_model_loader &) {
         case BACKBONE_DSV41:          load_tensors_layers_dsv4();           break;
         case BACKBONE_MISTRAL_LARGE4: load_tensors_layers_mistral_large4(); break;
     }
+}
+
+uint32_t llama_model_dflash::graph_nodes_per_tensor() const {
+    if (hparams.dsv4_hc_mult > 0) {
+        return 32;
+    }
+    if (hparams.dflash_selector_rank > 0) {
+        // DFlash2's convolutions and selector are shape work rather than matmuls,
+        // so they cost ~8.6 nodes per tensor against ~5.9 for a plain DFlash draft.
+        // The selector lattice scales with the draft block size; 12u was calibrated
+        // on block-8 drafters, so scale the budget for larger blocks (e.g. Ripple's 16).
+        return 12u*std::max<uint32_t>(1u, hparams.dflash_block_size/8u);
+    }
+    return llama_model_base::graph_nodes_per_tensor();
 }
 
 void llama_model_dflash::load_tensors_layers_base() {
