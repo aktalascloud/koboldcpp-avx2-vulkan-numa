@@ -1,8 +1,8 @@
 # KoboldCpp · Haswell AVX2 and Polaris Vulkan
 
-В этой ветке добавлена поддержка SenseNova Loop, DFlash и vision в KoboldCpp. [Профили RX 580 и объём проверки](performance/configs/sensenova-loop/).
+Текущий релиз добавляет SenseNova Loop, DFlash и vision в KoboldCpp. [Профили RX 580 и объём проверки](performance/configs/sensenova-loop/).
 
-[English](README.md) · [Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/tag/v1.125-20261121-f1df2675) · [Документация](performance/RUN.txt) · [Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
+[English](README.md) · [Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Документация](performance/RUN.txt) · [Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
 
 Переносимый движок Windows x64 для Intel Haswell и AMD Polaris / RX 580. Экспериментальный форк KoboldCpp с правками компиляции, ядер и NUMA для локальных GGUF-моделей текста и медиа.
 

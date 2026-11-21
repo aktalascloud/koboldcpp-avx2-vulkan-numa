@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-21",
+  "native_sha256": "b15e7d0b4378da7940d0ec1c810d82002773d8f56b498081f997b02a37780b6b",
+  "upstream_commit": "58bb2a2d5de78736db7883579f9dd789ca55784d",
+  "gpu": "AMD Radeon RX 580 2048SP, 8 GiB",
+  "mode": "Vulkan startup, one launch, no generation requests",
+  "api_context": 16384,
+  "dflash_initialized": true,
+  "vision_available": true,
+  "seconds_to_ready": 23.06,
+  "wddm_adapter": {
+    "samples": 51,
+    "peak_dedicated_bytes": 7389151232,
+    "peak_shared_bytes": 980930560
+  },
+  "installed_media_cold_start": true,
+  "media_capabilities": {
+    "txt2img": true,
+    "music": true,
+    "musicllm": true
+  },
+  "native_32k_measured": false
+}

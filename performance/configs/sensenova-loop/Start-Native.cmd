@@ -7,9 +7,10 @@ if /i not "%profile%"=="16K" if /i not "%profile%"=="32K" (
     exit /b 2
 )
 set "native=%~dp0koboldcpp-nocuda.exe"
+if not exist "%native%" set "native=%~dp0..\..\..\KoboldCpp\koboldcpp-nocuda.exe"
 if not "%~2"=="" set "native=%~f2"
 if not exist "%native%" (
-    echo Place the rebuilt koboldcpp-nocuda.exe next to this launcher or pass its path.
+    echo Place the released koboldcpp-nocuda.exe next to this launcher or pass its path.
     exit /b 2
 )
 pushd "%~dp0" || exit /b 2
