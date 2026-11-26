@@ -1,8 +1,8 @@
 diff --git a/Makefile b/Makefile
-index 0d83ec4e9..b4ce45df7 100644
+index eeeeffd51..cac555e58 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -788,7 +788,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel
+@@ -808,7 +808,7 @@ SDCPP_VOCAB_BASENAMES := $(filter-out src/tokenizers/vocab/vocab.h,$(sort $(shel
  
  # The vocab tables (.hpp) and vocab.cpp, together with convert.cpp and
  # version.cpp, are only linked with sdmain

@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 4ceaa2332..3ce18d3aa 100644
+index 0decdd10a..3e27c953b 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
-@@ -4164,7 +4164,11 @@ static void ggml_compute_forward_rms_norm_f32(
+@@ -4276,7 +4276,11 @@ static void ggml_compute_forward_rms_norm_f32(
      // TODO: optimize
      for (int64_t i03 = 0; i03 < ne03; i03++) {
          for (int64_t i02 = 0; i02 < ne02; i02++) {

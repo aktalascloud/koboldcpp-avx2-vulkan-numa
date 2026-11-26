@@ -1,0 +1,85 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+index 795d77c62..19be75aa5 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
++++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
+@@ -898,6 +898,7 @@ struct vk_device_struct {
+     vk_pipeline pipeline_upscale_nearest_f32, pipeline_upscale_bilinear_f32, pipeline_upscale_bicubic_f32, pipeline_upscale_bilinear_antialias_f32;
+     // [src/dst 0=fp32,1=fp16,2=bf16]
+     vk_pipeline pipeline_scale[3];
++    vk_pipeline pipeline_scale_f32_vec4;
+     vk_pipeline pipeline_log[3];
+     vk_pipeline pipeline_tri[3];
+     vk_pipeline pipeline_diag[3];
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+index 75f100f77..9b3330d31 100644
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -3938,6 +3938,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+     ggml_vk_create_pipeline(device, device->pipeline_ ## name [2], #name "_bf16", name ## _bf16_len, name ## _bf16_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
+ 
+     CREATE_UNARY(scale)
++    if (device->vendor_id == VK_VENDOR_ID_AMD && device->architecture == AMD_GCN &&
++        device->subgroup_size == 64 &&
++        (device->properties.deviceID == 0x6fdf || device->properties.deviceID == 0x67df) &&
++        device->properties.limits.minStorageBufferOffsetAlignment % 16 == 0) {
++        ggml_vk_create_pipeline(device, device->pipeline_scale_f32_vec4, "scale_f32_vec4", scale_f32_vec4_len, scale_f32_vec4_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
++    }
+     CREATE_UNARY(log)
+     CREATE_UNARY(sqr)
+     CREATE_UNARY(sqrt)
+@@ -11863,7 +11869,13 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+     p.param1 = ggml_get_op_params_f32(dst, 0);
+     p.param2 = ggml_get_op_params_f32(dst, 1);
+ 
+-    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p));
++    const auto & vec4 = ctx->device->pipeline_scale_f32_vec4;
++    const bool aligned = vec4 && src0->type == GGML_TYPE_F32 && dst->type == GGML_TYPE_F32 &&
++        ggml_is_contiguous(src0) && ggml_is_contiguous(dst) &&
++        p.ne >= 393216 && p.ne % 4 == 0 && std::isfinite(p.param1) && std::isfinite(p.param2) &&
++        (get_misalign_bytes(ctx, src0) | get_misalign_bytes(ctx, dst)) % 16 == 0;
++    ggml_vk_op_f32(ctx, subctx, src0, nullptr, nullptr, nullptr, dst, GGML_OP_SCALE, std::move(p),
++                   aligned ? vec4 : nullptr);
+ }
+ 
+ void ggml_vk_sqr(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml_tensor * src0, ggml_tensor * dst) {
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
+index 0313f2fed..099db194b 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/scale.comp
+@@ -7,6 +7,19 @@ const uint num_threads = 128;
+ 
+ layout(local_size_x = num_threads, local_size_y = 1, local_size_z = 1) in;
+ 
++#ifdef KCPP_SCALE_VEC4
++layout (binding = 0) readonly buffer VA {vec4 data_a4[];};
++layout (binding = 1) writeonly buffer VD {vec4 data_d4[];};
++
++void main() {
++    const uint index = gl_GlobalInvocationID.z * 65536u +
++                       gl_GlobalInvocationID.y * 128u + gl_GlobalInvocationID.x;
++    if (index < p.ne / 4u) {
++        const vec4 x = data_a4[get_aoffset() / 4u + index];
++        data_d4[get_doffset() / 4u + index] = x * p.param1 + p.param2;
++    }
++}
++#else
+ void main() {
+     uint idx = get_idx();
+ 
+@@ -22,3 +35,4 @@ void main() {
+         idx += num_threads;
+     }
+ }
++#endif
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+index f7d327935..f329fd756 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
+@@ -1023,6 +1023,7 @@ void process_shaders() {
+     string_to_spv("concat_transpose_i32", "concat_transpose.comp", {{"A_TYPE", "uint"}, {"B_TYPE", "uint"}, {"D_TYPE", "uint"}});
+ 
+     string_to_spv("upscale_f32", "upscale.comp", {{"A_TYPE", "float"}, {"B_TYPE", "float"}, {"D_TYPE", "float"}});
++    string_to_spv("scale_f32_vec4", "scale.comp", {{"A_TYPE", "float"}, {"D_TYPE", "float"}, {"FLOAT_TYPE", "float"}, {"KCPP_SCALE_VEC4", "1"}});
+ 
+     const std::vector<std::pair<std::string, std::map<std::string, std::string>>> float_types = {
+         {"f32",  {{"A_TYPE", "float"},     {"D_TYPE", "float"}}},

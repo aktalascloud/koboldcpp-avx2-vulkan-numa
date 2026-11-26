@@ -1,8 +1,8 @@
 diff --git a/ggml/src/gguf.cpp b/ggml/src/gguf.cpp
-index baea1c020..ed4452ea4 100644
+index ee4e0ebab..075c761af 100644
 --- a/ggml/src/gguf.cpp
 +++ b/ggml/src/gguf.cpp
-@@ -1588,7 +1588,11 @@ struct gguf_writer_base {
+@@ -1575,7 +1575,11 @@ struct gguf_writer_base {
      void write_tensor_meta(const struct gguf_tensor_info & info) {
          write(info.t.name);
  

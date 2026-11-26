@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-alloc.c b/ggml/src/ggml-alloc.c
-index 65d2bea27..58da1f47c 100644
+index 90082d861..626aa9eca 100644
 --- a/ggml/src/ggml-alloc.c
 +++ b/ggml/src/ggml-alloc.c
-@@ -72,11 +72,18 @@ struct ggml_tallocr ggml_tallocr_new(ggml_backend_buffer_t buffer) {
+@@ -73,11 +73,18 @@ struct ggml_tallocr ggml_tallocr_new(ggml_backend_buffer_t buffer) {
  
  enum ggml_status ggml_tallocr_alloc(struct ggml_tallocr * talloc, struct ggml_tensor * tensor) {
      size_t size = ggml_backend_buffer_get_alloc_size(talloc->buffer, tensor);

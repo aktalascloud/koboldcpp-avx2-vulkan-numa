@@ -1,13 +1,11 @@
 ## English
 
-KoboldCpp 1.125 for Haswell AVX2 and Polaris Vulkan. Native SHA-256 `NATIVE_SHA256`, upstream `SOURCE_COMMIT`, 77 verified patches.
+KoboldCpp 1.126 for Haswell AVX2 and Polaris Vulkan. Native SHA-256 NATIVE_SHA256, upstream SOURCE_COMMIT. The build includes 158 new upstream commits and 76 verified local patches, with O3 and LTO.
 
-SenseNova Loop prefill keeps only the logits it needs. DFlash uses one candidate at zero confidence cutoff, with a Vulkan subgroup reduction and a float-correct fallback. The released 16K and 32K profiles keep all three GGUFs available.
-
-16K 3.54 → 6.34 tok/s, 32K 3.78 → 6.35 tok/s on the local RX 580 in paired short generations. The benchmark receipt records the full settings, answer checks and VRAM.
+The MOSS FFN Vulkan port uses upstream strided SCALE. The local RPC transfer bounds check and Polaris dispatch guards remain in the verified series. Compilation, cold startup, the visible window and the read-only API passed. Generation and throughput were outside the validation scope.
 
 ## Русский
 
-Убрала лишние логиты префилла, перенесла часть `0009` для одного кандидата и редукцию Vulkan. При одинаковом коротком запросе на местной RX 580 медианы составили 16K 3,54 → 6,34 токена/с и 32K 3,78 → 6,35 токена/с. Профили 16K и 32K включены в архив.
+KoboldCpp 1.126 для Haswell AVX2 и Polaris Vulkan собран с O3 и LTO. Вошли 158 коммитов upstream и 76 проверенных локальных патчей. MOSS FFN использует strided SCALE из upstream. Проверены сборка, холодный запуск, видимое окно и GET API. Замеров генерации для этой версии нет.
 
-[Measurements / Замеры](results/sensenova-loop-speed.json) · [Profiles / Профили](performance/configs/sensenova-loop/README.md) · [Patch series / Патчи](performance/patches/series/README.md) · [Licenses / Лицензии](performance/NOTICE.md)
+[Upstream review / Обзор](results/mainstream-2026-11-26.md) · [Startup / Запуск](results/startup-4073df7f.json) · [Patch series / Патчи](performance/patches/series/README.md) · [Licenses / Лицензии](performance/NOTICE.md)

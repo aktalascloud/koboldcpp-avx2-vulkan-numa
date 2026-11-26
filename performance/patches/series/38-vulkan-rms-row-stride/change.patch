@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 59d50bdca..9c0153af8 100644
+index 179d0f6ff..a7734803b 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 @@ -922,6 +922,7 @@ struct vk_device_struct {
@@ -11,10 +11,10 @@ index 59d50bdca..9c0153af8 100644
      std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add[2][2][2];
      vk_pipeline pipeline_rms_norm_mul_add_partials_f32;
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index d68288c10..70395ad27 100644
+index b9d59ab61..d7feab78c 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -3730,8 +3730,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3752,8 +3752,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
          const std::string suffix = "_" + std::to_string(block_size);
          ggml_vk_create_pipeline2(device, device->pipeline_rms_norm[0][0][i], "rms_norm_f32" + suffix, RMS_SHADER(rms_norm_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 0, 0, block_size, rms_unroll}, 1, true, rms_subgroups);
          ggml_vk_create_pipeline2(device, device->pipeline_rms_norm[0][1][i], "rms_norm_mul_f32" + suffix, RMS_SHADER(rms_norm_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0, block_size, rms_unroll}, 1, true, rms_subgroups);
@@ -27,7 +27,7 @@ index d68288c10..70395ad27 100644
          for (uint32_t pm : {0, 1}) {
              const std::string name = pm ? "rms_norm_mul_add_mul" : "rms_norm_mul_add";
              ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add[0][0][pm][i], name + "_f32" + suffix, RMS_SHADER(rms_norm_mul_add_f32), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, pm, block_size, rms_unroll}, 1, true, rms_subgroups);
-@@ -10127,9 +10131,15 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
+@@ -10164,9 +10168,15 @@ static vk_pipeline ggml_vk_op_get_pipeline(ggml_backend_vk_context * ctx, const
              if (ctx->do_add_rms_partials) {
                  return ctx->fused_rms_norm_mode == RMS_NORM_MUL ? ctx->device->pipeline_rms_norm_mul_partials_f32 : ctx->device->pipeline_rms_norm_partials_f32;
              }
@@ -43,7 +43,7 @@ index d68288c10..70395ad27 100644
              return ggml_vk_rms_norm_pipeline(ctx->device->pipeline_rms_norm[1][ctx->fused_rms_norm_mode == RMS_NORM_MUL], src0->ne[0]);
          }
          return nullptr;
-@@ -10644,6 +10654,7 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
+@@ -10684,6 +10694,7 @@ static void ggml_vk_op_f32(ggml_backend_vk_context * ctx, vk_context& subctx, co
              elements = { (uint32_t)CEIL_DIV(ne00, 128), 1, 1 };
          } else {
              elements = { (uint32_t)ne01, (uint32_t)ne02, (uint32_t)ne03 };
@@ -51,7 +51,7 @@ index d68288c10..70395ad27 100644
              elements[1] = std::min(elements[1], ctx->device->properties.limits.maxComputeWorkGroupCount[1]);
              elements[2] = std::min(elements[2], ctx->device->properties.limits.maxComputeWorkGroupCount[2]);
          }
-@@ -14869,6 +14880,12 @@ bool ggml_vk_can_fuse(const ggml_backend_vk_context * ctx, const struct ggml_cgr
+@@ -14946,6 +14957,12 @@ bool ggml_vk_can_fuse(const ggml_backend_vk_context * ctx, const struct ggml_cgr
          return false;
      }
  
@@ -64,7 +64,7 @@ index d68288c10..70395ad27 100644
      if ((ops.size() == 2 || ops.size() == 3 || ops.size() == 4) &&
          ops.begin()[0] == GGML_OP_RMS_NORM && ops.begin()[1] == GGML_OP_MUL) {
          // additional constraints specific to this fusion
-@@ -15360,6 +15377,9 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct
+@@ -15437,6 +15454,9 @@ bool ggml_vk_can_fuse_rope_set_rows(ggml_backend_vk_context * ctx, const struct
  bool ggml_vk_can_fuse_rms_norm_set_rows(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
                                                 int node_idx) {
      const ggml_tensor * rms = cgraph->nodes[node_idx];
@@ -74,7 +74,7 @@ index d68288c10..70395ad27 100644
      const ggml_tensor * view = cgraph->nodes[node_idx + 1];
      const ggml_tensor * set_rows = cgraph->nodes[node_idx + 2];
  
-@@ -15465,6 +15485,9 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
+@@ -15542,6 +15562,9 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
  bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
                                                 int node_idx) {
      const ggml_tensor *rms = cgraph->nodes[node_idx + 0];
@@ -125,7 +125,7 @@ index 48c8396a2..6f085688b 100644
  
  void main() {
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 8fcf31f10..171198830 100644
+index 3ab00a658..4cfae8bf6 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 @@ -896,7 +896,9 @@ void process_shaders() {

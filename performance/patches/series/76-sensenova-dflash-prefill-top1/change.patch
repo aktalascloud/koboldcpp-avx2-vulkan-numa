@@ -1,0 +1,130 @@
+diff --git a/common/speculative.cpp b/common/speculative.cpp
+index 1d4d9fb2b..f6057f51a 100644
+--- a/common/speculative.cpp
++++ b/common/speculative.cpp
+@@ -1089,11 +1089,13 @@ protected:
+         batch        = common_batch(ctx_dft);
+         batch_inject = common_batch(ctx_dft);
+ 
++        // Only the best candidate is used for greedy DFlash without a confidence cut.
++        const int32_t n_candidates = type == COMMON_SPECULATIVE_TYPE_DRAFT_DFLASH && this->params.p_min <= 0.0f ? 1 : 10;
+         smpls.resize(n_seq);
+         for (auto & s : smpls) {
+             common_params_sampling sparams;
+             sparams.no_perf  = false;
+-            sparams.top_k    = 10;
++            sparams.top_k    = n_candidates;
+             sparams.samplers = { COMMON_SAMPLER_TYPE_TOP_K };
+             s.reset(common_sampler_init(model_dft, sparams));
+         }
+@@ -1103,7 +1105,7 @@ protected:
+         if (this->params.backend_sampling && opt.backend_sampling) {
+             for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+                 llama_sampler * chain = llama_sampler_chain_init(llama_sampler_chain_default_params());
+-                llama_sampler_chain_add(chain, llama_sampler_init_top_k(10));
++                llama_sampler_chain_add(chain, llama_sampler_init_top_k(n_candidates));
+ 
+                 if (!llama_set_sampler(ctx_dft, seq_id, chain)) {
+                     SPC_WRN("backend offload failed for seq_id=%d; using CPU sampler\n", (int) seq_id);
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/topk_argsort.comp b/ggml/src/ggml-vulkan/vulkan-shaders/topk_argsort.comp
+index 49d4ab8e7..6d719b2e7 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/topk_argsort.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/topk_argsort.comp
+@@ -52,7 +52,7 @@ void topk(bool needs_bounds_check, const uint row) {
+                 ivec2 a = dst_row[col];
+                 ivec2 b = dst_row[col + s];
+                 if (a.x >= p.orig_ncols ||
+-                    b.x < p.orig_ncols && b.y > a.y) {
++                    (b.x < p.orig_ncols && intBitsToFloat(b.y) > intBitsToFloat(a.y))) {
+                     dst_row[col] = b;
+                 }
+             }
+diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/topk_nary_search.comp b/ggml/src/ggml-vulkan/vulkan-shaders/topk_nary_search.comp
+index 3f6296bda..77439a832 100644
+--- a/ggml/src/ggml-vulkan/vulkan-shaders/topk_nary_search.comp
++++ b/ggml/src/ggml-vulkan/vulkan-shaders/topk_nary_search.comp
+@@ -77,19 +77,41 @@ void topk(const uint row) {
+     barrier();
+ 
+     if (p.k == 1) {
+-        // Fast path for single output - just do a max reduction
+-        [[unroll]] for (int s = BLOCK_SIZE / 2; s >= 1; s /= 2) {
+-            if (tid < s) {
+-                ivec2 a = dst_row[tid];
+-                ivec2 b = dst_row[tid + s];
+-                // compare as floats: the bit patterns of negative values
+-                // order the other way as integers
+-                if (a.x >= p.orig_ncols ||
+-                    b.x < p.orig_ncols && intBitsToFloat(b.y) > intBitsToFloat(a.y)) {
+-                    dst_row[tid] = b;
++        if (BLOCK_SIZE <= SUBGROUP_SIZE * SUBGROUP_SIZE) {
++            // Reduce the score and the first matching input index in each subgroup.
++            // The first subgroup then reduces the partial results.
++            const ivec2 item = dst_row[tid];
++            const float value = item.x < p.orig_ncols ? intBitsToFloat(item.y) : uintBitsToFloat(0xFF800000);
++            const float maximum = subgroupMax(value);
++            const uint winner = subgroupMin(value == maximum ? uint(item.x) : p.orig_ncols);
++            if (subgroupElect()) {
++                offset_partials[gl_SubgroupID] = floatBitsToUint(maximum);
++                eq_min_partials[gl_SubgroupID] = winner;
++            }
++            barrier();
++            if (tid < SUBGROUP_SIZE) {
++                const float partial = tid < int(gl_NumSubgroups) ? uintBitsToFloat(offset_partials[tid]) : uintBitsToFloat(0xFF800000);
++                const float best = subgroupMax(partial);
++                const uint index = subgroupMin(tid < int(gl_NumSubgroups) && partial == best ? eq_min_partials[tid] : p.orig_ncols);
++                if (tid == 0) {
++                    dst_row[0] = ivec2(index, floatBitsToInt(best));
+                 }
+             }
+             barrier();
++        } else {
++            [[unroll]] for (int s = BLOCK_SIZE / 2; s >= 1; s /= 2) {
++                if (tid < s) {
++                    ivec2 a = dst_row[tid];
++                    ivec2 b = dst_row[tid + s];
++                    // compare as floats: the bit patterns of negative values
++                    // order the other way as integers
++                    if (a.x >= p.orig_ncols ||
++                        b.x < p.orig_ncols && intBitsToFloat(b.y) > intBitsToFloat(a.y)) {
++                        dst_row[tid] = b;
++                    }
++                }
++                barrier();
++            }
+         }
+     } else {
+         // Do an N-ary search to find the K-th largest value.
+diff --git a/kcpp_src/gpttype_adapter.cpp b/kcpp_src/gpttype_adapter.cpp
+index 17d965387..cb2f5f57d 100644
+--- a/kcpp_src/gpttype_adapter.cpp
++++ b/kcpp_src/gpttype_adapter.cpp
+@@ -8503,7 +8503,9 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
+                 if(embd.size()!=1 || draft_ctx==nullptr || draft_spec==nullptr || remaining_tokens<=1 || grammar!=nullptr || startedsampling==false) //for large batch, or if no draft model, PP/TG as usual
+                 {
+                     draft_used = false;
+-                    kcpp_embd_batch batch = kcpp_embd_batch(embd, n_past, use_mrope, draft_is_mtp);
++                    // DFlash consumes target layer inputs during prefill. Only the last token needs LM-head logits.
++                    const bool all_logits = draft_is_mtp && draft_spec_type_active != COMMON_SPECULATIVE_TYPE_DRAFT_DFLASH;
++                    kcpp_embd_batch batch = kcpp_embd_batch(embd, n_past, use_mrope, all_logits);
+                     int32_t decode_status = -1;
+                     bool skipdecodelater = false;
+ 
+@@ -8532,7 +8534,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
+                                         smartcache_quick_snapshot();
+                                     }
+                                     std::vector<gpt_vocab::id> chunk = parts[p];
+-                                    kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, draft_is_mtp);
++                                    kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, all_logits);
+                                     decode_status = kcpp_decode_main_and_spec(llama_ctx_v4, smallbatch.batch);
+                                     if(p==0 && decode_status==1)
+                                     {
+@@ -8558,7 +8560,7 @@ generation_outputs gpttype_generate(const generation_inputs inputs)
+                             for(int p=0;p<parts.size();++p)
+                             {
+                                 std::vector<gpt_vocab::id> chunk = parts[p];
+-                                kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, draft_is_mtp);
++                                kcpp_embd_batch smallbatch = kcpp_embd_batch(chunk, temp_past, use_mrope, all_logits);
+                                 int32_t decode_status2 = kcpp_decode_main_and_spec(llama_ctx_v4, smallbatch.batch);
+                                 if(debugmode==1 && !is_quiet)
+                                 {

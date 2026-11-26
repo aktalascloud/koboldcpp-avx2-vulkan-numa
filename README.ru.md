@@ -1,6 +1,6 @@
 # KoboldCpp · Haswell AVX2 and Polaris Vulkan
 
-SenseNova Loop на местной RX 580. 16K 3,54 → 6,34 токена/с и 32K 3,78 → 6,35 токена/с. [Парные замеры](results/sensenova-loop-speed.json).
+В KoboldCpp 1.126 перенесены 158 коммитов upstream и 76 проверенных локальных патчей для Haswell AVX2 и Polaris Vulkan. [Обзор от 26 ноября](results/mainstream-2026-11-26.md).
 
 [English](README.md) · [Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Документация](performance/RUN.txt) · [Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
 

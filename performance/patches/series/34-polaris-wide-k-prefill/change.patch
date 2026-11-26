@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 2277a17a7..d68288c10 100644
+index bc9de14ab..b9d59ab61 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -3005,6 +3005,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3012,6 +3012,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
                                     const std::string& name, size_t len, const void* data, uint32_t pc_size, uint32_t pc,
                                     uint32_t rsgs = 0) {
              auto tc = filter_tc(tc_base, key.type_a, key.mul_mat_id);
@@ -22,7 +22,7 @@ index 2277a17a7..d68288c10 100644
              if (!tc.empty()) {
                  spec_fn_t qs = [&, type_a=key.type_a](const std::vector<uint32_t>& wt, bool a) { return ggml_vk_mul_mm_spec_quant(wt, a, (uint32_t)type_a); };
                  create_mm_pipelines(key, tc, name, len, data, pc_size, pc, qs, false, rsgs > 0, rsgs);
-@@ -3282,7 +3295,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3289,7 +3302,8 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              return 0;
          };
      } else {
@@ -32,7 +32,7 @@ index 2277a17a7..d68288c10 100644
                                            const std::vector<vk_matmul_pipeline_pair>& configs) -> uint32_t {
              if (configs.size() <= 1) return 0;
              for (uint32_t i = 0; i < configs.size(); ++i) {
-@@ -3293,6 +3307,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3300,6 +3314,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              if (last == 0 || m <= 32 || n <= 32) return 0;
              if (last == 1) return 1;
              if (m <= 64 || n <= 64) return 1;

@@ -1,8 +1,8 @@
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 897e7d6ed..5d3c83ea7 100644
+index 18c047616..a34697539 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -2933,6 +2933,8 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -2927,6 +2927,8 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
          vid_gen_params.video_frames = vid_req_frames;
          vid_gen_params.fps = vid_fps;
          vid_gen_params.vae_tiling_params = params.vae_tiling_params;

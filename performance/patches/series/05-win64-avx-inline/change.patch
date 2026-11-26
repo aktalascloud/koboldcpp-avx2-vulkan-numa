@@ -1,5 +1,5 @@
 diff --git a/ggml/src/ggml-cpu/vec.h b/ggml/src/ggml-cpu/vec.h
-index 4aac5e966..fc5c2b2f5 100644
+index 0b8ac5d51..91c6650e2 100644
 --- a/ggml/src/ggml-cpu/vec.h
 +++ b/ggml/src/ggml-cpu/vec.h
 @@ -1270,14 +1270,14 @@ inline static __m512 ggml_v_gelu_quick(__m512 x) {
