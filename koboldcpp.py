@@ -133,7 +133,7 @@ dry_seq_break_max = 128
 extra_images_max = 4 # for kontext/qwen img
 
 # global vars
-KcppVersion = "1.125"
+KcppVersion = "1.126"
 # KCPP_BUILD_DATE_PORT: package.py embeds the build day; launch time is not used.
 def _kcpp_packaged_build_day():
     try:
@@ -160,6 +160,7 @@ friendlymodelname = "inactive"
 friendlysdmodelname = "inactive"
 friendlyembeddingsmodelname = "inactive"
 autoswapmode = False
+autoswap_music = {}
 textName = None
 sttName = None
 ttsName = None
@@ -222,6 +223,7 @@ has_audio_support = False
 has_vision_support = False
 has_whisper = False
 cached_chat_template = None
+cached_eos_token = ""
 cached_sd_info = {}
 cached_sd_custom_sigmas = {}
 cached_jinja_kwargs = None
@@ -269,7 +271,8 @@ thinkformats = [{"start":"<|channel|>analysis<|message|>","end":"<|start|>assist
                 {"start":"<seed:think>","end":"</seed:think>"},
                 {"start":"<|START_THINKING|>","end":"<|END_THINKING|>"},
                 {"start":"<|channel>thought","end":"<channel|>"},
-                {"start":"[THINK]","end":"[/THINK]"}]
+                {"start":"[THINK]","end":"[/THINK]"},
+                {"start":"<|content_thinking|>","end":"<|end_message|>","shared_end":True}]
 tool_call_pairs = [ #third element is optional str to match in chat template before we use this pair, fourth element is whether its stream-handleable
     ("<tool_call>", "</tool_call>", None, True), #qwen, glm
     ("<seed:tool_call>", "</seed:tool_call>", None, True), #seed oss
@@ -293,6 +296,10 @@ address_header_formats = [
         "tail_message_pattern": r'(?:^|<\|start\|>assistant)\s*to=[^\s<]*',
         "tail_message_tag": "<|message|>",
     },
+    {
+        "required": ["<|message_model|>"],
+        "markers": ["<|message_model|>", "<|content_text|>", "<|end_message|>"],
+    },
 ]
 
 def active_address_header_formats():
@@ -304,7 +311,10 @@ def strip_address_headers(text):
     if not text:
         return text
     for fmt in active_address_header_formats():
-        text = re.sub(fmt["pattern"], '', text)
+        if fmt.get("pattern"):
+            text = re.sub(fmt["pattern"], '', text)
+        for marker in fmt.get("markers", []):
+            text = text.replace(marker, '')
     return text
 
 def split_address_header_tail(text, stream_done=False):
@@ -312,6 +322,12 @@ def split_address_header_tail(text, stream_done=False):
         return text, ""
     tail = ""
     for fmt in active_address_header_formats():
+        for marker in fmt.get("markers", []):
+            for n in range(1, len(marker)):
+                if text.endswith(marker[:n]) and n > len(tail):
+                    tail = marker[:n]
+        if not fmt.get("tail_start_pattern"):
+            continue
         start_match = re.search(fmt["tail_start_pattern"], text)
         msg_tail = fmt["tail_message_tag"]
         for n in range(1, len(msg_tail)):
@@ -448,7 +464,8 @@ class load_model_inputs(ctypes.Structure):
                 ("rpc_targets", ctypes.c_char_p),
                 ("lazy_mode", ctypes.c_int),
                 ("moe_cache_mib", ctypes.c_int),
-                ("parallel_total_context", ctypes.c_int)]
+                ("parallel_total_context", ctypes.c_int),
+                ("no_op_offload", ctypes.c_bool)]
 
 class generation_inputs(ctypes.Structure):
     _fields_ = [("seed", ctypes.c_int),
@@ -1202,6 +1219,9 @@ def init_library():
     handle.token_count.restype = token_count_outputs
     handle.get_pending_output.restype = ctypes.c_char_p
     handle.get_chat_template.restype = ctypes.c_char_p
+    if hasattr(handle, "get_eos_token_text"):
+        handle.get_eos_token_text.restype = ctypes.c_char_p
+        handle.get_eos_token_text.argtypes = []
     handle.parse_chat_tool_calls.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p, ctypes.c_bool, ctypes.c_bool]
     handle.parse_chat_tool_calls.restype = ctypes.c_char_p
 
@@ -1781,7 +1801,10 @@ def get_capabilities():
     has_router = True if args.routermode else False
     musicfamily_raw = handle.music_get_family()
     musicfamily = musicfamily_raw.decode("UTF-8", "ignore") if musicfamily_raw else "none"
-    return {"result":"KoboldCpp", "version":KcppVersion, "protected":has_password, "llm":has_llm, "txt2img":has_txt2img,"vision":visionSupport,"audio":audioSupport,"transcribe":has_whisper,"multiplayer":has_multiplayer,"websearch":has_search,"tts":has_tts, "embeddings":has_embeddings, "music":has_music, "musicllm":bool(musicllmmodelpath), "musicfamily":musicfamily, "savedata":(savedata_obj is not None), "admin": admin_type, "router":has_router, "guidance": has_guidance, "jinja": has_jinja, "mcp":has_mcp, "parallelrequests":args.parallelrequests, "defaults_modified":bool(args.gendefaults)}
+    musicllm = bool(musicllmmodelpath)
+    if autoswapmode and autoswap_music:
+        musicllm = autoswap_music['llm']
+    return {"result":"KoboldCpp", "version":KcppVersion, "protected":has_password, "llm":has_llm, "txt2img":has_txt2img,"vision":visionSupport,"audio":audioSupport,"transcribe":has_whisper,"multiplayer":has_multiplayer,"websearch":has_search,"tts":has_tts, "embeddings":has_embeddings, "music":has_music, "musicllm":musicllm, "musicfamily":musicfamily, "savedata":(savedata_obj is not None), "admin": admin_type, "router":has_router, "guidance": has_guidance, "jinja": has_jinja, "mcp":has_mcp, "parallelrequests":args.parallelrequests, "defaults_modified":bool(args.gendefaults)}
 
 
 def scan_directory(dirpath, valid_exts, depth):
@@ -2341,6 +2364,7 @@ def load_model(model_filename):
     inputs.max_context_length = maxctx #initial value to use for ctx, can be overwritten
     inputs.threads = args.threads
     inputs.low_vram = True if args.lowvram else False
+    inputs.no_op_offload = args.no_op_offload
     inputs.use_mmq = False if args.nommq else True
     inputs.splitmode = splitmode_choices_to_int(args.splitmode) #layer=1, row=2, tensor=3
     inputs.blasthreads = args.blasthreads
@@ -4524,16 +4548,16 @@ def toolcall_to_normalized_json(text,start_tag,end_tag,required_match_txt): #con
                 continue
             params[key] = value.strip()
         return json.dumps({"name": fn_name, "arguments": params})
-    def parse_glm(text: str) -> str:
+    def parse_tagged_arguments(text: str, prefix="arg") -> str:
         text = text.strip()
-        # Extract function name: it's the first thing before any <arg_key>
+        # The function name precedes the tagged key/value pairs.
         fn_match = re.match(r"^\s*([^\<\s]+)", text)
         if not fn_match:
             return text
         fn_name = fn_match.group(1).strip()
         # Extract all key/value pairs
-        keys = re.findall(r"<arg_key>(.*?)</arg_key>", text)
-        values = re.findall(r"<arg_value>(.*?)</arg_value>", text)
+        keys = re.findall(fr"<{prefix}_key>(.*?)</{prefix}_key>", text, re.DOTALL)
+        values = re.findall(fr"<{prefix}_value>(.*?)</{prefix}_value>", text, re.DOTALL)
         params = {}
         for i in range(min(len(keys), len(values))):
             params[keys[i].strip()] = values[i].strip()
@@ -4689,8 +4713,9 @@ def toolcall_to_normalized_json(text,start_tag,end_tag,required_match_txt): #con
     if check_ok and len(check_ok)>0:
         return text #is valid JSON or parsable
 
-    if "<arg_key>" in text and "<arg_value>" in text: # handle glm with args
-        return parse_glm(text)
+    for prefix in ("arg", "param"): # GLM and Xing tagged arguments
+        if f"<{prefix}_key>" in text and f"<{prefix}_value>" in text:
+            return parse_tagged_arguments(text, prefix)
 
     if "<function=" in text: # handle qwen3.5
         return parse_qwen35(text)
@@ -4705,7 +4730,7 @@ def toolcall_to_normalized_json(text,start_tag,end_tag,required_match_txt): #con
         return parse_deepseek_r1_sep(text)
 
     if ' ' not in text and '\n' not in text: # handle glm without args
-        return parse_glm(text)
+        return parse_tagged_arguments(text)
 
     if 'functions.' in text and "commentary" in start_tag:  # handle GPT-OSS
         return parse_gpt_oss(text)
@@ -4816,7 +4841,15 @@ def format_jinja(messages_orig, tools, chat_template_kwargs=None):
                 parser.stream.skip(1)
                 return parser.parse_statements( ("name:endgeneration",), drop_needle=True)
         from jinja2.sandbox import ImmutableSandboxedEnvironment
-        jinja_env = ImmutableSandboxedEnvironment(trim_blocks=True, lstrip_blocks=True,  extensions=[IgnoreGenerationTags,loopcontrols])
+        # Jinja calls finalize on output expressions after evaluating the template logic.
+        # Keep content iterable, but render a directly emitted text-only list as its text.
+        text_only_content = {}
+        def finalize_output(value):
+            content = text_only_content.get(id(value))
+            if content is value and content is not None:
+                return content[0]["text"]
+            return value
+        jinja_env = ImmutableSandboxedEnvironment(trim_blocks=True, lstrip_blocks=True, finalize=finalize_output, extensions=[IgnoreGenerationTags,loopcontrols])
         # sanitize messages to remove none types
         messages = json.loads(json.dumps(messages_orig))
         for m in messages:
@@ -4844,6 +4877,8 @@ def format_jinja(messages_orig, tools, chat_template_kwargs=None):
                         normalized.append(item)
                 if turn_text:
                     normalized.append({"type": "text","text": turn_text})
+                    if all(item.get("type") == "text" for item in m["content"]):
+                        text_only_content[id(normalized)] = normalized
                 m["content"] = normalized
         for m in messages: # Fix tool_calls arguments and content if parsable
             if m.get("tool_calls"):
@@ -4864,17 +4899,26 @@ def format_jinja(messages_orig, tools, chat_template_kwargs=None):
         assist_should_prefill = False
         chat_template_kwargs = chat_template_kwargs or {}
         last_assist_msg = ""
+        single_assistant_prefill = False
+        assistant_prefill_marker = "\ue000740915260831\ue001"
         if messages:
             last_assist_msg = messages[-1]["content"]
             assist_should_prefill = (messages and messages[-1]["role"].lower() == "assistant" and last_assist_msg and isinstance(last_assist_msg, str) and len(last_assist_msg.strip())>0) #avoid single character newline or space content
             last_assist_msg = "" if not assist_should_prefill else last_assist_msg
-            messages_for_render = messages[:-1] if len(messages) > 1 and assist_should_prefill else messages
+            single_assistant_prefill = assist_should_prefill and len(messages) == 1
+            messages_for_render = messages if single_assistant_prefill else (messages[:-1] if assist_should_prefill else messages)
+            if single_assistant_prefill:
+                messages_for_render[0]["content"] = assistant_prefill_marker
+        render_eos_token = "" if single_assistant_prefill else cached_eos_token
+        add_generation_prompt = not single_assistant_prefill
         if tools and len(tools)>0:
-            text = jinja_compiled_template.render(messages=messages_for_render, tools=tools, add_generation_prompt=True, bos_token="", eos_token="", **chat_template_kwargs)
+            text = jinja_compiled_template.render(messages=messages_for_render, tools=tools, add_generation_prompt=add_generation_prompt, bos_token="", eos_token=render_eos_token, **chat_template_kwargs)
         else:
-            text = jinja_compiled_template.render(messages=messages_for_render, add_generation_prompt=True, bos_token="", eos_token="", **chat_template_kwargs)
-        if assist_should_prefill and text and last_assist_msg: # handle prefill continuations
-            text = text + last_assist_msg
+            text = jinja_compiled_template.render(messages=messages_for_render, add_generation_prompt=add_generation_prompt, bos_token="", eos_token=render_eos_token, **chat_template_kwargs)
+        if single_assistant_prefill and text and assistant_prefill_marker in text:
+            text = text[:text.find(assistant_prefill_marker)] + last_assist_msg
+        elif assist_should_prefill and last_assist_msg: # handle prefill continuations
+            text = (text or "") + last_assist_msg
         return text if text else None
     except Exception as e:
         print(f"Jinja formatting failed: {e}")
@@ -6125,6 +6169,14 @@ def get_my_epurl():
 
 proxy_reload_lock = threading.Lock()
 
+def admin_idle_timeout_expired(activity, timeout, now):
+    last_active = activity.get("last_active_timestamp")
+    return bool(timeout > 0 and last_active
+        and activity.get("load_complete")
+        and not activity.get("restart_target")
+        and not activity.get("active_requests", 0)
+        and (now - last_active).total_seconds() > timeout)
+
 def header_password_matches(headers, target_password, target_alt_password=None):
     if not target_password:
         return True
@@ -6274,6 +6326,9 @@ class KcppProxyHandler(http.server.BaseHTTPRequestHandler):
                     and requestedType not in loadedReqTypes
                     and requestedType != global_memory["swapReqType"])
                 if swapModeChanged:
+                    # Publish activity before the requested type: the manager must
+                    # not interpret this wake-up as an already-idle loaded model.
+                    global_memory["last_active_timestamp"] = datetime.now()
                     global_memory["swapReqType"] = requestedType
 
                 if (global_memory["swapReqType"] is not None and swapModeChanged):
@@ -6658,7 +6713,8 @@ class KcppServerRequestHandler(http.server.SimpleHTTPRequestHandler):
                         reasoningtxt = recvtxt[start_idx + len(starter):end_idx]
                         recvtxt = recvtxt[:start_idx] + recvtxt[end_idx + len(ender):]
                         break
-                    elif starter not in recvtxt and ender in recvtxt:
+                    # A shared message terminator alone does not imply reasoning.
+                    elif starter not in recvtxt and ender in recvtxt and (not pair.get('shared_end', False) or genparams.get('already_started_thinking', False)):
                         parts = recvtxt.split(ender, 1)
                         reasoningtxt = parts[0]
                         recvtxt = parts[1]
@@ -7141,7 +7197,7 @@ class KcppServerRequestHandler(http.server.SimpleHTTPRequestHandler):
                                             out1, out2 = tokenStr.split(pair["start"], 1)
                                             # Preserve text that came BEFORE the start tag
                                             if out1:
-                                                delta['content'] = out1
+                                                delta['content'] = strip_address_headers(out1)
                                             if out2:
                                                 delta['reasoning_content'] = out2
                                             # Edge Case: The end tag is ALSO in this exact same chunk (in out2)
@@ -8689,7 +8745,7 @@ Change Mode<br>
                     targetfile = ""
                 if targetfile and targetfile!="":
                     if targetfile=="unload_model" or targetfile=="initial_model": #special request to simply unload model or swap back top intial model
-                        print("Admin: Received request to unload model")
+                        print("Admin: Received request to unload model" if targetfile == "unload_model" else "Admin: Received request to reload initial model")
                         global_memory["restart_target"] = targetfile
                         global_memory["restart_override_base_config"] = ""
                         resp = {"success": True}
@@ -10284,6 +10340,7 @@ def show_gui():
     nocertifymode = ctk.IntVar(value=0)
 
     lowvram_var = ctk.IntVar()
+    no_op_offload_var = ctk.IntVar()
     mmq_var = ctk.IntVar(value=1)
     quantkv_var = ctk.IntVar(value=0)
     blas_threads_var = ctk.StringVar()
@@ -11073,6 +11130,7 @@ def show_gui():
         "Direct I/O": [usedirectio, "Use direct I/O when loading GGUF models. May improve cold-load times on some storage."],
         "Keep Foreground": [keepforeground, "Bring KoboldCpp to the foreground every time there is a new generation."],
         "CLI Terminal Only": [terminalonly, "Does not launch KoboldCpp HTTP server. Instead, enables KoboldCpp from the command line, accepting interactive console input and displaying responses to the terminal."],
+        "No Op offload": [no_op_offload_var, "Disable offloading host tensor operations to the GPU for GGUF models.\nModel layer and KV cache offloading are controlled separately."],
     }
 
     for idx, (name, properties) in enumerate(hardware_boxes.items()):
@@ -11671,6 +11729,7 @@ def show_gui():
         qkvopt = quantkv_text[quantkv_var.get()].lower() if (quantkv_var.get()>=0 and quantkv_var.get() < len(quantkv_text)) else "f16"
         args.quantkv = qkvopt
         args.lowvram = lowvram_var.get()==1
+        args.no_op_offload = no_op_offload_var.get()==1
         args.nommq = mmq_var.get()==0
         args.splitmode = splitmode_var.get() if splitmode_var.get() in splitmode_choices else splitmode_choices[0]
 
@@ -11932,6 +11991,7 @@ def show_gui():
         nocertifymode.set(1 if "nocertify" in mydict and mydict["nocertify"] else 0)
         nomodel.set(1 if "nomodel" in mydict and mydict["nomodel"] else 0)
         lowvram_var.set(1 if "lowvram" in mydict and mydict["lowvram"] else 0)
+        no_op_offload_var.set(1 if mydict.get("no_op_offload", False) else 0)
         if "quantkv" in mydict:
             qkvstr = str(mydict["quantkv"]).lower()
             qkvval = 0
@@ -12925,6 +12985,12 @@ def run_beavernet_worker(args, api_key, worker_slots=None):
                 registered_model[0] = registration
 
     print(f"\n===\nEmbedded BeaverNet Worker Starting with {max_inflight} parallel request(s)...\n")
+    # Best-effort provider resume on boot; do not block startup or repeat on reconnect.
+    threading.Thread(
+        target=_beavernet_api_request,
+        args=(api_key, "PATCH", "/provider", {"status": "active"}),
+        daemon=True,
+    ).start()
     while exitcounter < 100:
         websocket = None
         max_body_size = local_size_limit
@@ -14010,7 +14076,7 @@ def get_kobold_agent_path():
 
 
 def run_bundled_kobold_agent(base_url=None, api_key=None, load_session=None,
-                             request_timeout=None, no_certify=False):
+                             request_timeout=None, no_certify=False, disable_view_image=False):
     """Run the bundled agent script inside a frozen KoboldCpp process."""
     agent_path = get_kobold_agent_path()
     if not os.path.isfile(agent_path):
@@ -14031,6 +14097,8 @@ def run_bundled_kobold_agent(base_url=None, api_key=None, load_session=None,
             sys.argv.extend(["--request-timeout", str(request_timeout)])
         if no_certify:
             sys.argv.append("--nocertify")
+        if disable_view_image:
+            sys.argv.append("--disable-view-image")
         kcpp_agent.main()
     finally:
         sys.argv = old_argv
@@ -14038,7 +14106,7 @@ def run_bundled_kobold_agent(base_url=None, api_key=None, load_session=None,
 
 def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=False,
                                  load_session=None, request_timeout=None,
-                                 no_certify=False):
+                                 no_certify=False, disable_view_image=False):
     """Run the agent in a new or existing terminal, using the bundled runner when frozen."""
     agent_path = get_kobold_agent_path()
     if not os.path.isfile(agent_path):
@@ -14058,6 +14126,8 @@ def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=Fals
         command.extend(["--reqtimeout" if is_frozen else "--request-timeout", str(request_timeout)])
     if no_certify:
         command.append("--nocertify")
+    if disable_view_image:
+        command.append("--agent-disable-view-image" if is_frozen else "--disable-view-image")
 
     try:
         if same_terminal:
@@ -14169,7 +14239,7 @@ def launch_kobold_agent_terminal(base_url=None, api_key=None, same_terminal=Fals
 
 def launch_kobold_agent_after_mcp_load(
     mcp_load_thread, base_url=None, api_key=None, same_terminal=False, load_session=None,
-    request_timeout=None, no_certify=False
+    request_timeout=None, no_certify=False, disable_view_image=False
 ):
     """Briefly wait for a complete MCP tool list, then launch regardless."""
     if mcp_load_thread is not None:
@@ -14183,7 +14253,8 @@ def launch_kobold_agent_after_mcp_load(
                 "to refresh MCP tools."
             )
     return launch_kobold_agent_terminal(
-        base_url, api_key, same_terminal, load_session, request_timeout, no_certify
+        base_url, api_key, same_terminal, load_session, request_timeout, no_certify,
+        disable_view_image
     )
 
 
@@ -14335,7 +14406,7 @@ def main(launch_args, default_args):
     if args.run_bundled_agent:
         run_bundled_kobold_agent(
             args.agent_base_url, args.agent_api_key, args.agentload, args.reqtimeout,
-            args.nocertify
+            args.nocertify, args.agent_disable_view_image
         )
         return
 
@@ -14556,13 +14627,13 @@ def main(launch_args, default_args):
                     restart_override_base_config = global_memory["restart_override_base_config"]
                     activity = global_memory.copy()
                     last_active = activity["last_active_timestamp"]
-                    if last_active and args.adminunloadtimeout>0 and not activity.get("active_requests", 0):
+                    if not restart_target and admin_idle_timeout_expired(activity, args.adminunloadtimeout, datetime.now()):
                         curtime = datetime.now()
                         elapsedtime = curtime - last_active
                         time_since_last_active = elapsedtime.total_seconds()
                         if time_since_last_active > args.adminunloadtimeout:
                             if args.autoswapmode:
-                                if global_memory["swapReqType"] is not None and global_memory["swapReqType"] != "nomodel":
+                                if activity.get("loadedReqTypes"):
                                     print(f"[Unload Timeout] Inactive for over {time_since_last_active}s, unloading models via autoswap...")
                                     global_memory["swapReqType"] = "nomodel"
                                     global_memory["triggered_sleeping"] = True
@@ -14800,6 +14871,7 @@ def disableSwappedFieldsInConfig(args, swapReqType):
 def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
     global embedded_kailite, embedded_kcpp_docs, embedded_kcpp_sdui, embedded_kailite_gz, embedded_kcpp_docs_gz, embedded_kcpp_sdui_gz, embedded_lcpp_ui_gz, embedded_musicui, embedded_musicui_gz, start_time, exitcounter, global_memory, using_gui_launcher
     global libname, args, friendlymodelname, friendlysdmodelname, fullsdmodelpath, password, fullwhispermodelpath, ttsmodelpath, embeddingsmodelpath, musicdiffusionmodelpath, musicllmmodelpath, friendlyembeddingsmodelname, has_audio_support, has_vision_support, cached_chat_template, cached_jinja_kwargs, cached_sd_info, preloaded_custom_jinja
+    global cached_eos_token
 
     start_server = True
 
@@ -14816,6 +14888,8 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
 
 
     global autoswapmode, textName, sttName, ttsName, embedName, musicName, imageName, mmprojName
+    global autoswap_music, imglora_preload, imglora_bypath, imglora_name2path
+    autoswap_music = {}
     autoswapmode = False
     textName = None
     mmprojName = None
@@ -14847,14 +14921,21 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
             tempName = os.path.basename(os.path.abspath(args.embeddingsmodel))
             tempName = os.path.splitext(tempName)[0]
             embedName = sanitize_string(tempName)
-        if args.musicdiffusion and args.musicdiffusion!="":
-            tempName = os.path.basename(os.path.abspath(args.musicdiffusion))
+        if args.musicdiffusion or args.musicllm:
+            # Preserve advertised capabilities before inactive model paths are cleared.
+            autoswap_music = {
+                'llm': bool(args.musicllm),
+            }
+            tempName = os.path.basename(os.path.abspath(args.musicdiffusion or args.musicllm))
             tempName = os.path.splitext(tempName)[0]
             musicName = sanitize_string(tempName)
         if args.sdmodel and args.sdmodel!="":
             tempName = os.path.basename(os.path.abspath(args.sdmodel))
             tempName = os.path.splitext(tempName)[0]
             imageName = sanitize_string(tempName)
+            # Directory discovery does not require loading the image model.
+            imglora_preload, imglora_bypath, imglora_name2path = mk_lora_info(
+                sanitize_lora_list(args.sdlora), sanitize_lora_multipliers(args.sdloramult))
         if global_memory["swapReqType"] is not None:
             disableSwappedFieldsInConfig(args, global_memory["swapReqType"])
         else:
@@ -15308,6 +15389,8 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
         if args.model_param:
             ctbytes = handle.get_chat_template()
             cached_chat_template = ctypes.string_at(ctbytes).decode("UTF-8","ignore")
+            eos_bytes = handle.get_eos_token_text() if hasattr(handle, "get_eos_token_text") else b""
+            cached_eos_token = eos_bytes.decode("UTF-8", "ignore")
             if cached_chat_template != "" and (chatcompl_adapter_list is not None and isinstance(chatcompl_adapter_list, list)):
                 for entry in chatcompl_adapter_list:
                     if all(s in cached_chat_template for s in entry['search']):
@@ -15349,7 +15432,6 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
             imgphotomaker = ""
             imgupscaler = ""
             imgaudiovae = ""
-            global imglora_preload, imglora_bypath, imglora_name2path
             imglora_preload, imglora_bypath, imglora_name2path = mk_lora_info(args.sdlora, args.sdloramult)
             if args.sdvae:
                 if os.path.exists(args.sdvae):
@@ -15724,6 +15806,8 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
                     print(f"StableUI is available at {endpoint_url}/sdui/")
                 if args.musicdiffusion or args.musicllm or args.ttsmodel or args.transcribemodel:
                     print(f"MusicUI is available at {endpoint_url}/musicui/")
+        if global_memory is not None:
+            global_memory["last_active_timestamp"] = datetime.now()
             global_memory["load_complete"] = True
         if args.launch:
             def launch_browser_thread():
@@ -15905,6 +15989,7 @@ def kcpp_main_process(launch_args, g_memory=None, gui_launcher=False):
                     load_session=args.agentload,
                     request_timeout=args.reqtimeout,
                     no_certify=args.nocertify,
+                    disable_view_image=not (has_vision_support or (autoswapmode and mmprojName is not None)),
                 )
                 if args.cli:
                     raise SystemExit(0 if success else 1)
@@ -16023,6 +16108,7 @@ if __name__ == '__main__':
     advparser.add_argument("--lora", help="GGUF models only, applies a lora file on top of model.", metavar=('[lora_filename]'), nargs='+')
     advparser.add_argument("--loramult", metavar=('[amount]'), help="Multiplier for the Text LORA model to be applied.", type=float, default=1.0)
     advparser.add_argument("--lowvram","-nkvo","--no-kv-offload", help="If supported by the backend, do not offload KV to GPU (lowvram mode). Not recommended, will be slow.", action='store_true')
+    advparser.add_argument("--noopoffload", "--no-op-offload", "-noo", dest="no_op_offload", help="GGUF models only. Disable offloading host tensor operations to the GPU. Model layer and KV cache offloading are controlled separately.", action='store_true')
     advparser.add_argument("--maingpu","--main-gpu","-mg", help="Only used in a multi-gpu setup. Sets the index of the main GPU that will be used.",metavar=('[Device ID]'), type=int, default=-1)
     advparser.add_argument("--maxrequestsize", metavar=('[size in MB]'), help="Specify a max request payload size. Any requests to the server larger than this size will be dropped. Do not change if unsure.", type=int, default=32)
     advparser.add_argument("--mcpfile", metavar=('[mcp json file]'), help="Specify path to mcp.json which contains the Cladue Desktop compatible MCP server config.", default="")
@@ -16186,6 +16272,7 @@ if __name__ == '__main__':
     internalgroup.add_argument("--run-bundled-agent", "--run-agent", dest="run_bundled_agent", help=argparse.SUPPRESS, action='store_true')
     internalgroup.add_argument("--agent-base-url", help=argparse.SUPPRESS, default=None)
     internalgroup.add_argument("--agent-api-key", help=argparse.SUPPRESS, default=None)
+    internalgroup.add_argument("--agent-disable-view-image", help=argparse.SUPPRESS, action='store_true')
 
     launch_args = parser.parse_args()
     cli_arg_overrides = get_cli_arg_overrides(parser)

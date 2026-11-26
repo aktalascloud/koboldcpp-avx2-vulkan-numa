@@ -305,8 +305,34 @@ struct SDLoadParams {
     lora_apply_mode_t lora_apply_mode = LORA_APPLY_AT_RUNTIME;
 };
 
+struct model_info: public sd_model_info {
+    /* from base class:
+        int version;
+        int vae_scale_factor;
+        int spatial_multiple;
+    */
+
+    bool is_flux1;
+    bool is_flux2;
+    bool is_kontext;
+    bool is_qwenimg;
+    bool is_sd1;
+    bool is_sd2;
+    bool is_sdxs;
+    bool is_sdxl;
+    bool is_wan;
+    bool is_zimage;
+    bool is_ltx;
+    bool is_minimaxh3;
+    bool is_boogu;
+    bool supports_ref_image;
+    bool is_video_model;
+};
+
 struct KcppLoadParams {
     // tracks loading state that does not have a direct sd_ctx_params_t mapping
+
+    model_info info {};
 
     // LoRA
     LoraMap lora_map;
@@ -322,6 +348,7 @@ struct KcppLoadParams {
     int img_hard_limit = 0;
     int img_soft_limit = 0;
     bool has_llm_vision = false;
+    bool photomaker_enabled = false;
 };
 
 // local intermediate representation of a generation request: decoded from
@@ -402,10 +429,6 @@ static int cfg_tiled_vae_threshold = 0;
 static int cfg_square_limit = 0;
 static int cfg_side_limit = 0;
 static bool sd_is_quiet = false;
-static bool photomaker_enabled = false;
-
-static bool is_vid_model = false;
-static bool remove_limits = false;
 
 struct gendata_st {
     int status = 0;
@@ -641,31 +664,6 @@ static void progress_callback(int step, int steps, float time, void* data)
     printf("\r%s: %d/%d steps, %.2f %s\033[K%s", phase, step, steps, speed, unit, (step == steps || sddebugmode==1) ? "\n" : "");
     fflush(stdout);
 }
-
-struct model_info: public sd_model_info {
-    /* from base class:
-        int version;
-        int vae_scale_factor;
-        int spatial_multiple;
-    */
-
-    bool is_flux1;
-    bool is_flux2;
-    bool is_kontext;
-    bool is_qwenimg;
-    bool is_sd1;
-    bool is_sd2;
-    bool is_sdxs;
-    bool is_sdxl;
-    bool is_wan;
-    bool is_zimage;
-    bool is_ltx;
-    bool is_minimaxh3;
-    bool is_boogu;
-    bool supports_ref_image;
-    bool is_video_model;
-};
-
 
 static model_info get_model_info(sd_ctx_t* ctx)
 {
@@ -1509,9 +1507,10 @@ static void kcpp_set_model_paths(SDLoadParams& lp, KcppLoadParams& klp)
             printf("With TAE SD VAE: %s\n", kcpp_taesd_path.c_str());
         }
     }
-    if (!lp.photo_maker_path.empty() > 0 && tempver != VERSION_SDXL) {
+    if (!lp.photo_maker_path.empty() && tempver != VERSION_SDXL) {
         printf("\nWARNING: PhotoMaker is only compatible with SDXL models. PhotoMaker will be disabled!\n");
         lp.photo_maker_path = "";
+        klp.photomaker_enabled = false;
     }
 
     // KCPP_WAN_SPLIT_VAE: worker validates the independent decoder path/hash.
@@ -1764,7 +1763,7 @@ bool sdtype_load_model(const sd_load_model_inputs inputs) {
     if(lp.photo_maker_path!="")
     {
         printf("With PhotoMaker Model: %s\n",lp.photo_maker_path.c_str());
-        photomaker_enabled = true;
+        klp.photomaker_enabled = true;
     }
     if(klp.upscaler_filename!="")
     {
@@ -1874,12 +1873,11 @@ bool sdtype_load_model(const sd_load_model_inputs inputs) {
         return false;
     }
 
-    auto info = get_model_info(sd_ctx);
+    const auto& info = klp.info = get_model_info(sd_ctx);
 
     if (info.is_video_model)
     {
         printf("\nSetting to Video Generation Mode!\n");
-        is_vid_model = true;
     }
 
     // preload the LoRAs with the initial multipliers
@@ -2352,12 +2350,6 @@ static sd_audio_t load_audio_from_b64(const std::string& b64audio) {
     return audio;
 }
 
-static bool supports_reference_images(model_info info)
-{
-    bool supported = (info.is_video_model || info.supports_ref_image || info.is_kontext || photomaker_enabled);
-    return supported;
-}
-
 static std::string upscale_image_to_png_base64(upscaler_ctx_t* upscaler_ctx, const sd_image_t& input_image, int upscale_factor = 2, const std::string& meta_image_info = "")
 {
     std::string gen_data;
@@ -2468,6 +2460,15 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
         ref_audio_data.push_back(std::string(inputs.ref_audios[i]));
     }
 
+    const auto& info = klp.info;
+    const bool supports_reference_images = (info.is_video_model || info.supports_ref_image || info.is_kontext || klp.photomaker_enabled);
+    const bool remove_limits = inputs.remove_limits;
+
+    //the below params are only used in video models. May move into standalone object in future
+    int vid_req_frames = inputs.vid_req_frames;
+    int video_output_type = inputs.video_output_type;
+    int vid_fps = inputs.vid_fps;
+
     {
         std::lock_guard<std::mutex> lock(geninfo.mux);
         geninfo.start_time = std::chrono::steady_clock::now();
@@ -2512,7 +2513,6 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
         gp.sample_method = sd_get_default_sample_method(sd_ctx);
     }
 
-    auto info = get_model_info(sd_ctx);
     bool is_img2img = img2img_data != "";
 
     if (!remove_limits && info.is_flux1)
@@ -2564,7 +2564,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
             // a single extra image is provided, and mask is NOT provided
             && extra_image_data.size()==1 && img2img_mask==""
             // the model does not support references natively, or through an edit mode/LoRa
-            && !supports_reference_images(info) && !gp.force_image_edit
+            && !supports_reference_images && !gp.force_image_edit
             // the model can't handle image tags, or the user didn't ask for them
             && !vision_tags_active);
 
@@ -2706,7 +2706,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
             const bool duplicates_video_frame = info.is_video_model && info.is_minimaxh3
                 && (extra_image_data[i] == video_start_frame_data || extra_image_data[i] == video_end_frame_data);
             sd_image_t image = {0,0,0,nullptr};
-            if(supports_reference_images(info)||gp.force_image_edit||vision_tags_active)
+            if(supports_reference_images||gp.force_image_edit||vision_tags_active)
             {
                 int nx2, ny2, nc2;
                 int desiredchannels = 3;
@@ -2749,7 +2749,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
                         }
                     }
                 }
-                else if (info.is_kontext || photomaker_enabled || vision_tags_active)
+                else if (info.is_kontext || klp.photomaker_enabled || vision_tags_active)
                 {
                     uint8_t * loaded = load_image_from_b64(extra_image_data[i],nx2,ny2);
                     if(loaded)
@@ -2772,7 +2772,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
                     continue; // used only as VLM context, kept out of the ref list
                 }
             }
-            if (duplicates_video_frame || !(supports_reference_images(info)||gp.force_image_edit)) {
+            if (duplicates_video_frame || !(supports_reference_images||gp.force_image_edit)) {
                 continue; // Keep frame deduplication in the diffusion reference list.
             }
             if (info.is_video_model) {
@@ -2785,7 +2785,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
             else if (info.is_kontext) {
                 reference_imgs.push_back(image);
             }
-            else if (photomaker_enabled) {
+            else if (klp.photomaker_enabled) {
                 photomaker_imgs.push_back(image);
             }
             else {
@@ -2794,7 +2794,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
         }
 
         //ensure prompt has img keyword, otherwise append it
-        if(photomaker_enabled)
+        if(klp.photomaker_enabled)
         {
             if (gp.prompt.find("img") == std::string::npos) {
                 gp.prompt += " img";
@@ -2901,12 +2901,6 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
     params.pm_params.id_images = photomaker_imgs.data();
     params.pm_params.id_images_count = photomaker_imgs.size();
 
-    //the below params are only used in video models. May move into standalone object in future
-    int vid_req_frames = inputs.vid_req_frames;
-    int video_output_type = inputs.video_output_type;
-    int vid_fps = inputs.vid_fps;
-    remove_limits = inputs.remove_limits;
-
      //special case, is img2img and denoise strength is 0 and steps is 1, do a passthru
     bool is_passthrough = (gp.sample_steps<=1 && gp.strength<=0 && is_img2img && vid_req_frames<=1 && extra_image_data.size()==0);
     sd_audio_t* generated_audio = nullptr;
@@ -2915,7 +2909,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
     sd_video_generation_result_t* vid_result = nullptr;
     int generated_num_results = 0;
 
-    if(is_vid_model)
+    if(info.is_video_model)
     {
         std::vector<sd_image_t> control_frames; //empty for now
         sd_vid_gen_params_t vid_gen_params = {};
@@ -3125,14 +3119,14 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
         }
     }
 
-    if (!is_passthrough && (is_vid_model ? vid_result == nullptr : img_result == nullptr)) {
+    if (!is_passthrough && (info.is_video_model ? vid_result == nullptr : img_result == nullptr)) {
         if (info.is_qwenimg && params.ref_images_count > 0) {
             printf("\nKCPP SD: If using Qwen Image 2.1, editing requires Qwen3-VL vision mmproj!\n");
         }
         return sd_generation.error("KCPP SD generate failed!");
     }
 
-    bool isanim = (vid_req_frames>1 && generated_num_results>1 && is_vid_model);
+    bool isanim = (vid_req_frames>1 && generated_num_results>1 && info.is_video_model);
     nlohmann::json jsoninfo = nlohmann::json::object();
     if (!isanim) {
         jsoninfo["prompt"] = params.prompt + gp.lora_meta;
@@ -3259,7 +3253,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
     {
         for (int i = 0; i < generated_num_results; i++)
         {
-            sd_image_t& result_image = is_vid_model ? vid_result->frames[i] : img_result->items[i].image;
+            sd_image_t& result_image = info.is_video_model ? vid_result->frames[i] : img_result->items[i].image;
             if (result_image.data == NULL) {
                 continue;
             }
@@ -3276,7 +3270,7 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
             jsoninfo["all_prompts"][i] = params.prompt;
             jsoninfo["all_negative_prompts"][i] = params.negative_prompt;
         }
-        if (is_vid_model) {
+        if (info.is_video_model) {
             free_sd_video_generation_result(vid_result);
             vid_result = nullptr;
         } else {
