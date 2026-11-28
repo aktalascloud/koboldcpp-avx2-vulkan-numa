@@ -1,8 +1,8 @@
 diff --git a/koboldcpp.py b/koboldcpp.py
-index f296af8d2..1b97c281e 100644
+index 727896b52..eb6e25d23 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
-@@ -9557,6 +9557,9 @@ Change Mode<br>
+@@ -9596,6 +9596,9 @@ Change Mode<br>
                              genresp = (json.dumps({"created":int(time.time()),"data":[{"b64_json":gendat}],"background":"opaque","output_format":"png","size":response_size,"quality":"medium"}).encode())
                          else:
                              genresp = (json.dumps({"images":[gendat],"parameters":{},"info":geninfo,"animated":genanim,"extra_data":gendatextra, "final_frame":genfinalframe}).encode())
@@ -13,10 +13,10 @@ index f296af8d2..1b97c281e 100644
                              self.send_response(202 if is_sdcpp_imggen else 200)
                              self.send_header('content-length', str(len(genresp)))
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index 56e872526..18c047616 100644
+index fbfe23a7b..a6c206a79 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -2976,6 +2976,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+@@ -3060,6 +3060,13 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
  
          fflush(stdout);
  
@@ -29,8 +29,8 @@ index 56e872526..18c047616 100644
 +        }
          vid_result = nullptr;
          generated_audio = nullptr;
-         int output_fps = vid_fps;
-@@ -2987,6 +2994,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
+         int output_fps = gp.vid.fps;
+@@ -3088,6 +3095,27 @@ sd_generation_outputs sdtype_generate(const sd_generation_inputs inputs)
              generated_audio = vid_result->audio;
              output_fps = vid_result->fps;
          }
@@ -44,20 +44,20 @@ index 56e872526..18c047616 100644
 +                length==static_cast<std::streamoff>(60+count*4) && shape[0]>0 && shape[0]<=256 && shape[1]>0 && shape[1]<=256 &&
 +                shape[2]>0 && shape[2]<=31 && shape[3]==48 && shape[4]==1 &&
 +                count==static_cast<uint64_t>(shape[0]*shape[1]*shape[2]*48) &&
-+                shape[0]*16==params.width && shape[1]*16==params.height && (shape[2]-1)*4+1==vid_req_frames;
++                shape[0]*16==vid_gen_params.width && shape[1]*16==vid_gen_params.height && (shape[2]-1)*4+1==gp.vid.req_frames;
 +            free_sd_video_generation_result(vid_result);
 +            vid_result=nullptr;
 +            generated_audio=nullptr;
 +            if (!valid) return sd_generation.error("KCPP: incomplete or incompatible Wan latent export");
 +            sd_generation.reset();
-+            sd_generation.info=nlohmann::json({{"operation","wan_latents"},{"kcpp_wan_latents_ready",true},{"seed",params.seed},
-+                {"frames",vid_req_frames},{"width",params.width},{"height",params.height}}).dump();
++            sd_generation.info=nlohmann::json({{"operation","wan_latents"},{"kcpp_wan_latents_ready",true},{"seed",vid_gen_params.seed},
++                {"frames",gp.vid.req_frames},{"width",vid_gen_params.width},{"height",vid_gen_params.height}}).dump();
 +            printf("KCPP: Wan latent-only operation complete; no RGB decoder executed.\n");
 +            return sd_generation.outputs(1);
 +        }
          if(!sd_is_quiet && sddebugmode==1)
          {
-             printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",vid_req_frames, generated_num_results);
+             printf("\nRequested Vid Frames: %d, Generated Vid Frames: %d\n",gp.vid.req_frames, generated_num_results);
 diff --git a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp b/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp
 index ba601ba67..e0191d63d 100644
 --- a/otherarch/sdcpp/src/pipeline/diffusion_engine.cpp

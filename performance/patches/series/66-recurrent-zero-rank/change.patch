@@ -41,7 +41,7 @@ index 18e45320a..c3db66c7b 100644
  
      // A layer is recurrent IFF the n_head_kv value is set to 0 and
 diff --git a/src/models/rwkv6.cpp b/src/models/rwkv6.cpp
-index 4cb5bce64..8d76d02df 100644
+index 0b17ae40a..c011bced9 100644
 --- a/src/models/rwkv6.cpp
 +++ b/src/models/rwkv6.cpp
 @@ -4,6 +4,9 @@ void llama_model_rwkv6::load_arch_hparams(llama_model_loader & ml) {

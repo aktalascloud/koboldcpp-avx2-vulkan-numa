@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index cba1d7da4..10345a819 100644
+index 553bf8515..ff40f7682 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -1293,6 +1293,21 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
+@@ -1299,6 +1299,21 @@ static vk_fa_tuning_params get_fa_tuning_params_scalar(const vk_device& device,
          result.block_rows = std::min(result.block_rows, 8u);
      }
  

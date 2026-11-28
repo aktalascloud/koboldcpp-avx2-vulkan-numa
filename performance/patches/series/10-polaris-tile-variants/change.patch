@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index b64516ec4..150321b8f 100644
+index c1345cbce..710bd8d36 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -2187,6 +2187,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -2198,6 +2198,19 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              !device->coopmat_support && getenv("GGML_VK_GCN_TILE64") != nullptr) {
              l_warptile = m_warptile = { 256, 64, 64, 32, 16, 64, 1, 4, 4, 1, 64 };
              l_wg_denoms = m_wg_denoms = { 64, 64, 1 };

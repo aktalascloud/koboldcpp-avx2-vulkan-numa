@@ -1,6 +1,6 @@
 # Native patch stack
 
-Apply in numeric order to `1dfd08253194643077afe6a74dad94c98644492a`. [Index and SHA-256](index.json).
+Apply in numeric order to `5db3674f222ac815c0afe637b4c1cb87fc4794a9`. [Index and SHA-256](index.json).
 
 - [Polaris Vulkan queue initialization](01-polaris-queue/README.md)
 - [Vulkan batched submissions](02-vulkan-batched-submits/README.md)

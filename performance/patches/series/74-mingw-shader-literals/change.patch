@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index f329fd756..130055238 100644
+index 0aa6fb8b8..02567f4a2 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -1299,6 +1299,18 @@ void write_output_files() {
+@@ -1304,6 +1304,18 @@ void write_output_files() {
              }
  
              src << "const uint64_t " << name << "_len = " << data.size() << ";\n";
@@ -21,7 +21,7 @@ index f329fd756..130055238 100644
              src << "const unsigned char " << name << "_data[" << data.size() << "] = {\n" << std::hex;
              auto bytes = reinterpret_cast<const uint8_t*>(data.data());
              for (size_t i = 0; i < data.size(); ++i) {
-@@ -1306,6 +1318,7 @@ void write_output_files() {
+@@ -1311,6 +1323,7 @@ void write_output_files() {
                  if ((i + 1) % 12 == 0) src << "\n";
              }
              src << std::dec << "\n};\n\n";

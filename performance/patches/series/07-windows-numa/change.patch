@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index be6914d6d..d975fad68 100644
+index d345d5450..c5095af40 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
-@@ -3113,11 +3113,147 @@ static void clear_numa_thread_affinity(void) {
+@@ -3134,11 +3134,147 @@ static void clear_numa_thread_affinity(void) {
      CPU_FREE(cpus);
  }
  #else
@@ -150,7 +150,7 @@ index be6914d6d..d975fad68 100644
  
  static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
      int n_tasks = 0;
-@@ -3407,40 +3543,8 @@ static thread_ret_t ggml_graph_compute_secondary_thread(void* data);
+@@ -3428,40 +3564,8 @@ static thread_ret_t ggml_graph_compute_secondary_thread(void* data);
  #if defined(_WIN32)
  #include "windows.h"
  
@@ -193,7 +193,7 @@ index be6914d6d..d975fad68 100644
  
  static bool ggml_thread_apply_priority(int32_t prio) {
      // Note that on Windows the Process Priority Class must be updated in order to set Thread priority.
-@@ -4017,6 +4121,9 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
+@@ -4038,6 +4142,9 @@ static thread_ret_t ggml_graph_compute_thread(void * data) {
  #ifdef GGML_USE_CPU_RISCV64_SPACEMIT
      ggml_backend_cpu_riscv64_spacemit_set_numa_thread_affinity(state->ith);
  #else
@@ -204,7 +204,7 @@ index be6914d6d..d975fad68 100644
  #endif
  
 diff --git a/koboldcpp.py b/koboldcpp.py
-index aaaf2fb68..e9122a555 100644
+index 939b64e41..9326cc108 100644
 --- a/koboldcpp.py
 +++ b/koboldcpp.py
 @@ -987,6 +987,18 @@ def restore_stdout():
@@ -257,7 +257,7 @@ index aaaf2fb68..e9122a555 100644
      libname = lib_default
  
      if not args: # debug helper: koboldcpp.py loaded by external script
-@@ -15947,6 +15979,7 @@ if __name__ == '__main__':
+@@ -15986,6 +16018,7 @@ if __name__ == '__main__':
      advparser.add_argument("--batchsize","--blasbatchsize","--batch-size","-b", help="Sets the logical batch size used in batched processing (default 512). Setting it to -1 disables batched mode, but keeps other benefits like GPU offload.", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=512)
      advparser.add_argument("--ubatchsize","--ubatch-size","-ub", help="Sets the physical batch size used in batched processing. Setting it to -1 uses the same value as batchsize (default).", type=int,choices=[-1,16,32,64,128,256,512,1024,2048,4096], default=-1)
      advparser.add_argument("--benchmark", help="Do not start server, instead run benchmarks. If filename is provided, appends results to provided file.", metavar=('[filename]'), nargs='?', const="stdout", type=str, default=None)

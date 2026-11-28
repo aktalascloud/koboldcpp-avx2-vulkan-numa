@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index c4d7ccce1..0efeb2d69 100644
+index 32dc7a89c..478159c8e 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
-@@ -1709,7 +1709,7 @@ static void ggml_compute_forward_mul_mat_id(
+@@ -1730,7 +1730,7 @@ static void ggml_compute_forward_mul_mat_id(
              for (int id = 0; id < n_ids; ++id) {
                  const int32_t i02 = *(const int32_t *) ((const char *) ids->data + iid1*ids->nb[1] + id*ids->nb[0]);
  

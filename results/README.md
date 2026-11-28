@@ -1,5 +1,7 @@
 # Validation records
 
+[November 28 upstream and engine review](mainstream-2026-11-28.md) · [Build and startup receipt](startup-dce636bd.json)
+
 The [November 19 RX 580 ABDM comparison](rx580-abdm-20261119.json) records seven real requests with identical RGB output. The original kernels had the lowest request median, 124.05 s. Aligned Q8_0 reads took 130.69 s and Q register reuse in FlashAttention took 140.51 s.
 
 - [Published build and executable hash](../performance/provenance.json) · [Build and recipes](../performance/BUILD.md) · [Ordered patches](../performance/patches/series/)

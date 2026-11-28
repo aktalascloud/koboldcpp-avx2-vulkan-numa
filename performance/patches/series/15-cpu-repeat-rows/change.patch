@@ -19,10 +19,10 @@ index f8b363728..88c5d8a72 100644
  void ggml_barrier(struct ggml_threadpool * tp);
  
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index d975fad68..95380ed11 100644
+index c5095af40..a3f4a70c5 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
-@@ -3301,6 +3301,10 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
+@@ -3322,6 +3322,10 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
                  n_tasks = n_threads;
              } break;
          case GGML_OP_REPEAT:
@@ -34,7 +34,7 @@ index d975fad68..95380ed11 100644
          case GGML_OP_LEAKY_RELU:
          case GGML_OP_SLEEP:
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 72dd3e691..cdc07d57b 100644
+index 61dfd220c..a6bcd23a1 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
 @@ -1731,12 +1731,31 @@ static void ggml_compute_forward_repeat_f32(

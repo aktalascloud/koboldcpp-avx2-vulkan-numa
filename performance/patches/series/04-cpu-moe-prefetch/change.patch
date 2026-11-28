@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index 6fba84683..be6914d6d 100644
+index 598e4ad66..d345d5450 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
-@@ -1571,6 +1571,20 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
+@@ -1588,6 +1588,20 @@ static void ggml_compute_forward_mul_mat_id_one_chunk(
                      ? (i11      + i12*ne11)*row_size
                      : (i11*nb11 + i12*nb12));
  

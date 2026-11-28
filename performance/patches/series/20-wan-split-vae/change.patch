@@ -1,8 +1,8 @@
 diff --git a/otherarch/sdcpp/sdtype_adapter.cpp b/otherarch/sdcpp/sdtype_adapter.cpp
-index f26796979..56e872526 100644
+index cd4dcf4b0..fbfe23a7b 100644
 --- a/otherarch/sdcpp/sdtype_adapter.cpp
 +++ b/otherarch/sdcpp/sdtype_adapter.cpp
-@@ -342,6 +342,7 @@ struct KcppLoadParams {
+@@ -343,6 +343,7 @@ struct KcppLoadParams {
      int quant = 0;              // decoded into wtype
      bool flash_attention = false;
      bool taesd = false;
@@ -10,7 +10,7 @@ index f26796979..56e872526 100644
      int tiled_vae_threshold = 0;
      std::string upscaler_filename;
      int img_hard_limit = 0;
-@@ -1512,6 +1513,18 @@ static void kcpp_set_model_paths(SDLoadParams& lp, KcppLoadParams& klp)
+@@ -1555,6 +1556,18 @@ static void kcpp_set_model_paths(SDLoadParams& lp, KcppLoadParams& klp)
          klp.photomaker_enabled = false;
      }
  
@@ -29,7 +29,7 @@ index f26796979..56e872526 100644
      //for models with TAE suppport, if vae is set, tae is off, and it looks like a tae, swap to tae
      if(kcpp_taesd_path=="" && !lp.vae_path.empty() && toLowerCase(lp.vae_path).rfind("tae")!=std::string::npos)
      {
-@@ -1827,6 +1840,7 @@ bool sdtype_load_model(const sd_load_model_inputs inputs) {
+@@ -1873,6 +1886,7 @@ bool sdtype_load_model(const sd_load_model_inputs inputs) {
      params.vae_path = lp.vae_path.c_str();
      params.audio_vae_path = lp.audio_vae_path.c_str();
      params.taesd_path = lp.taesd_path.c_str();

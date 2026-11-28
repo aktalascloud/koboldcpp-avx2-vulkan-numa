@@ -11,10 +11,10 @@ index f97a175f9..930a813e9 100644
          GGML_GLU_OP_COUNT,
      };
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
-index 95380ed11..c4d7ccce1 100644
+index a3f4a70c5..32dc7a89c 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.c
 +++ b/ggml/src/ggml-cpu/ggml-cpu.c
-@@ -3355,6 +3355,7 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
+@@ -3376,6 +3376,7 @@ static int ggml_get_n_tasks(struct ggml_tensor * node, int n_threads) {
                  case GGML_GLU_OP_GEGLU_ERF:
                  case GGML_GLU_OP_GEGLU_QUICK:
                  case GGML_GLU_OP_SWIGLU_CLAMP:
@@ -23,10 +23,10 @@ index 95380ed11..c4d7ccce1 100644
                          n_tasks = n_threads;
                      } break;
 diff --git a/ggml/src/ggml-cpu/ggml-cpu.cpp b/ggml/src/ggml-cpu/ggml-cpu.cpp
-index 7c90227f4..f946e86c3 100644
+index c65b9695d..d3bc6db22 100644
 --- a/ggml/src/ggml-cpu/ggml-cpu.cpp
 +++ b/ggml/src/ggml-cpu/ggml-cpu.cpp
-@@ -422,6 +422,12 @@ static ggml_backend_buffer_t ggml_backend_cpu_device_buffer_from_host_ptr(ggml_b
+@@ -423,6 +423,12 @@ static ggml_backend_buffer_t ggml_backend_cpu_device_buffer_from_host_ptr(ggml_b
  }
  
  static bool ggml_backend_cpu_device_supports_op(ggml_backend_dev_t dev, const struct ggml_tensor * op) {
@@ -36,11 +36,11 @@ index 7c90227f4..f946e86c3 100644
 +               (!op->src[1] || (op->src[1]->type == GGML_TYPE_F32 && ggml_is_contiguous_1(op->src[1])));
 +    }
 +
-     if (ggml_flash_attn_ext_has_indexed_bias(op)) {
-         return false;
-     }
+     const struct ggml_tensor * src0 = op->src[0];
+     const struct ggml_tensor * src1 = op->src[1];
+ 
 diff --git a/ggml/src/ggml-cpu/ops.cpp b/ggml/src/ggml-cpu/ops.cpp
-index 3e27c953b..09d2e709a 100644
+index 62ae9cc9b..26b75e3da 100644
 --- a/ggml/src/ggml-cpu/ops.cpp
 +++ b/ggml/src/ggml-cpu/ops.cpp
 @@ -3449,6 +3449,72 @@ static void ggml_compute_forward_swiglu_f32(
@@ -116,7 +116,7 @@ index 3e27c953b..09d2e709a 100644
  static void ggml_compute_forward_swiglu_f16(
      const ggml_compute_params * params,
      ggml_tensor * dst) {
-@@ -10657,6 +10723,12 @@ void ggml_compute_forward_glu(
+@@ -10658,6 +10724,12 @@ void ggml_compute_forward_glu(
              {
                  ggml_compute_forward_swiglu(params, dst);
              } break;
@@ -130,10 +130,10 @@ index 3e27c953b..09d2e709a 100644
              {
                  ggml_compute_forward_swiglu_oai(params, dst);
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 6bd5d56a1..27aca0b15 100644
+index d9b17493a..0d978a0af 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -4021,6 +4021,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -4038,6 +4038,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      CREATE_GLU(geglu, GEGLU)
      CREATE_GLU(reglu, REGLU)
      CREATE_GLU(swiglu, SWIGLU)
@@ -141,7 +141,7 @@ index 6bd5d56a1..27aca0b15 100644
      CREATE_GLU(swiglu_oai, SWIGLU_OAI)
      CREATE_GLU(swiglu_clamp, SWIGLU_CLAMP)
      CREATE_GLU(geglu_erf, GEGLU_ERF)
-@@ -13932,6 +13933,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
+@@ -13972,6 +13973,7 @@ bool ggml_vk_build_graph(ggml_backend_vk_context * ctx, ggml_cgraph * cgraph, in
          case GGML_GLU_OP_GEGLU:
          case GGML_GLU_OP_REGLU:
          case GGML_GLU_OP_SWIGLU:
@@ -149,7 +149,7 @@ index 6bd5d56a1..27aca0b15 100644
          case GGML_GLU_OP_SWIGLU_OAI:
          case GGML_GLU_OP_GEGLU_ERF:
          case GGML_GLU_OP_GEGLU_QUICK:
-@@ -16916,6 +16918,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
+@@ -16957,6 +16959,10 @@ static bool ggml_backend_vk_device_supports_op(ggml_backend_dev_t dev, const ggm
                      return false;
              }
          case GGML_OP_GLU:
@@ -190,10 +190,10 @@ index 000000000..5b367ecaa
 +}
 +#include "glu_main.glsl"
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index 4cfae8bf6..d67b904f2 100644
+index 59a5bb3ab..a8b690b71 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -1034,6 +1034,9 @@ void process_shaders() {
+@@ -1039,6 +1039,9 @@ void process_shaders() {
                                       "elu", "xielu", "sgn", "softplus", "step", "round", "ceil", "floor", "trunc"}) {
              string_to_spv(op + "_" + t, "unary.comp", merge_maps(dict, {{"OP", "op_" + op}}));
          }
@@ -204,7 +204,7 @@ index 4cfae8bf6..d67b904f2 100644
              string_to_spv(op + "_" + t, op + ".comp", dict);
          }
 diff --git a/ggml/src/ggml.c b/ggml/src/ggml.c
-index e1ccb4e29..f680a11ae 100644
+index 65ef3467d..66197d0b2 100644
 --- a/ggml/src/ggml.c
 +++ b/ggml/src/ggml.c
 @@ -1293,9 +1293,10 @@ static const char * GGML_GLU_OP_NAME[GGML_GLU_OP_COUNT] = {

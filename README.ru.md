@@ -1,6 +1,6 @@
 # KoboldCpp · Haswell AVX2 and Polaris Vulkan
 
-В KoboldCpp 1.126 перенесены 158 коммитов upstream и 76 проверенных локальных патчей для Haswell AVX2 и Polaris Vulkan. [Обзор от 26 ноября](results/mainstream-2026-11-26.md).
+В сборку KoboldCpp 1.126 от 28 ноября вошли 107 коммитов upstream и 76 проверенных локальных патчей для Haswell AVX2 и Polaris Vulkan. [Обзор upstream и движков](results/mainstream-2026-11-28.md).
 
 [English](README.md) · [Скачать](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/releases/latest) · [Документация](performance/RUN.txt) · [Данные](https://github.com/aktalascloud/koboldcpp-avx2-vulkan-numa/blob/v1.125-20261117-d9b2e6b5/results/performance-2026-11-11-kernels.json) · [Upstream](https://github.com/LostRuins/koboldcpp)
 

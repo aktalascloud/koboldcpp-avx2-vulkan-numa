@@ -1,0 +1,23 @@
+{
+  "executable_sha256": "dce636bda3c1b420426cd2455d6329b65ac0c3868da67096832cade9fedcd79d",
+  "source_commit": "5db3674f222ac815c0afe637b4c1cb87fc4794a9",
+  "validation_mode": "build-startup",
+  "build_verified": true,
+  "source_identity_verified": true,
+  "pgo_enabled": false,
+  "lto": true,
+  "inference_tests_run": false,
+  "benchmarks_run": false,
+  "cpu_api": null,
+  "vulkan_api": null,
+  "gpu_benchmark": null,
+  "cpu_no_regression": null,
+  "vulkan_no_regression": null,
+  "media_verified": null,
+  "cold_start_verified": true,
+  "visible_window_verified": true,
+  "startup_api_ready": true,
+  "checked": 1795845125.9449825,
+  "startup_evidence": "installation-verification.json",
+  "scope": "Compile/source/hash, registered startup, visible window and API readiness only; no generation/speed validation."
+}

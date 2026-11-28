@@ -1,5 +1,5 @@
 diff --git a/tools/mtmd/mtmd-subcontext.cpp b/tools/mtmd/mtmd-subcontext.cpp
-index 7ae2bdbac..676468207 100644
+index 67365c9ad..890ad4182 100644
 --- a/tools/mtmd/mtmd-subcontext.cpp
 +++ b/tools/mtmd/mtmd-subcontext.cpp
 @@ -242,7 +242,9 @@ void mtmd_subcontext::warmup(const mtmd_image_f32_batch & batch) {

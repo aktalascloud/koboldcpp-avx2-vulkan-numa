@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index 795d77c62..19be75aa5 100644
+index a9c54ab58..875894d42 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -898,6 +898,7 @@ struct vk_device_struct {
+@@ -901,6 +901,7 @@ struct vk_device_struct {
      vk_pipeline pipeline_upscale_nearest_f32, pipeline_upscale_bilinear_f32, pipeline_upscale_bicubic_f32, pipeline_upscale_bilinear_antialias_f32;
      // [src/dst 0=fp32,1=fp16,2=bf16]
      vk_pipeline pipeline_scale[3];
@@ -11,10 +11,10 @@ index 795d77c62..19be75aa5 100644
      vk_pipeline pipeline_tri[3];
      vk_pipeline pipeline_diag[3];
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 75f100f77..9b3330d31 100644
+index 6332d410e..064952602 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -3938,6 +3938,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3955,6 +3955,12 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
      ggml_vk_create_pipeline(device, device->pipeline_ ## name [2], #name "_bf16", name ## _bf16_len, name ## _bf16_data, "main", 2, sizeof(vk_op_unary_push_constants), {512, 1, 1}, {}, 1);
  
      CREATE_UNARY(scale)
@@ -27,7 +27,7 @@ index 75f100f77..9b3330d31 100644
      CREATE_UNARY(log)
      CREATE_UNARY(sqr)
      CREATE_UNARY(sqrt)
-@@ -11863,7 +11869,13 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
+@@ -11903,7 +11909,13 @@ void ggml_vk_scale(ggml_backend_vk_context * ctx, vk_context& subctx, const ggml
      p.param1 = ggml_get_op_params_f32(dst, 0);
      p.param2 = ggml_get_op_params_f32(dst, 1);
  
@@ -72,10 +72,10 @@ index 0313f2fed..099db194b 100644
  }
 +#endif
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index f7d327935..f329fd756 100644
+index 3586582da..0aa6fb8b8 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -1023,6 +1023,7 @@ void process_shaders() {
+@@ -1028,6 +1028,7 @@ void process_shaders() {
      string_to_spv("concat_transpose_i32", "concat_transpose.comp", {{"A_TYPE", "uint"}, {"B_TYPE", "uint"}, {"D_TYPE", "uint"}});
  
      string_to_spv("upscale_f32", "upscale.comp", {{"A_TYPE", "float"}, {"B_TYPE", "float"}, {"D_TYPE", "float"}});

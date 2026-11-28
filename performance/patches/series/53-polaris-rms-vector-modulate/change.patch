@@ -1,8 +1,8 @@
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan-types.h b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-index a7734803b..795d77c62 100644
+index 40418c166..a9c54ab58 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan-types.h
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan-types.h
-@@ -576,6 +576,8 @@ static constexpr std::initializer_list<std::array<int, 3>> topk_qsa_edges {
+@@ -578,6 +578,8 @@ static constexpr std::initializer_list<std::array<int, 3>> topk_qsa_edges {
  
  static constexpr std::initializer_list<ggml_op> rms_norm_mul_add_mul_pattern { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_ADD, GGML_OP_MUL };
  
@@ -11,7 +11,7 @@ index a7734803b..795d77c62 100644
  static constexpr std::initializer_list<ggml_op> rms_norm_mul_add_pattern     { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_ADD };
  
  static constexpr std::initializer_list<ggml_op> rms_norm_mul_rope_view_set_rows_pattern { GGML_OP_RMS_NORM, GGML_OP_MUL, GGML_OP_ROPE, GGML_OP_VIEW, GGML_OP_SET_ROWS };
-@@ -670,6 +672,7 @@ enum rms_norm_mode {
+@@ -672,6 +674,7 @@ enum rms_norm_mode {
      RMS_NORM_MUL_ROPE,
      RMS_NORM_MUL_ROPE_VIEW_SET_ROWS,
      RMS_NORM_VIEW_SET_ROWS,
@@ -19,7 +19,7 @@ index a7734803b..795d77c62 100644
      RMS_NORM_COUNT,
  };
  
-@@ -925,6 +928,7 @@ struct vk_device_struct {
+@@ -928,6 +931,7 @@ struct vk_device_struct {
      std::array<vk_pipeline, 3> pipeline_rms_norm_rows[2][2];
      // [src/dst 0=fp32,1=bf16][residual 0=fp32,1=bf16][post mul]
      std::array<vk_pipeline, 3> pipeline_rms_norm_mul_add[2][2][2];
@@ -28,10 +28,10 @@ index a7734803b..795d77c62 100644
      vk_pipeline pipeline_rms_norm_mul_add_mul_partials_f32;
      vk_pipeline pipeline_rms_norm_set_rows_f32_f32;
 diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-index 27aca0b15..4522aa948 100644
+index 0d978a0af..d2e2e04ed 100644
 --- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
 +++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
-@@ -3771,6 +3771,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
+@@ -3788,6 +3788,7 @@ void ggml_vk_load_shaders(vk_device& device, vk_pipeline requested) {
              ggml_vk_create_pipeline2(device, device->pipeline_rms_norm_mul_add[1][1][pm][i], name + "_bf16_bf16" + suffix, RMS_SHADER(rms_norm_mul_add_bf16_bf16), "main", 5, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, pm, block_size, rms_unroll}, 1, true, rms_subgroups);
          }
      }
@@ -39,7 +39,7 @@ index 27aca0b15..4522aa948 100644
      ggml_vk_create_pipeline(device, device->pipeline_rms_norm_mul_add_partials_f32, "rms_norm_mul_add_partials_f32", rms_norm_mul_add_partials_f32_len, rms_norm_mul_add_partials_f32_data, "main", 6, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 0}, 1, true);
      ggml_vk_create_pipeline(device, device->pipeline_rms_norm_mul_add_mul_partials_f32, "rms_norm_mul_add_mul_partials_f32", rms_norm_mul_add_partials_f32_len, rms_norm_mul_add_partials_f32_data, "main", 6, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 1, 1}, 1, true);
      ggml_vk_create_pipeline(device, device->pipeline_rms_norm_set_rows_f32_f32, "rms_norm_set_rows_f32_f32", RMS_SHADER(rms_norm_set_rows_f32_f32), "main", 4, sizeof(vk_op_binary_push_constants), {1, 1, 1}, {0, 0, 0, rms_set_rows_block_size, rms_unroll}, 1, true, rms_subgroups);
-@@ -12183,6 +12184,27 @@ void ggml_vk_rms_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const s
+@@ -12223,6 +12224,27 @@ void ggml_vk_rms_norm(ggml_backend_vk_context * ctx, vk_context& subctx, const s
          return;
      }
  
@@ -67,7 +67,7 @@ index 27aca0b15..4522aa948 100644
      if (ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD || ctx->fused_rms_norm_mode == RMS_NORM_MUL_ADD_MUL) {
          ggml_tensor * mul = cgraph->nodes[node_idx + 1];
          ggml_tensor * add = cgraph->nodes[node_idx + 2];
-@@ -15567,6 +15589,34 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
+@@ -15607,6 +15629,34 @@ bool ggml_vk_tensors_overlap(const ggml_tensor * a, const ggml_tensor * b, bool
      return false;
  }
  
@@ -102,7 +102,7 @@ index 27aca0b15..4522aa948 100644
  bool ggml_vk_can_fuse_rms_norm_mul_rope(ggml_backend_vk_context * ctx, const struct ggml_cgraph * cgraph,
                                                 int node_idx) {
      const ggml_tensor *rms = cgraph->nodes[node_idx + 0];
-@@ -15903,6 +15953,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
+@@ -15943,6 +15993,11 @@ static ggml_status ggml_backend_vk_graph_compute(ggml_backend_t backend, ggml_cg
                  ctx->fused_hc_post_gate = true;
                  fusion_string = "HC_POST_GATE";
                  std::fill_n(op_srcs_fused_elementwise, ctx->num_additional_fused_ops + 1, false);
@@ -114,7 +114,7 @@ index 27aca0b15..4522aa948 100644
              } else if (ggml_vk_can_fuse(ctx, cgraph, i, rms_norm_mul_add_mul_pattern)) {
                  ctx->num_additional_fused_ops = 3;
                  ctx->fused_rms_norm_mode = RMS_NORM_MUL_ADD_MUL;
-@@ -16333,6 +16388,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+@@ -16373,6 +16428,10 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
              continue;
          }
  
@@ -125,7 +125,7 @@ index 27aca0b15..4522aa948 100644
          if (keep_pattern(rms_norm_mul_add_mul_pattern)) {
              continue;
          }
-@@ -16388,6 +16447,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
+@@ -16428,6 +16487,7 @@ void ggml_vk_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * graph,
                  match_pattern(topk_moe_late_softmax, j) ||
                  match_pattern(snake_pattern, j) ||
                  in_qsa_pattern(j) ||
@@ -187,10 +187,10 @@ index 6f085688b..bc2772e88 100644
                          data_d[d_offset + col] = FLOAT_TO_D(value);
                      }
 diff --git a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-index d67b904f2..38a8620bd 100644
+index a8b690b71..c8967fce6 100644
 --- a/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
 +++ b/ggml/src/ggml-vulkan/vulkan-shaders/vulkan-shaders-gen.cpp
-@@ -900,6 +900,7 @@ void process_shaders() {
+@@ -905,6 +905,7 @@ void process_shaders() {
          string_to_spv("rms_norm_bf16" + suffix, "rms_norm.comp", rms_bf16_dict);
          string_to_spv("rms_norm_rows_bf16" + suffix, "rms_norm.comp", merge_maps(rms_bf16_dict, {{"RMS_NORM_ROW_STRIDE", "1"}}));
          string_to_spv("rms_norm_mul_add_f32" + suffix, "rms_norm.comp", merge_maps(rms_dict, {{"RMS_NORM_ADD_FUSION", "1"}}));
