@@ -581,6 +581,7 @@ bool llm_graph_input_rs::can_reuse(const llm_graph_params & params) {
 
     res &= head == mctx->get_head();
     res &= rs_z == mctx->get_rs_z();
+    res &= rs_in_place == mctx->get_rs_in_place();
 
     return res;
 }
@@ -1310,6 +1311,7 @@ bool llm_graph_input_mem_hybrid::can_reuse(const llm_graph_params & params) {
 
     res &= inp_rs->head == mctx->get_recr()->get_head();
     res &= inp_rs->rs_z == mctx->get_recr()->get_rs_z();
+    res &= inp_rs->rs_in_place == mctx->get_recr()->get_rs_in_place();
 
     return res;
 }
@@ -1357,6 +1359,7 @@ bool llm_graph_input_mem_hybrid_k::can_reuse(const llm_graph_params & params) {
 
     res &= inp_rs->head == mctx->get_recr()->get_head();
     res &= inp_rs->rs_z == mctx->get_recr()->get_rs_z();
+    res &= inp_rs->rs_in_place == mctx->get_recr()->get_rs_in_place();
 
     return res;
 }
@@ -1430,6 +1433,7 @@ bool llm_graph_input_mem_hybrid_iswa::can_reuse(const llm_graph_params & params)
 
     res &= inp_rs->head == mctx->get_recr()->get_head();
     res &= inp_rs->rs_z == mctx->get_recr()->get_rs_z();
+    res &= inp_rs->rs_in_place == mctx->get_recr()->get_rs_in_place();
 
     return res;
 }
@@ -1517,6 +1521,7 @@ bool llm_graph_input_mem_hybrid_iswa_rel::can_reuse(const llm_graph_params & par
 
     res &= inp_rs->head == mctx->get_recr()->get_head();
     res &= inp_rs->rs_z == mctx->get_recr()->get_rs_z();
+    res &= inp_rs->rs_in_place == mctx->get_recr()->get_rs_in_place();
 
     return res;
 }
@@ -2610,7 +2615,7 @@ ggml_tensor * llm_graph_context::build_moe_ffn(
                         const float limit = hparams.swiglu_clamp_exp[il];
                         constexpr float eps = 1e-6f;
                         if (limit > eps) {
-                            if (arch == LLM_ARCH_MAPLE || arch == LLM_ARCH_DEEPSEEK4 || arch == LLM_ARCH_DEEPSEEK41 || arch == LLM_ARCH_GLM5_NEXT || (arch == LLM_ARCH_DFLASH && hparams.dsv4_hc_mult > 0) || arch == LLM_ARCH_HY_V4) {
+                            if (arch == LLM_ARCH_MAPLE || arch == LLM_ARCH_DEEPSEEK4 || arch == LLM_ARCH_DEEPSEEK41 || arch == LLM_ARCH_GLM5_NEXT || (arch == LLM_ARCH_DFLASH && hparams.dsv4_hc_mult > 0) || arch == LLM_ARCH_HY_V4 || arch == LLM_ARCH_HY_V4_FLASH) {
                                 cur = ggml_swiglu_clamp(ctx0, cur, up, limit);
                             } else {
                                 up = ggml_clamp(ctx0, up, -limit, limit);
@@ -3149,7 +3154,9 @@ ggml_tensor * llm_graph_context::build_attn_mha(
          ggml_tensor * v_mla,
              int64_t   n_kv_max,
                float   kq_scale,
-                 int   il) const {
+                 int   il,
+         ggml_tensor * bias_table,
+         ggml_tensor * bias_indices) const {
     const bool v_trans = v->nb[1] > v->nb[2];
 
     // split the batch into streams if needed
@@ -3164,12 +3171,28 @@ ggml_tensor * llm_graph_context::build_attn_mha(
     k = ggml_permute(ctx0, k, 0, 2, 1, 3);
     v = ggml_permute(ctx0, v, 0, 2, 1, 3);
 
+    auto dense_bias_mask = [&]() {
+        ggml_tensor * table = ggml_cont(ctx0, ggml_permute(ctx0, bias_table, 1, 0, 2, 3));
+        ggml_tensor * bias = ggml_get_rows(ctx0, table, bias_indices);
+        bias = ggml_reshape_4d(ctx0, bias, q->ne[2], bias_indices->ne[0], q->ne[1], n_stream);
+        bias = ggml_cont(ctx0, ggml_permute(ctx0, bias, 2, 0, 1, 3));
+        cb(bias, "kq_b", il);
+
+        ggml_tensor * mask = kq_mask->type == GGML_TYPE_F32 ? kq_mask : ggml_cast(ctx0, kq_mask, GGML_TYPE_F32);
+        mask = ggml_add(ctx0, bias, mask);
+        if (cparams.flash_attn) {
+            mask = ggml_cast(ctx0, mask, GGML_TYPE_F16);
+        }
+        cb(mask, "kq_mask_rel_pos", il);
+        return mask;
+    };
+
     ggml_tensor * cur;
 
     const bool use_flash_attn = cparams.flash_attn && kq_b == nullptr;
     GGML_ASSERT(use_flash_attn || kv_rows == nullptr);
     if (use_flash_attn) {
-        GGML_ASSERT(kq_b == nullptr && "Flash attention does not support KQ bias yet");
+        GGML_ASSERT(kq_b == nullptr && "Flash attention does not support dense KQ bias");
 
         if (v_trans) {
             v = ggml_transpose(ctx0, v);
@@ -3198,6 +3221,16 @@ ggml_tensor * llm_graph_context::build_attn_mha(
         ggml_flash_attn_ext_set_n_kv_max(cur, static_cast<int32_t>(n_kv_max));
         ggml_prec_set_acc(cur, GGML_PREC_F32);
 
+        if (bias_table) {
+            ggml_flash_attn_ext_add_indexed_bias(cur, bias_table, bias_indices);
+            auto * dev = model.dev_layer(il);
+            if ((!cparams.offload_kqv && ggml_backend_dev_type(dev) != GGML_BACKEND_DEVICE_TYPE_CPU) || !ggml_backend_dev_supports_op(dev, cur)) {
+                // Keep ordinary flash attention on the layer device.
+                ggml_flash_attn_ext_add_indexed_bias(cur, nullptr, nullptr);
+                cur->src[3] = dense_bias_mask();
+            }
+        }
+
         if (v_mla) {
 #if 0
             // v_mla can be applied as a matrix-vector multiplication with broadcasting across dimension 3 == n_tokens.
@@ -3217,6 +3250,9 @@ ggml_tensor * llm_graph_context::build_attn_mha(
 
         cur = ggml_reshape_2d(ctx0, cur, cur->ne[0]*cur->ne[1], cur->ne[2]*cur->ne[3]);
     } else {
+        if (bias_table) {
+            kq_mask = dense_bias_mask();
+        }
         ggml_tensor * kq = ggml_mul_mat(ctx0, k, q);
         cb(kq, "kq", il);
 
@@ -3726,7 +3762,9 @@ static ggml_tensor * build_attn_iswa_impl(
         ggml_tensor * sinks,
         ggml_tensor * v_mla,
             float     kq_scale,
-            int       il) {
+            int       il,
+        ggml_tensor * bias_table = nullptr,
+        ggml_tensor * bias_indices = nullptr) {
     ggml_context * ctx0 = gctx.ctx0;
     ggml_cgraph  * gf   = gctx.gf;
 
@@ -3792,7 +3830,7 @@ static ggml_tensor * build_attn_iswa_impl(
     ggml_tensor * k = use_kv_cur ? k_cur : mctx_cur->get_k(ctx0, il);
     ggml_tensor * v = use_kv_cur ? v_cur : mctx_cur->get_v(ctx0, il);
 
-    ggml_tensor * cur = gctx.build_attn_mha(q, k, v, kq_b, kq_mask, kv_rows, sinks, v_mla, 0, kq_scale, il);
+    ggml_tensor * cur = gctx.build_attn_mha(q, k, v, kq_b, kq_mask, kv_rows, sinks, v_mla, 0, kq_scale, il, bias_table, bias_indices);
     cur = build_attn_scale_kv_output(ctx0, mctx_cur, cur, il);
     gctx.cb(cur, "kqv_out", il);
 
@@ -4135,7 +4173,9 @@ ggml_tensor * llm_graph_context::build_rs(
            uint32_t   rs_head,
            uint32_t   rs_size,
             int32_t   rs_zero,
-        const llm_graph_get_rows_fn & get_state_rows) const {
+        const llm_graph_get_rows_fn & get_state_rows,
+               bool   in_place,
+               bool   from_cache) const {
 
     GGML_UNUSED(rs_size);
     ggml_tensor * states = ggml_reshape_2d(ctx0, s, state_size, s->ne[1]);
@@ -4153,9 +4193,22 @@ ggml_tensor * llm_graph_context::build_rs(
 
     ggml_tensor * states_all = ggml_get_rows(ctx0, states, state_copy);
 
-    ggml_tensor * output_states = get_state_rows ?
-        get_state_rows(ctx0, states, state_copy_main) :
-        ggml_view_2d(ctx0, states_all, state_size, n_seqs, states_all->nb[1], 0);
+    ggml_tensor * output_states;
+    if (get_state_rows) {
+        output_states = get_state_rows(ctx0, states, state_copy_main);
+    } else if (!from_cache) {
+        // rollback snapshots: the states are never in place, so the readers read the gathered states directly
+        output_states = ggml_view_2d(ctx0, states_all, state_size, n_seqs, states_all->nb[1], 0);
+    } else {
+        // move the gathered states into their cells, the readers then read them from the cache
+        // when the states are already in place the gather and the move have no rows, so the graph only changes in size
+        const int64_t n_move = in_place ? 0 : n_seqs;
+        ggml_build_forward_expand(gf, ggml_cpy(ctx0,
+                ggml_view_2d(ctx0, states_all, state_size, n_move, states_all->nb[1], 0),
+                ggml_view_2d(ctx0, states,     state_size, n_move, states->nb[1],     rs_head*states->nb[1])));
+        // view of the cache: all readers must run after the move and before the new states are stored over it
+        output_states = ggml_view_2d(ctx0, states, state_size, n_seqs, states->nb[1], rs_head*states->nb[1]);
+    }
     ggml_build_forward_expand(gf, output_states);
 
     // copy extra states which won't be changed further (between n_seqs and n_rs)
@@ -4189,6 +4242,9 @@ static std::unique_ptr<llm_graph_input_rs> build_rs_inp_impl(
 
     inp->head = mctx_cur->get_head();
     inp->rs_z = mctx_cur->get_rs_z();
+
+    inp->rs_in_place = mctx_cur->get_rs_in_place();
+    inp->s_copy_rows = ggml_view_1d(ctx0, inp->s_copy, inp->rs_in_place ? 0 : n_rs, 0);
 
     inp->has_rep = mctx_cur->get_rs_replay();
     if (inp->has_rep) {
@@ -4231,16 +4287,23 @@ ggml_tensor * llm_graph_context::build_rs(
         ggml_tensor * s,
             int32_t   state_size,
             int32_t   n_seqs,
-        const llm_graph_get_rows_fn & get_state_rows) const {
+        const llm_graph_get_rows_fn & get_state_rows,
+               bool   gathered) const {
     const auto * kv_state = inp->mctx;
+
+    const bool in_place = inp->rs_in_place && !get_state_rows && !gathered;
+
+    // the snapshot mode is fixed per context, so the graph shape is stable
+    const bool from_cache = !gathered && !kv_state->get_rs_snapshots();
+    GGML_ASSERT(get_state_rows || !from_cache || s->type == GGML_TYPE_F32); // the states are read from the cache, the gather is F32
 
     // a custom getter reads the states of the ubatch straight from the cache, so the gather skips the first
     // state: it still holds the n_rs - n_seqs extra states and copies no state of a single sequence ubatch
-    ggml_tensor * state_copy = get_state_rows ? inp->s_copy_tail : inp->s_copy;
+    ggml_tensor * state_copy = get_state_rows ? inp->s_copy_tail : from_cache ? inp->s_copy_rows : inp->s_copy;
 
     return build_rs(s, state_copy, inp->s_copy_main, state_size, n_seqs,
                     kv_state->get_n_rs(), kv_state->get_head(), kv_state->get_size(), kv_state->get_rs_z(),
-                    get_state_rows);
+                    get_state_rows, in_place, from_cache);
 }
 
 void llm_graph_context::build_conv_state_store(
@@ -4455,7 +4518,7 @@ ggml_tensor * llm_graph_context::build_attn(
         ggml_tensor * q_cur,
         ggml_tensor * k_cur,
         ggml_tensor * v_cur,
-        ggml_tensor * kq_b,
+        ggml_tensor * bias_table,
         ggml_tensor * sinks,
             float     kq_scale,
             int       il) const {
@@ -4465,22 +4528,11 @@ ggml_tensor * llm_graph_context::build_attn(
 
     const auto & attn_mask = is_swa ? inp_attn->self_attn_mask_swa : inp_attn->self_attn_mask;
 
-    // TODO: support kv_rows - fill the distances over the kv_rows cell lists and pass the rows to build_attn_mha,
-    //       needs a kv_rows flash attention with a per-head mask (CUDA has none)
     GGML_ASSERT(attn_mask.rows == nullptr);
+    ggml_tensor * indices = is_swa ? inp->self_rel_pos_swa : inp->self_rel_pos;
 
-    // a mask per head, in the dense layout of the input mask, which flash attention takes in F16
-    ggml_tensor * kq_mask = attn_mask.raw;
-    if (kq_mask->type != GGML_TYPE_F32) {
-        kq_mask = ggml_cast(ctx0, kq_mask, GGML_TYPE_F32);
-    }
-    kq_mask = ggml_add(ctx0, kq_b, kq_mask);
-    if (cparams.flash_attn) {
-        kq_mask = ggml_cast(ctx0, kq_mask, GGML_TYPE_F16);
-    }
-    cb(kq_mask, "kq_mask_rel_pos", il);
-
-    return build_attn_iswa_impl(*this, inp_attn, wo, wo_b, wo_s, q_cur, k_cur, v_cur, nullptr, kq_mask, nullptr, sinks, nullptr, kq_scale, il);
+    return build_attn_iswa_impl(*this, inp_attn, wo, wo_b, wo_s, q_cur, k_cur, v_cur, nullptr, attn_mask.raw, nullptr,
+            sinks, nullptr, kq_scale, il, bias_table, indices);
 }
 
 void llm_graph_context::build_dense_out(

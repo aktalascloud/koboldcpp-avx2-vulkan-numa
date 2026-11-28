@@ -1781,6 +1781,14 @@ def convert_json_to_gbnf(json_obj):
         print(f"JSON to GBNF failed: {e}")
         return ""
 
+def get_ollama_capabilities():
+    # capabilities reported by the Ollama-compatible /api/show endpoint.
+    # /api/chat supports tool calling, and images are accepted when a vision projector is available.
+    caps = ["completion", "tools"]
+    if has_vision_support or (autoswapmode and mmprojName is not None):
+        caps.append("vision")
+    return caps
+
 def get_capabilities():
     global savedata_obj, has_multiplayer, KcppVersion, friendlymodelname, friendlysdmodelname, fullsdmodelpath, password, fullwhispermodelpath, ttsmodelpath, embeddingsmodelpath, musicdiffusionmodelpath, musicllmmodelpath, has_audio_support, has_vision_support, mcp_connections
     global autoswapmode, textName, sttName, ttsName, embedName, musicName, imageName, mmprojName
@@ -5519,6 +5527,35 @@ def apply_forced_sysprompt(genparams, api_format):
     return genparams
 
 
+def apply_ollama_options(genparams):
+    # Map the sampler/length settings from an Ollama request's "options" object onto genparams.
+    # Shared by the Ollama /api/generate and /api/chat endpoints.
+    ollamaopts = genparams.get('options', {})
+    if not isinstance(ollamaopts, dict):
+        return
+    if "num_predict" in ollamaopts:
+        genparams["max_length"] = ollamaopts.get('num_predict', args.defaultgenamt)
+    if "num_ctx" in ollamaopts:
+        genparams["max_context_length"] = ollamaopts.get('num_ctx', maxctx)
+    if "temperature" in ollamaopts:
+        genparams["temperature"] = ollamaopts.get('temperature', 0.7)
+    if "top_k" in ollamaopts:
+        genparams["top_k"] = ollamaopts.get('top_k', 100)
+    if "top_p" in ollamaopts:
+        genparams["top_p"] = ollamaopts.get('top_p', 0.9)
+    if "seed" in ollamaopts:
+        genparams["sampler_seed"] = tryparseint(ollamaopts.get('seed', -1),-1)
+    if "stop" in ollamaopts:
+        stop_sequences = ollamaopts.get('stop')
+        if isinstance(stop_sequences, list):
+            # The transform appends template delimiters, so do not mutate the request's options list.
+            genparams["stop_sequence"] = list(stop_sequences)
+        elif isinstance(stop_sequences, str):
+            genparams["stop_sequence"] = [stop_sequences]
+        else:
+            genparams["stop_sequence"] = []
+
+
 def transform_genparams(genparams, api_format, use_jinja):
     global chatcompl_adapter, maxctx, thinkformats, cached_jinja_kwargs
 
@@ -5594,6 +5631,9 @@ ws ::= | " " | "\n" [ \t]{0,20}
         genparams["sampler_seed"] = tryparseint(genparams.get('seed', -1),-1)
         genparams["mirostat"] = genparams.get('mirostat_mode', 0)
 
+        if api_format==7: # ollama chat passes sampler settings inside "options", same as /api/generate
+            apply_ollama_options(genparams)
+
         if api_format==4 or api_format==7: #handle ollama chat here too
             if genparams.get("tools"):
                 genparams["tools"] = normalize_openai_tools_input(genparams["tools"])
@@ -5624,6 +5664,14 @@ ws ::= | " " | "\n" [ \t]{0,20}
             continue_assistant_turn = genparams.get('continue_assistant_turn', True)
             latest_turn_was_assistant = False
             latest_turn_was_tool = False
+
+            # ollama chat requests structured outputs via "format": either "json" or a JSON schema object
+            if api_format==7 and not genparams.get('response_format', None):
+                ollamaformat = genparams.get('format', None)
+                if isinstance(ollamaformat, str) and ollamaformat.lower() == "json":
+                    genparams['response_format'] = {"type": "json_object"}
+                elif isinstance(ollamaformat, dict) and ollamaformat:
+                    genparams['response_format'] = {"type": "json_schema", "json_schema": {"schema": ollamaformat}}
 
             # handle structured outputs
             respformat = genparams.get('response_format', None)
@@ -5869,23 +5917,14 @@ ws ::= | " " | "\n" [ \t]{0,20}
             utfprint("Ollama Context Error: " + str(e))
         ollamasysprompt = genparams.get('system', "")
         ollamabodyprompt = f"{detokstr}{user_message_start}{genparams.get('prompt', '')}{assistant_message_gen}"
-        ollamaopts = genparams.get('options', {})
-        if genparams.get('stop',[]) is not None:
-            genparams["stop_sequence"] = genparams.get('stop', [])
-        if "num_predict" in ollamaopts:
-            genparams["max_length"] = ollamaopts.get('num_predict', args.defaultgenamt)
-        if "num_ctx" in ollamaopts:
-            genparams["max_context_length"] = ollamaopts.get('num_ctx', maxctx)
-        if "temperature" in ollamaopts:
-            genparams["temperature"] = ollamaopts.get('temperature', 0.7)
-        if "top_k" in ollamaopts:
-            genparams["top_k"] = ollamaopts.get('top_k', 100)
-        if "top_p" in ollamaopts:
-            genparams["top_p"] = ollamaopts.get('top_p', 0.9)
-        if "seed" in ollamaopts:
-            genparams["sampler_seed"] = tryparseint(ollamaopts.get('seed', -1),-1)
-        if "stop" in ollamaopts:
-            genparams["stop_sequence"] = ollamaopts.get('stop', [])
+        ollama_stop = genparams.get('stop', [])
+        if isinstance(ollama_stop, list):
+            genparams["stop_sequence"] = list(ollama_stop)
+        elif isinstance(ollama_stop, str):
+            genparams["stop_sequence"] = [ollama_stop]
+        else:
+            genparams["stop_sequence"] = []
+        apply_ollama_options(genparams)
         genparams["stop_sequence"].append(user_message_start.strip())
         genparams["stop_sequence"].append(assistant_message_start.strip())
         genparams["trim_stop"] = True
@@ -8771,7 +8810,7 @@ Change Mode<br>
             response_body = (json.dumps({"message": "Settings successfully applied"}).encode())
 
         elif clean_path=="/api/show": #ollama compatible
-            response_body = (json.dumps({"parameters":"temperature 1.0","license":"Ollama Emulation. Running on KoboldCpp","modelfile":"KoboldCpp","capabilities":["completion"],"modified_at":"2025-01-01T01:00:00.0000000+00:00","details":{},"model_info":{}}).encode())
+            response_body = (json.dumps({"parameters":"temperature 1.0","license":"Ollama Emulation. Running on KoboldCpp","modelfile":"KoboldCpp","capabilities":get_ollama_capabilities(),"modified_at":"2025-01-01T01:00:00.0000000+00:00","details":{},"model_info":{}}).encode())
 
         elif clean_path=="/mcp": #simple mcp proxy
             if not self.secure_endpoint():
